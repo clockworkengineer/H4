@@ -68,6 +68,10 @@ namespace H4
         {
         public:
             std::string string;
+            BNodeString(std::string string)
+            {
+                this->string = string;
+            }
         };
 
         // ============

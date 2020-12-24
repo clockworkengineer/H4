@@ -53,18 +53,30 @@ namespace H4
 
     std::unique_ptr<Bencode::BNode> Bencode::decode(const char *toDecode)
     {
-        int position=0;
         std::string workBuffer;
-        switch (toDecode[position])
+        switch (*toDecode)
         {
         case 'i':
-            while(std::isdigit(toDecode[++position])) {
-                workBuffer += toDecode[position];
+            toDecode++;
+            while (std::isdigit(*toDecode))
+            {
+                workBuffer += *toDecode++;
             }
             return (std::make_unique<Bencode::BNodeNumber>(BNodeNumber(workBuffer)));
         default:
-            return (std::make_unique<Bencode::BNodeString>(BNodeString()));
+            while (std::isdigit(*toDecode))
+            {
+                workBuffer += *toDecode++;
+            }
+            toDecode++;
+            int stringLength = std::stoi(workBuffer);
+            workBuffer.clear();
+            while (stringLength-- > 0)
+            {
+                workBuffer += *toDecode++;
+            }
+            return (std::make_unique<Bencode::BNodeString>(BNodeString(workBuffer)));
         }
-    } 
+    }
 
 } // namespace H4
