@@ -1,21 +1,42 @@
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-#include "LinkedList.h"
+#include "Bencode.hpp"
 
-SCENARIO("elements can be added to the end of a LinkedList", "[linkedlist]") {
-    GIVEN("an empty LinkedList") {
-        LinkedList<int> list;
+using namespace H4;
 
-        WHEN("an element is added") {
-            list.add(4);
+TEST_CASE("Creation and use of Bencode for decode of simple types", "[Bencode]")
+{
+  Bencode bEncode;
 
-            THEN("the length increases by 1") {
-                REQUIRE(list.length() == 1);
-            }
+  SECTION("Decode an integer", "[Bencode]")
+  {
+    std::unique_ptr<Bencode::BNode> bNodeNumber = bEncode.decode("i266e");
+    REQUIRE(dynamic_cast<Bencode::BNodeNumber *>(bNodeNumber.get()) != nullptr);
+  }
 
-            THEN("the element is added at index 0") {
-                REQUIRE(list.get(0) == 4);
-            }
-        }
-    }
+  SECTION("Decode an string", "[Bencode]")
+  {
+    std::unique_ptr<Bencode::BNode> bNodeString = bEncode.decode("12:qwertyuiopas");
+    REQUIRE(dynamic_cast<Bencode::BNodeString *>(bNodeString.get()) != nullptr);
+  }
+
+  SECTION("Decode an integer and check value", "[Bencode]")
+  {
+    std::unique_ptr<Bencode::BNode> bNodeNumber = bEncode.decode("i266e");
+    Bencode::BNodeNumber *pBNodeNumber = (Bencode::BNodeNumber *)bNodeNumber.get();
+    REQUIRE(pBNodeNumber->number == "266");
+  }
+
+  SECTION("Decode an integer and check value", "[Bencode]")
+  {
+    std::unique_ptr<Bencode::BNode> bNodeNumber = bEncode.decode("i1000e");
+    Bencode::BNodeNumber *pBNodeNumber = (Bencode::BNodeNumber *)bNodeNumber.get();
+    REQUIRE(pBNodeNumber->number == "1000");
+  }
+
+  SECTION("Decode an string", "[Bencode]")
+  {
+    std::unique_ptr<Bencode::BNode> bNodeString = bEncode.decode("12:qwertyuiopas");
+    Bencode::BNodeString *pBNodeString = (Bencode::BNodeString *)bNodeString.get();
+    REQUIRE(pBNodeString->string == "qwertyuiopas");
+  }
 }
