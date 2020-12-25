@@ -89,8 +89,7 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
     {
       numbers.push_back(((Bencode::BNodeNumber *)bNode.get())->number);
     }
-    std::vector<long> expected{266, 6780, 88};
-    REQUIRE(numbers == expected);
+    REQUIRE(numbers == std::vector<long> {266, 6780, 88});
   }
 
   SECTION("Decode an list of strings and check values", "[Bencode]")
@@ -101,8 +100,7 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
     {
       strings.push_back(((Bencode::BNodeString *)bNode.get())->string);
     }
-    std::vector<std::string> expected{"sillyy", "poiuytrewqas", "abcdefghijklmnopqrstuvwxyz"};
-    REQUIRE(strings == expected);
+    REQUIRE(strings == std::vector<std::string> {"sillyy", "poiuytrewqas", "abcdefghijklmnopqrstuvwxyz"});
   }
 
   SECTION("Decode an Dictionary of ints and check values", "[Bencode]")
@@ -113,8 +111,7 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
     {
       entries[bNode.first] = ((Bencode::BNodeNumber *)bNode.second.get())->number;
     }
-    std::map<std::string, long> expected{{"one", 1}, {"two", 2}, {"three", 3}};
-    REQUIRE(entries == expected);
+    REQUIRE(entries == std::map<std::string, long> {{"one", 1}, {"two", 2}, {"three", 3}});
   }
 
   SECTION("Decode a Dictionary of strings and check values", "[Bencode]")
@@ -125,7 +122,6 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
     {
       entries[bNode.first] = ((Bencode::BNodeString *)bNode.second.get())->string;
     }
-    std::map<std::string, std::string> expected{{"one", "0123456789"}, {"two", "qwerty"}, {"three", "asdfghjkl"}};
-    REQUIRE(entries == expected);
+    REQUIRE(entries == std::map<std::string, std::string> {{"one", "0123456789"}, {"two", "qwerty"}, {"three", "asdfghjkl"}});
   }
 }
