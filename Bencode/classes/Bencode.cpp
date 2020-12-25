@@ -47,36 +47,56 @@ namespace H4
     // PRIVATE METHODS
     // ===============
 
+    std::unique_ptr<Bencode::BNode> Bencode::decodeToBNode()
+    {
+
+        switch (*m_decodeBuffer)
+        {
+        case 'd':
+            return (std::make_unique<Bencode::BNodeDictionary>(BNodeDictionary()));
+        case 'l':
+        {
+            m_decodeBuffer++;
+            Bencode::BNodeList bNodeList;
+            while (*m_decodeBuffer != 'e')
+            {
+                bNodeList.list.push_back(decodeToBNode());
+            }
+            return (std::make_unique<Bencode::BNodeList>(std::move(bNodeList)));
+        }
+        case 'i':
+            m_workBuffer.clear();
+            m_decodeBuffer++;
+            while (std::isdigit(*m_decodeBuffer))
+            {
+                m_workBuffer += *m_decodeBuffer++;
+            }
+            m_decodeBuffer++;
+            return (std::make_unique<Bencode::BNodeNumber>(BNodeNumber(m_workBuffer)));
+        default:
+            m_workBuffer.clear();
+            while (std::isdigit(*m_decodeBuffer))
+            {
+                m_workBuffer += *m_decodeBuffer++;
+            }
+            m_decodeBuffer++;
+            int stringLength = std::stoi(m_workBuffer);
+            m_workBuffer.clear();
+            while (stringLength-- > 0)
+            {
+                m_workBuffer += *m_decodeBuffer++;
+            }
+            return (std::make_unique<Bencode::BNodeString>(BNodeString(m_workBuffer)));
+        }
+    }
     // ==============
     // PUBLIC METHODS
     // ==============
 
     std::unique_ptr<Bencode::BNode> Bencode::decode(const char *toDecode)
     {
-        std::string workBuffer;
-        switch (*toDecode)
-        {
-        case 'i':
-            toDecode++;
-            while (std::isdigit(*toDecode))
-            {
-                workBuffer += *toDecode++;
-            }
-            return (std::make_unique<Bencode::BNodeNumber>(BNodeNumber(workBuffer)));
-        default:
-            while (std::isdigit(*toDecode))
-            {
-                workBuffer += *toDecode++;
-            }
-            toDecode++;
-            int stringLength = std::stoi(workBuffer);
-            workBuffer.clear();
-            while (stringLength-- > 0)
-            {
-                workBuffer += *toDecode++;
-            }
-            return (std::make_unique<Bencode::BNodeString>(BNodeString(workBuffer)));
-        }
+        m_decodeBuffer = toDecode;
+        return decodeToBNode();
     }
 
 } // namespace H4

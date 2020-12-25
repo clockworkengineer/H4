@@ -105,9 +105,15 @@ namespace H4
         // PRIVATE METHODS
         // ===============
 
+        std::unique_ptr<Bencode::BNode> decodeToBNode();
+
         // =================
         // PRIVATE VARIABLES
         // =================
+
+        std::string m_workBuffer;
+        const char *m_decodeBuffer;
+
     };
 
 } // namespace H4
