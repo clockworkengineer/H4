@@ -21,6 +21,8 @@
 // C++ STL
 //
 
+#include <stdexcept>
+
 // =========
 // NAMESPACE
 // =========
@@ -47,15 +49,24 @@ namespace H4
     // PRIVATE METHODS
     // ===============
 
-    std::string Bencode::decodeString()
+    inline long Bencode::decodeNumber()
     {
         m_workBuffer.clear();
         while (std::isdigit(*m_decodeBuffer))
         {
             m_workBuffer += *m_decodeBuffer++;
         }
+        return (std::stol(m_workBuffer));
+    }
+
+    inline std::string Bencode::decodeString()
+    {
+        int stringLength = decodeNumber();
+        if (*m_decodeBuffer != ':')
+        {
+            throw std::runtime_error("Missing terminating ':' on string length.");
+        }
         m_decodeBuffer++;
-        int stringLength = std::stoi(m_workBuffer);
         m_workBuffer.clear();
         while (stringLength-- > 0)
         {
@@ -72,13 +83,14 @@ namespace H4
         case 'd':
         {
             m_decodeBuffer++;
-            Bencode::BNodeDictionary bNodeDictionary;
+            Bencode::BNodeDict bNodeDictionary;
             while (*m_decodeBuffer != 'e')
             {
                 std::string key = decodeString();
                 bNodeDictionary.dict[key] = decodeToBNodes();
             }
-            return (std::make_unique<Bencode::BNodeDictionary>(std::move(bNodeDictionary)));
+            m_decodeBuffer++;
+            return (std::make_unique<Bencode::BNodeDict>(std::move(bNodeDictionary)));
         }
         case 'l':
         {
@@ -88,17 +100,20 @@ namespace H4
             {
                 bNodeList.list.push_back(decodeToBNodes());
             }
+            m_decodeBuffer++;
             return (std::make_unique<Bencode::BNodeList>(std::move(bNodeList)));
         }
         case 'i':
-            m_workBuffer.clear();
+        {
             m_decodeBuffer++;
-            while (std::isdigit(*m_decodeBuffer))
+            long number = decodeNumber();
+            if (*m_decodeBuffer != 'e')
             {
-                m_workBuffer += *m_decodeBuffer++;
+                throw std::runtime_error("Missing terminating 'e' on number.");
             }
             m_decodeBuffer++;
-            return (std::make_unique<Bencode::BNodeNumber>(BNodeNumber(m_workBuffer)));
+            return (std::make_unique<Bencode::BNodeNumber>(BNodeNumber(number)));
+        }
         default:
             return (std::make_unique<Bencode::BNodeString>(BNodeString(decodeString())));
         }

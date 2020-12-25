@@ -39,7 +39,7 @@ namespace H4
         /// <summary>
         /// Dictionary BNode.
         /// </summary>
-        struct BNodeDictionary : BNode
+        struct BNodeDict : BNode
         {
             std::map<std::string, std::unique_ptr<BNode>> dict;
         };
@@ -55,8 +55,8 @@ namespace H4
         /// </summary>
         struct BNodeNumber : BNode
         {
-            std::string number;
-            BNodeNumber(std::string number)
+            long number;
+            BNodeNumber(long number)
             {
                 this->number = number;
             }
@@ -105,6 +105,7 @@ namespace H4
         // PRIVATE METHODS
         // ===============
 
+        long decodeNumber();
         std::string decodeString();
         std::unique_ptr<Bencode::BNode> decodeToBNodes();
 
