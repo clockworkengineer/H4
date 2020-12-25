@@ -83,7 +83,7 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
 
   SECTION("Decode an Dictionary", "[Bencode]")
   {
-    std::unique_ptr<Bencode::BNode> bNodeDictionary = bEncode.decode("d3:onei1e3:twoi2e:5:threei3ee");
+    std::unique_ptr<Bencode::BNode> bNodeDictionary = bEncode.decode("d3:onei1e3:twoi2e5:threei3ee");
     REQUIRE(dynamic_cast<Bencode::BNodeDictionary *>(bNodeDictionary.get()) != nullptr);
   }
 
@@ -111,5 +111,20 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
     }
     std::vector<std::string> expected{"sillyy", "poiuytrewqas", "abcdefghijklmnopqrstuvwxyz"};
     REQUIRE(strings == expected);
+  }
+
+
+  SECTION("Decode an Dictionary of ints and check values", "[Bencode]")
+  {
+    std::unique_ptr<Bencode::BNode> bNodeDictionary = bEncode.decode("d3:onei1e3:twoi2e5:threei3ee");
+    Bencode::BNodeDictionary *pBNodeDictionary = (Bencode::BNodeDictionary *)bNodeDictionary.get();
+    std::map<std::string, std::string> entries;
+    for (const auto &bNode : pBNodeDictionary->dict)
+    {
+       Bencode::BNodeNumber *pBNodeNumber = (Bencode::BNodeNumber *)bNode.second.get();
+       entries[bNode.first] = pBNodeNumber->number;
+    }
+    std::map<std::string, std::string> expected{ {"one","1"}, { "two", "2"}, {"three","3"}};
+    REQUIRE(entries == expected);
   }
 }

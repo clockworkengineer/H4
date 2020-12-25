@@ -47,20 +47,46 @@ namespace H4
     // PRIVATE METHODS
     // ===============
 
-    std::unique_ptr<Bencode::BNode> Bencode::decodeToBNode()
+    std::string Bencode::decodeString()
+    {
+        m_workBuffer.clear();
+        while (std::isdigit(*m_decodeBuffer))
+        {
+            m_workBuffer += *m_decodeBuffer++;
+        }
+        m_decodeBuffer++;
+        int stringLength = std::stoi(m_workBuffer);
+        m_workBuffer.clear();
+        while (stringLength-- > 0)
+        {
+            m_workBuffer += *m_decodeBuffer++;
+        }
+        return (m_workBuffer);
+    }
+
+    std::unique_ptr<Bencode::BNode> Bencode::decodeToBNodes()
     {
 
         switch (*m_decodeBuffer)
         {
         case 'd':
-            return (std::make_unique<Bencode::BNodeDictionary>(BNodeDictionary()));
+        {
+            m_decodeBuffer++;
+            Bencode::BNodeDictionary bNodeDictionary;
+            while (*m_decodeBuffer != 'e')
+            {
+                std::string key = decodeString();
+                bNodeDictionary.dict[key] = decodeToBNodes();
+            }
+            return (std::make_unique<Bencode::BNodeDictionary>(std::move(bNodeDictionary)));
+        }
         case 'l':
         {
             m_decodeBuffer++;
             Bencode::BNodeList bNodeList;
             while (*m_decodeBuffer != 'e')
             {
-                bNodeList.list.push_back(decodeToBNode());
+                bNodeList.list.push_back(decodeToBNodes());
             }
             return (std::make_unique<Bencode::BNodeList>(std::move(bNodeList)));
         }
@@ -74,19 +100,7 @@ namespace H4
             m_decodeBuffer++;
             return (std::make_unique<Bencode::BNodeNumber>(BNodeNumber(m_workBuffer)));
         default:
-            m_workBuffer.clear();
-            while (std::isdigit(*m_decodeBuffer))
-            {
-                m_workBuffer += *m_decodeBuffer++;
-            }
-            m_decodeBuffer++;
-            int stringLength = std::stoi(m_workBuffer);
-            m_workBuffer.clear();
-            while (stringLength-- > 0)
-            {
-                m_workBuffer += *m_decodeBuffer++;
-            }
-            return (std::make_unique<Bencode::BNodeString>(BNodeString(m_workBuffer)));
+            return (std::make_unique<Bencode::BNodeString>(BNodeString(decodeString())));
         }
     }
     // ==============
@@ -96,7 +110,7 @@ namespace H4
     std::unique_ptr<Bencode::BNode> Bencode::decode(const char *toDecode)
     {
         m_decodeBuffer = toDecode;
-        return decodeToBNode();
+        return decodeToBNodes();
     }
 
 } // namespace H4
