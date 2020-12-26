@@ -86,8 +86,8 @@ namespace H4
         // PUBLIC METHODS
         // ==============
 
-        std::unique_ptr<Bencode::BNode> decode(const char *toDecode);
-        std::string encode(std::unique_ptr<Bencode::BNode> bNodeRoot);
+        std::unique_ptr<BNode> decode(const char *toDecode);
+        std::string encode(std::unique_ptr<BNode> bNodeRoot);
 
         // ================
         // PUBLIC VARIABLES
@@ -108,7 +108,8 @@ namespace H4
 
         long decodeNumber();
         std::string decodeString();
-        std::unique_ptr<Bencode::BNode> decodeToBNodes();
+        std::unique_ptr<BNode> decodeToBNodes();
+        std::string encodeFromBNodes(BNode *bNode);
 
         // =================
         // PRIVATE VARIABLES
@@ -118,6 +119,9 @@ namespace H4
         const char *m_decodeBuffer;
     };
 
+    //
+    // Shortcuts for node structure
+    //
     using BNode = Bencode::BNode;
     using BNodeNumber = Bencode::BNodeNumber;
     using BNodeString = Bencode::BNodeString;

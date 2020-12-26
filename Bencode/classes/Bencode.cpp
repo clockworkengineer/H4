@@ -75,7 +75,7 @@ namespace H4
         return (m_workBuffer);
     }
 
-    std::unique_ptr<Bencode::BNode> Bencode::decodeToBNodes()
+    std::unique_ptr<BNode> Bencode::decodeToBNodes()
     {
 
         switch (*m_decodeBuffer)
@@ -83,25 +83,25 @@ namespace H4
         case 'd':
         {
             m_decodeBuffer++;
-            Bencode::BNodeDict bNodeDictionary;
+            BNodeDict bNodeDictionary;
             while (*m_decodeBuffer != 'e')
             {
                 std::string key = decodeString();
                 bNodeDictionary.dict[key] = decodeToBNodes();
             }
             m_decodeBuffer++;
-            return (std::make_unique<Bencode::BNodeDict>(std::move(bNodeDictionary)));
+            return (std::make_unique<BNodeDict>(std::move(bNodeDictionary)));
         }
         case 'l':
         {
             m_decodeBuffer++;
-            Bencode::BNodeList bNodeList;
+            BNodeList bNodeList;
             while (*m_decodeBuffer != 'e')
             {
                 bNodeList.list.push_back(decodeToBNodes());
             }
             m_decodeBuffer++;
-            return (std::make_unique<Bencode::BNodeList>(std::move(bNodeList)));
+            return (std::make_unique<BNodeList>(std::move(bNodeList)));
         }
         case 'i':
         {
@@ -112,34 +112,50 @@ namespace H4
                 throw std::runtime_error("Missing terminating 'e' on number.");
             }
             m_decodeBuffer++;
-            return (std::make_unique<Bencode::BNodeNumber>(BNodeNumber(number)));
+            return (std::make_unique<BNodeNumber>(BNodeNumber(number)));
         }
         default:
-            return (std::make_unique<Bencode::BNodeString>(BNodeString(decodeString())));
+            return (std::make_unique<BNodeString>(BNodeString(decodeString())));
         }
     }
+
+    std::string Bencode::encodeFromBNodes(BNode *bNode)
+    {
+        if (dynamic_cast<BNodeList *>(bNode) != nullptr)
+        {
+            std::string result = "l";
+            for (auto &bNodeEntry : ((BNodeList *)bNode)->list)
+            {
+                result += encodeFromBNodes(bNodeEntry.get());
+            }
+            result += "e";
+            return (result);
+        }
+        if (dynamic_cast<BNodeNumber *>(bNode) != nullptr)
+        {
+            return ("i" + std::to_string(((BNodeNumber *)(bNode))->number) + "e");
+        }
+        if (dynamic_cast<BNodeString *>(bNode) != nullptr)
+        {
+            std::string stringToEncode = ((BNodeString *)(bNode))->string;
+            return (std::to_string((int)stringToEncode.length()) + ":" + stringToEncode);
+        }
+        return ("");
+    }
+
     // ==============
     // PUBLIC METHODS
     // ==============
 
-    std::unique_ptr<Bencode::BNode> Bencode::decode(const char *toDecode)
+    std::unique_ptr<BNode> Bencode::decode(const char *toDecode)
     {
         m_decodeBuffer = toDecode;
         return decodeToBNodes();
     }
 
-    std::string Bencode::encode(std::unique_ptr<Bencode::BNode> bNode)
+    std::string Bencode::encode(std::unique_ptr<BNode> bNode)
     {
-        if (dynamic_cast<Bencode::BNodeNumber *>(bNode.get()) != nullptr)
-        {
-            return ("i" + std::to_string(((Bencode::BNodeNumber *)(bNode.get()))->number) + "e");
-        }
-        if (dynamic_cast<Bencode::BNodeString *>(bNode.get()) != nullptr)
-        {
-            std::string stringToEncode = ((Bencode::BNodeString *)(bNode.get()))->string;
-            return (std::to_string( (int) stringToEncode.length())+":"+stringToEncode);
-        }
-        return ("");
+        return(encodeFromBNodes(bNode.get()));
     }
 
 } // namespace H4

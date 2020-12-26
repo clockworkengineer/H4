@@ -173,5 +173,28 @@ TEST_CASE("Creation and use of Bencode for encode of a table of string test data
 
   Bencode bEncode;
   std::string actual = bEncode.encode(std::make_unique<BNodeString>(BNodeString(test_input)));
-  REQUIRE(actual== expected);
+  REQUIRE(actual == expected);
+}
+
+TEST_CASE("Creation and use of Bencode for encode of collection types (list, dictionary) ", "[Bencode][Encode]")
+{
+  Bencode bEncode;
+
+  SECTION("Encode an List of integers('li266ei6780ei88ee') and check value", "[Bencode][Enecode]")
+  {
+    std::string expected = "li266ei6780ei88ee";
+    REQUIRE(bEncode.encode(bEncode.decode(expected.c_str())) == expected);
+  }
+
+  SECTION("Encode an List of strings ('l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze') and check value", "[Bencode][Enecode]")
+  {
+    std::string expected = "l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze";
+    REQUIRE(bEncode.encode(bEncode.decode(expected.c_str())) == expected);
+  }
+
+  // SECTION("Encode an Dictionary", "[Bencode][Decode]")
+  // {
+  //   std::unique_ptr<BNode> bNodeDict = bEncode.decode("d3:onei1e3:twoi2e5:threei3ee");
+  //   REQUIRE(dynamic_cast<BNodeDict *>(bNodeDict.get()) != nullptr);
+  // }
 }
