@@ -118,6 +118,11 @@ namespace H4
         const char *m_decodeBuffer;
     };
 
-} // namespace H4
+    using BNode = Bencode::BNode;
+    using BNodeNumber = Bencode::BNodeNumber;
+    using BNodeString = Bencode::BNodeString;
+    using BNodeList = Bencode::BNodeList;
+    using BNodeDict = Bencode::BNodeDict;
 
+} // namespace H4
 #endif /* BENCODE_HPP */
