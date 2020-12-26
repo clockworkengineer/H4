@@ -128,4 +128,18 @@ namespace H4
         return decodeToBNodes();
     }
 
+    std::string Bencode::encode(std::unique_ptr<Bencode::BNode> bNode)
+    {
+        if (dynamic_cast<Bencode::BNodeNumber *>(bNode.get()) != nullptr)
+        {
+            return ("i" + std::to_string(((Bencode::BNodeNumber *)(bNode.get()))->number) + "e");
+        }
+        if (dynamic_cast<Bencode::BNodeString *>(bNode.get()) != nullptr)
+        {
+            std::string stringToEncode = ((Bencode::BNodeString *)(bNode.get()))->string;
+            return (std::to_string( (int) stringToEncode.length())+":"+stringToEncode);
+        }
+        return ("");
+    }
+
 } // namespace H4

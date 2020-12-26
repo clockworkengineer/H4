@@ -87,6 +87,7 @@ namespace H4
         // ==============
 
         std::unique_ptr<Bencode::BNode> decode(const char *toDecode);
+        std::string encode(std::unique_ptr<Bencode::BNode> bNodeRoot);
 
         // ================
         // PUBLIC VARIABLES
