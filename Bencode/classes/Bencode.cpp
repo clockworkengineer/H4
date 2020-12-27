@@ -121,6 +121,17 @@ namespace H4
 
     std::string Bencode::encodeFromBNodes(BNode *bNode)
     {
+        if (dynamic_cast<BNodeDict *>(bNode) != nullptr)
+        {
+            std::string result = "d";
+            for (auto &bNodeEntry : ((BNodeDict *)bNode)->dict)
+            {
+                result += std::to_string(bNodeEntry.first.length())+":"+bNodeEntry.first;
+                result += encodeFromBNodes(bNodeEntry.second.get());
+            }
+            result += "e";
+            return (result);
+        }
         if (dynamic_cast<BNodeList *>(bNode) != nullptr)
         {
             std::string result = "l";
@@ -155,7 +166,7 @@ namespace H4
 
     std::string Bencode::encode(std::unique_ptr<BNode> bNode)
     {
-        return(encodeFromBNodes(bNode.get()));
+        return (encodeFromBNodes(bNode.get()));
     }
 
 } // namespace H4

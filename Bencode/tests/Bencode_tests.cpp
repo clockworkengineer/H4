@@ -77,7 +77,7 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
 
   SECTION("Decode an Dictionary", "[Bencode][Decode]")
   {
-    std::unique_ptr<BNode> bNodeDict = bEncode.decode("d3:onei1e3:twoi2e5:threei3ee");
+    std::unique_ptr<BNode> bNodeDict = bEncode.decode("d3:onei1e5:threei3e3:twoi2ee");
     REQUIRE(dynamic_cast<BNodeDict *>(bNodeDict.get()) != nullptr);
   }
 
@@ -105,7 +105,7 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
 
   SECTION("Decode an Dictionary of ints and check values", "[Bencode][Decode]")
   {
-    std::unique_ptr<BNode> bNodeDict = bEncode.decode("d3:onei1e3:twoi2e5:threei3ee");
+    std::unique_ptr<BNode> bNodeDict = bEncode.decode("d3:onei1e5:threei3e3:twoi2ee");
     std::map<std::string, long> entries;
     for (const auto &bNode : ((BNodeDict *)bNodeDict.get())->dict)
     {
@@ -116,13 +116,13 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
 
   SECTION("Decode a Dictionary of strings and check values", "[Bencode][Decode]")
   {
-    std::unique_ptr<BNode> bNodeDict = bEncode.decode("d3:one10:01234567893:two6:qwerty5:three9:asdfghjkle");
+    std::unique_ptr<BNode> bNodeDict = bEncode.decode("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle");
     std::map<std::string, std::string> entries;
     for (const auto &bNode : ((BNodeDict *)bNodeDict.get())->dict)
     {
       entries[bNode.first] = ((BNodeString *)bNode.second.get())->string;
     }
-    REQUIRE(entries == std::map<std::string, std::string>{{"one", "0123456789"}, {"two", "qwerty"}, {"three", "asdfghjkl"}});
+    REQUIRE(entries == std::map<std::string, std::string>{{"one", "0123456789"}, {"two", "asdfghjkl"}, {"three", "qwerty"}});
   }
 }
 
@@ -180,21 +180,27 @@ TEST_CASE("Creation and use of Bencode for encode of collection types (list, dic
 {
   Bencode bEncode;
 
-  SECTION("Encode an List of integers('li266ei6780ei88ee') and check value", "[Bencode][Enecode]")
+  SECTION("Encode an List of integers('li266ei6780ei88ee') and check value", "[Bencode][Encode]")
   {
     std::string expected = "li266ei6780ei88ee";
     REQUIRE(bEncode.encode(bEncode.decode(expected.c_str())) == expected);
   }
 
-  SECTION("Encode an List of strings ('l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze') and check value", "[Bencode][Enecode]")
+  SECTION("Encode an List of strings ('l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze') and check value", "[Bencode][Encode]")
   {
     std::string expected = "l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze";
     REQUIRE(bEncode.encode(bEncode.decode(expected.c_str())) == expected);
   }
 
-  // SECTION("Encode an Dictionary", "[Bencode][Decode]")
-  // {
-  //   std::unique_ptr<BNode> bNodeDict = bEncode.decode("d3:onei1e3:twoi2e5:threei3ee");
-  //   REQUIRE(dynamic_cast<BNodeDict *>(bNodeDict.get()) != nullptr);
-  // }
+  SECTION("Encode an Dictionary of integers and check balue", "[Bencode][Encode]")
+  {
+    std::string expected = "d3:onei1e5:threei3e3:twoi2ee";
+    REQUIRE(bEncode.encode(bEncode.decode(expected.c_str())) == expected);
+  }
+
+    SECTION("Encode an Dictionary of strings and check balue", "[Bencode][Encode]")
+  {
+    std::string expected = "d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle";
+    REQUIRE(bEncode.encode(bEncode.decode(expected.c_str())) == expected);
+  }
 }
