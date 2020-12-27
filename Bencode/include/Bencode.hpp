@@ -6,6 +6,7 @@
 //
 
 #include <string>
+#include<string_view>
 #include <map>
 #include <vector>
 #include <list>
@@ -116,7 +117,7 @@ namespace H4
         // =================
 
         std::string m_workBuffer;
-        const char *m_decodeBuffer;
+        std::string_view m_decodeBuffer;
     };
 
     //
