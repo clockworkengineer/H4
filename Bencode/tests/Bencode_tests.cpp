@@ -204,4 +204,14 @@ TEST_CASE("Creation and use of Bencode for encode of collection types (list, dic
     REQUIRE(bEncode.encode(bEncode.decode(expected.c_str())) == expected);
   }
 }
+TEST_CASE("Encode/Decode generated exceptions", "[Bencode][Exceptions]")
+{
+  Bencode bEncode;
+
+  SECTION("Decode an integer without an end", "[Bencode][Decode]")
+  {
+    REQUIRE_THROWS_AS( [&]() {std::unique_ptr<BNode> bNodeNumber = bEncode.decode("i266d"); }, std::runtime_error);
+   
+  }
+}
 
