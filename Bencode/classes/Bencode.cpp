@@ -1,8 +1,7 @@
 //
 // Class: Bencode
 //
-// Description: Class to perform Bencode string encode/decode either to/from
-// a byte buffer or file stream when needed.
+// Description: Class to perform Bencode encode/decode.
 //
 // Dependencies:   C17++ - Language standard features used.
 //
@@ -126,7 +125,7 @@ namespace H4
             std::string result = "d";
             for (auto &bNodeEntry : ((BNodeDict *)bNode)->dict)
             {
-                result += std::to_string(bNodeEntry.first.length())+":"+bNodeEntry.first;
+                result += std::to_string(bNodeEntry.first.length()) + ":" + bNodeEntry.first;
                 result += encodeFromBNodes(bNodeEntry.second.get());
             }
             result += "e";
@@ -151,7 +150,7 @@ namespace H4
             std::string stringToEncode = ((BNodeString *)(bNode))->string;
             return (std::to_string((int)stringToEncode.length()) + ":" + stringToEncode);
         }
-        return ("");
+        throw std::runtime_error("Unknown BNode type encountered during encode.");
     }
 
     // ==============

@@ -198,9 +198,10 @@ TEST_CASE("Creation and use of Bencode for encode of collection types (list, dic
     REQUIRE(bEncode.encode(bEncode.decode(expected.c_str())) == expected);
   }
 
-    SECTION("Encode an Dictionary of strings and check balue", "[Bencode][Encode]")
+  SECTION("Encode an Dictionary of strings and check balue", "[Bencode][Encode]")
   {
     std::string expected = "d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle";
     REQUIRE(bEncode.encode(bEncode.decode(expected.c_str())) == expected);
   }
 }
+
