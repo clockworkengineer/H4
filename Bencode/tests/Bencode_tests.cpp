@@ -225,27 +225,33 @@ TEST_CASE("Decode generated exceptions", "[Bencode][Decode][Exceptions]")
     REQUIRE_THROWS_WITH(bEncode.decode(""), "nullptr/empty string passed to be decoded.");
   }
 
-    SECTION("Decode an string without terminating ':' on its length", "[Bencode][Decode]")
+  SECTION("Decode an string without terminating ':' on its length", "[Bencode][Decode]")
   {
     REQUIRE_THROWS_AS(bEncode.decode("26abcdefghijklmnopqrstuvwxyz"), std::runtime_error);
     REQUIRE_THROWS_WITH(bEncode.decode("26abcdefghijklmnopqrstuvwxyz"), "Missing terminating ':' on string length.");
   }
 
-  SECTION("Decode an integer without an end", "[Bencode][Decode]")
+  SECTION("Decode an integer without a terminating end", "[Bencode][Decode]")
   {
     REQUIRE_THROWS_AS(bEncode.decode("i266"), std::runtime_error);
     REQUIRE_THROWS_WITH(bEncode.decode("i266"), "Missing terminating 'e' on integer.");
   }
 
-  SECTION("Decode an list without an end", "[Bencode][Decode]")
+  SECTION("Decode an list without a terminating end", "[Bencode][Decode]")
   {
     REQUIRE_THROWS_AS(bEncode.decode("li266ei6780ei88e"), std::runtime_error);
     REQUIRE_THROWS_WITH(bEncode.decode("li266ei6780ei88e"), "Missing terminating 'e' on list.");
   }
 
-  SECTION("Decode an diictionary without an end", "[Bencode][Decode]")
+  SECTION("Decode an diictionary without a terminating end", "[Bencode][Decode]")
   {
     REQUIRE_THROWS_AS(bEncode.decode("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkl"), std::runtime_error);
     REQUIRE_THROWS_WITH(bEncode.decode("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkl"), "Missing terminating 'e' on dictionary.");
+  }
+
+  SECTION("Decode an string that terminates prematurely", "[Bencode][Decode]")
+  {
+    REQUIRE_THROWS_AS(bEncode.decode("26:abcdefghijklmno"), std::runtime_error);
+    REQUIRE_THROWS_WITH(bEncode.decode("26:abcdefghijklmno"), "Decode buffer empty before decode complete.");
   }
 }

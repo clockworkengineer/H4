@@ -48,13 +48,28 @@ namespace H4
     // PRIVATE METHODS
     // ===============
 
+    inline unsigned char Bencode::currentByte() {
+        return (m_decodeBuffer[0]);
+    }
+
+    inline void Bencode::moveToNextByte() {
+        if (m_decodeBuffer.empty()) {
+            throw std::runtime_error("Decode buffer empty before decode complete.");
+        }
+        m_decodeBuffer.remove_prefix(1);
+    }
+
+    inline bool Bencode::bytesToDecode() {
+        return !m_decodeBuffer.empty();
+    }
+
     inline long Bencode::decodePositiveInteger()
     {
         m_workBuffer.clear();
-        while (!m_decodeBuffer.empty() && std::isdigit(m_decodeBuffer[0]))
+        while (bytesToDecode() && std::isdigit(currentByte()))
         {
-            m_workBuffer += m_decodeBuffer[0];
-            m_decodeBuffer.remove_prefix(1);
+            m_workBuffer += currentByte();
+            moveToNextByte();
         }
         return (std::stol(m_workBuffer));
     }
@@ -62,16 +77,16 @@ namespace H4
     inline std::string Bencode::decodeString()
     {
         int stringLength = decodePositiveInteger();
-        if (m_decodeBuffer[0] != ':')
+        if (currentByte() != ':')
         {
             throw std::runtime_error("Missing terminating ':' on string length.");
         }
-        m_decodeBuffer.remove_prefix(1);
+        moveToNextByte();
         m_workBuffer.clear();
         while (stringLength-- > 0)
         {
-            m_workBuffer += m_decodeBuffer[0];
-            m_decodeBuffer.remove_prefix(1);
+            m_workBuffer += currentByte();
+            moveToNextByte();
         }
         return (m_workBuffer);
     }
@@ -79,54 +94,54 @@ namespace H4
     std::unique_ptr<BNode> Bencode::decodeToBNodes()
     {
 
-        switch (m_decodeBuffer[0])
+        switch (currentByte())
         {
         case 'd':
         {
-            m_decodeBuffer.remove_prefix(1);
+            moveToNextByte();
             BNodeDict bNodeDictionary;
-            while (!m_decodeBuffer.empty() && m_decodeBuffer[0] != 'e')
+            while (bytesToDecode() && currentByte() != 'e')
             {
                 std::string key = decodeString();
                 bNodeDictionary.dict[key] = decodeToBNodes();
             }
-            if (m_decodeBuffer[0] != 'e')
+            if (currentByte() != 'e')
             {
                 throw std::runtime_error("Missing terminating 'e' on dictionary.");
             }
-            m_decodeBuffer.remove_prefix(1);
+            moveToNextByte();
             return (std::make_unique<BNodeDict>(std::move(bNodeDictionary)));
         }
         case 'l':
         {
-            m_decodeBuffer.remove_prefix(1);
+            moveToNextByte();
             BNodeList bNodeList;
-            while (!m_decodeBuffer.empty() && m_decodeBuffer[0] != 'e')
+            while (bytesToDecode() && currentByte() != 'e')
             {
                 bNodeList.list.push_back(decodeToBNodes());
             }
-            if (m_decodeBuffer[0] != 'e')
+            if (currentByte() != 'e')
             {
                 throw std::runtime_error("Missing terminating 'e' on list.");
             }
-            m_decodeBuffer.remove_prefix(1);
+            moveToNextByte();
             return (std::make_unique<BNodeList>(std::move(bNodeList)));
         }
         case 'i':
         {
             long number = 1;
-            m_decodeBuffer.remove_prefix(1);
-            if (m_decodeBuffer[0] == '-')
+            moveToNextByte();
+            if (currentByte() == '-')
             {
-                m_decodeBuffer.remove_prefix(1);
+                moveToNextByte();
                 number = -1;
             }
             number *= decodePositiveInteger();
-            if (m_decodeBuffer[0] != 'e')
+            if (currentByte() != 'e')
             {
                 throw std::runtime_error("Missing terminating 'e' on integer.");
             }
-            m_decodeBuffer.remove_prefix(1);
+            moveToNextByte();
             return (std::make_unique<BNodeInteger>(BNodeInteger(number)));
         }
         default:

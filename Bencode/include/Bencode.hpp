@@ -6,7 +6,7 @@
 //
 
 #include <string>
-#include<string_view>
+#include <string_view>
 #include <map>
 #include <vector>
 #include <list>
@@ -107,6 +107,9 @@ namespace H4
         // PRIVATE METHODS
         // ===============
 
+        unsigned char currentByte();
+        void moveToNextByte();
+        bool bytesToDecode();
         long decodePositiveInteger();
         std::string decodeString();
         std::unique_ptr<BNode> decodeToBNodes();
