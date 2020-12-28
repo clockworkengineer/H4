@@ -3,14 +3,16 @@
 
 using namespace H4;
 
+using Catch::Matchers::Equals;
+
 TEST_CASE("Creation and use of Bencode for decode of simple types (number, string) ", "[Bencode][Decode]")
 {
   Bencode bEncode;
 
   SECTION("Decode an integer", "[Bencode][Decode]")
   {
-    std::unique_ptr<BNode> bNodeNumber = bEncode.decode("i266e");
-    REQUIRE(dynamic_cast<BNodeNumber *>(bNodeNumber.get()) != nullptr);
+    std::unique_ptr<BNode> bNodeInteger = bEncode.decode("i266e");
+    REQUIRE(dynamic_cast<BNodeInteger *>(bNodeInteger.get()) != nullptr);
   }
 
   SECTION("Decode an string", "[Bencode][Decode]")
@@ -21,14 +23,20 @@ TEST_CASE("Creation and use of Bencode for decode of simple types (number, strin
 
   SECTION("Decode an integer (266) and check value", "[Bencode][Decode]")
   {
-    std::unique_ptr<BNode> bNodeNumber = bEncode.decode("i266e");
-    REQUIRE(((BNodeNumber *)bNodeNumber.get())->number == 266);
+    std::unique_ptr<BNode> bNodeInteger = bEncode.decode("i266e");
+    REQUIRE(((BNodeInteger *)bNodeInteger.get())->number == 266);
   }
 
   SECTION("Decode an integer (1000) and check value", "[Bencode][Decode]")
   {
-    std::unique_ptr<BNode> bNodeNumber = bEncode.decode("i1000e");
-    REQUIRE(((BNodeNumber *)bNodeNumber.get())->number == 1000);
+    std::unique_ptr<BNode> bNodeInteger = bEncode.decode("i1000e");
+    REQUIRE(((BNodeInteger *)bNodeInteger.get())->number == 1000);
+  }
+
+  SECTION("Decode an negative integer (-666) and check value", "[Bencode][Decode]")
+  {
+    std::unique_ptr<BNode> bNodeInteger = bEncode.decode("i-666e");
+    REQUIRE(((BNodeInteger *)bNodeInteger.get())->number == -666);
   }
 
   SECTION("Decode an string ('qwertyuiopas') and check value", "[Bencode][Decode]")
@@ -50,8 +58,8 @@ TEST_CASE("Creation and use of Bencode for decode of a table of integer test dat
                                                                    {"i32767e", 32767}}));
 
   Bencode bEncode;
-  std::unique_ptr<BNode> bNodeNumber = bEncode.decode(test_input.c_str());
-  REQUIRE(((BNodeNumber *)bNodeNumber.get())->number == expected);
+  std::unique_ptr<BNode> bNodeInteger = bEncode.decode(test_input.c_str());
+  REQUIRE(((BNodeInteger *)bNodeInteger.get())->number == expected);
 }
 
 TEST_CASE("Creation and use of Bencode for decode of a table of string test data", "[Bencode][Decode]")
@@ -87,7 +95,7 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
     std::vector<long> numbers;
     for (const auto &bNode : ((BNodeList *)bNodeList.get())->list)
     {
-      numbers.push_back(((BNodeNumber *)bNode.get())->number);
+      numbers.push_back(((BNodeInteger *)bNode.get())->number);
     }
     REQUIRE(numbers == std::vector<long>{266, 6780, 88});
   }
@@ -109,7 +117,7 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
     std::map<std::string, long> entries;
     for (const auto &bNode : ((BNodeDict *)bNodeDict.get())->dict)
     {
-      entries[bNode.first] = ((BNodeNumber *)bNode.second.get())->number;
+      entries[bNode.first] = ((BNodeInteger *)bNode.second.get())->number;
     }
     REQUIRE(entries == std::map<std::string, long>{{"one", 1}, {"two", 2}, {"three", 3}});
   }
@@ -132,13 +140,13 @@ TEST_CASE("Creation and use of Bencode for encode of simple types (number, strin
 
   SECTION("Encode an integer (266) and check value", "[Bencode][Encode]")
   {
-    std::string actual = bEncode.encode(std::make_unique<BNodeNumber>(BNodeNumber(266)));
+    std::string actual = bEncode.encode(std::make_unique<BNodeInteger>(BNodeInteger(266)));
     REQUIRE(actual == "i266e");
   }
 
   SECTION("Encode an integer (10000) and check value", "[Bencode][Encode]")
   {
-    std::string actual = bEncode.encode(std::make_unique<BNodeNumber>(BNodeNumber(10000)));
+    std::string actual = bEncode.encode(std::make_unique<BNodeInteger>(BNodeInteger(10000)));
     REQUIRE(actual == "i10000e");
   }
 
@@ -161,7 +169,7 @@ TEST_CASE("Creation and use of Bencode for encode of a table of integer test dat
                                                                    {32767, "i32767e"}}));
 
   Bencode bEncode;
-  std::string actual = bEncode.encode(std::make_unique<BNodeNumber>(BNodeNumber(test_input)));
+  std::string actual = bEncode.encode(std::make_unique<BNodeInteger>(BNodeInteger(test_input)));
   REQUIRE(actual == expected);
 }
 
@@ -204,13 +212,40 @@ TEST_CASE("Creation and use of Bencode for encode of collection types (list, dic
     REQUIRE(bEncode.encode(bEncode.decode(expected.c_str())) == expected);
   }
 }
-// TEST_CASE("Encode/Decode generated exceptions", "[Bencode][Exceptions]")
-// {
-//   Bencode bEncode;
 
-//   SECTION("Decode an integer without an end", "[Bencode][Decode]")
-//   {
-//     REQUIRE_THROWS_AS( [&]() {std::unique_ptr<BNode> bNodeNumber = bEncode.decode("i266"); }, std::runtime_error);
+TEST_CASE("Decode generated exceptions", "[Bencode][Decode][Exceptions]")
+{
+  Bencode bEncode;
 
-//   }
-// }
+  SECTION("Decode passing a null/empty string", "[Bencode][Decode]")
+  {
+    REQUIRE_THROWS_AS(bEncode.decode(nullptr), std::invalid_argument);
+    REQUIRE_THROWS_WITH(bEncode.decode(nullptr), "nullptr/empty string passed to be decoded.");
+    REQUIRE_THROWS_AS(bEncode.decode(""), std::invalid_argument);
+    REQUIRE_THROWS_WITH(bEncode.decode(""), "nullptr/empty string passed to be decoded.");
+  }
+
+    SECTION("Decode an string without terminating ':' on its length", "[Bencode][Decode]")
+  {
+    REQUIRE_THROWS_AS(bEncode.decode("26abcdefghijklmnopqrstuvwxyz"), std::runtime_error);
+    REQUIRE_THROWS_WITH(bEncode.decode("26abcdefghijklmnopqrstuvwxyz"), "Missing terminating ':' on string length.");
+  }
+
+  SECTION("Decode an integer without an end", "[Bencode][Decode]")
+  {
+    REQUIRE_THROWS_AS(bEncode.decode("i266"), std::runtime_error);
+    REQUIRE_THROWS_WITH(bEncode.decode("i266"), "Missing terminating 'e' on integer.");
+  }
+
+  SECTION("Decode an list without an end", "[Bencode][Decode]")
+  {
+    REQUIRE_THROWS_AS(bEncode.decode("li266ei6780ei88e"), std::runtime_error);
+    REQUIRE_THROWS_WITH(bEncode.decode("li266ei6780ei88e"), "Missing terminating 'e' on list.");
+  }
+
+  SECTION("Decode an diictionary without an end", "[Bencode][Decode]")
+  {
+    REQUIRE_THROWS_AS(bEncode.decode("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkl"), std::runtime_error);
+    REQUIRE_THROWS_WITH(bEncode.decode("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkl"), "Missing terminating 'e' on dictionary.");
+  }
+}

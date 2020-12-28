@@ -54,10 +54,10 @@ namespace H4
         /// <summary>
         /// Number BNode.
         /// </summary>
-        struct BNodeNumber : BNode
+        struct BNodeInteger : BNode
         {
             long number;
-            BNodeNumber(long number)
+            BNodeInteger(long number)
             {
                 this->number = number;
             }
@@ -107,7 +107,7 @@ namespace H4
         // PRIVATE METHODS
         // ===============
 
-        long decodeNumber();
+        long decodePositiveInteger();
         std::string decodeString();
         std::unique_ptr<BNode> decodeToBNodes();
         std::string encodeFromBNodes(BNode *bNode);
@@ -124,7 +124,7 @@ namespace H4
     // Shortcuts for node structure
     //
     using BNode = Bencode::BNode;
-    using BNodeNumber = Bencode::BNodeNumber;
+    using BNodeInteger = Bencode::BNodeInteger;
     using BNodeString = Bencode::BNodeString;
     using BNodeList = Bencode::BNodeList;
     using BNodeDict = Bencode::BNodeDict;

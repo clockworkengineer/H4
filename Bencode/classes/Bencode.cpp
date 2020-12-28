@@ -48,10 +48,10 @@ namespace H4
     // PRIVATE METHODS
     // ===============
 
-    inline long Bencode::decodeNumber()
+    inline long Bencode::decodePositiveInteger()
     {
         m_workBuffer.clear();
-        while (std::isdigit(m_decodeBuffer[0]))
+        while (!m_decodeBuffer.empty() && std::isdigit(m_decodeBuffer[0]))
         {
             m_workBuffer += m_decodeBuffer[0];
             m_decodeBuffer.remove_prefix(1);
@@ -61,7 +61,7 @@ namespace H4
 
     inline std::string Bencode::decodeString()
     {
-        int stringLength = decodeNumber();
+        int stringLength = decodePositiveInteger();
         if (m_decodeBuffer[0] != ':')
         {
             throw std::runtime_error("Missing terminating ':' on string length.");
@@ -85,10 +85,14 @@ namespace H4
         {
             m_decodeBuffer.remove_prefix(1);
             BNodeDict bNodeDictionary;
-            while (m_decodeBuffer[0] != 'e')
+            while (!m_decodeBuffer.empty() && m_decodeBuffer[0] != 'e')
             {
                 std::string key = decodeString();
                 bNodeDictionary.dict[key] = decodeToBNodes();
+            }
+            if (m_decodeBuffer[0] != 'e')
+            {
+                throw std::runtime_error("Missing terminating 'e' on dictionary.");
             }
             m_decodeBuffer.remove_prefix(1);
             return (std::make_unique<BNodeDict>(std::move(bNodeDictionary)));
@@ -97,23 +101,33 @@ namespace H4
         {
             m_decodeBuffer.remove_prefix(1);
             BNodeList bNodeList;
-            while (m_decodeBuffer[0] != 'e')
+            while (!m_decodeBuffer.empty() && m_decodeBuffer[0] != 'e')
             {
                 bNodeList.list.push_back(decodeToBNodes());
+            }
+            if (m_decodeBuffer[0] != 'e')
+            {
+                throw std::runtime_error("Missing terminating 'e' on list.");
             }
             m_decodeBuffer.remove_prefix(1);
             return (std::make_unique<BNodeList>(std::move(bNodeList)));
         }
         case 'i':
         {
+            long number = 1;
             m_decodeBuffer.remove_prefix(1);
-            long number = decodeNumber();
+            if (m_decodeBuffer[0] == '-')
+            {
+                m_decodeBuffer.remove_prefix(1);
+                number = -1;
+            }
+            number *= decodePositiveInteger();
             if (m_decodeBuffer[0] != 'e')
             {
-                throw std::runtime_error("Missing terminating 'e' on number.");
+                throw std::runtime_error("Missing terminating 'e' on integer.");
             }
             m_decodeBuffer.remove_prefix(1);
-            return (std::make_unique<BNodeNumber>(BNodeNumber(number)));
+            return (std::make_unique<BNodeInteger>(BNodeInteger(number)));
         }
         default:
             return (std::make_unique<BNodeString>(BNodeString(decodeString())));
@@ -143,9 +157,9 @@ namespace H4
             result += "e";
             return (result);
         }
-        if (dynamic_cast<BNodeNumber *>(bNode) != nullptr)
+        if (dynamic_cast<BNodeInteger *>(bNode) != nullptr)
         {
-            return ("i" + std::to_string(((BNodeNumber *)(bNode))->number) + "e");
+            return ("i" + std::to_string(((BNodeInteger *)(bNode))->number) + "e");
         }
         if (dynamic_cast<BNodeString *>(bNode) != nullptr)
         {
@@ -161,6 +175,10 @@ namespace H4
 
     std::unique_ptr<BNode> Bencode::decode(const char *toDecode)
     {
+        if ((toDecode == nullptr) || (*toDecode == '\0'))
+        {
+            throw std::invalid_argument("nullptr/empty string passed to be decoded.");
+        }
         m_decodeBuffer = std::string_view(toDecode);
         return decodeToBNodes();
     }
