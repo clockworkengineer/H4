@@ -13,7 +13,6 @@ set(BENCODE_LIBRARY_NAME Bencode)
 
 enable_testing()
 
-
 # Bencode sources and includes
 
 set (BENCODE_SOURCES
@@ -32,6 +31,4 @@ target_link_libraries(${BENCODE_LIBRARY_NAME})
 
 add_subdirectory(tests)
 
-#install(TARGETS ${PROJECT_BENCIDE_LIBRARY} DESTINATION ${BENCODE_LIBRARY_NAME}/lib)
-#install(FILES $(BENCODE_INCLUDES} DESTINATION ${BENCODE_LIBRARY_NAME}/include)
 

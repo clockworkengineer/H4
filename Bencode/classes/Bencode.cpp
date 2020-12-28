@@ -48,104 +48,89 @@ namespace H4
     // PRIVATE METHODS
     // ===============
 
-    inline unsigned char Bencode::currentByte() {
-        return (m_decodeBuffer[0]);
-    }
-
-    inline void Bencode::moveToNextByte() {
-        if (m_decodeBuffer.empty()) {
-            throw std::runtime_error("Decode buffer empty before decode complete.");
-        }
-        m_decodeBuffer.remove_prefix(1);
-    }
-
-    inline bool Bencode::bytesToDecode() {
-        return !m_decodeBuffer.empty();
-    }
-
-    inline long Bencode::decodePositiveInteger()
+    inline long Bencode::decodePositiveInteger(ISource *source)
     {
         m_workBuffer.clear();
-        while (bytesToDecode() && std::isdigit(currentByte()))
+        while (source->bytesToDecode() && std::isdigit(source->currentByte()))
         {
-            m_workBuffer += currentByte();
-            moveToNextByte();
+            m_workBuffer += source->currentByte();
+            source->moveToNextByte();
         }
         return (std::stol(m_workBuffer));
     }
 
-    inline std::string Bencode::decodeString()
+    inline std::string Bencode::decodeString(ISource *source)
     {
-        int stringLength = decodePositiveInteger();
-        if (currentByte() != ':')
+        int stringLength = decodePositiveInteger(source);
+        if (source->currentByte() != ':')
         {
             throw std::runtime_error("Missing terminating ':' on string length.");
         }
-        moveToNextByte();
+        source->moveToNextByte();
         m_workBuffer.clear();
         while (stringLength-- > 0)
         {
-            m_workBuffer += currentByte();
-            moveToNextByte();
+            m_workBuffer += source->currentByte();
+            source->moveToNextByte();
         }
         return (m_workBuffer);
     }
 
-    std::unique_ptr<BNode> Bencode::decodeToBNodes()
+    std::unique_ptr<BNode> Bencode::decodeToBNodes(ISource *source)
     {
 
-        switch (currentByte())
+        switch (source->currentByte())
         {
         case 'd':
         {
-            moveToNextByte();
+            source->moveToNextByte();
             BNodeDict bNodeDictionary;
-            while (bytesToDecode() && currentByte() != 'e')
+            while (source->bytesToDecode() && source->currentByte() != 'e')
             {
-                std::string key = decodeString();
-                bNodeDictionary.dict[key] = decodeToBNodes();
+                std::string key = decodeString(source);
+                bNodeDictionary.dict[key] = decodeToBNodes(source);
             }
-            if (currentByte() != 'e')
+            if (source->currentByte() != 'e')
             {
                 throw std::runtime_error("Missing terminating 'e' on dictionary.");
             }
-            moveToNextByte();
+            source->moveToNextByte();
             return (std::make_unique<BNodeDict>(std::move(bNodeDictionary)));
         }
         case 'l':
         {
-            moveToNextByte();
+            source->moveToNextByte();
             BNodeList bNodeList;
-            while (bytesToDecode() && currentByte() != 'e')
+            while (source->bytesToDecode() && source->currentByte() != 'e')
             {
-                bNodeList.list.push_back(decodeToBNodes());
+                bNodeList.list.push_back(decodeToBNodes(source));
             }
-            if (currentByte() != 'e')
+            if (source->currentByte() != 'e')
             {
                 throw std::runtime_error("Missing terminating 'e' on list.");
             }
-            moveToNextByte();
+            source->moveToNextByte();
             return (std::make_unique<BNodeList>(std::move(bNodeList)));
         }
         case 'i':
         {
             long number = 1;
-            moveToNextByte();
-            if (currentByte() == '-')
+            source->moveToNextByte();
+            if (source->currentByte() == '-')
             {
-                moveToNextByte();
+                source->moveToNextByte();
                 number = -1;
             }
-            number *= decodePositiveInteger();
-            if (currentByte() != 'e')
+            number *= decodePositiveInteger(source);
+            if (source->currentByte() != 'e')
             {
                 throw std::runtime_error("Missing terminating 'e' on integer.");
             }
-            moveToNextByte();
+            source->moveToNextByte();
             return (std::make_unique<BNodeInteger>(BNodeInteger(number)));
         }
         default:
-            return (std::make_unique<BNodeString>(BNodeString(decodeString())));
+            return (std::make_unique<BNodeString>(BNodeString(decodeString(source))));
         }
     }
 
@@ -194,8 +179,7 @@ namespace H4
         {
             throw std::invalid_argument("nullptr/empty string passed to be decoded.");
         }
-        m_decodeBuffer = std::string_view(toDecode);
-        return decodeToBNodes();
+        return decodeToBNodes(std::make_unique<BufferSource>(BufferSource(toDecode)).get());
     }
 
     std::string Bencode::encode(std::unique_ptr<BNode> bNode)

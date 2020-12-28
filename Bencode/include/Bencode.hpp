@@ -99,6 +99,45 @@ namespace H4
         // PRIVATE TYPES AND CONSTANTS
         // ===========================
 
+        class ISource
+        {
+        public:
+            virtual unsigned char currentByte() = 0;
+            virtual void moveToNextByte() = 0;
+            virtual bool bytesToDecode() = 0;
+        };
+
+        class BufferSource : public ISource
+        {
+        public:
+            BufferSource(const char *toDecode)
+            {
+                m_decodeBuffer = std::string_view(toDecode);
+            }
+
+            unsigned char currentByte()
+            {
+                return (m_decodeBuffer[0]);
+            }
+
+            void moveToNextByte()
+            {
+                if (m_decodeBuffer.empty())
+                {
+                    throw std::runtime_error("Decode buffer empty before decode complete.");
+                }
+                m_decodeBuffer.remove_prefix(1);
+            }
+
+            bool bytesToDecode()
+            {
+                return !m_decodeBuffer.empty();
+            }
+
+        private:
+            std::string_view m_decodeBuffer;
+        };
+
         // ===========================================
         // DISABLED CONSTRUCTORS/DESTRUCTORS/OPERATORS
         // ===========================================
@@ -107,12 +146,9 @@ namespace H4
         // PRIVATE METHODS
         // ===============
 
-        unsigned char currentByte();
-        void moveToNextByte();
-        bool bytesToDecode();
-        long decodePositiveInteger();
-        std::string decodeString();
-        std::unique_ptr<BNode> decodeToBNodes();
+        long decodePositiveInteger(ISource *source);
+        std::string decodeString(ISource *source);
+        std::unique_ptr<BNode> decodeToBNodes(ISource *source);
         std::string encodeFromBNodes(BNode *bNode);
 
         // =================
@@ -120,7 +156,7 @@ namespace H4
         // =================
 
         std::string m_workBuffer;
-        std::string_view m_decodeBuffer;
+        // std::string_view m_decodeBuffer;
     };
 
     //

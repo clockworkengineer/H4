@@ -3,8 +3,6 @@
 
 using namespace H4;
 
-using Catch::Matchers::Equals;
-
 TEST_CASE("Creation and use of Bencode for decode of simple types (number, string) ", "[Bencode][Decode]")
 {
   Bencode bEncode;
