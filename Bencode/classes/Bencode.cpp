@@ -94,7 +94,7 @@ namespace H4
             {
                 throw std::runtime_error("Missing terminating 'e' on dictionary.");
             }
-            source->moveToNextByte(); 
+            source->moveToNextByte();
             return (std::make_unique<BNodeDict>(std::move(bNodeDictionary)));
         }
         case 'l':
@@ -184,6 +184,11 @@ namespace H4
 
     std::string Bencode::encode(std::unique_ptr<BNode> bNode)
     {
+        if (bNode == nullptr)
+        {
+            throw std::invalid_argument("nullptr passed as bNode to be encoded.");
+        }
+
         return (encodeFromBNodes(bNode.get()));
     }
 

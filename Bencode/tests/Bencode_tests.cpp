@@ -254,7 +254,22 @@ TEST_CASE("Decode generated exceptions", "[Bencode][Decode][Exceptions]")
   }
 }
 
-TEST_CASE("Decode generated exceptions", "[Bencode][Encode][Exceptions]")
+TEST_CASE("Encode generated exceptions", "[Bencode][Encode][Exceptions]")
 {
   Bencode bEncode;
+
+  SECTION("Encode passed nullptr", "[Bencode][Decode]")
+  {
+
+    REQUIRE_THROWS_AS(bEncode.encode(nullptr), std::invalid_argument);
+    REQUIRE_THROWS_WITH(bEncode.encode(nullptr), "nullptr passed as bNode to be encoded.");
+    REQUIRE_THROWS_AS(bEncode.encode(std::unique_ptr<BNode>(nullptr)), std::invalid_argument);
+    REQUIRE_THROWS_WITH(bEncode.encode(std::unique_ptr<BNode>(nullptr)), "nullptr passed as bNode to be encoded.");
+  }
+
+  SECTION("Encode passed invalid BNode type", "[Bencode][Decode]")
+  {
+    REQUIRE_THROWS_AS(bEncode.encode(std::unique_ptr<BNode>(new BNode())), std::runtime_error);
+    REQUIRE_THROWS_WITH(bEncode.encode(std::unique_ptr<BNode>(new BNode())), "Unknown BNode type encountered during encode.");
+  }
 }
