@@ -156,7 +156,7 @@ namespace H4
         // =================
 
         std::string m_workBuffer;
-        // std::string_view m_decodeBuffer;
+
     };
 
     //

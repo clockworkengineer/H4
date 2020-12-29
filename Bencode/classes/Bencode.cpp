@@ -90,11 +90,11 @@ namespace H4
                 std::string key = decodeString(source);
                 bNodeDictionary.dict[key] = decodeToBNodes(source);
             }
-            if (source->currentByte() != 'e')
+            if (!source->bytesToDecode())
             {
                 throw std::runtime_error("Missing terminating 'e' on dictionary.");
             }
-            source->moveToNextByte();
+            source->moveToNextByte(); 
             return (std::make_unique<BNodeDict>(std::move(bNodeDictionary)));
         }
         case 'l':
@@ -105,7 +105,7 @@ namespace H4
             {
                 bNodeList.list.push_back(decodeToBNodes(source));
             }
-            if (source->currentByte() != 'e')
+            if (!source->bytesToDecode())
             {
                 throw std::runtime_error("Missing terminating 'e' on list.");
             }

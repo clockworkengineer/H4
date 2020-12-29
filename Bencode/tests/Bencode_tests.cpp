@@ -253,3 +253,8 @@ TEST_CASE("Decode generated exceptions", "[Bencode][Decode][Exceptions]")
     REQUIRE_THROWS_WITH(bEncode.decode("26:abcdefghijklmno"), "Decode buffer empty before decode complete.");
   }
 }
+
+TEST_CASE("Decode generated exceptions", "[Bencode][Encode][Exceptions]")
+{
+  Bencode bEncode;
+}
