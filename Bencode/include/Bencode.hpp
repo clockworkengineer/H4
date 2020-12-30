@@ -11,6 +11,8 @@
 #include <vector>
 #include <list>
 #include <memory>
+#include <fstream>
+#include <iostream>
 
 // =========
 // NAMESPACE
@@ -87,7 +89,8 @@ namespace H4
         // PUBLIC METHODS
         // ==============
 
-        std::unique_ptr<BNode> decode(const char *toDecode);
+        std::unique_ptr<BNode> decode(const char *source);
+        std::unique_ptr<BNode> decodeFile(std::string fileName);
         std::string encode(std::unique_ptr<BNode> bNodeRoot);
 
         // ================
@@ -138,6 +141,38 @@ namespace H4
             std::string_view m_decodeBuffer;
         };
 
+        class FileSource : public ISource
+        {
+        public:
+            FileSource(std::string fileName)
+            {
+                m_source.open(fileName.c_str(), std::ios_base::in | std::ios_base::binary);
+                if (!m_source.is_open())
+                {
+                    throw std::runtime_error("File input stream source failed to open.");
+                }
+            }
+
+            unsigned char currentByte()
+            {
+                return (m_source.peek());
+            }
+
+            void moveToNextByte()
+            {
+                char c;
+                m_source.get(c);
+            }
+
+            bool bytesToDecode()
+            {
+                return (!m_source.eof());
+            }
+
+        private:
+            std::fstream m_source;
+        };
+
         // ===========================================
         // DISABLED CONSTRUCTORS/DESTRUCTORS/OPERATORS
         // ===========================================
@@ -156,7 +191,6 @@ namespace H4
         // =================
 
         std::string m_workBuffer;
-
     };
 
     //

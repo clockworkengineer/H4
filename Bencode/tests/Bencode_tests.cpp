@@ -3,6 +3,8 @@
 
 using namespace H4;
 
+#include <fstream>
+
 TEST_CASE("Creation and use of Bencode for decode of simple types (number, string) ", "[Bencode][Decode]")
 {
   Bencode bEncode;
@@ -271,5 +273,25 @@ TEST_CASE("Encode generated exceptions", "[Bencode][Encode][Exceptions]")
   {
     REQUIRE_THROWS_AS(bEncode.encode(std::unique_ptr<BNode>(new BNode())), std::runtime_error);
     REQUIRE_THROWS_WITH(bEncode.encode(std::unique_ptr<BNode>(new BNode())), "Unknown BNode type encountered during encode.");
+  }
+}
+
+TEST_CASE("Decode torrent files using ifilestream decode", "[Bencode][Decode][Torrents]")
+{
+  Bencode bEncode;
+
+  SECTION("Decode singlefile.torrent", "[Bencode][Decode][Torrents]")
+  {
+
+    std::unique_ptr<BNode> bNodeRoot = bEncode.decodeFile("./testData/singlefile.torrent");
+    REQUIRE(dynamic_cast<BNodeDict *>(bNodeRoot.get()) != nullptr);
+  }
+
+  SECTION("Decode singlefile.torrent and check value ", "[Bencode][Decode][Torrents]")
+  {
+    std::fstream torrentFile { "./testData/singlefile.torrent"};
+    std::ostringstream expected;
+    expected << torrentFile.rdbuf();
+    REQUIRE(bEncode.encode(bEncode.decodeFile("./testData/singlefile.torrent")) == expected.str());
   }
 }
