@@ -173,11 +173,11 @@ namespace H4
     // PUBLIC METHODS
     // ==============
 
-    std::unique_ptr<BNode> Bencode::decodeBuffer(const char *sourceBuffer)
+    std::unique_ptr<BNode> Bencode::decodeBuffer(std::string_view sourceBuffer)
     {
-        if ((sourceBuffer == nullptr) || (*sourceBuffer == '\0'))
+        if (sourceBuffer[0] == '\0')
         {
-            throw std::invalid_argument("nullptr/empty string passed to be decoded.");
+            throw std::invalid_argument("Empty string passed to be decoded.");
         }
         return decodeToBNodes(std::make_unique<BufferSource>(BufferSource(sourceBuffer)).get());
     }
@@ -191,7 +191,7 @@ namespace H4
     {
         if (bNode == nullptr)
         {
-            throw std::invalid_argument("nullptr passed as bNode to be encoded.");
+            throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
         }
 
         return (encodeFromBNodes(bNode.get()));
