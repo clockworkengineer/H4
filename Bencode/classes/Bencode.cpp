@@ -173,21 +173,21 @@ namespace H4
     // PUBLIC METHODS
     // ==============
 
-    std::unique_ptr<BNode> Bencode::decode(const char *source)
+    std::unique_ptr<BNode> Bencode::decodeBuffer(const char *sourceBuffer)
     {
-        if ((source == nullptr) || (*source == '\0'))
+        if ((sourceBuffer == nullptr) || (*sourceBuffer == '\0'))
         {
             throw std::invalid_argument("nullptr/empty string passed to be decoded.");
         }
-        return decodeToBNodes(std::make_unique<BufferSource>(BufferSource(source)).get());
+        return decodeToBNodes(std::make_unique<BufferSource>(BufferSource(sourceBuffer)).get());
     }
 
-    std::unique_ptr<BNode> Bencode::decodeFile(std::string fileName)
+    std::unique_ptr<BNode> Bencode::decodeFile(std::string sourceFileName)
     {
-        return decodeToBNodes(std::make_unique<FileSource>(FileSource(fileName)).get());
+        return decodeToBNodes(std::make_unique<FileSource>(FileSource(sourceFileName)).get());
     }
 
-    std::string Bencode::encode(std::unique_ptr<BNode> bNode)
+    std::string Bencode::encodeToBuffer(std::unique_ptr<BNode> bNode)
     {
         if (bNode == nullptr)
         {

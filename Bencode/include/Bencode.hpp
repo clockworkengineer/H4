@@ -89,9 +89,9 @@ namespace H4
         // PUBLIC METHODS
         // ==============
 
-        std::unique_ptr<BNode> decode(const char *source);
+        std::unique_ptr<BNode> decodeBuffer(const char *source);
         std::unique_ptr<BNode> decodeFile(std::string fileName);
-        std::string encode(std::unique_ptr<BNode> bNodeRoot);
+        std::string encodeToBuffer(std::unique_ptr<BNode> bNodeRoot);
 
         // ================
         // PUBLIC VARIABLES
@@ -113,9 +113,9 @@ namespace H4
         class BufferSource : public ISource
         {
         public:
-            BufferSource(const char *toDecode)
+            BufferSource(const char *sourceBuffer)
             {
-                m_decodeBuffer = std::string_view(toDecode);
+                m_decodeBuffer = std::string_view(sourceBuffer);
             }
 
             unsigned char currentByte()
@@ -144,9 +144,9 @@ namespace H4
         class FileSource : public ISource
         {
         public:
-            FileSource(std::string fileName)
+            FileSource(std::string sourceSFileName)
             {
-                m_source.open(fileName.c_str(), std::ios_base::in | std::ios_base::binary);
+                m_source.open(sourceSFileName.c_str(), std::ios_base::in | std::ios_base::binary);
                 if (!m_source.is_open())
                 {
                     throw std::runtime_error("File input stream source failed to open.");
