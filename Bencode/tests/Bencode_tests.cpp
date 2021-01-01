@@ -270,3 +270,32 @@ TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][T
     REQUIRE_THROWS_WITH(bEncode.decodeFile("./testData/doesntexist.torrent"), "Bencode file input stream source failed to open or does not exist.");
   }
 }
+
+TEST_CASE("Encode torrent files using decodeFile", "[Bencode][Encode][Torrents]")
+{
+  // Bencode bEncode;
+  // SECTION("Decode singlefile.torrent", "[Bencode][Decode][Torrents]")
+  // {
+  //   std::unique_ptr<BNode> bNodeRoot = bEncode.decodeFile("./testData/singlefile.torrent");
+  //   REQUIRE(dynamic_cast<BNodeDict *>(bNodeRoot.get()) != nullptr);
+  // }
+  // SECTION("Decode singlefile.torrent and check value ", "[Bencode][Decode][Torrents]")
+  // {
+  //   std::fstream torrentFile{"./testData/singlefile.torrent"};
+  //   std::ostringstream expected;
+  //   expected << torrentFile.rdbuf();
+  //   REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/singlefile.torrent")) == expected.str());
+  // }
+  // SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
+  // {
+  //   std::unique_ptr<BNode> bNodeRoot = bEncode.decodeFile("./testData/multifile.torrent");
+  //   REQUIRE(dynamic_cast<BNodeDict *>(bNodeRoot.get()) != nullptr);
+  // }
+  // SECTION("Decode multifile.torrent and check value ", "[Bencode][Decode][Torrents]")
+  // {
+  //   std::fstream torrentFile{"./testData/multifile.torrent"};
+  //   std::ostringstream expected;
+  //   expected << torrentFile.rdbuf();
+  //   REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/multifile.torrent")) == expected.str());
+  // }
+}

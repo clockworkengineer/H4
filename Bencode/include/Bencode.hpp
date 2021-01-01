@@ -1,10 +1,8 @@
 #ifndef BENCODE_HPP
 #define BENCODE_HPP
-
 //
 // C++ STL
 //
-
 #include <string>
 #include <string_view>
 #include <map>
@@ -13,25 +11,20 @@
 #include <memory>
 #include <fstream>
 #include <iostream>
-
 // =========
 // NAMESPACE
 // =========
-
 namespace H4
 {
-
     // ================
     // CLASS DEFINITION
     // ================
-
     class Bencode
     {
     public:
         // ==========================
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
-
         /// <summary>
         /// Base for BNode structure.
         /// </summary>
@@ -76,32 +69,26 @@ namespace H4
                 this->string = string;
             }
         };
-
         // ============
         // CONSTRUCTORS
         // ============
-
         // ==========
         // DESTRUCTOR
         // ==========
-
         // ==============
         // PUBLIC METHODS
         // ==============
-
         std::unique_ptr<BNode> decodeBuffer(const std::string_view source);
         std::unique_ptr<BNode> decodeFile(std::string fileName);
         std::string encodeToBuffer(std::unique_ptr<BNode> bNodeRoot);
-
+        void encodeToFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName);
         // ================
         // PUBLIC VARIABLES
         // ================
-
     private:
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
         // ===========================
-
         class ISource
         {
         public:
@@ -109,7 +96,6 @@ namespace H4
             virtual void moveToNextByte() = 0;
             virtual bool bytesToDecode() = 0;
         };
-
         class BufferSource : public ISource
         {
         public:
@@ -117,12 +103,10 @@ namespace H4
             {
                 m_decodeBuffer = sourceBuffer;
             }
-
             unsigned char currentByte()
             {
                 return (m_decodeBuffer[0]);
             }
-
             void moveToNextByte()
             {
                 if (m_decodeBuffer.empty())
@@ -131,16 +115,13 @@ namespace H4
                 }
                 m_decodeBuffer.remove_prefix(1);
             }
-
             bool bytesToDecode()
             {
                 return !m_decodeBuffer.empty();
             }
-
         private:
             std::string_view m_decodeBuffer;
         };
-
         class FileSource : public ISource
         {
         public:
@@ -149,50 +130,79 @@ namespace H4
                 m_source.open(sourceFileName.c_str(), std::ios_base::in | std::ios_base::binary);
                 if (!m_source.is_open())
                 {
-                    throw std::runtime_error("Bencode file input stream source failed to open or does not exist.");
+                    throw std::runtime_error("Bencode file input stream failed to open or does not exist.");
                 }
             }
-
             unsigned char currentByte()
             {
                 return (m_source.peek());
             }
-
             void moveToNextByte()
             {
                 char c;
                 m_source.get(c);
             }
-
             bool bytesToDecode()
             {
                 return (!m_source.eof());
             }
-
         private:
             std::fstream m_source;
         };
-
+        class IDestination
+        {
+        public:
+            virtual void addBytes(std::string bytes) = 0;
+        };
+        class BufferDestination : public IDestination
+        {
+        public:
+            BufferDestination()
+            {
+            }
+            void addBytes(std::string bytes)
+            {
+                m_encodeBuffer += bytes;
+            }
+            std::string getBuffer()
+            {
+                return (m_encodeBuffer);
+            }
+        private:
+            std::string m_encodeBuffer;
+        };
+        class FileDestination : public IDestination
+        {
+        public:
+            FileDestination(std::string desinationFileName)
+            {
+                m_destination.open(desinationFileName.c_str(), std::ios_base::out | std::ios_base::binary);
+                if (!m_destination.is_open())
+                {
+                    throw std::runtime_error("Bencode file output stream failed to open or could not be created.");
+                }
+            }
+            void addBytes(std::string bytes) {
+                m_destination.write(bytes.c_str(), bytes.length());
+            }
+        private:
+            std::ofstream m_destination;
+        };
         // ===========================================
         // DISABLED CONSTRUCTORS/DESTRUCTORS/OPERATORS
         // ===========================================
-
         // ===============
         // PRIVATE METHODS
         // ===============
-
         long decodePositiveInteger(ISource *source);
         std::string decodeString(ISource *source);
         std::unique_ptr<BNode> decodeToBNodes(ISource *source);
-        std::string encodeFromBNodes(BNode *bNode);
-
+        void encodeFromBNodes(BNode *bNode, IDestination *destination);
         // =================
         // PRIVATE VARIABLES
         // =================
-
         std::string m_workBuffer;
     };
-
     //
     // Shortcuts for node structure
     //
@@ -201,6 +211,5 @@ namespace H4
     using BNodeString = Bencode::BNodeString;
     using BNodeList = Bencode::BNodeList;
     using BNodeDict = Bencode::BNodeDict;
-
 } // namespace H4
 #endif /* BENCODE_HPP */

@@ -134,37 +134,39 @@ namespace H4
         }
     }
 
-    std::string Bencode::encodeFromBNodes(BNode *bNode)
+    void Bencode::encodeFromBNodes(BNode *bNode, IDestination *destination)
     {
         if (dynamic_cast<BNodeDict *>(bNode) != nullptr)
         {
-            std::string result = "d";
+            destination->addBytes("d");
             for (auto &bNodeEntry : ((BNodeDict *)bNode)->dict)
             {
-                result += std::to_string(bNodeEntry.first.length()) + ":" + bNodeEntry.first;
-                result += encodeFromBNodes(bNodeEntry.second.get());
+                destination->addBytes(std::to_string(bNodeEntry.first.length()) + ":" + bNodeEntry.first);
+                encodeFromBNodes(bNodeEntry.second.get(), destination);
             }
-            result += "e";
-            return (result);
+            destination->addBytes("e");
+            return;
         }
         if (dynamic_cast<BNodeList *>(bNode) != nullptr)
         {
-            std::string result = "l";
+            destination->addBytes("l");
             for (auto &bNodeEntry : ((BNodeList *)bNode)->list)
             {
-                result += encodeFromBNodes(bNodeEntry.get());
+                encodeFromBNodes(bNodeEntry.get(), destination);
             }
-            result += "e";
-            return (result);
+            destination->addBytes("e");
+            return;
         }
         if (dynamic_cast<BNodeInteger *>(bNode) != nullptr)
         {
-            return ("i" + std::to_string(((BNodeInteger *)(bNode))->number) + "e");
+            destination->addBytes("i" + std::to_string(((BNodeInteger *)(bNode))->number) + "e");
+            return;
         }
         if (dynamic_cast<BNodeString *>(bNode) != nullptr)
         {
             std::string stringToEncode = ((BNodeString *)(bNode))->string;
-            return (std::to_string((int)stringToEncode.length()) + ":" + stringToEncode);
+            destination->addBytes(std::to_string((int)stringToEncode.length()) + ":" + stringToEncode);
+            return;
         }
         throw std::runtime_error("Unknown BNode type encountered during encode.");
     }
@@ -187,14 +189,27 @@ namespace H4
         return decodeToBNodes(std::make_unique<FileSource>(FileSource(sourceFileName)).get());
     }
 
-    std::string Bencode::encodeToBuffer(std::unique_ptr<BNode> bNode)
+    std::string Bencode::encodeToBuffer(std::unique_ptr<BNode> bNodeRoot)
     {
-        if (bNode == nullptr)
+        if (bNodeRoot == nullptr)
         {
             throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
         }
 
-        return (encodeFromBNodes(bNode.get()));
+        BufferDestination destination;
+        encodeFromBNodes(bNodeRoot.get(), &destination);
+        return (destination.getBuffer());
+    }
+
+    void Bencode::encodeToFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName)
+    {
+        if (bNodeRoot == nullptr)
+        {
+            throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
+        }
+
+        FileDestination destination(destinationFileName);
+        encodeFromBNodes(bNodeRoot.get(), &destination);
     }
 
 } // namespace H4
