@@ -267,7 +267,7 @@ TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][T
     SECTION("Decode doesntexist.torrent", "[Bencode][Decode][Torrents]")
   {
     REQUIRE_THROWS_AS(bEncode.decodeFile("./testData/doesntexist.torrent"), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.decodeFile("./testData/doesntexist.torrent"), "Bencode file input stream source failed to open or does not exist.");
+    REQUIRE_THROWS_WITH(bEncode.decodeFile("./testData/doesntexist.torrent"), "Bencode file input stream failed to open or does not exist.");
   }
 }
 

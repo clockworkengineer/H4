@@ -5,49 +5,37 @@
 //
 // Dependencies:   C17++ - Language standard features used.
 //
-
 // =================
 // CLASS DEFINITIONS
 // =================
-
 #include "Bencode.hpp"
-
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
-
 //
 // C++ STL
 //
-
 #include <stdexcept>
-
 // =========
 // NAMESPACE
 // =========
-
 namespace H4
 {
     // ===========================
     // PRIVATE TYPES AND CONSTANTS
     // ===========================
-
     // ==========================
     // PUBLIC TYPES AND CONSTANTS
     // ==========================
-
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
-
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
-
     // ===============
     // PRIVATE METHODS
     // ===============
-
     inline long Bencode::decodePositiveInteger(ISource *source)
     {
         m_workBuffer.clear();
@@ -58,7 +46,6 @@ namespace H4
         }
         return (std::stol(m_workBuffer));
     }
-
     inline std::string Bencode::decodeString(ISource *source)
     {
         int stringLength = decodePositiveInteger(source);
@@ -75,10 +62,8 @@ namespace H4
         }
         return (m_workBuffer);
     }
-
     std::unique_ptr<BNode> Bencode::decodeToBNodes(ISource *source)
     {
-
         switch (source->currentByte())
         {
         case 'd':
@@ -114,26 +99,25 @@ namespace H4
         }
         case 'i':
         {
-            long number = 1;
+            long integer = 1;
             source->moveToNextByte();
             if (source->currentByte() == '-')
             {
                 source->moveToNextByte();
-                number = -1;
+                integer = -1;
             }
-            number *= decodePositiveInteger(source);
+            integer *= decodePositiveInteger(source);
             if (source->currentByte() != 'e')
             {
                 throw std::runtime_error("Missing terminating 'e' on integer.");
             }
             source->moveToNextByte();
-            return (std::make_unique<BNodeInteger>(BNodeInteger(number)));
+            return (std::make_unique<BNodeInteger>(BNodeInteger(integer)));
         }
         default:
             return (std::make_unique<BNodeString>(BNodeString(decodeString(source))));
         }
     }
-
     void Bencode::encodeFromBNodes(BNode *bNode, IDestination *destination)
     {
         if (dynamic_cast<BNodeDict *>(bNode) != nullptr)
@@ -170,46 +154,40 @@ namespace H4
         }
         throw std::runtime_error("Unknown BNode type encountered during encode.");
     }
-
     // ==============
     // PUBLIC METHODS
     // ==============
-
     std::unique_ptr<BNode> Bencode::decodeBuffer(std::string_view sourceBuffer)
     {
         if (sourceBuffer[0] == '\0')
         {
             throw std::invalid_argument("Empty string passed to be decoded.");
         }
-        return decodeToBNodes(std::make_unique<BufferSource>(BufferSource(sourceBuffer)).get());
+        BufferSource source(sourceBuffer);
+        return decodeToBNodes(&source);
     }
-
     std::unique_ptr<BNode> Bencode::decodeFile(std::string sourceFileName)
     {
-        return decodeToBNodes(std::make_unique<FileSource>(FileSource(sourceFileName)).get());
+        FileSource source(sourceFileName);
+        return decodeToBNodes(&source);
     }
-
     std::string Bencode::encodeToBuffer(std::unique_ptr<BNode> bNodeRoot)
     {
         if (bNodeRoot == nullptr)
         {
             throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
         }
-
         BufferDestination destination;
         encodeFromBNodes(bNodeRoot.get(), &destination);
         return (destination.getBuffer());
     }
-
     void Bencode::encodeToFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName)
     {
         if (bNodeRoot == nullptr)
         {
             throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
         }
-
         FileDestination destination(destinationFileName);
         encodeFromBNodes(bNodeRoot.get(), &destination);
     }
-
 } // namespace H4
