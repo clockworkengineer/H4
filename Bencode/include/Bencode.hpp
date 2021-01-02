@@ -26,6 +26,10 @@ namespace H4
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
         /// <summary>
+        /// Source/destination for bencoded strings.
+        /// </summary>
+        using Bencoding = std::basic_string<char>;
+        /// <summary>
         /// Base for BNode structure.
         /// </summary>
         struct BNode
@@ -78,9 +82,9 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        std::unique_ptr<BNode> decodeBuffer(const std::string_view source);
+        std::unique_ptr<BNode> decodeBuffer(Bencoding source);
         std::unique_ptr<BNode> decodeFile(std::string fileName);
-        std::string encodeToBuffer(std::unique_ptr<BNode> bNodeRoot);
+        Bencoding encodeToBuffer(std::unique_ptr<BNode> bNodeRoot);
         void encodeToFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName);
         // ================
         // PUBLIC VARIABLES
@@ -99,28 +103,29 @@ namespace H4
         class BufferSource : public ISource
         {
         public:
-            BufferSource(std::string_view sourceBuffer)
+            BufferSource(Bencoding sourceBuffer)
             {
                 m_decodeBuffer = sourceBuffer;
             }
             unsigned char currentByte()
             {
-                return (m_decodeBuffer[0]);
+                return (m_decodeBuffer[m_bufferPosition]);
             }
             void moveToNextByte()
             {
-                if (m_decodeBuffer.empty())
+                if (!bytesToDecode())
                 {
                     throw std::runtime_error("Decode buffer empty before decode complete.");
                 }
-                m_decodeBuffer.remove_prefix(1);
+                m_bufferPosition++;
             }
             bool bytesToDecode()
             {
-                return !m_decodeBuffer.empty();
+                return (m_bufferPosition < m_decodeBuffer.length());
             }
         private:
-            std::string_view m_decodeBuffer;
+            std::size_t m_bufferPosition=0;
+            Bencoding m_decodeBuffer;
         };
         class FileSource : public ISource
         {

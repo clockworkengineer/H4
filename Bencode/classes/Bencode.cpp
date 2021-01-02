@@ -157,7 +157,7 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-    std::unique_ptr<BNode> Bencode::decodeBuffer(std::string_view sourceBuffer)
+    std::unique_ptr<BNode> Bencode::decodeBuffer(Bencoding sourceBuffer)
     {
         if (sourceBuffer[0] == '\0')
         {
@@ -171,7 +171,7 @@ namespace H4
         FileSource source(sourceFileName);
         return decodeToBNodes(&source);
     }
-    std::string Bencode::encodeToBuffer(std::unique_ptr<BNode> bNodeRoot)
+    Bencode::Bencoding Bencode::encodeToBuffer(std::unique_ptr<BNode> bNodeRoot)
     {
         if (bNodeRoot == nullptr)
         {
