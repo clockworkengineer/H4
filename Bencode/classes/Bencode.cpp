@@ -159,7 +159,7 @@ namespace H4
     // ==============
     std::unique_ptr<BNode> Bencode::decodeBuffer(Bencoding sourceBuffer)
     {
-        if (sourceBuffer[0] == '\0')
+        if (sourceBuffer.buffer.size()==0)
         {
             throw std::invalid_argument("Empty string passed to be decoded.");
         }

@@ -1,6 +1,11 @@
 #include "catch.hpp"
 #include "Bencode.hpp"
 using namespace H4;
+
+inline bool operator==(const Bencode::Bencoding &lhs, const Bencode::Bencoding &rhs)
+{
+  return (std::equal(lhs.buffer.begin(), lhs.buffer.end(), rhs.buffer.begin()));
+}
 TEST_CASE("Creation and use of Bencode for decode of simple types (number, string) ", "[Bencode][Decode]")
 {
   Bencode bEncode;
@@ -115,39 +120,39 @@ TEST_CASE("Creation and use of Bencode for encode of simple types (number, strin
   Bencode bEncode;
   SECTION("Encode an integer (266) and check value", "[Bencode][Encode]")
   {
-    std::string actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(266)));
-    REQUIRE(actual == "i266e");
+    Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(266)));
+    REQUIRE(actual == Bencode::Bencoding("i266e"));
   }
-  SECTION("Encode an integer (10000) and check value", "[Bencode][Encode]")
-  {
-    std::string actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(10000)));
-    REQUIRE(actual == "i10000e");
-  }
-  SECTION("Encode an string ('qwertyuiopas') and check its value", "[Bencode][Encode]")
-  {
-    std::string actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString("qwertyuiopas")));
-    REQUIRE(actual == "12:qwertyuiopas");
-  }
-  SECTION("Encode an string ('abcdefghijklmnopqrstuvwxyz') and check its value", "[Bencode][Encode]")
-  {
-    std::string actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString("abcdefghijklmnopqrstuvwxyz")));
-    REQUIRE(actual == "26:abcdefghijklmnopqrstuvwxyz");
-  }
+    SECTION("Encode an integer (10000) and check value", "[Bencode][Encode]")
+    {
+      Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(10000)));
+      REQUIRE(actual == Bencode::Bencoding("i10000e"));
+    }
+    SECTION("Encode an string ('qwertyuiopas') and check its value", "[Bencode][Encode]")
+    {
+      Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString("qwertyuiopas")));
+      REQUIRE(actual == Bencode::Bencoding("12:qwertyuiopas"));
+    }
+    SECTION("Encode an string ('abcdefghijklmnopqrstuvwxyz') and check its value", "[Bencode][Encode]")
+    {
+      Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString("abcdefghijklmnopqrstuvwxyz")));
+      REQUIRE(actual == Bencode::Bencoding("26:abcdefghijklmnopqrstuvwxyz"));
+    }
 }
 TEST_CASE("Creation and use of Bencode for encode of a table of integer test data", "[Bencode][Encode]")
 {
-  auto [test_input, expected] = GENERATE(table<long, std::string>({{277, "i277e"},
-                                                                   {32767, "i32767e"}}));
+  auto [test_input, expected] = GENERATE(table<long, Bencode::Bencoding>({{277, "i277e"},
+                                                                          {32767, "i32767e"}}));
   Bencode bEncode;
-  std::string actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(test_input)));
+  Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(test_input)));
   REQUIRE(actual == expected);
 }
 TEST_CASE("Creation and use of Bencode for encode of a table of string test data", "[Bencode][Encode]")
 {
-  auto [test_input, expected] = GENERATE(table<std::string, std::string>({{"qwertyuiopasd", "13:qwertyuiopasd"},
-                                                                          {"mnbvcx", "6:mnbvcx"}}));
+  auto [test_input, expected] = GENERATE(table<std::string, Bencode::Bencoding>({{"qwertyuiopasd", "13:qwertyuiopasd"},
+                                                                                 {"mnbvcx", "6:mnbvcx"}}));
   Bencode bEncode;
-  std::string actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString(test_input)));
+  Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString(test_input)));
   REQUIRE(actual == expected);
 }
 TEST_CASE("Creation and use of Bencode for encode of collection types (list, dictionary) ", "[Bencode][Encode]")
@@ -155,23 +160,23 @@ TEST_CASE("Creation and use of Bencode for encode of collection types (list, dic
   Bencode bEncode;
   SECTION("Encode an List of integers('li266ei6780ei88ee') and check value", "[Bencode][Encode]")
   {
-    std::string expected = "li266ei6780ei88ee";
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected.c_str())) == expected);
+    Bencode::Bencoding expected("li266ei6780ei88ee");
+    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected)) == expected);
   }
   SECTION("Encode an List of strings ('l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze') and check value", "[Bencode][Encode]")
   {
-    std::string expected = "l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze";
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected.c_str())) == expected);
+    Bencode::Bencoding expected = "l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze";
+    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected)) == expected);
   }
   SECTION("Encode an Dictionary of integers and check balue", "[Bencode][Encode]")
   {
-    std::string expected = "d3:onei1e5:threei3e3:twoi2ee";
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected.c_str())) == expected);
+    Bencode::Bencoding expected = "d3:onei1e5:threei3e3:twoi2ee";
+    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected)) == expected);
   }
   SECTION("Encode an Dictionary of strings and check balue", "[Bencode][Encode]")
   {
-    std::string expected = "d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle";
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected.c_str())) == expected);
+    Bencode::Bencoding expected = "d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle";
+    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected)) == expected);
   }
 }
 TEST_CASE("Decode generated exceptions", "[Bencode][Decode][Exceptions]")
@@ -236,7 +241,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
     std::fstream torrentFile{"./testData/singlefile.torrent"};
     std::ostringstream expected;
     expected << torrentFile.rdbuf();
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/singlefile.torrent")) == expected.str());
+    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/singlefile.torrent")) == Bencode::Bencoding(expected.str().c_str()));
   }
   SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
   {
@@ -248,7 +253,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
     std::fstream torrentFile{"./testData/multifile.torrent"};
     std::ostringstream expected;
     expected << torrentFile.rdbuf();
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/multifile.torrent")) == expected.str());
+    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/multifile.torrent")) == Bencode::Bencoding(expected.str().c_str()));
   }
 }
 TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][Torrents]")

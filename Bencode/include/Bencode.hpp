@@ -28,7 +28,19 @@ namespace H4
         /// <summary>
         /// Source/destination for bencoded strings.
         /// </summary>
-        using Bencoding = std::basic_string<char>;
+        struct Bencoding
+        {
+            Bencoding(const char *data)
+            {
+                while (*data != '\0')
+                {
+                    buffer.push_back((std::byte)*data);
+                    data++;
+                }
+            }
+            Bencoding() {}
+            std::vector<std::byte> buffer;
+        };
         /// <summary>
         /// Base for BNode structure.
         /// </summary>
@@ -109,7 +121,7 @@ namespace H4
             }
             unsigned char currentByte()
             {
-                return (m_decodeBuffer[m_bufferPosition]);
+                return ((unsigned char)m_decodeBuffer.buffer[m_bufferPosition]);
             }
             void moveToNextByte()
             {
@@ -121,10 +133,11 @@ namespace H4
             }
             bool bytesToDecode()
             {
-                return (m_bufferPosition < m_decodeBuffer.length());
+                return (m_bufferPosition < m_decodeBuffer.buffer.size());
             }
+
         private:
-            std::size_t m_bufferPosition=0;
+            std::size_t m_bufferPosition = 0;
             Bencoding m_decodeBuffer;
         };
         class FileSource : public ISource
@@ -151,6 +164,7 @@ namespace H4
             {
                 return (!m_source.eof());
             }
+
         private:
             std::fstream m_source;
         };
@@ -167,14 +181,19 @@ namespace H4
             }
             void addBytes(std::string bytes)
             {
-                m_encodeBuffer += bytes;
+
+                for (auto b : bytes)
+                {
+                    m_encodeBuffer.buffer.push_back((std::byte)b);
+                }
             }
-            std::string getBuffer()
+            Bencoding getBuffer()
             {
                 return (m_encodeBuffer);
             }
+
         private:
-            std::string m_encodeBuffer;
+            Bencoding m_encodeBuffer;
         };
         class FileDestination : public IDestination
         {
@@ -187,9 +206,11 @@ namespace H4
                     throw std::runtime_error("Bencode file output stream failed to open or could not be created.");
                 }
             }
-            void addBytes(std::string bytes) {
+            void addBytes(std::string bytes)
+            {
                 m_destination.write(bytes.c_str(), bytes.length());
             }
+
         private:
             std::ofstream m_destination;
         };
