@@ -90,7 +90,7 @@ namespace H4
         class ISource
         {
         public:
-            virtual unsigned char currentByte() = 0;
+            virtual std::byte currentByte() = 0;
             virtual void moveToNextByte() = 0;
             virtual bool bytesToDecode() = 0;
         };
@@ -129,9 +129,9 @@ namespace H4
             {
                 m_decodeBuffer = sourceBuffer;
             }
-            unsigned char currentByte()
+            std::byte currentByte()
             {
-                return ((unsigned char)m_decodeBuffer.buffer[m_bufferPosition]);
+                return (m_decodeBuffer.buffer[m_bufferPosition]);
             }
             void moveToNextByte()
             {
@@ -160,9 +160,9 @@ namespace H4
                     throw std::runtime_error("Bencode file input stream failed to open or does not exist.");
                 }
             }
-            unsigned char currentByte()
+            std::byte currentByte()
             {
-                return (m_source.peek());
+                return ((std::byte) m_source.peek());
             }
             void moveToNextByte()
             {

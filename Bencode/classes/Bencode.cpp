@@ -39,9 +39,9 @@ namespace H4
     inline long Bencode::decodePositiveInteger(ISource *source)
     {
         m_workBuffer.clear();
-        while (source->bytesToDecode() && std::isdigit(source->currentByte()))
+        while (source->bytesToDecode() && std::isdigit((char) source->currentByte()))
         {
-            m_workBuffer += source->currentByte();
+            m_workBuffer += (char) source->currentByte();
             source->moveToNextByte();
         }
         return (std::stol(m_workBuffer));
@@ -49,7 +49,7 @@ namespace H4
     inline std::string Bencode::decodeString(ISource *source)
     {
         int stringLength = decodePositiveInteger(source);
-        if (source->currentByte() != ':')
+        if (source->currentByte() != (std::byte) ':')
         {
             throw std::runtime_error("Missing terminating ':' on string length.");
         }
@@ -57,20 +57,20 @@ namespace H4
         m_workBuffer.clear();
         while (stringLength-- > 0)
         {
-            m_workBuffer += source->currentByte();
+            m_workBuffer += (char) source->currentByte();
             source->moveToNextByte();
         }
         return (m_workBuffer);
     }
     std::unique_ptr<BNode> Bencode::decodeToBNodes(ISource *source)
     {
-        switch (source->currentByte())
+        switch ((char) source->currentByte())
         {
         case 'd':
         {
             source->moveToNextByte();
             BNodeDict bNodeDictionary;
-            while (source->bytesToDecode() && source->currentByte() != 'e')
+            while (source->bytesToDecode() && source->currentByte() != (std::byte) 'e')
             {
                 std::string key = decodeString(source);
                 bNodeDictionary.dict[key] = decodeToBNodes(source);
@@ -86,7 +86,7 @@ namespace H4
         {
             source->moveToNextByte();
             BNodeList bNodeList;
-            while (source->bytesToDecode() && source->currentByte() != 'e')
+            while (source->bytesToDecode() && source->currentByte() !=  (std::byte) 'e')
             {
                 bNodeList.list.push_back(decodeToBNodes(source));
             }
@@ -101,13 +101,13 @@ namespace H4
         {
             long integer = 1;
             source->moveToNextByte();
-            if (source->currentByte() == '-')
+            if (source->currentByte() ==  (std::byte)'-')
             {
                 source->moveToNextByte();
                 integer = -1;
             }
             integer *= decodePositiveInteger(source);
-            if (source->currentByte() != 'e')
+            if (source->currentByte() !=  (std::byte) 'e')
             {
                 throw std::runtime_error("Missing terminating 'e' on integer.");
             }
