@@ -2,10 +2,6 @@
 #include "Bencode.hpp"
 using namespace H4;
 
-inline bool operator==(const Bencode::Bencoding &lhs, const Bencode::Bencoding &rhs)
-{
-  return (std::equal(lhs.buffer.begin(), lhs.buffer.end(), rhs.buffer.begin()));
-}
 TEST_CASE("Creation and use of Bencode for decode of simple types (number, string) ", "[Bencode][Decode]")
 {
   Bencode bEncode;

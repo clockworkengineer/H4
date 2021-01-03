@@ -4,7 +4,6 @@
 // C++ STL
 //
 #include <string>
-#include <string_view>
 #include <map>
 #include <vector>
 #include <list>
@@ -135,7 +134,6 @@ namespace H4
             {
                 return (m_bufferPosition < m_decodeBuffer.buffer.size());
             }
-
         private:
             std::size_t m_bufferPosition = 0;
             Bencoding m_decodeBuffer;
@@ -164,7 +162,6 @@ namespace H4
             {
                 return (!m_source.eof());
             }
-
         private:
             std::fstream m_source;
         };
@@ -181,7 +178,6 @@ namespace H4
             }
             void addBytes(std::string bytes)
             {
-
                 for (auto b : bytes)
                 {
                     m_encodeBuffer.buffer.push_back((std::byte)b);
@@ -191,7 +187,6 @@ namespace H4
             {
                 return (m_encodeBuffer);
             }
-
         private:
             Bencoding m_encodeBuffer;
         };
@@ -210,7 +205,6 @@ namespace H4
             {
                 m_destination.write(bytes.c_str(), bytes.length());
             }
-
         private:
             std::ofstream m_destination;
         };
@@ -237,5 +231,9 @@ namespace H4
     using BNodeString = Bencode::BNodeString;
     using BNodeList = Bencode::BNodeList;
     using BNodeDict = Bencode::BNodeDict;
+    inline bool operator==(const Bencode::Bencoding &lhs, const Bencode::Bencoding &rhs)
+    {
+        return (std::equal(lhs.buffer.begin(), lhs.buffer.end(), rhs.buffer.begin()));
+    }
 } // namespace H4
 #endif /* BENCODE_HPP */
