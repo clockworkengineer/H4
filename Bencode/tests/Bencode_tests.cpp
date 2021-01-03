@@ -1,7 +1,30 @@
 #include "catch.hpp"
 #include "Bencode.hpp"
+#include <filesystem>
+#include <fstream>
+#include <iterator>
+#include <string>
+#include <algorithm>
 using namespace H4;
-
+bool compareFiles(const std::string &p1, const std::string &p2)
+{
+  std::ifstream f1(p1, std::ifstream::binary | std::ifstream::ate);
+  std::ifstream f2(p2, std::ifstream::binary | std::ifstream::ate);
+  if (f1.fail() || f2.fail())
+  {
+    return false; //file problem
+  }
+  if (f1.tellg() != f2.tellg())
+  {
+    return false; //size mismatch
+  }
+  //seek back to beginning and use std::equal to compare contents
+  f1.seekg(0, std::ifstream::beg);
+  f2.seekg(0, std::ifstream::beg);
+  return std::equal(std::istreambuf_iterator<char>(f1.rdbuf()),
+                    std::istreambuf_iterator<char>(),
+                    std::istreambuf_iterator<char>(f2.rdbuf()));
+}
 TEST_CASE("Creation and use of Bencode for decode of simple types (number, string) ", "[Bencode][Decode]")
 {
   Bencode bEncode;
@@ -119,21 +142,21 @@ TEST_CASE("Creation and use of Bencode for encode of simple types (number, strin
     Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(266)));
     REQUIRE(actual == Bencode::Bencoding("i266e"));
   }
-    SECTION("Encode an integer (10000) and check value", "[Bencode][Encode]")
-    {
-      Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(10000)));
-      REQUIRE(actual == Bencode::Bencoding("i10000e"));
-    }
-    SECTION("Encode an string ('qwertyuiopas') and check its value", "[Bencode][Encode]")
-    {
-      Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString("qwertyuiopas")));
-      REQUIRE(actual == Bencode::Bencoding("12:qwertyuiopas"));
-    }
-    SECTION("Encode an string ('abcdefghijklmnopqrstuvwxyz') and check its value", "[Bencode][Encode]")
-    {
-      Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString("abcdefghijklmnopqrstuvwxyz")));
-      REQUIRE(actual == Bencode::Bencoding("26:abcdefghijklmnopqrstuvwxyz"));
-    }
+  SECTION("Encode an integer (10000) and check value", "[Bencode][Encode]")
+  {
+    Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(10000)));
+    REQUIRE(actual == Bencode::Bencoding("i10000e"));
+  }
+  SECTION("Encode an string ('qwertyuiopas') and check its value", "[Bencode][Encode]")
+  {
+    Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString("qwertyuiopas")));
+    REQUIRE(actual == Bencode::Bencoding("12:qwertyuiopas"));
+  }
+  SECTION("Encode an string ('abcdefghijklmnopqrstuvwxyz') and check its value", "[Bencode][Encode]")
+  {
+    Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString("abcdefghijklmnopqrstuvwxyz")));
+    REQUIRE(actual == Bencode::Bencoding("26:abcdefghijklmnopqrstuvwxyz"));
+  }
 }
 TEST_CASE("Creation and use of Bencode for encode of a table of integer test data", "[Bencode][Encode]")
 {
@@ -265,38 +288,31 @@ TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][T
     REQUIRE_THROWS_AS(bEncode.decodeFile("./testData/multifileerror.torrent"), std::runtime_error);
     REQUIRE_THROWS_WITH(bEncode.decodeFile("./testData/multifileerror.torrent"), "Missing terminating ':' on string length.");
   }
-    SECTION("Decode doesntexist.torrent", "[Bencode][Decode][Torrents]")
+  SECTION("Decode doesntexist.torrent", "[Bencode][Decode][Torrents]")
   {
     REQUIRE_THROWS_AS(bEncode.decodeFile("./testData/doesntexist.torrent"), std::runtime_error);
     REQUIRE_THROWS_WITH(bEncode.decodeFile("./testData/doesntexist.torrent"), "Bencode file input stream failed to open or does not exist.");
   }
 }
-
-TEST_CASE("Encode torrent files using decodeFile", "[Bencode][Encode][Torrents]")
+TEST_CASE("Encode torrent files using encodeToFile", "[Bencode][Encode][Torrents]")
 {
-  // Bencode bEncode;
-  // SECTION("Decode singlefile.torrent", "[Bencode][Decode][Torrents]")
-  // {
-  //   std::unique_ptr<BNode> bNodeRoot = bEncode.decodeFile("./testData/singlefile.torrent");
-  //   REQUIRE(dynamic_cast<BNodeDict *>(bNodeRoot.get()) != nullptr);
-  // }
-  // SECTION("Decode singlefile.torrent and check value ", "[Bencode][Decode][Torrents]")
-  // {
-  //   std::fstream torrentFile{"./testData/singlefile.torrent"};
-  //   std::ostringstream expected;
-  //   expected << torrentFile.rdbuf();
-  //   REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/singlefile.torrent")) == expected.str());
-  // }
-  // SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
-  // {
-  //   std::unique_ptr<BNode> bNodeRoot = bEncode.decodeFile("./testData/multifile.torrent");
-  //   REQUIRE(dynamic_cast<BNodeDict *>(bNodeRoot.get()) != nullptr);
-  // }
-  // SECTION("Decode multifile.torrent and check value ", "[Bencode][Decode][Torrents]")
-  // {
-  //   std::fstream torrentFile{"./testData/multifile.torrent"};
-  //   std::ostringstream expected;
-  //   expected << torrentFile.rdbuf();
-  //   REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/multifile.torrent")) == expected.str());
-  // }
+  Bencode bEncode;
+  SECTION("Encode singlefile.torrent and check value", "[Bencode][Encode][Torrents]")
+  {
+    if (std::filesystem::exists("./testData/generated.torrent"))
+    {
+      std::filesystem::remove("./testData/generated.torrent");
+    }
+    bEncode.encodeToFile(bEncode.decodeFile("./testData/singlefile.torrent"), "./testData/generated.torrent");
+    REQUIRE_FALSE(!compareFiles("./testData/singlefile.torrent", "./testData/generated.torrent"));
+  }
+  SECTION("Encode multifile.torrent and check value", "[Bencode][Encode][Torrents]")
+  {
+    if (std::filesystem::exists("./testData/generated.torrent"))
+    {
+      std::filesystem::remove("./testData/generated.torrent");
+    }
+    bEncode.encodeToFile(bEncode.decodeFile("./testData/multifile.torrent"), "./testData/generated.torrent");
+    REQUIRE_FALSE(!compareFiles("./testData/multifile.torrent", "./testData/generated.torrent"));
+  }
 }

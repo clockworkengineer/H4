@@ -24,9 +24,9 @@ namespace H4
         // ==========================
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
-        /// <summary>
-        /// Source/destination for bencoded strings.
-        /// </summary>
+        //
+        // Source/destination for bencoded strings.
+        //
         struct Bencoding
         {
             Bencoding(const char *data)
@@ -40,30 +40,30 @@ namespace H4
             Bencoding() {}
             std::vector<std::byte> buffer;
         };
-        /// <summary>
-        /// Base for BNode structure.
-        /// </summary>
+        //
+        // Base for BNode structure.
+        //
         struct BNode
         {
             virtual ~BNode() = default;
         };
-        /// <summary>
-        /// Dictionary BNode.
-        /// </summary>
+        //
+        // Dictionary BNode.
+        //
         struct BNodeDict : BNode
         {
             std::map<std::string, std::unique_ptr<BNode>> dict;
         };
-        /// <summary>
-        /// List BNode.
-        /// </summary>
+        //
+        // List BNode.
+        //
         struct BNodeList : BNode
         {
             std::list<std::unique_ptr<BNode>> list;
         };
-        /// <summary>
-        /// Number BNode.
-        /// </summary>
+        //
+        // Number BNode.
+        //
         struct BNodeInteger : BNode
         {
             long number;
@@ -72,9 +72,9 @@ namespace H4
                 this->number = number;
             }
         };
-        /// <summary>
-        /// String BNode.
-        /// </summary>
+        //
+        // String BNode.
+        //
         struct BNodeString : BNode
         {
         public:
@@ -83,6 +83,24 @@ namespace H4
             {
                 this->string = string;
             }
+        };
+        //
+        // Source interface
+        //
+        class ISource
+        {
+        public:
+            virtual unsigned char currentByte() = 0;
+            virtual void moveToNextByte() = 0;
+            virtual bool bytesToDecode() = 0;
+        };
+        //
+        // Destination interface
+        //
+        class IDestination
+        {
+        public:
+            virtual void addBytes(std::string bytes) = 0;
         };
         // ============
         // CONSTRUCTORS
@@ -104,13 +122,6 @@ namespace H4
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
         // ===========================
-        class ISource
-        {
-        public:
-            virtual unsigned char currentByte() = 0;
-            virtual void moveToNextByte() = 0;
-            virtual bool bytesToDecode() = 0;
-        };
         class BufferSource : public ISource
         {
         public:
@@ -164,11 +175,6 @@ namespace H4
             }
         private:
             std::fstream m_source;
-        };
-        class IDestination
-        {
-        public:
-            virtual void addBytes(std::string bytes) = 0;
         };
         class BufferDestination : public IDestination
         {
@@ -224,13 +230,17 @@ namespace H4
         std::string m_workBuffer;
     };
     //
-    // Shortcuts for node structure
+    // Shortcuts for B node structure and Bencoding type
     //
     using BNode = Bencode::BNode;
     using BNodeInteger = Bencode::BNodeInteger;
     using BNodeString = Bencode::BNodeString;
     using BNodeList = Bencode::BNodeList;
     using BNodeDict = Bencode::BNodeDict;
+    using Bencoding = Bencode::Bencoding;
+    //
+    // Bencoding comparison operator
+    //
     inline bool operator==(const Bencode::Bencoding &lhs, const Bencode::Bencoding &rhs)
     {
         return (std::equal(lhs.buffer.begin(), lhs.buffer.end(), rhs.buffer.begin()));
