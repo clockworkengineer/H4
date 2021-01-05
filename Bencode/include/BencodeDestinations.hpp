@@ -22,7 +22,6 @@ namespace H4
         {
             return (m_encodeBuffer);
         }
-
     private:
         Bencoding m_encodeBuffer;
     };
@@ -41,7 +40,6 @@ namespace H4
         {
             m_destination.write(bytes.c_str(), bytes.length());
         }
-
     private:
         std::ofstream m_destination;
     };

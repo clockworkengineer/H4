@@ -24,7 +24,7 @@ namespace H4
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
         //
-        // Source/destination for bencoded strings.
+        // Source/destination for Bencoded data.
         //
         struct Bencoding
         {
@@ -51,24 +51,24 @@ namespace H4
         //
         struct BNodeDict : BNode
         {
-            std::map<std::string, std::unique_ptr<BNode>> dict;
+            std::map<std::string, std::unique_ptr<BNode>> value;
         };
         //
         // List BNode.
         //
         struct BNodeList : BNode
         {
-            std::list<std::unique_ptr<BNode>> list;
+            std::list<std::unique_ptr<BNode>> value;
         };
         //
-        // Number BNode.
+        // Integer BNode.
         //
         struct BNodeInteger : BNode
         {
-            long number;
-            BNodeInteger(long number)
+            long value;
+            BNodeInteger(long value)
             {
-                this->number = number;
+                this->value = value;
             }
         };
         //
@@ -77,10 +77,10 @@ namespace H4
         struct BNodeString : BNode
         {
         public:
-            std::string string;
-            BNodeString(std::string string)
+            std::string value;
+            BNodeString(std::string value)
             {
-                this->string = string;
+                this->value = value;
             }
         };
         //
@@ -110,7 +110,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        std::unique_ptr<BNode> decodeBuffer(Bencoding source);
+        std::unique_ptr<BNode> decodeBuffer(const Bencoding& source);
         std::unique_ptr<BNode> decodeFile(std::string fileName);
         Bencoding encodeToBuffer(std::unique_ptr<BNode> bNodeRoot);
         void encodeToFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName);
@@ -145,7 +145,6 @@ namespace H4
     using BNodeList = Bencode::BNodeList;
     using BNodeDict = Bencode::BNodeDict;
     using Bencoding = Bencode::Bencoding;
-
     //
     // Bencoding comparison operator
     //
