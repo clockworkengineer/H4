@@ -14,7 +14,7 @@ namespace H4
         }
         std::byte currentByte()
         {
-            return (m_decodeBuffer.buffer[m_bufferPosition]);
+            return (m_decodeBuffer.bEncodedBuffer[m_bufferPosition]);
         }
         void moveToNextByte()
         {
@@ -26,7 +26,7 @@ namespace H4
         }
         bool bytesToDecode()
         {
-            return (m_bufferPosition < m_decodeBuffer.buffer.size());
+            return (m_bufferPosition < m_decodeBuffer.bEncodedBuffer.size());
         }
 
     private:

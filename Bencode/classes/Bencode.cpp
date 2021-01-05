@@ -191,7 +191,7 @@ namespace H4
     /// <returns>BNode structure root.</returns> 
     std::unique_ptr<BNode> Bencode::decodeBuffer(const Bencoding& sourceBuffer)
     {
-        if (sourceBuffer.buffer.empty())
+        if (sourceBuffer.bEncodedBuffer.empty())
         {
             throw std::invalid_argument("Empty string passed to be decoded.");
         }
@@ -206,9 +206,9 @@ namespace H4
         FileSource source(std::move(sourceFileName));
         return decodeToBNodes(&source);
     }
-    /// <summary></summary>
-    /// <param name="bNodeRoot"></param>  
-    /// <returns></returns> 
+    /// <summary>Take BNode structure and create an Bencode encoding for it in a destination buffer.</summary>
+    /// <param name="bNodeRoot">Bnode structure root.</param>  
+    /// <returns>Encoded data buffer.</returns> 
     Bencode::Bencoding Bencode::encodeToBuffer(std::unique_ptr<BNode> bNodeRoot)
     {
         if (bNodeRoot == nullptr)
@@ -219,10 +219,9 @@ namespace H4
         encodeFromBNodes(bNodeRoot.get(), &destination);
         return (destination.getBuffer());
     }
-    /// <summary></summary>
-    /// <param name="bNodeRoot"></param> 
-    /// <param name="destinationFileName"></param>  
-    /// <returns></returns> 
+    /// <summary>Take BNode structure and create an Bencode encoding for it in a destination file.</summary>
+    /// <param name="bNodeRoot">Bnode structure root.</param>  
+    /// <param name="destinationFileName">Destination file name.</param>  
     void Bencode::encodeToFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName)
     {
         if (bNodeRoot == nullptr)

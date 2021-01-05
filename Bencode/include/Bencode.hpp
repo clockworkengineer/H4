@@ -28,16 +28,16 @@ namespace H4
         //
         struct Bencoding
         {
-            Bencoding(const char *data)
+            Bencoding(const char *bEncodedData)
             {
-                while (*data != '\0')
+                while (*bEncodedData != '\0')
                 {
-                    buffer.push_back((std::byte)*data);
-                    data++;
+                    bEncodedBuffer.push_back((std::byte)*bEncodedData);
+                    bEncodedData++;
                 }
             }
             Bencoding() {}
-            std::vector<std::byte> buffer;
+            std::vector<std::byte> bEncodedBuffer;
         };
         //
         // Base for BNode structure.
@@ -137,7 +137,7 @@ namespace H4
         std::string m_workBuffer;
     };
     //
-    // Shortcuts for B node structure and Bencoding type
+    // Shortcuts for BNode structure and Bencoding type
     //
     using BNode = Bencode::BNode;
     using BNodeInteger = Bencode::BNodeInteger;
@@ -150,7 +150,7 @@ namespace H4
     //
     inline bool operator==(const Bencode::Bencoding &lhs, const Bencode::Bencoding &rhs)
     {
-        return (std::equal(lhs.buffer.begin(), lhs.buffer.end(), rhs.buffer.begin()));
+        return (std::equal(lhs.bEncodedBuffer.begin(), lhs.bEncodedBuffer.end(), rhs.bEncodedBuffer.begin()));
     }
 } // namespace H4
 #endif /* BENCODE_HPP */

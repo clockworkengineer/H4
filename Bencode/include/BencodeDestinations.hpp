@@ -15,7 +15,7 @@ namespace H4
         {
             for (auto b : bytes)
             {
-                m_encodeBuffer.buffer.push_back((std::byte)b);
+                m_encodeBuffer.bEncodedBuffer.push_back((std::byte)b);
             }
         }
         Bencoding getBuffer()
