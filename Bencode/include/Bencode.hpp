@@ -9,7 +9,6 @@
 #include <list>
 #include <memory>
 #include <fstream>
-#include <iostream>
 // =========
 // NAMESPACE
 // =========
@@ -155,5 +154,4 @@ namespace H4
         return (std::equal(lhs.buffer.begin(), lhs.buffer.end(), rhs.buffer.begin()));
     }
 } // namespace H4
-#include "BencodeSources.hpp"
 #endif /* BENCODE_HPP */

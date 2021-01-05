@@ -9,6 +9,8 @@
 // CLASS DEFINITIONS
 // =================
 #include "Bencode.hpp"
+#include "BencodeSources.hpp"
+#include "BencodeDestinations.hpp"
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
