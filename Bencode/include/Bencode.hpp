@@ -40,17 +40,32 @@ namespace H4
             std::vector<std::byte> bEncodedBuffer;
         };
         //
-        // Base for BNode structure.
+        // BNode structure.
+        //
+        enum BNodeType {
+            base=0,
+            dictionary=1,
+            list=2,
+            integer=3,
+            string=4
+        };
+        //
+        // Base BNode/
         //
         struct BNode
         {
-            virtual ~BNode() = default;
+            BNode(BNodeType nodeType = BNodeType::base)
+            {
+                this->nodeType = nodeType;
+            }
+            BNodeType nodeType;
         };
         //
         // Dictionary BNode.
         //
         struct BNodeDict : BNode
         {
+            BNodeDict() : BNode(BNodeType::dictionary) {}
             std::map<std::string, std::unique_ptr<BNode>> value;
         };
         //
@@ -58,6 +73,7 @@ namespace H4
         //
         struct BNodeList : BNode
         {
+            BNodeList() : BNode(BNodeType::list) {}
             std::list<std::unique_ptr<BNode>> value;
         };
         //
@@ -66,7 +82,7 @@ namespace H4
         struct BNodeInteger : BNode
         {
             long value;
-            BNodeInteger(long value)
+            BNodeInteger(long value) : BNode(BNodeType::integer)
             {
                 this->value = value;
             }
@@ -78,7 +94,7 @@ namespace H4
         {
         public:
             std::string value;
-            BNodeString(std::string value)
+            BNodeString(std::string value) : BNode(BNodeType::string)
             {
                 this->value = value;
             }
@@ -110,7 +126,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        std::unique_ptr<BNode> decodeBuffer(const Bencoding& source);
+        std::unique_ptr<BNode> decodeBuffer(const Bencoding &source);
         std::unique_ptr<BNode> decodeFile(std::string fileName);
         Bencoding encodeToBuffer(std::unique_ptr<BNode> bNodeRoot);
         void encodeToFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName);

@@ -30,13 +30,13 @@ TEST_CASE("Creation and use of Bencode for decode of simple types (number, strin
   Bencode bEncode;
   SECTION("Decode an integer", "[Bencode][Decode]")
   {
-    std::unique_ptr<BNode> bNodeInteger = bEncode.decodeBuffer("i266e");
-    REQUIRE(dynamic_cast<BNodeInteger *>(bNodeInteger.get()) != nullptr);
+    std::unique_ptr<BNode> bNode = bEncode.decodeBuffer("i266e");
+    ((BNode *)bNode.get())->nodeType = Bencode::BNodeType::integer;
   }
   SECTION("Decode an string", "[Bencode][Decode]")
   {
-    std::unique_ptr<BNode> bNodeString = bEncode.decodeBuffer("12:qwertyuiopas");
-    REQUIRE(dynamic_cast<BNodeString *>(bNodeString.get()) != nullptr);
+    std::unique_ptr<BNode> bNode = bEncode.decodeBuffer("12:qwertyuiopas");
+    ((BNode *)bNode.get())->nodeType = Bencode::BNodeType::string;
   }
   SECTION("Decode an integer (266) and check value", "[Bencode][Decode]")
   {
@@ -85,13 +85,13 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
   Bencode bEncode;
   SECTION("Decode an List", "[Bencode][Decode]")
   {
-    std::unique_ptr<BNode> bNodeList = bEncode.decodeBuffer("li266ei6780ei88ee");
-    REQUIRE(dynamic_cast<BNodeList *>(bNodeList.get()) != nullptr);
+    std::unique_ptr<BNode> bNode = bEncode.decodeBuffer("li266ei6780ei88ee");
+    ((BNode *)bNode.get())->nodeType = Bencode::BNodeType::list;
   }
   SECTION("Decode an Dictionary", "[Bencode][Decode]")
   {
-    std::unique_ptr<BNode> bNodeDict = bEncode.decodeBuffer("d3:onei1e5:threei3e3:twoi2ee");
-    REQUIRE(dynamic_cast<BNodeDict *>(bNodeDict.get()) != nullptr);
+    std::unique_ptr<BNode> bNode = bEncode.decodeBuffer("d3:onei1e5:threei3e3:twoi2ee");
+    ((BNode *)bNode.get())->nodeType = Bencode::BNodeType::dictionary;
   }
   SECTION("Decode an list of integers and check values", "[Bencode][Decode]")
   {
@@ -252,8 +252,8 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   Bencode bEncode;
   SECTION("Decode singlefile.torrent", "[Bencode][Decode][Torrents]")
   {
-    std::unique_ptr<BNode> bNodeRoot = bEncode.decodeFile("./testData/singlefile.torrent");
-    REQUIRE(dynamic_cast<BNodeDict *>(bNodeRoot.get()) != nullptr);
+    std::unique_ptr<BNode> bNode = bEncode.decodeFile("./testData/singlefile.torrent");
+    ((BNode *)bNode.get())->nodeType = Bencode::BNodeType::dictionary;
   }
   SECTION("Decode singlefile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
@@ -264,8 +264,8 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   }
   SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
   {
-    std::unique_ptr<BNode> bNodeRoot = bEncode.decodeFile("./testData/multifile.torrent");
-    REQUIRE(dynamic_cast<BNodeDict *>(bNodeRoot.get()) != nullptr);
+    std::unique_ptr<BNode> bNode = bEncode.decodeFile("./testData/multifile.torrent");
+    ((BNode *)bNode.get())->nodeType = Bencode::BNodeType::dictionary;
   }
   SECTION("Decode multifile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
