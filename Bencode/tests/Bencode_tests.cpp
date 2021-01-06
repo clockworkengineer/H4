@@ -7,6 +7,12 @@
 #include <iterator>
 #include <string>
 #include <algorithm>
+const char *kSingleFileTorrent="./testData/singlefile.torrent";
+const char *kMultiFileTorrent="./testData/multifile.torrent";
+const char *kSingleFileWithErrorTorrent="./testData/singlefileerror.torrent";
+const char *kMultiFileWithErrorTorrent="./testData/multifileerror.torrent";
+const char *kNonExistantTorrent="./testData/doesntexist.torrent";
+const char *kGeneratedTorrent="./testData/generated.torrent";
 using namespace H4;
 bool compareFiles(const std::string &p1, const std::string &p2)
 {
@@ -254,27 +260,27 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   Bencode bEncode;
   SECTION("Decode singlefile.torrent", "[Bencode][Decode][Torrents]")
   {
-    std::unique_ptr<BNode> bNode = bEncode.decodeFile("./testData/singlefile.torrent");
+    std::unique_ptr<BNode> bNode = bEncode.decodeFile(kSingleFileTorrent);
     ((BNode *)bNode.get())->nodeType = Bencode::BNodeType::dictionary;
   }
   SECTION("Decode singlefile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
-    std::ifstream torrentFile{"./testData/singlefile.torrent"};
+    std::ifstream torrentFile{kSingleFileTorrent};
     std::ostringstream expected;
     expected << torrentFile.rdbuf();
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/singlefile.torrent")) == Bencode::Bencoding(expected.str()));
+    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile(kSingleFileTorrent)) == Bencode::Bencoding(expected.str()));
   }
   SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
   {
-    std::unique_ptr<BNode> bNode = bEncode.decodeFile("./testData/multifile.torrent");
+    std::unique_ptr<BNode> bNode = bEncode.decodeFile(kMultiFileTorrent);
     ((BNode *)bNode.get())->nodeType = Bencode::BNodeType::dictionary;
   }
   SECTION("Decode multifile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
-    std::ifstream torrentFile{"./testData/multifile.torrent"};
+    std::ifstream torrentFile{kMultiFileTorrent};
     std::ostringstream expected;
     expected << torrentFile.rdbuf();
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/multifile.torrent")) == Bencode::Bencoding(expected.str()));
+    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile(kMultiFileTorrent)) == Bencode::Bencoding(expected.str()));
   }
 }
 TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][Torrents]")
@@ -282,18 +288,18 @@ TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][T
   Bencode bEncode;
   SECTION("Decode singlefileerror.torrent", "[Bencode][Decode][Torrents]")
   {
-    REQUIRE_THROWS_AS(bEncode.decodeFile("./testData/singlefileerror.torrent"), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.decodeFile("./testData/singlefileerror.torrent"), "Missing terminating ':' on string length.");
+    REQUIRE_THROWS_AS(bEncode.decodeFile(kSingleFileWithErrorTorrent), std::runtime_error);
+    REQUIRE_THROWS_WITH(bEncode.decodeFile(kSingleFileWithErrorTorrent), "Missing terminating ':' on string length.");
   }
   SECTION("Decode multifileerror.torrent", "[Bencode][Decode][Torrents]")
   {
-    REQUIRE_THROWS_AS(bEncode.decodeFile("./testData/multifileerror.torrent"), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.decodeFile("./testData/multifileerror.torrent"), "Missing terminating ':' on string length.");
+    REQUIRE_THROWS_AS(bEncode.decodeFile(kMultiFileWithErrorTorrent), std::runtime_error);
+    REQUIRE_THROWS_WITH(bEncode.decodeFile(kMultiFileWithErrorTorrent), "Missing terminating ':' on string length.");
   }
   SECTION("Decode doesntexist.torrent", "[Bencode][Decode][Torrents]")
   {
-    REQUIRE_THROWS_AS(bEncode.decodeFile("./testData/doesntexist.torrent"), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.decodeFile("./testData/doesntexist.torrent"), "Bencode file input stream failed to open or does not exist.");
+    REQUIRE_THROWS_AS(bEncode.decodeFile(kNonExistantTorrent), std::runtime_error);
+    REQUIRE_THROWS_WITH(bEncode.decodeFile(kNonExistantTorrent), "Bencode file input stream failed to open or does not exist.");
   }
 }
 TEST_CASE("Encode torrent files using encodeToFile", "[Bencode][Encode][Torrents]")
@@ -301,21 +307,21 @@ TEST_CASE("Encode torrent files using encodeToFile", "[Bencode][Encode][Torrents
   Bencode bEncode;
   SECTION("Encode singlefile.torrent and check value", "[Bencode][Encode][Torrents]")
   {
-    if (std::filesystem::exists("./testData/generated.torrent"))
+    if (std::filesystem::exists(kGeneratedTorrent))
     {
-      std::filesystem::remove("./testData/generated.torrent");
+      std::filesystem::remove(kGeneratedTorrent);
     }
-    bEncode.encodeToFile(bEncode.decodeFile("./testData/singlefile.torrent"), "./testData/generated.torrent");
-    REQUIRE_FALSE(!compareFiles("./testData/singlefile.torrent", "./testData/generated.torrent"));
+    bEncode.encodeToFile(bEncode.decodeFile(kSingleFileTorrent), kGeneratedTorrent);
+    REQUIRE_FALSE(!compareFiles(kSingleFileTorrent, kGeneratedTorrent));
   }
   SECTION("Encode multifile.torrent and check value", "[Bencode][Encode][Torrents]")
   {
-    if (std::filesystem::exists("./testData/generated.torrent"))
+    if (std::filesystem::exists(kGeneratedTorrent))
     {
-      std::filesystem::remove("./testData/generated.torrent");
+      std::filesystem::remove(kGeneratedTorrent);
     }
-    bEncode.encodeToFile(bEncode.decodeFile("./testData/multifile.torrent"), "./testData/generated.torrent");
-    REQUIRE_FALSE(!compareFiles("./testData/multifile.torrent", "./testData/generated.torrent"));
+    bEncode.encodeToFile(bEncode.decodeFile(kMultiFileTorrent), kGeneratedTorrent);
+    REQUIRE_FALSE(!compareFiles(kMultiFileTorrent, kGeneratedTorrent));
   }
 }
 TEST_CASE("Creation and use of ISource (File) interface.", "[Bencode][Decode][ISource]")
@@ -323,33 +329,33 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[Bencode][Decode][IS
 
   SECTION("Create FileSource with singlefile.torrent.", "[Bencode][Decode][ISource]")
   {
-    REQUIRE_NOTHROW(FileSource("./testData/singlefile.torrent"));
+    REQUIRE_NOTHROW(FileSource(kSingleFileTorrent));
   }
 
   SECTION("Create FileSource with non existants file.", "[Bencode][Decode][ISource]")
   {
-    REQUIRE_THROWS_AS(FileSource("./testData/doesntexist.torrent"), std::runtime_error);
-    REQUIRE_THROWS_WITH(FileSource("./testData/doesntexist.torrent"), "Bencode file input stream failed to open or does not exist.");
+    REQUIRE_THROWS_AS(FileSource(kNonExistantTorrent), std::runtime_error);
+    REQUIRE_THROWS_WITH(FileSource(kNonExistantTorrent), "Bencode file input stream failed to open or does not exist.");
   }
 
   SECTION("Create FileSource with singlefile.torrent. and positioned on the correct first character", "[Bencode][Decode][ISource]")
   {
-    FileSource source = FileSource("./testData/singlefile.torrent");
+    FileSource source = FileSource(kSingleFileTorrent);
     REQUIRE_FALSE(!source.bytesToDecode());
     REQUIRE((char)source.currentByte() == 'd');
   }
 
-  SECTION("Create FileSource with singlefile.torrent moveToNextByte positions to correct next character", "[Bencode][Decode][ISource]")
+  SECTION("Create FileSource with singlefile.torrent and then check moveToNextByte positions to correct next character", "[Bencode][Decode][ISource]")
   {
-    FileSource source = FileSource("./testData/singlefile.torrent");
+    FileSource source = FileSource(kSingleFileTorrent);
     source.moveToNextByte();
     REQUIRE_FALSE(!source.bytesToDecode());
     REQUIRE((char)source.currentByte() == '8');
   }
 
-  SECTION("Create FileSource with singlefile.torrent move to last character, check it and the bytes moved.", "[Bencode][Decode][ISource]")
+  SECTION("Create FileSource with singlefile.torrent move past last character, check it and the bytes moved.", "[Bencode][Decode][ISource]")
   {
-    FileSource source = FileSource("./testData/singlefile.torrent");
+    FileSource source = FileSource(kSingleFileTorrent);
     long length = 0;
     while (source.bytesToDecode())
     {
@@ -364,7 +370,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[Bencode][Decode][IS
 TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file singlefile.torrent).", "[Bencode][Decode][ISource]")
 {
 
-  std::ifstream torrentFile{"./testData/singlefile.torrent"};
+  std::ifstream torrentFile{kSingleFileTorrent};
   std::ostringstream buffer;
   buffer << torrentFile.rdbuf();
 
@@ -386,7 +392,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE((char)source.currentByte() == 'd');
   }
 
-  SECTION("Create BufferSource with singlefile.torrent and that moveToNextByte positions to correct next character", "[Bencode][Decode][ISource]")
+  SECTION("Create BufferSource with singlefile.torrent and then check moveToNextByte positions to correct next character", "[Bencode][Decode][ISource]")
   {
     BufferSource source = BufferSource(buffer.str());
     source.moveToNextByte();
@@ -394,7 +400,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE((char)source.currentByte() == '8');
   }
 
-  SECTION("Create BufferSource with singlefile.torrent move to last character, check it and the bytes moved.", "[Bencode][Decode][ISource]")
+  SECTION("Create BufferSource with singlefile.torrent move past last character, check it and the bytes moved.", "[Bencode][Decode][ISource]")
   {
     BufferSource source = BufferSource(buffer.str());
     long length = 0;
