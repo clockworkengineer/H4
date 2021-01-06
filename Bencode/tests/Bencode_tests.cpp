@@ -1,19 +1,42 @@
+//
+// Unit Tests: Bencode
+//
+// Description: Unit tests for Bencode class using the Catch2 test framework.
+//
+//
+// Test framework include
+//
 #include "catch.hpp"
+//
+// Class under test includes
+//
 #include "Bencode.hpp"
 #include "BencodeSources.hpp"
 #include "BencodeDestinations.hpp"
+//
+// STL includes
+//
 #include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <string>
 #include <algorithm>
+//
+// Unit test constants
+//
 const char *kSingleFileTorrent="./testData/singlefile.torrent";
 const char *kMultiFileTorrent="./testData/multifile.torrent";
 const char *kSingleFileWithErrorTorrent="./testData/singlefileerror.torrent";
 const char *kMultiFileWithErrorTorrent="./testData/multifileerror.torrent";
 const char *kNonExistantTorrent="./testData/doesntexist.torrent";
 const char *kGeneratedTorrent="./testData/generated.torrent";
+//
+// Bencode class namespace
+//
 using namespace H4;
+//
+// Local support functions
+//
 bool compareFiles(const std::string &p1, const std::string &p2)
 {
   std::ifstream f1(p1, std::ifstream::binary | std::ifstream::ate);
@@ -33,6 +56,9 @@ bool compareFiles(const std::string &p1, const std::string &p2)
                     std::istreambuf_iterator<char>(),
                     std::istreambuf_iterator<char>(f2.rdbuf()));
 }
+//
+// Test cases
+//
 TEST_CASE("Creation and use of Bencode for decode of simple types (number, string) ", "[Bencode][Decode]")
 {
   Bencode bEncode;
