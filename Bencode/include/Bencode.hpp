@@ -28,6 +28,7 @@ namespace H4
         //
         struct Bencoding
         {
+            Bencoding() {}
             Bencoding(const char *bEncodedData)
             {
                 while (*bEncodedData != '\0')
@@ -36,18 +37,25 @@ namespace H4
                     bEncodedData++;
                 }
             }
-            Bencoding() {}
+            Bencoding(const std::string bEncodedData)
+            {
+                for (auto byte : bEncodedData)
+                {
+                    bEncodedBuffer.push_back((std::byte)byte);
+                }
+            }
             std::vector<std::byte> bEncodedBuffer;
         };
         //
         // BNode structure.
         //
-        enum BNodeType {
-            base=0,
-            dictionary=1,
-            list=2,
-            integer=3,
-            string=4
+        enum BNodeType
+        {
+            base = 0,
+            dictionary = 1,
+            list = 2,
+            integer = 3,
+            string = 4
         };
         //
         // Base BNode/

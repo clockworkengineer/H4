@@ -144,7 +144,6 @@ namespace H4
     /// <returns></returns>
     void Bencode::encodeFromBNodes(BNode *bNode, IDestination *destination)
     {
-        // Dictionary
         switch (bNode->nodeType)
         {
         case BNodeType::dictionary:

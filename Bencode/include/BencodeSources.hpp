@@ -28,7 +28,6 @@ namespace H4
         {
             return (m_bufferPosition < m_decodeBuffer.bEncodedBuffer.size());
         }
-
     private:
         std::size_t m_bufferPosition = 0;
         Bencoding m_decodeBuffer;
@@ -38,7 +37,7 @@ namespace H4
     public:
         FileSource(std::string sourceFileName)
         {
-            m_source.open(sourceFileName.c_str(), std::ios_base::in | std::ios_base::binary);
+            m_source.open(sourceFileName.c_str(), std::ios_base::binary);
             if (!m_source.is_open())
             {
                 throw std::runtime_error("Bencode file input stream failed to open or does not exist.");
@@ -57,10 +56,8 @@ namespace H4
         {
             return (!m_source.eof());
         }
-
     private:
-        std::fstream m_source;
+        std::ifstream m_source;
     };
-
 } // namespace H4
 #endif /* BENCODESOURCES_HPP */

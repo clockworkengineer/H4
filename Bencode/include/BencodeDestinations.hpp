@@ -30,7 +30,7 @@ namespace H4
     public:
         FileDestination(std::string desinationFileName)
         {
-            m_destination.open(desinationFileName.c_str(), std::ios_base::out | std::ios_base::binary);
+            m_destination.open(desinationFileName.c_str(), std::ios_base::binary);
             if (!m_destination.is_open())
             {
                 throw std::runtime_error("Bencode file output stream failed to open or could not be created.");

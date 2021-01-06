@@ -257,10 +257,10 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   }
   SECTION("Decode singlefile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
-    std::fstream torrentFile{"./testData/singlefile.torrent"};
+    std::ifstream torrentFile{"./testData/singlefile.torrent"};
     std::ostringstream expected;
     expected << torrentFile.rdbuf();
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/singlefile.torrent")) == Bencode::Bencoding(expected.str().c_str()));
+    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/singlefile.torrent")) == Bencode::Bencoding(expected.str()));
   }
   SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
   {
@@ -269,10 +269,10 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   }
   SECTION("Decode multifile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
-    std::fstream torrentFile{"./testData/multifile.torrent"};
+    std::ifstream torrentFile{"./testData/multifile.torrent"};
     std::ostringstream expected;
     expected << torrentFile.rdbuf();
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/multifile.torrent")) == Bencode::Bencoding(expected.str().c_str()));
+    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile("./testData/multifile.torrent")) == Bencode::Bencoding(expected.str()));
   }
 }
 TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][Torrents]")
