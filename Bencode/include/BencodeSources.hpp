@@ -10,11 +10,22 @@ namespace H4
     public:
         BufferSource(Bencoding sourceBuffer)
         {
+            if (sourceBuffer.bEncodedBuffer.empty())
+            {
+                throw std::invalid_argument("Empty source buffer passed to be encoded.");
+            }
             m_decodeBuffer = sourceBuffer;
         }
         std::byte currentByte()
         {
-            return (m_decodeBuffer.bEncodedBuffer[m_bufferPosition]);
+            if (bytesToDecode())
+            {
+                return (m_decodeBuffer.bEncodedBuffer[m_bufferPosition]);
+            }
+            else
+            {
+                return ((std::byte)EOF);
+            }
         }
         void moveToNextByte()
         {
@@ -28,6 +39,7 @@ namespace H4
         {
             return (m_bufferPosition < m_decodeBuffer.bEncodedBuffer.size());
         }
+
     private:
         std::size_t m_bufferPosition = 0;
         Bencoding m_decodeBuffer;
@@ -54,8 +66,9 @@ namespace H4
         }
         bool bytesToDecode()
         {
-            return (!m_source.eof());
+            return (m_source.peek() != EOF);
         }
+
     private:
         std::ifstream m_source;
     };

@@ -1,5 +1,7 @@
 #include "catch.hpp"
 #include "Bencode.hpp"
+#include "BencodeSources.hpp"
+#include "BencodeDestinations.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iterator>
@@ -314,5 +316,94 @@ TEST_CASE("Encode torrent files using encodeToFile", "[Bencode][Encode][Torrents
     }
     bEncode.encodeToFile(bEncode.decodeFile("./testData/multifile.torrent"), "./testData/generated.torrent");
     REQUIRE_FALSE(!compareFiles("./testData/multifile.torrent", "./testData/generated.torrent"));
+  }
+}
+TEST_CASE("Creation and use of ISource (File) interface.", "[Bencode][Decode][ISource]")
+{
+
+  SECTION("Create FileSource with singlefile.torrent.", "[Bencode][Decode][ISource]")
+  {
+    REQUIRE_NOTHROW(FileSource("./testData/singlefile.torrent"));
+  }
+
+  SECTION("Create FileSource with non existants file.", "[Bencode][Decode][ISource]")
+  {
+    REQUIRE_THROWS_AS(FileSource("./testData/doesntexist.torrent"), std::runtime_error);
+    REQUIRE_THROWS_WITH(FileSource("./testData/doesntexist.torrent"), "Bencode file input stream failed to open or does not exist.");
+  }
+
+  SECTION("Create FileSource with singlefile.torrent. and positioned on the correct first character", "[Bencode][Decode][ISource]")
+  {
+    FileSource source = FileSource("./testData/singlefile.torrent");
+    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE((char)source.currentByte() == 'd');
+  }
+
+  SECTION("Create FileSource with singlefile.torrent moveToNextByte positions to correct next character", "[Bencode][Decode][ISource]")
+  {
+    FileSource source = FileSource("./testData/singlefile.torrent");
+    source.moveToNextByte();
+    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE((char)source.currentByte() == '8');
+  }
+
+  SECTION("Create FileSource with singlefile.torrent move to last character, check it and the bytes moved.", "[Bencode][Decode][ISource]")
+  {
+    FileSource source = FileSource("./testData/singlefile.torrent");
+    long length = 0;
+    while (source.bytesToDecode())
+    {
+      source.moveToNextByte();
+      length++;
+    }
+    REQUIRE(length == 764);                     // eof
+    REQUIRE((int)source.currentByte() == 0xff); // eof
+  }
+}
+
+TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file singlefile.torrent).", "[Bencode][Decode][ISource]")
+{
+
+  std::ifstream torrentFile{"./testData/singlefile.torrent"};
+  std::ostringstream buffer;
+  buffer << torrentFile.rdbuf();
+
+  SECTION("Create BufferSource.", "[Bencode][Decode][ISource]")
+  {
+    REQUIRE_NOTHROW(BufferSource(buffer.str()));
+  }
+
+  SECTION("Create BufferSource with empty buffer.", "[Bencode][Decode][ISource]")
+  {
+    REQUIRE_THROWS_AS(BufferSource(""), std::invalid_argument);
+    REQUIRE_THROWS_WITH(BufferSource(""), "Empty source buffer passed to be encoded.");
+  }
+
+  SECTION("Create BufferSource with singlefile.torrent and that it is positioned on the correct first character", "[Bencode][Decode][ISource]")
+  {
+    BufferSource source = BufferSource(buffer.str());
+    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE((char)source.currentByte() == 'd');
+  }
+
+  SECTION("Create BufferSource with singlefile.torrent and that moveToNextByte positions to correct next character", "[Bencode][Decode][ISource]")
+  {
+    BufferSource source = BufferSource(buffer.str());
+    source.moveToNextByte();
+    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE((char)source.currentByte() == '8');
+  }
+
+  SECTION("Create BufferSource with singlefile.torrent move to last character, check it and the bytes moved.", "[Bencode][Decode][ISource]")
+  {
+    BufferSource source = BufferSource(buffer.str());
+    long length = 0;
+    while (source.bytesToDecode())
+    {
+      source.moveToNextByte();
+      length++;
+    }
+    REQUIRE(length == 764); // eof
+    REQUIRE((int) source.currentByte() == 255); //eof
   }
 }
