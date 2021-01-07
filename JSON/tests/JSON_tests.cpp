@@ -53,3 +53,29 @@ bool compareFiles(const std::string &fileName1, const std::string &fileName2)
 // ==========
 // Test cases
 // ==========
+
+TEST_CASE("Creation and use of JSON for decode of simple types (number, string, boolean, null) ", "[JSON][Decode]")
+{
+  JSON json;
+
+  SECTION("Decode an string", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("\"example string\"");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::string);
+  }
+  SECTION("Decode an number", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("6767");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::number);
+  }
+  SECTION("Decode an boolean (true)", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("true");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::boolean);
+  }
+  SECTION("Decode an boolean (false)", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("false");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::boolean);
+  }
+}

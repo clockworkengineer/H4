@@ -29,10 +29,12 @@ namespace H4
         enum JNodeType
         {
             base = 0,
-            dictionary = 1,
-            list = 2,
-            integer = 3,
-            string = 4
+            object = 1,
+            array = 2,
+            number = 3,
+            string = 4,
+            boolean = 5,
+            null = 6
         };
         //
         // Base JNode/
@@ -48,26 +50,26 @@ namespace H4
         //
         // Dictionary JNode.
         //
-        struct JNodeDict : JNode
+        struct JNodeObject : JNode
         {
-            JNodeDict() : JNode(JNodeType::dictionary) {}
+            JNodeObject() : JNode(JNodeType::object) {}
             std::map<std::string, std::unique_ptr<JNode>> value;
         };
         //
         // List JNode.
         //
-        struct JNodeList : JNode
+        struct JNodeArray : JNode
         {
-            JNodeList() : JNode(JNodeType::list) {}
-            std::list<std::unique_ptr<JNode>> value;
+            JNodeArray() : JNode(JNodeType::array) {}
+            std::vector<std::unique_ptr<JNode>> value;
         };
         //
         // Integer JNode.
         //
-        struct JNodeInteger : JNode
+        struct JNodeNumber : JNode
         {
-            long value;
-            JNodeInteger(long value) : JNode(JNodeType::integer)
+            std::string value;
+            JNodeNumber(std::string value) : JNode(JNodeType::number)
             {
                 this->value = value;
             }
@@ -82,6 +84,29 @@ namespace H4
             JNodeString(std::string value) : JNode(JNodeType::string)
             {
                 this->value = value;
+            }
+        };
+        //
+        // Boolean JNode.
+        //
+        struct JNodeBoolean : JNode
+        {
+        public:
+            bool value;
+            JNodeBoolean(bool value) : JNode(JNodeType::boolean)
+            {
+                this->value = value;
+            }
+        };
+        //
+        // Boolean JNode.
+        //
+        struct JNodeNull : JNode
+        {
+        public:
+            const int value = 0;
+            JNodeNull() : JNode(JNodeType::null)
+            {
             }
         };
         //
@@ -111,7 +136,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-
+        std::unique_ptr<JNode> decode(std::string jsonBuffer);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -125,7 +150,6 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-
         // =================
         // PRIVATE VARIABLES
         // =================
@@ -134,9 +158,9 @@ namespace H4
     // Shortcuts for JNode structure and Bencoding type
     //
     using JNode = JSON::JNode;
-    using JNodeInteger = JSON::JNodeInteger;
+    using JNodeInteger = JSON::JNodeNumber;
     using JNodeString = JSON::JNodeString;
-    using JNodeList = JSON::JNodeList;
-    using JNodeDict = JSON::JNodeDict;
+    using JNodeList = JSON::JNodeArray;
+    using JNodeDict = JSON::JNodeObject;
 } // namespace H4
 #endif /* JSON_HPP */

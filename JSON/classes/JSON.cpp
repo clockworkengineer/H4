@@ -44,5 +44,20 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-
+    std::unique_ptr<JNode> JSON::decode(std::string jsonBuffer)
+    {
+        switch (jsonBuffer[0])
+        {
+        case '"':
+            return (std::make_unique<JNode>(JNodeString(jsonBuffer)));
+        case 't':
+        case 'T':
+            return (std::make_unique<JNode>(JNodeBoolean(true)));
+        case 'f':
+        case 'F':
+            return (std::make_unique<JNode>(JNodeBoolean(false)));
+        default:
+            return (std::make_unique<JNode>(JNodeNumber(jsonBuffer)));
+        }
+    }
 } // namespace H4
