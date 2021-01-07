@@ -39,6 +39,7 @@ namespace H4
         void addBytes(std::string bytes)
         {
             m_destination.write(bytes.c_str(), bytes.length());
+            m_destination.flush();
         }
     private:
         std::ofstream m_destination;

@@ -24,12 +24,12 @@
 // ===================
 // Unit test constants
 // ===================
-const char *kSingleFileTorrent="./testData/singlefile.torrent";
-const char *kMultiFileTorrent="./testData/multifile.torrent";
-const char *kSingleFileWithErrorTorrent="./testData/singlefileerror.torrent";
-const char *kMultiFileWithErrorTorrent="./testData/multifileerror.torrent";
-const char *kNonExistantTorrent="./testData/doesntexist.torrent";
-const char *kGeneratedTorrent="./testData/generated.torrent";
+const char *kSingleFileTorrent = "./testData/singlefile.torrent";
+const char *kMultiFileTorrent = "./testData/multifile.torrent";
+const char *kSingleFileWithErrorTorrent = "./testData/singlefileerror.torrent";
+const char *kMultiFileWithErrorTorrent = "./testData/multifileerror.torrent";
+const char *kNonExistantTorrent = "./testData/doesntexist.torrent";
+const char *kGeneratedTorrent = "./testData/generated.torrent";
 // =======================
 // Bencode class namespace
 // =======================
@@ -37,24 +37,24 @@ using namespace H4;
 // =======================
 // Local support functions
 // =======================
-bool compareFiles(const std::string &p1, const std::string &p2)
+bool compareFiles(const std::string &fileName1, const std::string &fileName2)
 {
-  std::ifstream f1(p1, std::ifstream::binary | std::ifstream::ate);
-  std::ifstream f2(p2, std::ifstream::binary | std::ifstream::ate);
-  if (f1.fail() || f2.fail())
+  std::ifstream file1(fileName1, std::ifstream::binary | std::ifstream::ate);
+  std::ifstream file2(fileName2, std::ifstream::binary | std::ifstream::ate);
+  if (file1.fail() || file2.fail())
   {
     return false; //file problem
   }
-  if (f1.tellg() != f2.tellg())
+  if (file1.tellg() != file2.tellg())
   {
     return false; //size mismatch
   }
   //seek back to beginning and use std::equal to compare contents
-  f1.seekg(0, std::ifstream::beg);
-  f2.seekg(0, std::ifstream::beg);
-  return std::equal(std::istreambuf_iterator<char>(f1.rdbuf()),
+  file1.seekg(0, std::ifstream::beg);
+  file2.seekg(0, std::ifstream::beg);
+  return std::equal(std::istreambuf_iterator<char>(file1.rdbuf()),
                     std::istreambuf_iterator<char>(),
-                    std::istreambuf_iterator<char>(f2.rdbuf()));
+                    std::istreambuf_iterator<char>(file2.rdbuf()));
 }
 // ==========
 // Test cases
@@ -352,25 +352,21 @@ TEST_CASE("Encode torrent files using encodeToFile", "[Bencode][Encode][Torrents
 }
 TEST_CASE("Creation and use of ISource (File) interface.", "[Bencode][Decode][ISource]")
 {
-
   SECTION("Create FileSource with singlefile.torrent.", "[Bencode][Decode][ISource]")
   {
     REQUIRE_NOTHROW(FileSource(kSingleFileTorrent));
   }
-
   SECTION("Create FileSource with non existants file.", "[Bencode][Decode][ISource]")
   {
     REQUIRE_THROWS_AS(FileSource(kNonExistantTorrent), std::runtime_error);
     REQUIRE_THROWS_WITH(FileSource(kNonExistantTorrent), "Bencode file input stream failed to open or does not exist.");
   }
-
   SECTION("Create FileSource with singlefile.torrent. and positioned on the correct first character", "[Bencode][Decode][ISource]")
   {
     FileSource source = FileSource(kSingleFileTorrent);
     REQUIRE_FALSE(!source.bytesToDecode());
     REQUIRE((char)source.currentByte() == 'd');
   }
-
   SECTION("Create FileSource with singlefile.torrent and then check moveToNextByte positions to correct next character", "[Bencode][Decode][ISource]")
   {
     FileSource source = FileSource(kSingleFileTorrent);
@@ -378,7 +374,6 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[Bencode][Decode][IS
     REQUIRE_FALSE(!source.bytesToDecode());
     REQUIRE((char)source.currentByte() == '8');
   }
-
   SECTION("Create FileSource with singlefile.torrent move past last character, check it and the bytes moved.", "[Bencode][Decode][ISource]")
   {
     FileSource source = FileSource(kSingleFileTorrent);
@@ -392,32 +387,26 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[Bencode][Decode][IS
     REQUIRE((int)source.currentByte() == 0xff); // eof
   }
 }
-
 TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file singlefile.torrent).", "[Bencode][Decode][ISource]")
 {
-
   std::ifstream torrentFile{kSingleFileTorrent};
   std::ostringstream buffer;
   buffer << torrentFile.rdbuf();
-
   SECTION("Create BufferSource.", "[Bencode][Decode][ISource]")
   {
     REQUIRE_NOTHROW(BufferSource(buffer.str()));
   }
-
   SECTION("Create BufferSource with empty buffer.", "[Bencode][Decode][ISource]")
   {
     REQUIRE_THROWS_AS(BufferSource(""), std::invalid_argument);
     REQUIRE_THROWS_WITH(BufferSource(""), "Empty source buffer passed to be encoded.");
   }
-
   SECTION("Create BufferSource with singlefile.torrent and that it is positioned on the correct first character", "[Bencode][Decode][ISource]")
   {
     BufferSource source = BufferSource(buffer.str());
     REQUIRE_FALSE(!source.bytesToDecode());
     REQUIRE((char)source.currentByte() == 'd');
   }
-
   SECTION("Create BufferSource with singlefile.torrent and then check moveToNextByte positions to correct next character", "[Bencode][Decode][ISource]")
   {
     BufferSource source = BufferSource(buffer.str());
@@ -425,7 +414,6 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE_FALSE(!source.bytesToDecode());
     REQUIRE((char)source.currentByte() == '8');
   }
-
   SECTION("Create BufferSource with singlefile.torrent move past last character, check it and the bytes moved.", "[Bencode][Decode][ISource]")
   {
     BufferSource source = BufferSource(buffer.str());
@@ -435,7 +423,89 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       source.moveToNextByte();
       length++;
     }
-    REQUIRE(length == 764); // eof
-    REQUIRE((int) source.currentByte() == 255); //eof
+    REQUIRE(length == 764);                    // eof
+    REQUIRE((int)source.currentByte() == 255); // eof
+  }
+}
+TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[Bencode][Decode][ISource]")
+{
+  SECTION("Create BufferDesination.", "[Bencode][Encode][IDesination]")
+  {
+    REQUIRE_NOTHROW(BufferDestination());
+  }
+  SECTION("Create BufferDestination and get buffer which should be empty.", "[Bencode][Encode][IDesination]")
+  {
+    BufferDestination buffer;
+    REQUIRE_FALSE(!buffer.getBuffer().bEncodedBuffer.empty());
+  }
+  SECTION("Create BufferDestination and add one character.", "[Bencode][Encode][IDesination]")
+  {
+    BufferDestination buffer;
+    buffer.addBytes("i");
+    REQUIRE(buffer.getBuffer().bEncodedBuffer.size() == 1);
+  }
+  SECTION("Create BufferDestination and add an encoded integer and chekc result.", "[Bencode][Encode][IDesination]")
+  {
+    BufferDestination buffer;
+    buffer.addBytes("i65767e");
+    REQUIRE(buffer.getBuffer().bEncodedBuffer.size() == 7);
+    REQUIRE(buffer.getBuffer() == Bencoding("i65767e"));
+  }
+}
+TEST_CASE("Creation and use of IDestination (File) interface.", "[Bencode][Decode][ISource]")
+{
+  SECTION("Create FileDestination.", "[Bencode][Encode][IDesination]")
+  {
+    if (std::filesystem::exists(kGeneratedTorrent))
+    {
+      std::filesystem::remove(kGeneratedTorrent);
+    }
+    REQUIRE_NOTHROW(FileDestination(kGeneratedTorrent));
+  }
+  SECTION("Create FileDestination when file already exists.", "[Bencode][Encode][IDesination]")
+  {
+    FileDestination file(kGeneratedTorrent);
+    if (!std::filesystem::exists(kGeneratedTorrent))
+    {
+      file = FileDestination(kGeneratedTorrent);
+    }
+    REQUIRE_NOTHROW(FileDestination(kGeneratedTorrent));
+  }
+  SECTION("Create FileDestination and test file exists and should be empty.", "[Bencode][Encode][IDesination]")
+  {
+    if (std::filesystem::exists(kGeneratedTorrent))
+    {
+      std::filesystem::remove(kGeneratedTorrent);
+    }
+    FileDestination file(kGeneratedTorrent);
+    REQUIRE_FALSE(!std::filesystem::exists(kGeneratedTorrent));
+    std::filesystem::path filePath(kGeneratedTorrent);
+    REQUIRE(std::filesystem::file_size(filePath) == 0);
+  }
+  SECTION("Create FileDestination and add one character.", "[Bencode][Encode][IDesination]")
+  {
+    if (std::filesystem::exists(kGeneratedTorrent))
+    {
+      std::filesystem::remove(kGeneratedTorrent);
+    }
+    FileDestination file(kGeneratedTorrent);
+    file.addBytes("i");
+    std::filesystem::path filePath(kGeneratedTorrent);
+    REQUIRE(std::filesystem::file_size(filePath) == 1);
+  }
+  SECTION("Create FileDestination, add an encoded integer and check result.", "[Bencode][Encode][IDesination]")
+  {
+    if (std::filesystem::exists(kGeneratedTorrent))
+    {
+      std::filesystem::remove(kGeneratedTorrent);
+    }
+    FileDestination file(kGeneratedTorrent);
+    file.addBytes("i65767e");
+    std::filesystem::path filePath(kGeneratedTorrent);
+    REQUIRE(std::filesystem::file_size(filePath) == 7);
+     std::ifstream torrentFile{kGeneratedTorrent};
+    std::ostringstream expected;
+    expected << torrentFile.rdbuf();
+    REQUIRE(expected.str() =="i65767e");
   }
 }
