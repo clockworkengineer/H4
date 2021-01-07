@@ -53,11 +53,9 @@ bool compareFiles(const std::string &fileName1, const std::string &fileName2)
 // ==========
 // Test cases
 // ==========
-
 TEST_CASE("Creation and use of JSON for decode of simple types (number, string, boolean, null) ", "[JSON][Decode]")
 {
   JSON json;
-
   SECTION("Decode an string", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode("\"example string\"");
@@ -77,5 +75,49 @@ TEST_CASE("Creation and use of JSON for decode of simple types (number, string, 
   {
     std::unique_ptr<JNode> jNode = json.decode("false");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::boolean);
+  }
+  SECTION("Decode an null", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("null");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::null);
+  }
+}
+TEST_CASE("Creation and use of JSON for decode of simple types (number, string, boolean, null) and check values.", "[JSON][Decode]")
+{
+  JSON json;
+  SECTION("Decode an string and check its value", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("\"example string\"");
+    REQUIRE(((JNodeString *)jNode.get())->value == "example string");
+  }
+  SECTION("Decode an string and check its value", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("\"another example string\"");
+    REQUIRE(((JNodeString *)jNode.get())->value == "another example string");
+  }
+  SECTION("Decode an number and check its value", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("6767");
+    REQUIRE(((JNodeNumber *)jNode.get())->value == "6767");
+  }
+  SECTION("Decode an number and check its value", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("190000");
+    REQUIRE(((JNodeNumber *)jNode.get())->value == "190000");
+  }
+  SECTION("Decode an boolean (true) and check its value", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("true");
+    REQUIRE(((JNodeBoolean *)jNode.get())->value == true);
+  }
+  SECTION("Decode an boolean (false) and check its value", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("false");
+    REQUIRE(((JNodeBoolean *)jNode.get())->value == false);
+  }
+  SECTION("Decode an null and check its value", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("null");
+    REQUIRE(((JNodeNull *)jNode.get())->value == nullptr);
   }
 }

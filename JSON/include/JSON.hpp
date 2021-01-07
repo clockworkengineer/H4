@@ -104,7 +104,7 @@ namespace H4
         struct JNodeNull : JNode
         {
         public:
-            const int value = 0;
+            const void *value = nullptr;
             JNodeNull() : JNode(JNodeType::null)
             {
             }
@@ -150,6 +150,11 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        std::unique_ptr<JNode> decodeJNodes(ISource *source);
+        std::unique_ptr<JNode> decodeString(ISource *source);
+        std::unique_ptr<JNode> decodeNumber(ISource *source);
+        std::unique_ptr<JNode> decodeBoolean(ISource *source);
+        std::unique_ptr<JNode> decodeNull(ISource *source);
         // =================
         // PRIVATE VARIABLES
         // =================
@@ -158,9 +163,11 @@ namespace H4
     // Shortcuts for JNode structure and Bencoding type
     //
     using JNode = JSON::JNode;
-    using JNodeInteger = JSON::JNodeNumber;
+    using JNodeNumber = JSON::JNodeNumber;
     using JNodeString = JSON::JNodeString;
     using JNodeList = JSON::JNodeArray;
     using JNodeDict = JSON::JNodeObject;
+    using JNodeNull = JSON::JNodeNull;
+    using JNodeBoolean = JSON::JNodeBoolean;
 } // namespace H4
 #endif /* JSON_HPP */
