@@ -154,5 +154,12 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
   {
     std::unique_ptr<JNode> jNode = json.decode("[ 777, 9000, \"apples\"]");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
+    REQUIRE(((JNodeArray *)jNode.get())->value.size() == 3);
+    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[0].get())->nodeType == JSON::JNodeType::number);
+    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[1].get())->nodeType == JSON::JNodeType::number);
+    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[2].get())->nodeType == JSON::JNodeType::string);
+    REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[0].get())->value == "777");
+    REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[1].get())->value == "9000");
+    REQUIRE(((JNodeString *)((JNodeArray *)jNode.get())->value[2].get())->value == "apples");
   }
 }

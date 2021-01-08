@@ -125,6 +125,14 @@ namespace H4
         object.value["Age"] = std::make_unique<JNodeNumber>(JNodeNumber("15"));
         return (std::make_unique<JNodeObject>(std::move(object)));
     }
+    std::unique_ptr<JNode> JSON::decodeArray(ISource * /*source*/)
+    {
+        JNodeArray array;
+        array.value.push_back(std::make_unique<JNodeNumber>(JNodeNumber("777")));
+        array.value.push_back(std::make_unique<JNodeNumber>(JNodeNumber("9000")));
+        array.value.push_back(std::make_unique<JNodeString>(JNodeString("apples")));
+        return (std::make_unique<JNodeArray>(std::move(array)));
+    }
     std::unique_ptr<JNode> JSON::decodeJNodes(ISource *source)
     {
         switch (source->currentByte())
@@ -139,7 +147,7 @@ namespace H4
         case '{':
             return (decodeObject(source));
         case '[':
-            return (std::make_unique<JNodeArray>(JNodeArray()));
+            return (decodeArray(source));
         default:
             return (decodeNumber(source));
         }

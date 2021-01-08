@@ -158,7 +158,7 @@ namespace H4
         std::unique_ptr<JNode> decodeBoolean(ISource *source);
         std::unique_ptr<JNode> decodeNull(ISource *source);
         std::unique_ptr<JNode> decodeObject(ISource *source);
-
+        std::unique_ptr<JNode> decodeArray(ISource *source);
         // =================
         // PRIVATE VARIABLES
         // =================
