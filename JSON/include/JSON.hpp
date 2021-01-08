@@ -150,11 +150,15 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        void ignoreWhiteSpace(ISource *source);
+        std::string extractString(ISource *source);
         std::unique_ptr<JNode> decodeJNodes(ISource *source);
         std::unique_ptr<JNode> decodeString(ISource *source);
         std::unique_ptr<JNode> decodeNumber(ISource *source);
         std::unique_ptr<JNode> decodeBoolean(ISource *source);
         std::unique_ptr<JNode> decodeNull(ISource *source);
+        std::unique_ptr<JNode> decodeObject(ISource *source);
+
         // =================
         // PRIVATE VARIABLES
         // =================
@@ -165,8 +169,8 @@ namespace H4
     using JNode = JSON::JNode;
     using JNodeNumber = JSON::JNodeNumber;
     using JNodeString = JSON::JNodeString;
-    using JNodeList = JSON::JNodeArray;
-    using JNodeDict = JSON::JNodeObject;
+    using JNodeArray = JSON::JNodeArray;
+    using JNodeObject = JSON::JNodeObject;
     using JNodeNull = JSON::JNodeNull;
     using JNodeBoolean = JSON::JNodeBoolean;
 } // namespace H4

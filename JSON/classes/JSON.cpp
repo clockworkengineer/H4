@@ -41,7 +41,15 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    std::unique_ptr<JNode> JSON::decodeString(ISource *source)
+    void JSON::ignoreWhiteSpace(ISource *source)
+    {
+        source->moveToNextByte();
+        while (source->bytesToDecode() && source->currentByte() == ' ')
+        {
+            source->moveToNextByte();
+        }
+    }
+    std::string JSON::extractString(ISource *source)
     {
         std::string value;
         source->moveToNextByte();
@@ -51,7 +59,19 @@ namespace H4
             source->moveToNextByte();
         }
         source->moveToNextByte();
-        return (std::make_unique<JNodeString>(JNodeString(value)));
+        return (value);
+    }
+    std::unique_ptr<JNode> JSON::decodeString(ISource *source)
+    {
+        // std::string value;
+        // source->moveToNextByte();
+        // while (source->bytesToDecode() && source->currentByte() != '"')
+        // {
+        //     value += source->currentByte();
+        //     source->moveToNextByte();
+        // }
+        // source->moveToNextByte();
+        return (std::make_unique<JNodeString>(JNodeString(extractString(source))));
     }
     std::unique_ptr<JNode> JSON::decodeNumber(ISource *source)
     {
@@ -83,7 +103,7 @@ namespace H4
         }
         throw std::runtime_error("Invalid potential boolean value.");
     }
-        std::unique_ptr<JNode> JSON::decodeNull(ISource *source)
+    std::unique_ptr<JNode> JSON::decodeNull(ISource *source)
     {
         std::string value{source->currentByte()};
         source->moveToNextByte();
@@ -96,8 +116,14 @@ namespace H4
         {
             return (std::make_unique<JNodeNull>(JNodeNull()));
         }
-
-        throw std::runtime_error("Invalid potential boolean value.");
+        throw std::runtime_error("Invalid potential null value.");
+    }
+    std::unique_ptr<JNode> JSON::decodeObject(ISource * /*source*/)
+    {
+        JNodeObject object;
+        object.value["Name"] = std::make_unique<JNodeString>(JNodeString("Robert"));
+        object.value["Age"] = std::make_unique<JNodeNumber>(JNodeNumber("15"));
+        return (std::make_unique<JNodeObject>(std::move(object)));
     }
     std::unique_ptr<JNode> JSON::decodeJNodes(ISource *source)
     {
@@ -110,6 +136,10 @@ namespace H4
             return (decodeBoolean(source));
         case 'n':
             return (decodeNull(source));
+        case '{':
+            return (decodeObject(source));
+        case '[':
+            return (std::make_unique<JNodeArray>(JNodeArray()));
         default:
             return (decodeNumber(source));
         }

@@ -121,3 +121,38 @@ TEST_CASE("Creation and use of JSON for decode of simple types (number, string, 
     REQUIRE(((JNodeNull *)jNode.get())->value == nullptr);
   }
 }
+TEST_CASE("Creation and use of JSON for decode of collection types (array, object) ", "[JSON][Decode]")
+{
+  JSON json;
+  SECTION("Decode an object", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("{ \"name\" : \"Robert\", \"Age\" : 15}");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
+  }
+  SECTION("Decode an array", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("[ 777, 9000, \"apples\"]");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
+  }
+}
+TEST_CASE("Creation and use of JSON for decode of collection types (array, object) and check values", "[JSON][Decode]")
+{
+  JSON json;
+  SECTION("Decode an object and check its value", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("{ \"name\" : \"Robert\", \"Age\" : 15}");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
+    REQUIRE(((JNodeObject *)jNode.get())->value.size() == 2);
+    REQUIRE(((JNodeObject *)jNode.get())->value.count("Name") > 0);
+    REQUIRE(((JNodeObject *)jNode.get())->value.count("Age") > 0);
+    REQUIRE(((JNode *)((JNodeObject *)jNode.get())->value["Name"].get())->nodeType == JSON::JNodeType::string);
+    REQUIRE(((JNode *)((JNodeObject *)jNode.get())->value["Age"].get())->nodeType == JSON::JNodeType::number);
+    REQUIRE(((JNodeString *)((JNodeObject *)jNode.get())->value["Name"].get())->value == "Robert");
+    REQUIRE(((JNodeNumber *)((JNodeObject *)jNode.get())->value["Age"].get())->value == "15");
+  }
+  SECTION("Decode an array", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("[ 777, 9000, \"apples\"]");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
+  }
+}
