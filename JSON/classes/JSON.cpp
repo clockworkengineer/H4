@@ -41,9 +41,9 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    void JSON::ignoreWhiteSpace(ISource *source)
+    inline void JSON::ignoreWhiteSpace(ISource *source)
     {
-        source->moveToNextByte();
+        //   source->moveToNextByte();
         while (source->bytesToDecode() && source->currentByte() == ' ')
         {
             source->moveToNextByte();
@@ -63,14 +63,6 @@ namespace H4
     }
     std::unique_ptr<JNode> JSON::decodeString(ISource *source)
     {
-        // std::string value;
-        // source->moveToNextByte();
-        // while (source->bytesToDecode() && source->currentByte() != '"')
-        // {
-        //     value += source->currentByte();
-        //     source->moveToNextByte();
-        // }
-        // source->moveToNextByte();
         return (std::make_unique<JNodeString>(JNodeString(extractString(source))));
     }
     std::unique_ptr<JNode> JSON::decodeNumber(ISource *source)
@@ -118,11 +110,29 @@ namespace H4
         }
         throw std::runtime_error("Invalid potential null value.");
     }
-    std::unique_ptr<JNode> JSON::decodeObject(ISource * /*source*/)
+    std::unique_ptr<JNode> JSON::decodeObject(ISource *source)
     {
         JNodeObject object;
-        object.value["Name"] = std::make_unique<JNodeString>(JNodeString("Robert"));
-        object.value["Age"] = std::make_unique<JNodeNumber>(JNodeNumber("15"));
+        do
+        {
+            source->moveToNextByte();
+            ignoreWhiteSpace(source);
+            std::string key = extractString(source);
+            ignoreWhiteSpace(source);
+            if (source->currentByte() != ':')
+            {
+                throw new std::runtime_error("Missing ':' after key value");
+            }
+            source->moveToNextByte();
+            ignoreWhiteSpace(source);
+            object.value[key] = decodeJNodes(source);
+            ignoreWhiteSpace(source);
+        } while (source->currentByte() == ',');
+        if (source->currentByte() != '}')
+        {
+            throw new std::runtime_error("Missing terminating '}' for object.");
+        }
+        source->moveToNextByte();
         return (std::make_unique<JNodeObject>(std::move(object)));
     }
     std::unique_ptr<JNode> JSON::decodeArray(ISource * /*source*/)
@@ -135,6 +145,7 @@ namespace H4
     }
     std::unique_ptr<JNode> JSON::decodeJNodes(ISource *source)
     {
+        ignoreWhiteSpace(source);
         switch (source->currentByte())
         {
         case '"':
@@ -151,7 +162,6 @@ namespace H4
         default:
             return (decodeNumber(source));
         }
-        return (std::make_unique<JNode>(JNode()));
     }
     // ==============
     // PUBLIC METHODS

@@ -138,9 +138,9 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
 TEST_CASE("Creation and use of JSON for decode of collection types (array, object) and check values", "[JSON][Decode]")
 {
   JSON json;
-  SECTION("Decode an object and check its value", "[JSON][Decode]")
+  SECTION("Decode an object { \"name\" : \"Robert\", \"Age\" : 15} and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decode("{ \"name\" : \"Robert\", \"Age\" : 15}");
+    std::unique_ptr<JNode> jNode = json.decode("{ \"Name\" : \"Robert\", \"Age\" : 15}");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
     REQUIRE(((JNodeObject *)jNode.get())->value.size() == 2);
     REQUIRE(((JNodeObject *)jNode.get())->value.count("Name") > 0);
@@ -150,7 +150,7 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
     REQUIRE(((JNodeString *)((JNodeObject *)jNode.get())->value["Name"].get())->value == "Robert");
     REQUIRE(((JNodeNumber *)((JNodeObject *)jNode.get())->value["Age"].get())->value == "15");
   }
-  SECTION("Decode an array", "[JSON][Decode]")
+  SECTION("Decode an array [ 777, 9000, \"apples\"] and check its value", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode("[ 777, 9000, \"apples\"]");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
@@ -161,5 +161,17 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
     REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[0].get())->value == "777");
     REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[1].get())->value == "9000");
     REQUIRE(((JNodeString *)((JNodeArray *)jNode.get())->value[2].get())->value == "apples");
+  }
+  SECTION("Decode object { \"City\" : \"Southampton\", \"Population\" : 500000} and check its value", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("{ \"City\" : \"Southampton\", \"Population\" : 500000}");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
+    REQUIRE(((JNodeObject *)jNode.get())->value.size() == 2);
+    REQUIRE(((JNodeObject *)jNode.get())->value.count("City") > 0);
+    REQUIRE(((JNodeObject *)jNode.get())->value.count("Population") > 0);
+    REQUIRE(((JNode *)((JNodeObject *)jNode.get())->value["City"].get())->nodeType == JSON::JNodeType::string);
+    REQUIRE(((JNode *)((JNodeObject *)jNode.get())->value["Population"].get())->nodeType == JSON::JNodeType::number);
+    REQUIRE(((JNodeString *)((JNodeObject *)jNode.get())->value["City"].get())->value == "Southampton");
+    REQUIRE(((JNodeNumber *)((JNodeObject *)jNode.get())->value["Population"].get())->value == "500000");
   }
 }
