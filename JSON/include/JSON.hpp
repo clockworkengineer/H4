@@ -136,7 +136,8 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        std::unique_ptr<JNode> decode(std::string jsonBuffer);
+        std::unique_ptr<JNode> decodeBuffer(std::string jsonBuffer);
+        std::unique_ptr<JNode> decodeFile(std::string sourceFileName);
         // ================
         // PUBLIC VARIABLES
         // ================

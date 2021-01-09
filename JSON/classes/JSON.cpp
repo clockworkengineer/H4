@@ -67,9 +67,9 @@ namespace H4
     }
     std::unique_ptr<JNode> JSON::decodeNumber(ISource *source)
     {
-        std::set<char> validCharacters { '1','2','3','4','5','6','7','8','9','0','.','-'};
+        std::set<char> validCharacters { '1','2','3','4','5','6','7','8','9','0','.','-','+'};
         if (validCharacters.count(source->currentByte())==0) {
-            throw std::runtime_error(std::string("Invalid numeric character ")+source->currentByte()+'.');
+            throw std::runtime_error(std::string("Invalid numeric character '")+source->currentByte()+"'.");
         }
         std::string value{source->currentByte()};
         source->moveToNextByte();
@@ -179,9 +179,14 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-    std::unique_ptr<JNode> JSON::decode(std::string jsonBuffer)
+    std::unique_ptr<JNode> JSON::decodeBuffer(std::string jsonBuffer)
     {
         BufferSource source(jsonBuffer);
+        return (decodeJNodes(&source));
+    }
+    std::unique_ptr<JNode> JSON::decodeFile(std::string sourceFileName)
+    {
+        FileSource source(sourceFileName);
         return (decodeJNodes(&source));
     }
 } // namespace H4
