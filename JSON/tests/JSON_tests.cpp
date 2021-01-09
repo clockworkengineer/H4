@@ -50,6 +50,19 @@ bool compareFiles(const std::string &fileName1, const std::string &fileName2)
                     std::istreambuf_iterator<char>(),
                     std::istreambuf_iterator<char>(file2.rdbuf()));
 }
+void checkArray(JNode *jNode)
+{
+  REQUIRE(((JNode *)jNode)->nodeType == JSON::JNodeType::array);
+  REQUIRE(((JNodeArray *)jNode)->value.size() == 4);
+  REQUIRE(((JNode *)((JNodeArray *)jNode)->value[0].get())->nodeType == JSON::JNodeType::string);
+  REQUIRE(((JNode *)((JNodeArray *)jNode)->value[1].get())->nodeType == JSON::JNodeType::number);
+  REQUIRE(((JNode *)((JNodeArray *)jNode)->value[2].get())->nodeType == JSON::JNodeType::boolean);
+  REQUIRE(((JNode *)((JNodeArray *)jNode)->value[3].get())->nodeType == JSON::JNodeType::null);
+  REQUIRE(((JNodeNumber *)((JNodeArray *)jNode)->value[0].get())->value == "Dog");
+  REQUIRE(((JNodeString *)((JNodeArray *)jNode)->value[1].get())->value == "1964");
+  REQUIRE(((JNodeBoolean *)((JNodeArray *)jNode)->value[2].get())->value == true);
+  REQUIRE(((JNodeNull *)((JNodeArray *)jNode)->value[2].get())->value == nullptr);
+}
 // ==========
 // Test cases
 // ==========
@@ -178,16 +191,7 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
   SECTION("Decode an array [ \"Dog\", 1964, true, null ] and check its value", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode("[ \"Dog\", 1964, true, null ]");
-    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
-    REQUIRE(((JNodeArray *)jNode.get())->value.size() == 4);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[0].get())->nodeType == JSON::JNodeType::string);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[1].get())->nodeType == JSON::JNodeType::number);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[2].get())->nodeType == JSON::JNodeType::boolean);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[3].get())->nodeType == JSON::JNodeType::null);
-    REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[0].get())->value == "Dog");
-    REQUIRE(((JNodeString *)((JNodeArray *)jNode.get())->value[1].get())->value == "1964");
-    REQUIRE(((JNodeBoolean *)((JNodeArray *)jNode.get())->value[2].get())->value == true);
-    REQUIRE(((JNodeNull *)((JNodeArray *)jNode.get())->value[2].get())->value == nullptr);
+    checkArray(jNode.get());
   }
 }
 TEST_CASE("Creation and use of JSON for decode checking various whitespace characters are ignored.", "[JSON][Decode]")
@@ -197,75 +201,30 @@ TEST_CASE("Creation and use of JSON for decode checking various whitespace chara
   SECTION("Decode an array [\"Dog\",1964,true,null] with no white space.", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode("[\"Dog\",1964,true,null]");
-    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
-    REQUIRE(((JNodeArray *)jNode.get())->value.size() == 4);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[0].get())->nodeType == JSON::JNodeType::string);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[1].get())->nodeType == JSON::JNodeType::number);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[2].get())->nodeType == JSON::JNodeType::boolean);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[3].get())->nodeType == JSON::JNodeType::null);
-    REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[0].get())->value == "Dog");
-    REQUIRE(((JNodeString *)((JNodeArray *)jNode.get())->value[1].get())->value == "1964");
-    REQUIRE(((JNodeBoolean *)((JNodeArray *)jNode.get())->value[2].get())->value == true);
-    REQUIRE(((JNodeNull *)((JNodeArray *)jNode.get())->value[2].get())->value == nullptr);
+    checkArray(jNode.get());
   }
 
   SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' '.", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
-    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
-    REQUIRE(((JNodeArray *)jNode.get())->value.size() == 4);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[0].get())->nodeType == JSON::JNodeType::string);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[1].get())->nodeType == JSON::JNodeType::number);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[2].get())->nodeType == JSON::JNodeType::boolean);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[3].get())->nodeType == JSON::JNodeType::null);
-    REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[0].get())->value == "Dog");
-    REQUIRE(((JNodeString *)((JNodeArray *)jNode.get())->value[1].get())->value == "1964");
-    REQUIRE(((JNodeBoolean *)((JNodeArray *)jNode.get())->value[2].get())->value == true);
-    REQUIRE(((JNodeNull *)((JNodeArray *)jNode.get())->value[2].get())->value == nullptr);
+    checkArray(jNode.get());
   }
   ws += "\t";
-  SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' \t'.", "[JSON][Decode]")
+  SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' \\t'.", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
-    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
-    REQUIRE(((JNodeArray *)jNode.get())->value.size() == 4);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[0].get())->nodeType == JSON::JNodeType::string);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[1].get())->nodeType == JSON::JNodeType::number);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[2].get())->nodeType == JSON::JNodeType::boolean);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[3].get())->nodeType == JSON::JNodeType::null);
-    REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[0].get())->value == "Dog");
-    REQUIRE(((JNodeString *)((JNodeArray *)jNode.get())->value[1].get())->value == "1964");
-    REQUIRE(((JNodeBoolean *)((JNodeArray *)jNode.get())->value[2].get())->value == true);
-    REQUIRE(((JNodeNull *)((JNodeArray *)jNode.get())->value[2].get())->value == nullptr);
+    checkArray(jNode.get());
   }
   ws += "\n";
-  SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' \t\n'.", "[JSON][Decode]")
+  SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' \\t\\n'.", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
-    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
-    REQUIRE(((JNodeArray *)jNode.get())->value.size() == 4);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[0].get())->nodeType == JSON::JNodeType::string);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[1].get())->nodeType == JSON::JNodeType::number);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[2].get())->nodeType == JSON::JNodeType::boolean);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[3].get())->nodeType == JSON::JNodeType::null);
-    REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[0].get())->value == "Dog");
-    REQUIRE(((JNodeString *)((JNodeArray *)jNode.get())->value[1].get())->value == "1964");
-    REQUIRE(((JNodeBoolean *)((JNodeArray *)jNode.get())->value[2].get())->value == true);
-    REQUIRE(((JNodeNull *)((JNodeArray *)jNode.get())->value[2].get())->value == nullptr);
+    checkArray(jNode.get());
   }
   ws += "\r";
-  SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' \t\n\r'.", "[JSON][Decode]")
+  SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' \\t\\n\\r'.", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
-    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
-    REQUIRE(((JNodeArray *)jNode.get())->value.size() == 4);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[0].get())->nodeType == JSON::JNodeType::string);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[1].get())->nodeType == JSON::JNodeType::number);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[2].get())->nodeType == JSON::JNodeType::boolean);
-    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[3].get())->nodeType == JSON::JNodeType::null);
-    REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[0].get())->value == "Dog");
-    REQUIRE(((JNodeString *)((JNodeArray *)jNode.get())->value[1].get())->value == "1964");
-    REQUIRE(((JNodeBoolean *)((JNodeArray *)jNode.get())->value[2].get())->value == true);
-    REQUIRE(((JNodeNull *)((JNodeArray *)jNode.get())->value[2].get())->value == nullptr);
+    checkArray(jNode.get());
   }
 }
