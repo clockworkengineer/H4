@@ -63,6 +63,17 @@ void checkArray(JNode *jNode)
   REQUIRE(((JNodeBoolean *)((JNodeArray *)jNode)->value[2].get())->value == true);
   REQUIRE(((JNodeNull *)((JNodeArray *)jNode)->value[2].get())->value == nullptr);
 }
+void checkObject(JNode *jNode)
+{
+  REQUIRE(((JNode *)jNode)->nodeType == JSON::JNodeType::object);
+  REQUIRE(((JNodeObject *)jNode)->value.size() == 2);
+  REQUIRE(((JNodeObject *)jNode)->value.count("City") > 0);
+  REQUIRE(((JNodeObject *)jNode)->value.count("Population") > 0);
+  REQUIRE(((JNode *)((JNodeObject *)jNode)->value["City"].get())->nodeType == JSON::JNodeType::string);
+  REQUIRE(((JNode *)((JNodeObject *)jNode)->value["Population"].get())->nodeType == JSON::JNodeType::number);
+  REQUIRE(((JNodeString *)((JNodeObject *)jNode)->value["City"].get())->value == "Southampton");
+  REQUIRE(((JNodeNumber *)((JNodeObject *)jNode)->value["Population"].get())->value == "500000");
+}
 // ==========
 // Test cases
 // ==========
@@ -178,16 +189,8 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
   SECTION("Decode object { \"City\" : \"Southampton\", \"Population\" : 500000} and check its value", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode("{ \"City\" : \"Southampton\", \"Population\" : 500000}");
-    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
-    REQUIRE(((JNodeObject *)jNode.get())->value.size() == 2);
-    REQUIRE(((JNodeObject *)jNode.get())->value.count("City") > 0);
-    REQUIRE(((JNodeObject *)jNode.get())->value.count("Population") > 0);
-    REQUIRE(((JNode *)((JNodeObject *)jNode.get())->value["City"].get())->nodeType == JSON::JNodeType::string);
-    REQUIRE(((JNode *)((JNodeObject *)jNode.get())->value["Population"].get())->nodeType == JSON::JNodeType::number);
-    REQUIRE(((JNodeString *)((JNodeObject *)jNode.get())->value["City"].get())->value == "Southampton");
-    REQUIRE(((JNodeNumber *)((JNodeObject *)jNode.get())->value["Population"].get())->value == "500000");
+    checkObject(jNode.get());
   }
-
   SECTION("Decode an array [ \"Dog\", 1964, true, null ] and check its value", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode("[ \"Dog\", 1964, true, null ]");
@@ -197,17 +200,27 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
 TEST_CASE("Creation and use of JSON for decode checking various whitespace characters are ignored.", "[JSON][Decode]")
 {
   JSON json;
-  std::string ws = " ";
+  std::string ws = "";
   SECTION("Decode an array [\"Dog\",1964,true,null] with no white space.", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decode("[\"Dog\",1964,true,null]");
+    std::unique_ptr<JNode> jNode = json.decode(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
     checkArray(jNode.get());
   }
-
+  SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} with no whitespace", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
+     checkObject(jNode.get());
+  }
+  ws += " ";
   SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' '.", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
     checkArray(jNode.get());
+  }
+  SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} white space ' '.", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
+    checkObject(jNode.get());
   }
   ws += "\t";
   SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' \\t'.", "[JSON][Decode]")
@@ -215,16 +228,31 @@ TEST_CASE("Creation and use of JSON for decode checking various whitespace chara
     std::unique_ptr<JNode> jNode = json.decode(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
     checkArray(jNode.get());
   }
+  SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} white space ' \\t'.", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
+    checkObject(jNode.get());
+  }
   ws += "\n";
   SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' \\t\\n'.", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
     checkArray(jNode.get());
   }
+  SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} white space ' \\t\\n'.", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
+    checkObject(jNode.get());
+  }
   ws += "\r";
   SECTION("Decode an array [\"Dog\",1964,true,null] with white space ' \\t\\n\\r'.", "[JSON][Decode]")
   {
     std::unique_ptr<JNode> jNode = json.decode(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
     checkArray(jNode.get());
+  }
+  SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} white space ' \\t\\n\\r'.", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
+    checkObject(jNode.get());
   }
 }
