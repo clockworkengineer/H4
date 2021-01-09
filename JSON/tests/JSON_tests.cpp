@@ -174,4 +174,19 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
     REQUIRE(((JNodeString *)((JNodeObject *)jNode.get())->value["City"].get())->value == "Southampton");
     REQUIRE(((JNodeNumber *)((JNodeObject *)jNode.get())->value["Population"].get())->value == "500000");
   }
+
+  SECTION("Decode an array [ \"Dog\", 1964, true, null ] and check its value", "[JSON][Decode]")
+  {
+    std::unique_ptr<JNode> jNode = json.decode("[ \"Dog\", 1964, true, null ]");
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
+    REQUIRE(((JNodeArray *)jNode.get())->value.size() == 4);
+    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[0].get())->nodeType == JSON::JNodeType::string);
+    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[1].get())->nodeType == JSON::JNodeType::number);
+    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[2].get())->nodeType == JSON::JNodeType::boolean);
+    REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[3].get())->nodeType == JSON::JNodeType::null);
+    REQUIRE(((JNodeNumber *)((JNodeArray *)jNode.get())->value[0].get())->value == "Dog");
+    REQUIRE(((JNodeString *)((JNodeArray *)jNode.get())->value[1].get())->value == "1964");
+    REQUIRE(((JNodeBoolean *)((JNodeArray *)jNode.get())->value[2].get())->value == true);
+    REQUIRE(((JNodeNull *)((JNodeArray *)jNode.get())->value[2].get())->value == nullptr);
+  }
 }

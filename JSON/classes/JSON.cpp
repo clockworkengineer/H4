@@ -43,7 +43,6 @@ namespace H4
     // ===============
     inline void JSON::ignoreWhiteSpace(ISource *source)
     {
-        //   source->moveToNextByte();
         while (source->bytesToDecode() && source->currentByte() == ' ')
         {
             source->moveToNextByte();
@@ -135,12 +134,21 @@ namespace H4
         source->moveToNextByte();
         return (std::make_unique<JNodeObject>(std::move(object)));
     }
-    std::unique_ptr<JNode> JSON::decodeArray(ISource * /*source*/)
+    std::unique_ptr<JNode> JSON::decodeArray(ISource *source)
     {
         JNodeArray array;
-        array.value.push_back(std::make_unique<JNodeNumber>(JNodeNumber("777")));
-        array.value.push_back(std::make_unique<JNodeNumber>(JNodeNumber("9000")));
-        array.value.push_back(std::make_unique<JNodeString>(JNodeString("apples")));
+        do
+        {
+            source->moveToNextByte();
+            ignoreWhiteSpace(source);
+            array.value.push_back(decodeJNodes(source));
+            ignoreWhiteSpace(source);
+        } while (source->currentByte() == ',');
+        if (source->currentByte() != ']')
+        {
+            throw new std::runtime_error("Missing terminating ']' for array.");
+        }
+        source->moveToNextByte();
         return (std::make_unique<JNodeArray>(std::move(array)));
     }
     std::unique_ptr<JNode> JSON::decodeJNodes(ISource *source)
