@@ -259,7 +259,9 @@ TEST_CASE("Creation and use of JSON for decode checking various whitespace chara
 TEST_CASE("Creation and use of JSON for decode a table example JSON files that are read info memory.", "[JSON][Decode]")
 {
   auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
-                                                "./testData/testfile002.json"}));
+                                                "./testData/testfile002.json",
+                                                "./testData/testfile003.json",
+                                                "./testData/testfile004.json"}));
   JSON json;
   std::ifstream jsonFile;
   jsonFile.open(testFile);
