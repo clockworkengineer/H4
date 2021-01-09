@@ -43,7 +43,7 @@ namespace H4
     // ===============
     inline void JSON::ignoreWhiteSpace(ISource *source)
     {
-        while (source->bytesToDecode() && source->currentByte() == ' ')
+        while (source->bytesToDecode() && std::iswspace(source->currentByte()))
         {
             source->moveToNextByte();
         }
