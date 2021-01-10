@@ -21,6 +21,8 @@ set (BENCODE_SOURCES
 
 set (BENCODE_INCLUDES
     ./include/Bencode.hpp
+    ./include/BencodeSources.hpp
+    ./include/BencodeDestinations.hpp
 )
 
 # Bencode library

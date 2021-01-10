@@ -21,6 +21,8 @@ set (JSON_SOURCES
 
 set (JSON_INCLUDES
     ./include/JSON.hpp
+    ./include/JSONSources.hpp
+    ./include/JSONDestinations.hpp
 )
 
 # JSON library
