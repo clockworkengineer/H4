@@ -52,27 +52,29 @@ bool compareFiles(const std::string &fileName1, const std::string &fileName2)
 }
 void checkArray(JNode *jNode)
 {
+  JNodeArray *jNodeArray = (JNodeArray *)jNode;
   REQUIRE(((JNode *)jNode)->nodeType == JSON::JNodeType::array);
-  REQUIRE(((JNodeArray *)jNode)->value.size() == 4);
-  REQUIRE(((JNode *)((JNodeArray *)jNode)->value[0].get())->nodeType == JSON::JNodeType::string);
-  REQUIRE(((JNode *)((JNodeArray *)jNode)->value[1].get())->nodeType == JSON::JNodeType::number);
-  REQUIRE(((JNode *)((JNodeArray *)jNode)->value[2].get())->nodeType == JSON::JNodeType::boolean);
-  REQUIRE(((JNode *)((JNodeArray *)jNode)->value[3].get())->nodeType == JSON::JNodeType::null);
-  REQUIRE(((JNodeNumber *)((JNodeArray *)jNode)->value[0].get())->value == "Dog");
-  REQUIRE(((JNodeString *)((JNodeArray *)jNode)->value[1].get())->value == "1964");
-  REQUIRE(((JNodeBoolean *)((JNodeArray *)jNode)->value[2].get())->value == true);
-  REQUIRE(((JNodeNull *)((JNodeArray *)jNode)->value[2].get())->value == nullptr);
+  REQUIRE(jNodeArray->value.size() == 4);
+  REQUIRE(((JNode *)jNodeArray->value[0].get())->nodeType == JSON::JNodeType::string);
+  REQUIRE(((JNode *)jNodeArray->value[1].get())->nodeType == JSON::JNodeType::number);
+  REQUIRE(((JNode *)jNodeArray->value[2].get())->nodeType == JSON::JNodeType::boolean);
+  REQUIRE(((JNode *)jNodeArray->value[3].get())->nodeType == JSON::JNodeType::null);
+  REQUIRE(((JNodeNumber *)jNodeArray->value[0].get())->value == "Dog");
+  REQUIRE(((JNodeString *)jNodeArray->value[1].get())->value == "1964");
+  REQUIRE(((JNodeBoolean *)jNodeArray->value[2].get())->value == true);
+  REQUIRE(((JNodeNull *)jNodeArray->value[3].get())->value == nullptr);
 }
 void checkObject(JNode *jNode)
 {
+  JNodeObject *jNodeObject = (JNodeObject*)jNode;
   REQUIRE(((JNode *)jNode)->nodeType == JSON::JNodeType::object);
-  REQUIRE(((JNodeObject *)jNode)->value.size() == 2);
-  REQUIRE(((JNodeObject *)jNode)->value.count("City") > 0);
-  REQUIRE(((JNodeObject *)jNode)->value.count("Population") > 0);
-  REQUIRE(((JNode *)((JNodeObject *)jNode)->value["City"].get())->nodeType == JSON::JNodeType::string);
-  REQUIRE(((JNode *)((JNodeObject *)jNode)->value["Population"].get())->nodeType == JSON::JNodeType::number);
-  REQUIRE(((JNodeString *)((JNodeObject *)jNode)->value["City"].get())->value == "Southampton");
-  REQUIRE(((JNodeNumber *)((JNodeObject *)jNode)->value["Population"].get())->value == "500000");
+  REQUIRE(jNodeObject->value.size() == 2);
+  REQUIRE(jNodeObject->value.count("City") > 0);
+  REQUIRE(jNodeObject->value.count("Population") > 0);
+  REQUIRE(((JNode *)jNodeObject->value["City"].get())->nodeType == JSON::JNodeType::string);
+  REQUIRE(((JNode *)jNodeObject->value["Population"].get())->nodeType == JSON::JNodeType::number);
+  REQUIRE(((JNodeString *)jNodeObject->value["City"].get())->value == "Southampton");
+  REQUIRE(((JNodeNumber *)jNodeObject->value["Population"].get())->value == "500000");
 }
 // ==========
 // Test cases
@@ -80,91 +82,95 @@ void checkObject(JNode *jNode)
 TEST_CASE("Creation and use of JSON for decode of simple types (number, string, boolean, null) ", "[JSON][Decode]")
 {
   JSON json;
+  std::unique_ptr<JNode> jNode;
   SECTION("Decode an string", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("\"example string\"");
+    jNode = json.decodeBuffer("\"example string\"");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::string);
   }
   SECTION("Decode an number", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("6767");
+    jNode = json.decodeBuffer("6767");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::number);
   }
   SECTION("Decode an boolean (true)", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("true");
+    jNode = json.decodeBuffer("true");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::boolean);
   }
   SECTION("Decode an boolean (false)", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("false");
+    jNode = json.decodeBuffer("false");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::boolean);
   }
   SECTION("Decode an null", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("null");
+    jNode = json.decodeBuffer("null");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::null);
   }
 }
 TEST_CASE("Creation and use of JSON for decode of simple types (number, string, boolean, null) and check values.", "[JSON][Decode]")
 {
   JSON json;
+  std::unique_ptr<JNode> jNode;
   SECTION("Decode an string and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("\"example string\"");
+    jNode = json.decodeBuffer("\"example string\"");
     REQUIRE(((JNodeString *)jNode.get())->value == "example string");
   }
   SECTION("Decode an string and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("\"another example string\"");
+    jNode = json.decodeBuffer("\"another example string\"");
     REQUIRE(((JNodeString *)jNode.get())->value == "another example string");
   }
   SECTION("Decode an number and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("6767");
+    jNode = json.decodeBuffer("6767");
     REQUIRE(((JNodeNumber *)jNode.get())->value == "6767");
   }
   SECTION("Decode an number and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("190000");
+    jNode = json.decodeBuffer("190000");
     REQUIRE(((JNodeNumber *)jNode.get())->value == "190000");
   }
   SECTION("Decode an boolean (true) and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("true");
+    jNode = json.decodeBuffer("true");
     REQUIRE(((JNodeBoolean *)jNode.get())->value == true);
   }
   SECTION("Decode an boolean (false) and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("false");
+    jNode = json.decodeBuffer("false");
     REQUIRE(((JNodeBoolean *)jNode.get())->value == false);
   }
   SECTION("Decode an null and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("null");
+    jNode = json.decodeBuffer("null");
     REQUIRE(((JNodeNull *)jNode.get())->value == nullptr);
   }
 }
 TEST_CASE("Creation and use of JSON for decode of collection types (array, object) ", "[JSON][Decode]")
 {
   JSON json;
+  std::unique_ptr<JNode> jNode;
   SECTION("Decode an object", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("{ \"name\" : \"Robert\", \"Age\" : 15}");
+    jNode = json.decodeBuffer("{ \"name\" : \"Robert\", \"Age\" : 15}");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
   }
   SECTION("Decode an array", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("[ 777, 9000, \"apples\"]");
+    jNode = json.decodeBuffer("[ 777, 9000, \"apples\"]");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
   }
 }
 TEST_CASE("Creation and use of JSON for decode of collection types (array, object) and check values", "[JSON][Decode]")
 {
   JSON json;
+  std::unique_ptr<JNode> jNode;
   SECTION("Decode an object { \"name\" : \"Robert\", \"Age\" : 15} and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("{ \"Name\" : \"Robert\", \"Age\" : 15}");
+    jNode = json.decodeBuffer("{ \"Name\" : \"Robert\", \"Age\" : 15}");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
     REQUIRE(((JNodeObject *)jNode.get())->value.size() == 2);
     REQUIRE(((JNodeObject *)jNode.get())->value.count("Name") > 0);
@@ -176,7 +182,7 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
   }
   SECTION("Decode an array [ 777, 9000, \"apples\"] and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("[ 777, 9000, \"apples\"]");
+    jNode = json.decodeBuffer("[ 777, 9000, \"apples\"]");
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::array);
     REQUIRE(((JNodeArray *)jNode.get())->value.size() == 3);
     REQUIRE(((JNode *)((JNodeArray *)jNode.get())->value[0].get())->nodeType == JSON::JNodeType::number);
@@ -188,71 +194,72 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
   }
   SECTION("Decode object { \"City\" : \"Southampton\", \"Population\" : 500000} and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("{ \"City\" : \"Southampton\", \"Population\" : 500000}");
+    jNode = json.decodeBuffer("{ \"City\" : \"Southampton\", \"Population\" : 500000}");
     checkObject(jNode.get());
   }
   SECTION("Decode an array [ \"Dog\", 1964, true, null ] and check its value", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer("[ \"Dog\", 1964, true, null ]");
+    jNode = json.decodeBuffer("[ \"Dog\", 1964, true, null ]");
     checkArray(jNode.get());
   }
 }
 TEST_CASE("Creation and use of JSON for decode checking various whitespace characters are ignored.", "[JSON][Decode]")
 {
   JSON json;
+  std::unique_ptr<JNode> jNode;
   std::string ws = "";
   SECTION("Decode an array [\"Dog\",1964,true,null] with no whitespace.", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
+    jNode = json.decodeBuffer(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
     checkArray(jNode.get());
   }
   SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} with no whitespace", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
+    jNode = json.decodeBuffer(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
     checkObject(jNode.get());
   }
   ws += " ";
   SECTION("Decode an array [\"Dog\",1964,true,null] with whitespace ' '.", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
+    jNode = json.decodeBuffer(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
     checkArray(jNode.get());
   }
   SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} whitespace ' '.", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
+    jNode = json.decodeBuffer(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
     checkObject(jNode.get());
   }
   ws += "\t";
   SECTION("Decode an array [\"Dog\",1964,true,null] with whitespace ' \\t'.", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
+    jNode = json.decodeBuffer(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
     checkArray(jNode.get());
   }
   SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} whitespace ' \\t'.", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
+    jNode = json.decodeBuffer(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
     checkObject(jNode.get());
   }
   ws += "\n";
   SECTION("Decode an array [\"Dog\",1964,true,null] with whitespace ' \\t\\n'.", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
+    jNode = json.decodeBuffer(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
     checkArray(jNode.get());
   }
   SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} whitespace ' \\t\\n'.", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
+    jNode = json.decodeBuffer(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
     checkObject(jNode.get());
   }
   ws += "\r";
   SECTION("Decode an array [\"Dog\",1964,true,null] with whitespace ' \\t\\n\\r'.", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
+    jNode = json.decodeBuffer(ws + "[" + ws + "\"Dog\"" + ws + "," + ws + "1964" + ws + "," + ws + "true" + ws + "," + ws + "null" + ws + "]");
     checkArray(jNode.get());
   }
   SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} whitespace ' \\t\\n\\r'.", "[JSON][Decode]")
   {
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
+    jNode = json.decodeBuffer(ws + "{" + ws + "\"City\"" + ws + ":" + ws + "\"Southampton\"" + ws + "," + ws + "\"Population\"" + ws + ":" + ws + "500000" + ws + "}");
     checkObject(jNode.get());
   }
 }
