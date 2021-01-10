@@ -77,7 +77,7 @@ namespace H4
     //  and decode complex encodings this method is called recursively to build up a BNode structure.</summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
     /// <returns></returns>
-    std::unique_ptr<BNode> Bencode::decodeToBNodes(ISource *source)
+    std::unique_ptr<BNode> Bencode::decodeBNodes(ISource *source)
     {
         switch ((char)source->currentByte())
         {
@@ -89,7 +89,7 @@ namespace H4
             while (source->bytesToDecode() && source->currentByte() != (std::byte)'e')
             {
                 std::string key = decodeString(source);
-                bNodeDictionary.value[key] = decodeToBNodes(source);
+                bNodeDictionary.value[key] = decodeBNodes(source);
             }
             if (!source->bytesToDecode())
             {
@@ -105,7 +105,7 @@ namespace H4
             BNodeList bNodeList;
             while (source->bytesToDecode() && source->currentByte() != (std::byte)'e')
             {
-                bNodeList.value.push_back(decodeToBNodes(source));
+                bNodeList.value.push_back(decodeBNodes(source));
             }
             if (!source->bytesToDecode())
             {
@@ -142,7 +142,7 @@ namespace H4
     /// <param name="bNode">Pointer to root of current BNode structure.</param>
     /// <param name="desination ">Pointer to interface used to facilitate the output stream.</param>
     /// <returns></returns>
-    void Bencode::encodeFromBNodes(BNode *bNode, IDestination *destination)
+    void Bencode::encodeBNodes(BNode *bNode, IDestination *destination)
     {
         switch (bNode->nodeType)
         {
@@ -151,7 +151,7 @@ namespace H4
             for (auto &bNodeEntry : ((BNodeDict *)bNode)->value)
             {
                 destination->addBytes(std::to_string(bNodeEntry.first.length()) + ":" + bNodeEntry.first);
-                encodeFromBNodes(bNodeEntry.second.get(), destination);
+                encodeBNodes(bNodeEntry.second.get(), destination);
             }
             destination->addBytes("e");
             break;
@@ -159,7 +159,7 @@ namespace H4
             destination->addBytes("l");
             for (auto &bNodeEntry : ((BNodeList *)bNode)->value)
             {
-                encodeFromBNodes(bNodeEntry.get(), destination);
+                encodeBNodes(bNodeEntry.get(), destination);
             }
             destination->addBytes("e");
             break;
@@ -189,7 +189,7 @@ namespace H4
             throw std::invalid_argument("Empty string passed to be decoded.");
         }
         BufferSource source(sourceBuffer);
-        return decodeToBNodes(&source);
+        return decodeBNodes(&source);
     }
     /// <summary>Decode Bencoded source file into BNode(s)</summary>
     /// <param name="sourceFileName">Input source file name</param>
@@ -197,31 +197,31 @@ namespace H4
     std::unique_ptr<BNode> Bencode::decodeFile(std::string sourceFileName)
     {
         FileSource source(std::move(sourceFileName));
-        return decodeToBNodes(&source);
+        return decodeBNodes(&source);
     }
     /// <summary>Take BNode structure and create an Bencode encoding for it in a destination buffer.</summary>
     /// <param name="bNodeRoot">Bnode structure root.</param>
     /// <returns>Encoded data buffer.</returns>
-    Bencode::Bencoding Bencode::encodeToBuffer(std::unique_ptr<BNode> bNodeRoot)
+    Bencode::Bencoding Bencode::encodeBuffer(std::unique_ptr<BNode> bNodeRoot)
     {
         if (bNodeRoot == nullptr)
         {
             throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
         }
         BufferDestination destination;
-        encodeFromBNodes(bNodeRoot.get(), &destination);
+        encodeBNodes(bNodeRoot.get(), &destination);
         return (destination.getBuffer());
     }
     /// <summary>Take BNode structure and create an Bencode encoding for it in a destination file.</summary>
     /// <param name="bNodeRoot">Bnode structure root.</param>
     /// <param name="destinationFileName">Destination file name.</param>
-    void Bencode::encodeToFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName)
+    void Bencode::encodeFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName)
     {
         if (bNodeRoot == nullptr)
         {
             throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
         }
         FileDestination destination(std::move(destinationFileName));
-        encodeFromBNodes(bNodeRoot.get(), &destination);
+        encodeBNodes(bNodeRoot.get(), &destination);
     }
 } // namespace H4

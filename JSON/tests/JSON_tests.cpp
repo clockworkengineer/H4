@@ -289,3 +289,57 @@ TEST_CASE("Creation and use of JSON for decode of a list of example JSON files."
     REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
   }
 }
+TEST_CASE("Decode generated exceptions.", "[JSON][Decode][Exceptions]")
+{
+  // Note: The tests for syntax errors is not exhaustive and more may be added over time.
+  JSON json;
+  SECTION("Decode passing a empty string", "[JSON][Decode]")
+  {
+    REQUIRE_THROWS_AS(json.decodeBuffer(""), std::invalid_argument);
+    REQUIRE_THROWS_WITH(json.decodeBuffer(""), "Empty string passed to be decoded.");
+  }
+  SECTION("Decode file passing a empty file name", "[JSON][Decode]")
+  {
+    REQUIRE_THROWS_AS(json.decodeBuffer(""), std::invalid_argument);
+    REQUIRE_THROWS_WITH(json.decodeFile(""), "Empty file name passed to be decoded.");
+  }
+  SECTION("Decode missing terminating '\"' in string", "[JSON][Decode]")
+  {
+    REQUIRE_THROWS_AS(json.decodeBuffer("{ \"one\" : \"Apple }"), std::runtime_error);
+    REQUIRE_THROWS_WITH(json.decodeBuffer("{ \"one\" : \"Apple }"), "JSON syntax error detected.");
+  }
+  SECTION("Decode number with starting with invalid character", "[JSON][Decode]")
+  {
+    REQUIRE_THROWS_AS(json.decodeBuffer("{ \"one\" : z19034}"), std::runtime_error);
+    REQUIRE_THROWS_WITH(json.decodeBuffer("{ \"one\" : z19034 }"), "JSON syntax error detected.");
+  }
+  SECTION("Decode object with invalid value field (number).", "[JSON][Decode]")
+  {
+    REQUIRE_THROWS_AS(json.decodeBuffer("{ \"one\" : 18987u3 }"), std::runtime_error);
+    REQUIRE_THROWS_WITH(json.decodeBuffer("{ \"one\" : 18987u3 }"), "JSON syntax error detected.");
+  }
+  SECTION("Decode object with missing value field.", "[JSON][Decode]")
+  {
+    REQUIRE_THROWS_AS(json.decodeBuffer("{ \"one\" : }"), std::runtime_error);
+    REQUIRE_THROWS_WITH(json.decodeBuffer("{ \"one\" : }"), "JSON syntax error detected.");
+  }
+  SECTION("Decode object with missing key field.", "[JSON][Decode]")
+  {
+    REQUIRE_THROWS_AS(json.decodeBuffer("{  : 89012 }"), std::runtime_error);
+    REQUIRE_THROWS_WITH(json.decodeBuffer("{ : }"), "JSON syntax error detected.");
+  }
+  SECTION("Decode object with missing closing '}'.", "[JSON][Decode]")
+  {
+    REQUIRE_THROWS_AS(json.decodeBuffer("{  \"one\" : 18987"), std::runtime_error);
+    REQUIRE_THROWS_WITH(json.decodeBuffer("{ \"one\" : 18987 "), "JSON syntax error detected.");
+  }
+}
+TEST_CASE("Creation and use of JSON for encode of simple types (number, string, boolean, null) ", "[JSON][Encode]")
+{
+  JSON json;
+  SECTION("Encode a string", "[JSON][Encode]")
+  {
+    std::string expected = "\"Test string.\"";;
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+}

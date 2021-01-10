@@ -138,6 +138,7 @@ namespace H4
         // ==============
         std::unique_ptr<JNode> decodeBuffer(std::string jsonBuffer);
         std::unique_ptr<JNode> decodeFile(std::string sourceFileName);
+        std::string encodeBuffer(std::unique_ptr<JNode> jNodeRoot);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -160,6 +161,7 @@ namespace H4
         std::unique_ptr<JNode> decodeNull(ISource *source);
         std::unique_ptr<JNode> decodeObject(ISource *source);
         std::unique_ptr<JNode> decodeArray(ISource *source);
+        void encodeJNodes(JNode *jNode, IDestination *destination);
         // =================
         // PRIVATE VARIABLES
         // =================

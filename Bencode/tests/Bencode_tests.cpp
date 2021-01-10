@@ -173,22 +173,22 @@ TEST_CASE("Creation and use of Bencode for encode of simple types (number, strin
   Bencode bEncode;
   SECTION("Encode an integer (266) and check value", "[Bencode][Encode]")
   {
-    Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(266)));
+    Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeInteger>(BNodeInteger(266)));
     REQUIRE(actual == Bencode::Bencoding("i266e"));
   }
   SECTION("Encode an integer (10000) and check value", "[Bencode][Encode]")
   {
-    Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(10000)));
+    Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeInteger>(BNodeInteger(10000)));
     REQUIRE(actual == Bencode::Bencoding("i10000e"));
   }
   SECTION("Encode an string ('qwertyuiopas') and check its value", "[Bencode][Encode]")
   {
-    Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString("qwertyuiopas")));
+    Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeString>(BNodeString("qwertyuiopas")));
     REQUIRE(actual == Bencode::Bencoding("12:qwertyuiopas"));
   }
   SECTION("Encode an string ('abcdefghijklmnopqrstuvwxyz') and check its value", "[Bencode][Encode]")
   {
-    Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString("abcdefghijklmnopqrstuvwxyz")));
+    Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeString>(BNodeString("abcdefghijklmnopqrstuvwxyz")));
     REQUIRE(actual == Bencode::Bencoding("26:abcdefghijklmnopqrstuvwxyz"));
   }
 }
@@ -197,7 +197,7 @@ TEST_CASE("Creation and use of Bencode for encode of a table of integer test dat
   auto [test_input, expected] = GENERATE(table<long, Bencode::Bencoding>({{277, "i277e"},
                                                                           {32767, "i32767e"}}));
   Bencode bEncode;
-  Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeInteger>(BNodeInteger(test_input)));
+  Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeInteger>(BNodeInteger(test_input)));
   REQUIRE(actual == expected);
 }
 TEST_CASE("Creation and use of Bencode for encode of a table of string test data", "[Bencode][Encode]")
@@ -205,7 +205,7 @@ TEST_CASE("Creation and use of Bencode for encode of a table of string test data
   auto [test_input, expected] = GENERATE(table<std::string, Bencode::Bencoding>({{"qwertyuiopasd", "13:qwertyuiopasd"},
                                                                                  {"mnbvcx", "6:mnbvcx"}}));
   Bencode bEncode;
-  Bencode::Bencoding actual = bEncode.encodeToBuffer(std::make_unique<BNodeString>(BNodeString(test_input)));
+  Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeString>(BNodeString(test_input)));
   REQUIRE(actual == expected);
 }
 TEST_CASE("Creation and use of Bencode for encode of collection types (list, dictionary) ", "[Bencode][Encode]")
@@ -214,22 +214,22 @@ TEST_CASE("Creation and use of Bencode for encode of collection types (list, dic
   SECTION("Encode an List of integers('li266ei6780ei88ee') and check value", "[Bencode][Encode]")
   {
     Bencode::Bencoding expected("li266ei6780ei88ee");
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected)) == expected);
+    REQUIRE(bEncode.encodeBuffer(bEncode.decodeBuffer(expected)) == expected);
   }
   SECTION("Encode an List of strings ('l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze') and check value", "[Bencode][Encode]")
   {
     Bencode::Bencoding expected = "l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze";
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected)) == expected);
+    REQUIRE(bEncode.encodeBuffer(bEncode.decodeBuffer(expected)) == expected);
   }
   SECTION("Encode an Dictionary of integers and check balue", "[Bencode][Encode]")
   {
     Bencode::Bencoding expected = "d3:onei1e5:threei3e3:twoi2ee";
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected)) == expected);
+    REQUIRE(bEncode.encodeBuffer(bEncode.decodeBuffer(expected)) == expected);
   }
   SECTION("Encode an Dictionary of strings and check balue", "[Bencode][Encode]")
   {
     Bencode::Bencoding expected = "d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle";
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeBuffer(expected)) == expected);
+    REQUIRE(bEncode.encodeBuffer(bEncode.decodeBuffer(expected)) == expected);
   }
 }
 TEST_CASE("Decode generated exceptions", "[Bencode][Decode][Exceptions]")
@@ -270,15 +270,15 @@ TEST_CASE("Encode generated exceptions", "[Bencode][Encode][Exceptions]")
   Bencode bEncode;
   SECTION("Encode passed nullptr", "[Bencode][Decode]")
   {
-    REQUIRE_THROWS_AS(bEncode.encodeToBuffer(nullptr), std::invalid_argument);
-    REQUIRE_THROWS_WITH(bEncode.encodeToBuffer(nullptr), "Nullptr passed as bNode to be encoded.");
-    REQUIRE_THROWS_AS(bEncode.encodeToBuffer(std::unique_ptr<BNode>(nullptr)), std::invalid_argument);
-    REQUIRE_THROWS_WITH(bEncode.encodeToBuffer(std::unique_ptr<BNode>(nullptr)), "Nullptr passed as bNode to be encoded.");
+    REQUIRE_THROWS_AS(bEncode.encodeBuffer(nullptr), std::invalid_argument);
+    REQUIRE_THROWS_WITH(bEncode.encodeBuffer(nullptr), "Nullptr passed as bNode to be encoded.");
+    REQUIRE_THROWS_AS(bEncode.encodeBuffer(std::unique_ptr<BNode>(nullptr)), std::invalid_argument);
+    REQUIRE_THROWS_WITH(bEncode.encodeBuffer(std::unique_ptr<BNode>(nullptr)), "Nullptr passed as bNode to be encoded.");
   }
   SECTION("Encode passed invalid BNode type", "[Bencode][Decode]")
   {
-    REQUIRE_THROWS_AS(bEncode.encodeToBuffer(std::unique_ptr<BNode>(new BNode())), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.encodeToBuffer(std::unique_ptr<BNode>(new BNode())), "Unknown BNode type encountered during encode.");
+    REQUIRE_THROWS_AS(bEncode.encodeBuffer(std::unique_ptr<BNode>(new BNode())), std::runtime_error);
+    REQUIRE_THROWS_WITH(bEncode.encodeBuffer(std::unique_ptr<BNode>(new BNode())), "Unknown BNode type encountered during encode.");
   }
 }
 TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]")
@@ -294,7 +294,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
     std::ifstream torrentFile{kSingleFileTorrent};
     std::ostringstream expected;
     expected << torrentFile.rdbuf();
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile(kSingleFileTorrent)) == Bencode::Bencoding(expected.str()));
+    REQUIRE(bEncode.encodeBuffer(bEncode.decodeFile(kSingleFileTorrent)) == Bencode::Bencoding(expected.str()));
   }
   SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
   {
@@ -306,7 +306,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
     std::ifstream torrentFile{kMultiFileTorrent};
     std::ostringstream expected;
     expected << torrentFile.rdbuf();
-    REQUIRE(bEncode.encodeToBuffer(bEncode.decodeFile(kMultiFileTorrent)) == Bencode::Bencoding(expected.str()));
+    REQUIRE(bEncode.encodeBuffer(bEncode.decodeFile(kMultiFileTorrent)) == Bencode::Bencoding(expected.str()));
   }
 }
 TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][Torrents]")
@@ -337,7 +337,7 @@ TEST_CASE("Encode torrent files using encodeToFile", "[Bencode][Encode][Torrents
     {
       std::filesystem::remove(kGeneratedTorrent);
     }
-    bEncode.encodeToFile(bEncode.decodeFile(kSingleFileTorrent), kGeneratedTorrent);
+    bEncode.encodeFile(bEncode.decodeFile(kSingleFileTorrent), kGeneratedTorrent);
     REQUIRE_FALSE(!compareFiles(kSingleFileTorrent, kGeneratedTorrent));
   }
   SECTION("Encode multifile.torrent and check value", "[Bencode][Encode][Torrents]")
@@ -346,7 +346,7 @@ TEST_CASE("Encode torrent files using encodeToFile", "[Bencode][Encode][Torrents
     {
       std::filesystem::remove(kGeneratedTorrent);
     }
-    bEncode.encodeToFile(bEncode.decodeFile(kMultiFileTorrent), kGeneratedTorrent);
+    bEncode.encodeFile(bEncode.decodeFile(kMultiFileTorrent), kGeneratedTorrent);
     REQUIRE_FALSE(!compareFiles(kMultiFileTorrent, kGeneratedTorrent));
   }
 }

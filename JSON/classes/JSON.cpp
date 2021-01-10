@@ -3,7 +3,10 @@
 //
 // Description: Class to perform JSON encoding encode/decode to/from
 // a byte buffer or file. It is also  possible to customize this with the
-// ISource and IDestination interfaces if required.
+// ISource and IDestination interfaces if required. Note: At present it will
+// report incorrect JSON syntax but will not be specific about what error has
+// occurred; this is reasoned to add too much overhead to the process of parsing
+// for the requirements of this library (this might change in future versions).
 //
 // Dependencies:   C17++ - Language standard features used.
 //
@@ -58,6 +61,10 @@ namespace H4
             value += source->currentByte();
             source->moveToNextByte();
         }
+        if (!source->bytesToDecode())
+        {
+            throw std::runtime_error("JSON syntax error detected.");
+        }
         source->moveToNextByte();
         return (value);
     }
@@ -67,13 +74,14 @@ namespace H4
     }
     std::unique_ptr<JNode> JSON::decodeNumber(ISource *source)
     {
-        std::set<char> validCharacters { '1','2','3','4','5','6','7','8','9','0','.','-','+','E','e'};
-        if (validCharacters.count(source->currentByte())==0) {
-            throw std::runtime_error(std::string("Invalid numeric character '")+source->currentByte()+"'.");
+        std::set<char> validCharacters{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', '-', '+', 'E', 'e'};
+        if (validCharacters.count(source->currentByte()) == 0)
+        {
+            throw std::runtime_error("JSON syntax error detected.");
         }
         std::string value{source->currentByte()};
         source->moveToNextByte();
-        while (source->bytesToDecode() && validCharacters.count(source->currentByte())>0)
+        while (source->bytesToDecode() && validCharacters.count(source->currentByte()) > 0)
         {
             value += source->currentByte();
             source->moveToNextByte();
@@ -97,7 +105,7 @@ namespace H4
         {
             return (std::make_unique<JNodeBoolean>(JNodeBoolean(false)));
         }
-        throw std::runtime_error("Invalid potential boolean value.");
+        throw std::runtime_error("JSON syntax error detected.");
     }
     std::unique_ptr<JNode> JSON::decodeNull(ISource *source)
     {
@@ -112,7 +120,7 @@ namespace H4
         {
             return (std::make_unique<JNodeNull>(JNodeNull()));
         }
-        throw std::runtime_error("Invalid potential null value.");
+        throw std::runtime_error("JSON syntax error detected.");
     }
     std::unique_ptr<JNode> JSON::decodeObject(ISource *source)
     {
@@ -125,7 +133,7 @@ namespace H4
             ignoreWhiteSpace(source);
             if (source->currentByte() != ':')
             {
-                throw new std::runtime_error("Missing ':' after key value");
+                throw std::runtime_error("JSON syntax error detected.");
             }
             source->moveToNextByte();
             ignoreWhiteSpace(source);
@@ -134,7 +142,7 @@ namespace H4
         } while (source->currentByte() == ',');
         if (source->currentByte() != '}')
         {
-            throw new std::runtime_error("Missing terminating '}' for object.");
+            throw std::runtime_error("JSON syntax error detected.");
         }
         source->moveToNextByte();
         return (std::make_unique<JNodeObject>(std::move(object)));
@@ -151,7 +159,7 @@ namespace H4
         } while (source->currentByte() == ',');
         if (source->currentByte() != ']')
         {
-            throw new std::runtime_error("Missing terminating ']' for array.");
+            throw std::runtime_error("JSON syntax error detected.");
         }
         source->moveToNextByte();
         return (std::make_unique<JNodeArray>(std::move(array)));
@@ -176,17 +184,35 @@ namespace H4
             return (decodeNumber(source));
         }
     }
+    void JSON::encodeJNodes(JNode * /*jNode*/, IDestination *destination)
+    {
+        destination->addBytes("\"Test string.\"");
+    }
     // ==============
     // PUBLIC METHODS
     // ==============
     std::unique_ptr<JNode> JSON::decodeBuffer(std::string jsonBuffer)
     {
+        if (jsonBuffer.empty())
+        {
+            throw std::invalid_argument("Empty string passed to be decoded.");
+        }
         BufferSource source(jsonBuffer);
         return (decodeJNodes(&source));
     }
     std::unique_ptr<JNode> JSON::decodeFile(std::string sourceFileName)
     {
+        if (sourceFileName.empty())
+        {
+            throw std::invalid_argument("Empty file name passed to be decoded.");
+        }
         FileSource source(sourceFileName);
         return (decodeJNodes(&source));
+    }
+    std::string JSON::encodeBuffer(std::unique_ptr<JNode> jNodeRoot)
+    {
+        BufferDestination destination;
+        encodeJNodes(jNodeRoot.get(), &destination);
+        return (destination.getBuffer());
     }
 } // namespace H4

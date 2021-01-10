@@ -136,8 +136,8 @@ namespace H4
         // ==============
         std::unique_ptr<BNode> decodeBuffer(const Bencoding &source);
         std::unique_ptr<BNode> decodeFile(std::string fileName);
-        Bencoding encodeToBuffer(std::unique_ptr<BNode> bNodeRoot);
-        void encodeToFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName);
+        Bencoding encodeBuffer(std::unique_ptr<BNode> bNodeRoot);
+        void encodeFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -153,8 +153,8 @@ namespace H4
         // ===============
         long decodePositiveInteger(ISource *source);
         std::string decodeString(ISource *source);
-        std::unique_ptr<BNode> decodeToBNodes(ISource *source);
-        void encodeFromBNodes(BNode *bNode, IDestination *destination);
+        std::unique_ptr<BNode> decodeBNodes(ISource *source);
+        void encodeBNodes(BNode *bNode, IDestination *destination);
         // =================
         // PRIVATE VARIABLES
         // =================
