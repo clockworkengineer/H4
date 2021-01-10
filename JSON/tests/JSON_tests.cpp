@@ -66,7 +66,7 @@ void checkArray(JNode *jNode)
 }
 void checkObject(JNode *jNode)
 {
-  JNodeObject *jNodeObject = (JNodeObject*)jNode;
+  JNodeObject *jNodeObject = (JNodeObject *)jNode;
   REQUIRE(((JNode *)jNode)->nodeType == JSON::JNodeType::object);
   REQUIRE(jNodeObject->value.size() == 2);
   REQUIRE(jNodeObject->value.count("City") > 0);
@@ -263,29 +263,27 @@ TEST_CASE("Creation and use of JSON for decode checking various whitespace chara
     checkObject(jNode.get());
   }
 }
-TEST_CASE("Creation and use of JSON for decode of a table of example JSON files that are read info memory.", "[JSON][Decode]")
+TEST_CASE("Creation and use of JSON for decode of a list of example JSON files.", "[JSON][Decode]")
 {
   auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
                                                 "./testData/testfile002.json",
                                                 "./testData/testfile003.json",
                                                 "./testData/testfile004.json"}));
   JSON json;
-  std::ifstream jsonFile;
-  jsonFile.open(testFile);
-  std::ostringstream buffer; 
-  buffer << jsonFile.rdbuf();
-  REQUIRE_NOTHROW(json.decodeBuffer(buffer.str()));
-  std::unique_ptr<JNode> jNode = json.decodeBuffer(buffer.str());
-  REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
-}
-TEST_CASE("Creation and use of JSON decodeFile to decode an table of files from disk.", "[JSON][Decode]")
-{
-  auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
-                                                "./testData/testfile002.json",
-                                                "./testData/testfile003.json",
-                                                "./testData/testfile004.json"}));
-  JSON json;
-  REQUIRE_NOTHROW(json.decodeFile(testFile));
-  std::unique_ptr<JNode> jNode = json.decodeFile(testFile);
-  REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
+  SECTION("Decode from buffer", "[JSON][Decode]")
+  {
+    std::ifstream jsonFile;
+    jsonFile.open(testFile);
+    std::ostringstream buffer;
+    buffer << jsonFile.rdbuf();
+    REQUIRE_NOTHROW(json.decodeBuffer(buffer.str()));
+    std::unique_ptr<JNode> jNode = json.decodeBuffer(buffer.str());
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
+  }
+  SECTION("Decode from file directly", "[JSON][Decode]")
+  {
+    REQUIRE_NOTHROW(json.decodeFile(testFile));
+    std::unique_ptr<JNode> jNode = json.decodeFile(testFile);
+    REQUIRE(((JNode *)jNode.get())->nodeType == JSON::JNodeType::object);
+  }
 }
