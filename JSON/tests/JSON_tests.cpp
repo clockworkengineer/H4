@@ -334,13 +334,66 @@ TEST_CASE("Decode generated exceptions.", "[JSON][Decode][Exceptions]")
     REQUIRE_THROWS_WITH(json.decodeBuffer("{ \"one\" : 18987 "), "JSON syntax error detected.");
   }
 }
-TEST_CASE("Creation and use of JSON for encode of simple types (number, string, boolean, null) ", "[JSON][Encode]")
+TEST_CASE("Creation and use of JSON for encode of simple types (number, string, boolean, null) and check its value", "[JSON][Encode]")
 {
   JSON json;
   SECTION("Encode a string", "[JSON][Encode]")
   {
     std::string expected = "\"Test string.\"";
-    ;
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+  SECTION("Encode a string", "[JSON][Encode]")
+  {
+    std::string expected = "\"Test another string.\"";
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+  SECTION("Encode a boolean", "[JSON][Encode]")
+  {
+    std::string expected = "true";
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+  SECTION("Encode a boolean", "[JSON][Encode]")
+  {
+    std::string expected = "false";
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+  SECTION("Encode a number", "[JSON][Encode]")
+  {
+    std::string expected = "98345";
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+  SECTION("Encode a number", "[JSON][Encode]")
+  {
+    std::string expected = "25000";
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+  SECTION("Encode a null", "[JSON][Encode]")
+  {
+    std::string expected = "null";
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+}
+TEST_CASE("Creation and use of JSON for encode of collection types (object, array) and check its value", "[JSON][Encode]")
+{
+  JSON json;
+  SECTION("Encode an object", "[JSON][Encode]")
+  {
+    std::string expected = "{\"Age\":77,\"Name\":\"Rob\"}";
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+  SECTION("Encode an array", "[JSON][Encode]")
+  {
+    std::string expected = "[999,\"Time\",null,true]";
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+  SECTION("Encode an object", "[JSON][Encode]")
+  {
+    std::string expected = "{\"City\":\"London\",\"Population\":8000000}";
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
+  }
+  SECTION("Encode an array", "[JSON][Encode]")
+  {
+    std::string expected = "[true,\"Out of time\",789043e13,true]";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
 }

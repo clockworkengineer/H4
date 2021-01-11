@@ -184,9 +184,57 @@ namespace H4
             return (decodeNumber(source));
         }
     }
-    void JSON::encodeJNodes(JNode * /*jNode*/, IDestination *destination)
+    void JSON::encodeJNodes(JNode *jNode, IDestination *destination)
     {
-        destination->addBytes("\"Test string.\"");
+        switch (jNode->nodeType)
+        {
+        case JNodeType::number:
+            destination->addBytes(static_cast<JNodeNumber *>(jNode)->value);
+            break;
+        case JNodeType::string:
+            destination->addBytes("\"" + static_cast<JNodeString *>(jNode)->value + "\"");
+            break;
+        case JNodeType::boolean:
+            destination->addBytes(static_cast<JNodeBoolean *>(jNode)->value ? "true" : "false");
+            break;
+        case JNodeType::null:
+            destination->addBytes("null");
+            break;
+        case JNodeType::object:
+        {
+            int commaCount = ((JNodeObject *)jNode)->value.size() - 1;
+            destination->addBytes("{");
+            for (auto &jNodeEntry : ((JNodeObject *)jNode)->value)
+            {
+                destination->addBytes("\"" + jNodeEntry.first + "\"" + ":");
+                encodeJNodes(jNodeEntry.second.get(), destination);
+                if (commaCount-- > 0)
+                {
+                    destination->addBytes(",");
+                }
+            }
+            destination->addBytes("}");
+            break;
+        }
+        case JNodeType::array:
+        {
+            int commaCount = ((JNodeArray *)jNode)->value.size() - 1;
+            destination->addBytes("[");
+            for (auto &bNodeEntry : ((JNodeArray *)jNode)->value)
+            {
+                encodeJNodes(bNodeEntry.get(), destination);
+                if (commaCount-- > 0)
+                {
+                    destination->addBytes(",");
+                }
+            }
+
+            destination->addBytes("]");
+            break;
+        }
+        default:
+            break;
+        }
     }
     // ==============
     // PUBLIC METHODS
