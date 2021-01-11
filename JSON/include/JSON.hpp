@@ -54,6 +54,9 @@ namespace H4
         {
             JNodeObject() : JNode(JNodeType::object) {}
             std::map<std::string, std::unique_ptr<JNode>> value;
+            // Note: Store keys so when write away keep key order
+            // that they have had in the source form be it file/network/buffer.
+            std::vector<std::string> keys;
         };
         //
         // List JNode.
@@ -139,6 +142,8 @@ namespace H4
         std::unique_ptr<JNode> decodeBuffer(std::string jsonBuffer);
         std::unique_ptr<JNode> decodeFile(std::string sourceFileName);
         std::string encodeBuffer(std::unique_ptr<JNode> jNodeRoot);
+        void encodeFile(std::unique_ptr<JNode> bNodeRoot, std::string destinationFileName);
+        std::string stripWhiteSpaceFromBuffer(std::string jsonBuffer);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -162,6 +167,7 @@ namespace H4
         std::unique_ptr<JNode> decodeObject(ISource *source);
         std::unique_ptr<JNode> decodeArray(ISource *source);
         void encodeJNodes(JNode *jNode, IDestination *destination);
+        void stripWhiteSpaceBuffer(ISource *source, IDestination *destination);
         // =================
         // PRIVATE VARIABLES
         // =================

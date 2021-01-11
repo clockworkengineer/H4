@@ -138,6 +138,7 @@ namespace H4
             source->moveToNextByte();
             ignoreWhiteSpace(source);
             object.value[key] = decodeJNodes(source);
+            object.keys.push_back(key);
             ignoreWhiteSpace(source);
         } while (source->currentByte() == ',');
         if (source->currentByte() != '}')
@@ -204,10 +205,10 @@ namespace H4
         {
             int commaCount = ((JNodeObject *)jNode)->value.size() - 1;
             destination->addBytes("{");
-            for (auto &jNodeEntry : ((JNodeObject *)jNode)->value)
+            for (auto key : ((JNodeObject *)jNode)->keys)
             {
-                destination->addBytes("\"" + jNodeEntry.first + "\"" + ":");
-                encodeJNodes(jNodeEntry.second.get(), destination);
+                destination->addBytes("\"" + key + "\"" + ":");
+                encodeJNodes(((JNodeObject *)jNode)->value[key].get(), destination);
                 if (commaCount-- > 0)
                 {
                     destination->addBytes(",");
@@ -228,12 +229,46 @@ namespace H4
                     destination->addBytes(",");
                 }
             }
-
             destination->addBytes("]");
             break;
         }
         default:
             throw std::runtime_error("Unknown JNode type encountered during encode.");
+        }
+    }
+    void JSON::stripWhiteSpaceBuffer(ISource *source, IDestination *destination)
+    {
+        while (source->bytesToDecode())
+        {
+            ignoreWhiteSpace(source);
+            if (source->bytesToDecode())
+            {
+                if (source->currentByte() == '"')
+                {
+                    destination->addBytes(std::string(1, source->currentByte()));
+                    source->moveToNextByte();
+                    while (source->bytesToDecode() && source->currentByte() != '"')
+                    {
+                        if (source->currentByte() == '\\')
+                        {
+                            destination->addBytes(std::string(1, source->currentByte()));
+                            source->moveToNextByte();
+                        }
+                        destination->addBytes(std::string(1, source->currentByte()));
+                        source->moveToNextByte();
+                    }
+                    if (source->bytesToDecode())
+                    {
+                        destination->addBytes(std::string(1, source->currentByte()));
+                        source->moveToNextByte();
+                    }
+                }
+                else
+                {
+                    destination->addBytes(std::string(1, source->currentByte()));
+                    source->moveToNextByte();
+                }
+            }
         }
     }
     // ==============
@@ -261,6 +296,22 @@ namespace H4
     {
         BufferDestination destination;
         encodeJNodes(jNodeRoot.get(), &destination);
+        return (destination.getBuffer());
+    }
+    void JSON::encodeFile(std::unique_ptr<JNode> bNodeRoot, std::string destinationFileName)
+    {
+        if (bNodeRoot == nullptr)
+        {
+            throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
+        }
+        FileDestination destination(std::move(destinationFileName));
+        encodeJNodes(bNodeRoot.get(), &destination);
+    }
+    std::string JSON::stripWhiteSpaceFromBuffer(std::string jsonBuffer)
+    {
+        BufferSource source(jsonBuffer);
+        BufferDestination destination;
+        stripWhiteSpaceBuffer(&source, &destination);
         return (destination.getBuffer());
     }
 } // namespace H4

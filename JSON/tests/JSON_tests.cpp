@@ -397,3 +397,34 @@ TEST_CASE("Creation and use of JSON for encode of collection types (object, arra
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
 }
+
+// TEST_CASE("Encode generated exceptions", "[Bencode][Encode][Exceptions]")
+// {
+// }
+
+TEST_CASE("Creation and use of JSON for encode of a list of example JSON files.", "[JSON][Decode]")
+{
+  auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
+                                                "./testData/testfile002.json",
+                                                "./testData/testfile003.json",
+                                                "./testData/testfile004.json"}));
+
+  SECTION("Encode from buffer", "[JSON][Decode]")
+  {
+    JSON json;
+    std::ifstream jsonFile;
+    jsonFile.open(testFile);
+    std::ostringstream buffer;
+    buffer << jsonFile.rdbuf();
+    REQUIRE_NOTHROW(json.decodeBuffer(buffer.str()));
+    std::string actual = json.encodeBuffer(json.decodeBuffer(buffer.str()));
+    std::string expected = json.stripWhiteSpaceFromBuffer(buffer.str());
+    REQUIRE(actual == expected);
+  }
+  // SECTION("Decode from file directly", "[JSON][Decode]")
+  // {
+  //   REQUIRE_NOTHROW(json.decodeFile(testFile));
+  //   std::unique_ptr<JNode> jNode = json.decodeFile(testFile);
+  //   REQUIRE(jNode->nodeType == JSON::JNodeType::object);
+  // }
+}
