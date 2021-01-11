@@ -83,12 +83,12 @@ TEST_CASE("Creation and use of JSON for decode of simple types (number, string, 
 {
   JSON json;
   std::unique_ptr<JNode> jNode;
-  SECTION("Decode an string", "[JSON][Decode]")
+  SECTION("Decode an string (example string)", "[JSON][Decode]")
   {
     jNode = json.decodeBuffer("\"example string\"");
     REQUIRE(jNode->nodeType == JSON::JNodeType::string);
   }
-  SECTION("Decode an number", "[JSON][Decode]")
+  SECTION("Decode an number (6767)", "[JSON][Decode]")
   {
     jNode = json.decodeBuffer("6767");
     REQUIRE(jNode->nodeType == JSON::JNodeType::number);
@@ -113,22 +113,22 @@ TEST_CASE("Creation and use of JSON for decode of simple types (number, string, 
 {
   JSON json;
   std::unique_ptr<JNode> jNode;
-  SECTION("Decode an string and check its value", "[JSON][Decode]")
+  SECTION("Decode an string (example string) and check its value", "[JSON][Decode]")
   {
     jNode = json.decodeBuffer("\"example string\"");
     REQUIRE(static_cast<JNodeString *>(jNode.get())->value == "example string");
   }
-  SECTION("Decode an string and check its value", "[JSON][Decode]")
+  SECTION("Decode an string (another example string) and check its value", "[JSON][Decode]")
   {
     jNode = json.decodeBuffer("\"another example string\"");
     REQUIRE(static_cast<JNodeString *>(jNode.get())->value == "another example string");
   }
-  SECTION("Decode an number and check its value", "[JSON][Decode]")
+  SECTION("Decode an number (6767) and check its value", "[JSON][Decode]")
   {
     jNode = json.decodeBuffer("6767");
     REQUIRE(static_cast<JNodeNumber *>(jNode.get())->value == "6767");
   }
-  SECTION("Decode an number and check its value", "[JSON][Decode]")
+  SECTION("Decode an number (190000) and check its value", "[JSON][Decode]")
   {
     jNode = json.decodeBuffer("190000");
     REQUIRE(static_cast<JNodeNumber *>(jNode.get())->value == "190000");
@@ -153,14 +153,14 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
 {
   JSON json;
   std::unique_ptr<JNode> jNode;
-  SECTION("Decode an object", "[JSON][Decode]")
+  SECTION("Decode an object ({\"name\":\"Robert\",\"Age\":15})", "[JSON][Decode]")
   {
-    jNode = json.decodeBuffer("{ \"name\" : \"Robert\", \"Age\" : 15}");
+    jNode = json.decodeBuffer("{\"name\":\"Robert\",\"Age\":15}");
     REQUIRE(jNode->nodeType == JSON::JNodeType::object);
   }
-  SECTION("Decode an array", "[JSON][Decode]")
+  SECTION("Decode an array ([ 777,9000,\"apples\"]) ", "[JSON][Decode]")
   {
-    jNode = json.decodeBuffer("[ 777, 9000, \"apples\"]");
+    jNode = json.decodeBuffer("[777,9000,\"apples\"]");
     REQUIRE(jNode->nodeType == JSON::JNodeType::array);
   }
 }
@@ -168,9 +168,9 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
 {
   JSON json;
   std::unique_ptr<JNode> jNode;
-  SECTION("Decode an object { \"name\" : \"Robert\", \"Age\" : 15} and check its value", "[JSON][Decode]")
+  SECTION("Decode an object {\"name\":\"Robert\",\"Age\":15} and check its value", "[JSON][Decode]")
   {
-    jNode = json.decodeBuffer("{ \"Name\" : \"Robert\", \"Age\" : 15}");
+    jNode = json.decodeBuffer("{\"Name\":\"Robert\",\"Age\":15}");
     JNodeObject *jNodeObject = (JNodeObject *)jNode.get();
     REQUIRE(jNodeObject->nodeType == JSON::JNodeType::object);
     REQUIRE(jNodeObject->value.size() == 2);
@@ -181,9 +181,9 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
     REQUIRE(static_cast<JNodeString *>(jNodeObject->value["Name"].get())->value == "Robert");
     REQUIRE(static_cast<JNodeNumber *>(jNodeObject->value["Age"].get())->value == "15");
   }
-  SECTION("Decode an array [ 777, 9000, \"apples\"] and check its value", "[JSON][Decode]")
+  SECTION("Decode an array [777,9000,\"apples\"] and check its value", "[JSON][Decode]")
   {
-    jNode = json.decodeBuffer("[ 777, 9000, \"apples\"]");
+    jNode = json.decodeBuffer("[777,9000,\"apples\"]");
     JNodeArray *jNodeArray = (JNodeArray *)jNode.get();
     REQUIRE(jNodeArray->nodeType == JSON::JNodeType::array);
     REQUIRE(jNodeArray->value.size() == 3);
@@ -194,14 +194,14 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
     REQUIRE(static_cast<JNodeNumber *>(jNodeArray->value[1].get())->value == "9000");
     REQUIRE(static_cast<JNodeString *>(jNodeArray->value[2].get())->value == "apples");
   }
-  SECTION("Decode object { \"City\" : \"Southampton\", \"Population\" : 500000} and check its value", "[JSON][Decode]")
+  SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} and check its value", "[JSON][Decode]")
   {
-    jNode = json.decodeBuffer("{ \"City\" : \"Southampton\", \"Population\" : 500000}");
+    jNode = json.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
     checkObject(jNode.get());
   }
-  SECTION("Decode an array [ \"Dog\", 1964, true, null ] and check its value", "[JSON][Decode]")
+  SECTION("Decode an array [\"Dog\",1964,true,null ] and check its value", "[JSON][Decode]")
   {
-    jNode = json.decodeBuffer("[ \"Dog\", 1964, true, null ]");
+    jNode = json.decodeBuffer("[\"Dog\",1964,true,null]");
     checkArray(jNode.get());
   }
 }
@@ -337,37 +337,37 @@ TEST_CASE("Decode generated exceptions.", "[JSON][Decode][Exceptions]")
 TEST_CASE("Creation and use of JSON for encode of simple types (number, string, boolean, null) and check its value", "[JSON][Encode]")
 {
   JSON json;
-  SECTION("Encode a string", "[JSON][Encode]")
+  SECTION("Encode a string (Test string) and check its value", "[JSON][Encode]")
   {
     std::string expected = "\"Test string.\"";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
-  SECTION("Encode a string", "[JSON][Encode]")
+  SECTION("Encode a string (Test another string) and check its value", "[JSON][Encode]")
   {
     std::string expected = "\"Test another string.\"";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
-  SECTION("Encode a boolean", "[JSON][Encode]")
+  SECTION("Encode a boolean (true) and check its value", "[JSON][Encode]")
   {
     std::string expected = "true";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
-  SECTION("Encode a boolean", "[JSON][Encode]")
+  SECTION("Encode a boolean (false) and check its value", "[JSON][Encode]")
   {
     std::string expected = "false";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
-  SECTION("Encode a number", "[JSON][Encode]")
+  SECTION("Encode a number (98345) and check its value", "[JSON][Encode]")
   {
     std::string expected = "98345";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
-  SECTION("Encode a number", "[JSON][Encode]")
+  SECTION("Encode a number (250000) and check its value", "[JSON][Encode]")
   {
     std::string expected = "25000";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
-  SECTION("Encode a null", "[JSON][Encode]")
+  SECTION("Encode a null and check its value", "[JSON][Encode]")
   {
     std::string expected = "null";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
@@ -376,22 +376,22 @@ TEST_CASE("Creation and use of JSON for encode of simple types (number, string, 
 TEST_CASE("Creation and use of JSON for encode of collection types (object, array) and check its value", "[JSON][Encode]")
 {
   JSON json;
-  SECTION("Encode an object", "[JSON][Encode]")
+  SECTION("Encode an object ({\"Age\":77,\"Name\":\"Rob\"}) and check its value", "[JSON][Encode]")
   {
     std::string expected = "{\"Age\":77,\"Name\":\"Rob\"}";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
-  SECTION("Encode an array", "[JSON][Encode]")
+  SECTION("Encode an array ([999,\"Time\",null,true] and check its value", "[JSON][Encode]")
   {
     std::string expected = "[999,\"Time\",null,true]";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
-  SECTION("Encode an object", "[JSON][Encode]")
+  SECTION("Encode an object ({\"City\":\"London\",\"Population\":8000000}) and check its value", "[JSON][Encode]")
   {
     std::string expected = "{\"City\":\"London\",\"Population\":8000000}";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
-  SECTION("Encode an array", "[JSON][Encode]")
+  SECTION("Encode an array ([true,\"Out of time\",789043e13,true]) and check its value", "[JSON][Encode]")
   {
     std::string expected = "[true,\"Out of time\",789043e13,true]";
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);

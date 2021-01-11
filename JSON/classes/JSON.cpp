@@ -233,7 +233,7 @@ namespace H4
             break;
         }
         default:
-            break;
+            throw std::runtime_error("Unknown JNode type encountered during encode.");
         }
     }
     // ==============
