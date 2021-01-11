@@ -245,23 +245,7 @@ namespace H4
             {
                 if (source->currentByte() == '"')
                 {
-                    destination->addBytes(std::string(1, source->currentByte()));
-                    source->moveToNextByte();
-                    while (source->bytesToDecode() && source->currentByte() != '"')
-                    {
-                        if (source->currentByte() == '\\')
-                        {
-                            destination->addBytes(std::string(1, source->currentByte()));
-                            source->moveToNextByte();
-                        }
-                        destination->addBytes(std::string(1, source->currentByte()));
-                        source->moveToNextByte();
-                    }
-                    if (source->bytesToDecode())
-                    {
-                        destination->addBytes(std::string(1, source->currentByte()));
-                        source->moveToNextByte();
-                    }
+                    destination->addBytes("\""+extractString(source)+"\"");
                 }
                 else
                 {
