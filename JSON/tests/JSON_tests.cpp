@@ -24,6 +24,7 @@
 // ===================
 // Unit test constants
 // ===================
+const char *kGeneratedTorrent = "./testData/generated.torrent";
 // =======================
 // JSON class namespace
 // =======================
@@ -49,6 +50,14 @@ bool compareFiles(const std::string &fileName1, const std::string &fileName2)
   return std::equal(std::istreambuf_iterator<char>(file1.rdbuf()),
                     std::istreambuf_iterator<char>(),
                     std::istreambuf_iterator<char>(file2.rdbuf()));
+}
+std::string readJSONFromFile(const std::string &jsonFileName)
+{
+  std::ifstream jsonFile;
+  jsonFile.open(jsonFileName);
+  std::ostringstream buffer;
+  buffer << jsonFile.rdbuf();
+  return (buffer.str());
 }
 void checkArray(JNode *jNode)
 {
@@ -274,12 +283,9 @@ TEST_CASE("Creation and use of JSON for decode of a list of example JSON files."
   JSON json;
   SECTION("Decode from buffer", "[JSON][Decode]")
   {
-    std::ifstream jsonFile;
-    jsonFile.open(testFile);
-    std::ostringstream buffer;
-    buffer << jsonFile.rdbuf();
-    REQUIRE_NOTHROW(json.decodeBuffer(buffer.str()));
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(buffer.str());
+    std::string buffer = readJSONFromFile(testFile);
+    REQUIRE_NOTHROW(json.decodeBuffer(buffer));
+    std::unique_ptr<JNode> jNode = json.decodeBuffer(buffer);
     REQUIRE(jNode->nodeType == JSON::JNodeType::object);
   }
   SECTION("Decode from file directly", "[JSON][Decode]")
@@ -397,34 +403,53 @@ TEST_CASE("Creation and use of JSON for encode of collection types (object, arra
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
 }
-
-// TEST_CASE("Encode generated exceptions", "[Bencode][Encode][Exceptions]")
-// {
-// }
-
-TEST_CASE("Creation and use of JSON for encode of a list of example JSON files.", "[JSON][Decode]")
+TEST_CASE("Encode to a file and check result", "[Bencode][Encode][Exceptions]")
+{
+  JSON json;
+  SECTION("Encode object to file and check value", "[JSON][Encode]")
+  {
+    std::string expected = "{\"City\":\"London\",\"Population\":8000000}";
+    if (std::filesystem::exists(kGeneratedTorrent))
+    {
+      std::filesystem::remove(kGeneratedTorrent);
+    }
+    json.encodeFile(json.decodeBuffer(expected), kGeneratedTorrent);
+    REQUIRE(readJSONFromFile(kGeneratedTorrent) == expected);
+  }
+  SECTION("Encode array to file and check value", "[JSON][ENcode]")
+  {
+    std::string expected = "[999,\"Time\",null,true]";
+    if (std::filesystem::exists(kGeneratedTorrent))
+    {
+      std::filesystem::remove(kGeneratedTorrent);
+    }
+    json.encodeFile(json.decodeBuffer(expected), kGeneratedTorrent);
+    REQUIRE(readJSONFromFile(kGeneratedTorrent) == expected);
+  }
+}
+TEST_CASE("Encode generated exceptions", "[Bencode][Encode][Exceptions]")
+{
+}
+TEST_CASE("Creation and use of JSON for encode of a list of example JSON files.", "[JSON][Encode]")
 {
   auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
                                                 "./testData/testfile002.json",
                                                 "./testData/testfile003.json",
                                                 "./testData/testfile004.json"}));
-
-  SECTION("Encode from buffer", "[JSON][Decode]")
+  JSON json;
+  SECTION("Encode to  buffer and check value", "[JSON][Encode]")
   {
-    JSON json;
-    std::ifstream jsonFile;
-    jsonFile.open(testFile);
-    std::ostringstream buffer;
-    buffer << jsonFile.rdbuf();
-    REQUIRE_NOTHROW(json.decodeBuffer(buffer.str()));
-    std::string actual = json.encodeBuffer(json.decodeBuffer(buffer.str()));
-    std::string expected = json.stripWhiteSpaceFromBuffer(buffer.str());
-    REQUIRE(actual == expected);
+    std::string buffer = readJSONFromFile(testFile);
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(buffer)) == json.stripWhiteSpaceBuffer(buffer));
   }
-  // SECTION("Decode from file directly", "[JSON][Decode]")
-  // {
-  //   REQUIRE_NOTHROW(json.decodeFile(testFile));
-  //   std::unique_ptr<JNode> jNode = json.decodeFile(testFile);
-  //   REQUIRE(jNode->nodeType == JSON::JNodeType::object);
-  // }
+  SECTION("Encode to file and check value", "[JSON][ENcode]")
+  {
+    if (std::filesystem::exists(kGeneratedTorrent))
+    {
+      std::filesystem::remove(kGeneratedTorrent);
+    }
+    std::string buffer = readJSONFromFile(testFile);
+    json.encodeFile(json.decodeBuffer(buffer), kGeneratedTorrent);
+    REQUIRE(readJSONFromFile(kGeneratedTorrent) == json.stripWhiteSpaceBuffer(buffer));
+  }
 }

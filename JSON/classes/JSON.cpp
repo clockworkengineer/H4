@@ -236,7 +236,7 @@ namespace H4
             throw std::runtime_error("Unknown JNode type encountered during encode.");
         }
     }
-    void JSON::stripWhiteSpaceBuffer(ISource *source, IDestination *destination)
+    void JSON::stripWhiteSpace(ISource *source, IDestination *destination)
     {
         while (source->bytesToDecode())
         {
@@ -291,11 +291,11 @@ namespace H4
         FileDestination destination(std::move(destinationFileName));
         encodeJNodes(bNodeRoot.get(), &destination);
     }
-    std::string JSON::stripWhiteSpaceFromBuffer(std::string jsonBuffer)
+    std::string JSON::stripWhiteSpaceBuffer(std::string jsonBuffer)
     {
         BufferSource source(jsonBuffer);
         BufferDestination destination;
-        stripWhiteSpaceBuffer(&source, &destination);
+        stripWhiteSpace(&source, &destination);
         return (destination.getBuffer());
     }
 } // namespace H4
