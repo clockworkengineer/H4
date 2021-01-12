@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 
 configure_file(JSONConfig.h.in JSONConfig.hpp)
 
-set(JSON_LIBRARY_NAME "${PROJECT_NAME}")
+set(JSON_LIBRARY_NAME ${PROJECT_NAME})
 
 # Enable unit tests
 
@@ -30,7 +30,7 @@ set (JSON_INCLUDES
 # JSON library
 
 add_library(${JSON_LIBRARY_NAME} STATIC ${JSON_SOURCES})
-target_include_directories(${JSON_LIBRARY_NAME} PUBLIC "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}" )
+target_include_directories(${JSON_LIBRARY_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR} )
 target_link_libraries(${JSON_LIBRARY_NAME})
 
 # Add tests

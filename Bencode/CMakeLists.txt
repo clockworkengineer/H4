@@ -30,7 +30,7 @@ set (BENCODE_INCLUDES
 # Bencode library
 
 add_library(${BENCODE_LIBRARY_NAME} STATIC ${BENCODE_SOURCES})
-target_include_directories(${BENCODE_LIBRARY_NAME} PUBLIC "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}" )
+target_include_directories(${BENCODE_LIBRARY_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR})
 target_link_libraries(${BENCODE_LIBRARY_NAME})
 
 # Add tests
