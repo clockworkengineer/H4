@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 
-configure_file(JSONConfig.h.in JSONConfig.h)
+configure_file(JSONConfig.h.in JSONConfig.hpp)
 
 set(JSON_LIBRARY_NAME "${PROJECT_NAME}")
 
