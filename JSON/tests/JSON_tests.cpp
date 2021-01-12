@@ -55,12 +55,12 @@ std::string readJSONFromFile(const std::string &jsonFileName)
 {
   std::ifstream jsonFile;
   jsonFile.open(jsonFileName);
-  std::ostringstream buffer;
-  buffer << jsonFile.rdbuf();
-  return (buffer.str());
+  std::ostringstream jsonFileBuffer;
+  jsonFileBuffer << jsonFile.rdbuf();
+  return (jsonFileBuffer.str());
 }
 void checkArray(JNode *jNode)
-{
+{ // Array [\"Dog\",1964,true,null]
   JNodeArray *jNodeArray = static_cast<JNodeArray *>(jNode);
   REQUIRE(jNodeArray->nodeType == JSON::JNodeType::array);
   REQUIRE(jNodeArray->value.size() == 4);
@@ -74,7 +74,7 @@ void checkArray(JNode *jNode)
   REQUIRE(static_cast<JNodeNull *>(jNodeArray->value[3].get())->value == nullptr);
 }
 void checkObject(JNode *jNode)
-{
+{ // {\"City\":\"Southampton\",\"Population\":500000}
   JNodeObject *jNodeObject = (JNodeObject *)jNode;
   REQUIRE(jNode->nodeType == JSON::JNodeType::object);
   REQUIRE(jNodeObject->value.size() == 2);
@@ -283,9 +283,9 @@ TEST_CASE("Creation and use of JSON for decode of a list of example JSON files."
   JSON json;
   SECTION("Decode from buffer", "[JSON][Decode]")
   {
-    std::string buffer = readJSONFromFile(testFile);
-    REQUIRE_NOTHROW(json.decodeBuffer(buffer));
-    std::unique_ptr<JNode> jNode = json.decodeBuffer(buffer);
+    std::string jsonFileBuffer = readJSONFromFile(testFile);
+    REQUIRE_NOTHROW(json.decodeBuffer(jsonFileBuffer));
+    std::unique_ptr<JNode> jNode = json.decodeBuffer(jsonFileBuffer);
     REQUIRE(jNode->nodeType == JSON::JNodeType::object);
   }
   SECTION("Decode from file directly", "[JSON][Decode]")
@@ -439,8 +439,8 @@ TEST_CASE("Creation and use of JSON for encode of a list of example JSON files."
   JSON json;
   SECTION("Encode to  buffer and check value", "[JSON][Encode]")
   {
-    std::string buffer = readJSONFromFile(testFile);
-    REQUIRE(json.encodeBuffer(json.decodeBuffer(buffer)) == json.stripWhiteSpaceBuffer(buffer));
+    std::string jsonFileBuffer = readJSONFromFile(testFile);
+    REQUIRE(json.encodeBuffer(json.decodeBuffer(jsonFileBuffer)) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
   }
   SECTION("Encode to file and check value", "[JSON][ENcode]")
   {
@@ -448,8 +448,8 @@ TEST_CASE("Creation and use of JSON for encode of a list of example JSON files."
     {
       std::filesystem::remove(kGeneratedTorrent);
     }
-    std::string buffer = readJSONFromFile(testFile);
-    json.encodeFile(json.decodeBuffer(buffer), kGeneratedTorrent);
-    REQUIRE(readJSONFromFile(kGeneratedTorrent) == json.stripWhiteSpaceBuffer(buffer));
+    std::string jsonFileBuffer = readJSONFromFile(testFile);
+    json.encodeFile(json.decodeBuffer(jsonFileBuffer), kGeneratedTorrent);
+    REQUIRE(readJSONFromFile(kGeneratedTorrent) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
   }
 }
