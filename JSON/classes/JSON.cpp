@@ -203,12 +203,12 @@ namespace H4
             break;
         case JNodeType::object:
         {
-            int commaCount = ((JNodeObject *)jNode)->value.size() - 1;
+            int commaCount = static_cast<JNodeObject *>(jNode)->value.size() - 1;
             destination->addBytes("{");
-            for (auto key : ((JNodeObject *)jNode)->keys)
+            for (auto key : static_cast<JNodeObject *>(jNode)->keys)
             {
                 destination->addBytes("\"" + key + "\"" + ":");
-                encodeJNodes(((JNodeObject *)jNode)->value[key].get(), destination);
+                encodeJNodes(static_cast<JNodeObject *>(jNode)->value[key].get(), destination);
                 if (commaCount-- > 0)
                 {
                     destination->addBytes(",");
@@ -219,9 +219,9 @@ namespace H4
         }
         case JNodeType::array:
         {
-            int commaCount = ((JNodeArray *)jNode)->value.size() - 1;
+            int commaCount = static_cast<JNodeArray *>(jNode)->value.size() - 1;
             destination->addBytes("[");
-            for (auto &bNodeEntry : ((JNodeArray *)jNode)->value)
+            for (auto &bNodeEntry : static_cast<JNodeArray *>(jNode)->value)
             {
                 encodeJNodes(bNodeEntry.get(), destination);
                 if (commaCount-- > 0)
@@ -245,7 +245,7 @@ namespace H4
             {
                 if (source->currentByte() == '"')
                 {
-                    destination->addBytes("\""+extractString(source)+"\"");
+                    destination->addBytes("\"" + extractString(source) + "\"");
                 }
                 else
                 {
@@ -258,7 +258,7 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-    std::unique_ptr<JNode> JSON::decodeBuffer(std::string jsonBuffer)
+    std::unique_ptr<JNode> JSON::decodeBuffer(const std::string &jsonBuffer)
     {
         if (jsonBuffer.empty())
         {
@@ -267,7 +267,7 @@ namespace H4
         BufferSource source(jsonBuffer);
         return (decodeJNodes(&source));
     }
-    std::unique_ptr<JNode> JSON::decodeFile(std::string sourceFileName)
+    std::unique_ptr<JNode> JSON::decodeFile(const std::string &sourceFileName)
     {
         if (sourceFileName.empty())
         {
@@ -278,20 +278,28 @@ namespace H4
     }
     std::string JSON::encodeBuffer(std::unique_ptr<JNode> jNodeRoot)
     {
+        if (jNodeRoot == nullptr) 
+        {
+            throw std::invalid_argument("Nullptr passed as JNode root to be encoded.");
+        }
         BufferDestination destination;
         encodeJNodes(jNodeRoot.get(), &destination);
         return (destination.getBuffer());
     }
-    void JSON::encodeFile(std::unique_ptr<JNode> bNodeRoot, std::string destinationFileName)
+    void JSON::encodeFile(std::unique_ptr<JNode> jNodeRoot, const std::string &destinationFileName)
     {
-        if (bNodeRoot == nullptr)
+        if (jNodeRoot == nullptr)
         {
-            throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
+            throw std::invalid_argument("Nullptr passed as JNode root to be encoded.");
+        }
+        if (destinationFileName.empty())
+        {
+            throw std::invalid_argument("Empty file name passed to be encoded.");
         }
         FileDestination destination(std::move(destinationFileName));
-        encodeJNodes(bNodeRoot.get(), &destination);
+        encodeJNodes(jNodeRoot.get(), &destination);
     }
-    std::string JSON::stripWhiteSpaceBuffer(std::string jsonBuffer)
+    std::string JSON::stripWhiteSpaceBuffer(const std::string &jsonBuffer)
     {
         BufferSource source(jsonBuffer);
         BufferDestination destination;

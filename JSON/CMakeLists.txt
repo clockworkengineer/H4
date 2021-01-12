@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.17.0)
 
-project("JSON C++ library" VERSION 0.0.0 DESCRIPTION "JSON C++ Static Library")
+project("JSON" VERSION 0.0.1 DESCRIPTION "JSON C++ Static Library")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 
-set(JSON_LIBRARY_NAME JSON)
+configure_file(JSONConfig.h.in JSONConfig.h)
+
+set(JSON_LIBRARY_NAME "${PROJECT_NAME}")
 
 # Enable unit tests
 
@@ -28,9 +30,10 @@ set (JSON_INCLUDES
 # JSON library
 
 add_library(${JSON_LIBRARY_NAME} STATIC ${JSON_SOURCES})
-target_include_directories(${JSON_LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${JSON_LIBRARY_NAME} PUBLIC "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}" )
 target_link_libraries(${JSON_LIBRARY_NAME})
 
-add_subdirectory(tests)
+# Add tests
 
+add_subdirectory(tests)
 

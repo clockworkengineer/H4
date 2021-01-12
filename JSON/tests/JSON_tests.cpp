@@ -427,8 +427,23 @@ TEST_CASE("Encode to a file and check result", "[Bencode][Encode][Exceptions]")
     REQUIRE(readJSONFromFile(kGeneratedTorrent) == expected);
   }
 }
-TEST_CASE("Encode generated exceptions", "[Bencode][Encode][Exceptions]")
+TEST_CASE("Encode generated exceptions", "[JSON][Encode][Exceptions]")
 {
+  JSON json;
+  
+  SECTION("Encode passed nullptr", "[JSON][Encode][Exceptions]")
+  {
+    REQUIRE_THROWS_AS(json.encodeBuffer(nullptr), std::invalid_argument);
+    REQUIRE_THROWS_WITH(json.encodeBuffer(nullptr), "Nullptr passed as JNode root to be encoded.");
+    REQUIRE_THROWS_AS(json.encodeBuffer(std::unique_ptr<JNode>(nullptr)), std::invalid_argument);
+    REQUIRE_THROWS_WITH(json.encodeBuffer(std::unique_ptr<JNode>(nullptr)),"Nullptr passed as JNode root to be encoded.");
+  }
+  SECTION("Encode passed invalid JNode type", "[JSON][Encode][Exceptions]")
+  {
+    REQUIRE_THROWS_AS(json.encodeBuffer(std::unique_ptr<JNode>(new JNode())), std::runtime_error);
+    REQUIRE_THROWS_WITH(json.encodeBuffer(std::unique_ptr<JNode>(new JNode())), "Unknown JNode type encountered during encode.");
+  }
+
 }
 TEST_CASE("Creation and use of JSON for encode of a list of example JSON files.", "[JSON][Encode]")
 {

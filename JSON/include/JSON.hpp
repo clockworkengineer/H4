@@ -9,6 +9,10 @@
 #include <list>
 #include <memory>
 #include <fstream>
+//
+// JSON version details
+//
+#include "JSONConfig.h"
 // =========
 // NAMESPACE
 // =========
@@ -72,7 +76,7 @@ namespace H4
         struct JNodeNumber : JNode
         {
             std::string value;
-            JNodeNumber(std::string value) : JNode(JNodeType::number)
+            JNodeNumber(const std::string &value) : JNode(JNodeType::number)
             {
                 this->value = value;
             }
@@ -84,7 +88,7 @@ namespace H4
         {
         public:
             std::string value;
-            JNodeString(std::string value) : JNode(JNodeType::string)
+            JNodeString(const std::string &value) : JNode(JNodeType::string)
             {
                 this->value = value;
             }
@@ -139,11 +143,11 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        std::unique_ptr<JNode> decodeBuffer(std::string jsonBuffer);
-        std::unique_ptr<JNode> decodeFile(std::string sourceFileName);
+        std::unique_ptr<JNode> decodeBuffer(const std::string &jsonBuffer);
+        std::unique_ptr<JNode> decodeFile(const std::string &sourceFileName);
         std::string encodeBuffer(std::unique_ptr<JNode> jNodeRoot);
-        void encodeFile(std::unique_ptr<JNode> bNodeRoot, std::string destinationFileName);
-        std::string stripWhiteSpaceBuffer(std::string jsonBuffer);
+        void encodeFile(std::unique_ptr<JNode> bNodeRoot, const std::string &destinationFileName);
+        std::string stripWhiteSpaceBuffer(const std::string &jsonBuffer);
         // ================
         // PUBLIC VARIABLES
         // ================
