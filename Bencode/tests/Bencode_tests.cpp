@@ -29,7 +29,7 @@ const char *kMultiFileTorrent = "./testData/multifile.torrent";
 const char *kSingleFileWithErrorTorrent = "./testData/singlefileerror.torrent";
 const char *kMultiFileWithErrorTorrent = "./testData/multifileerror.torrent";
 const char *kNonExistantTorrent = "./testData/doesntexist.torrent";
-const char *kGeneratedTorrent = "./testData/generated.torrent";
+const char *kGeneratedJSONFile = "./testData/generated.torrent";
 // =======================
 // Bencode class namespace
 // =======================
@@ -337,21 +337,21 @@ TEST_CASE("Encode torrent files using encodeToFile", "[Bencode][Encode][Torrents
   Bencode bEncode;
   SECTION("Encode singlefile.torrent and check value", "[Bencode][Encode][Torrents]")
   {
-    if (std::filesystem::exists(kGeneratedTorrent))
+    if (std::filesystem::exists(kGeneratedJSONFile))
     {
-      std::filesystem::remove(kGeneratedTorrent);
+      std::filesystem::remove(kGeneratedJSONFile);
     }
-    bEncode.encodeFile(bEncode.decodeFile(kSingleFileTorrent), kGeneratedTorrent);
-    REQUIRE_FALSE(!compareFiles(kSingleFileTorrent, kGeneratedTorrent));
+    bEncode.encodeFile(bEncode.decodeFile(kSingleFileTorrent), kGeneratedJSONFile);
+    REQUIRE_FALSE(!compareFiles(kSingleFileTorrent, kGeneratedJSONFile));
   }
   SECTION("Encode multifile.torrent and check value", "[Bencode][Encode][Torrents]")
   {
-    if (std::filesystem::exists(kGeneratedTorrent))
+    if (std::filesystem::exists(kGeneratedJSONFile))
     {
-      std::filesystem::remove(kGeneratedTorrent);
+      std::filesystem::remove(kGeneratedJSONFile);
     }
-    bEncode.encodeFile(bEncode.decodeFile(kMultiFileTorrent), kGeneratedTorrent);
-    REQUIRE_FALSE(!compareFiles(kMultiFileTorrent, kGeneratedTorrent));
+    bEncode.encodeFile(bEncode.decodeFile(kMultiFileTorrent), kGeneratedJSONFile);
+    REQUIRE_FALSE(!compareFiles(kMultiFileTorrent, kGeneratedJSONFile));
   }
 }
 TEST_CASE("Creation and use of ISource (File) interface.", "[Bencode][Decode][ISource]")
@@ -460,54 +460,54 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[Bencode][Decod
 {
   SECTION("Create FileDestination.", "[Bencode][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedTorrent))
+    if (std::filesystem::exists(kGeneratedJSONFile))
     {
-      std::filesystem::remove(kGeneratedTorrent);
+      std::filesystem::remove(kGeneratedJSONFile);
     }
-    REQUIRE_NOTHROW(FileDestination(kGeneratedTorrent));
+    REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
   }
   SECTION("Create FileDestination when file already exists.", "[Bencode][Encode][IDesination]")
   {
-    FileDestination file(kGeneratedTorrent);
-    if (!std::filesystem::exists(kGeneratedTorrent))
+    FileDestination file(kGeneratedJSONFile);
+    if (!std::filesystem::exists(kGeneratedJSONFile))
     {
-      file = FileDestination(kGeneratedTorrent);
+      file = FileDestination(kGeneratedJSONFile);
     }
-    REQUIRE_NOTHROW(FileDestination(kGeneratedTorrent));
+    REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
   }
   SECTION("Create FileDestination and test file exists and should be empty.", "[Bencode][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedTorrent))
+    if (std::filesystem::exists(kGeneratedJSONFile))
     {
-      std::filesystem::remove(kGeneratedTorrent);
+      std::filesystem::remove(kGeneratedJSONFile);
     }
-    FileDestination file(kGeneratedTorrent);
-    REQUIRE_FALSE(!std::filesystem::exists(kGeneratedTorrent));
-    std::filesystem::path filePath(kGeneratedTorrent);
+    FileDestination file(kGeneratedJSONFile);
+    REQUIRE_FALSE(!std::filesystem::exists(kGeneratedJSONFile));
+    std::filesystem::path filePath(kGeneratedJSONFile);
     REQUIRE(std::filesystem::file_size(filePath) == 0);
   }
   SECTION("Create FileDestination and add one character.", "[Bencode][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedTorrent))
+    if (std::filesystem::exists(kGeneratedJSONFile))
     {
-      std::filesystem::remove(kGeneratedTorrent);
+      std::filesystem::remove(kGeneratedJSONFile);
     }
-    FileDestination file(kGeneratedTorrent);
+    FileDestination file(kGeneratedJSONFile);
     file.addBytes("i");
-    std::filesystem::path filePath(kGeneratedTorrent);
+    std::filesystem::path filePath(kGeneratedJSONFile);
     REQUIRE(std::filesystem::file_size(filePath) == 1);
   }
   SECTION("Create FileDestination, add an encoded integer and check result.", "[Bencode][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedTorrent))
+    if (std::filesystem::exists(kGeneratedJSONFile))
     {
-      std::filesystem::remove(kGeneratedTorrent);
+      std::filesystem::remove(kGeneratedJSONFile);
     }
-    FileDestination file(kGeneratedTorrent);
+    FileDestination file(kGeneratedJSONFile);
     file.addBytes("i65767e");
-    std::filesystem::path filePath(kGeneratedTorrent);
+    std::filesystem::path filePath(kGeneratedJSONFile);
     REQUIRE(std::filesystem::file_size(filePath) == 7);
-    std::ifstream torrentFile{kGeneratedTorrent};
+    std::ifstream torrentFile{kGeneratedJSONFile};
     std::ostringstream expected;
     expected << torrentFile.rdbuf();
     REQUIRE(expected.str() == "i65767e");

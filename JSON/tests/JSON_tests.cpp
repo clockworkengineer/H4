@@ -24,7 +24,7 @@
 // ===================
 // Unit test constants
 // ===================
-const char *kGeneratedTorrent = "./testData/generated.torrent";
+const char *kGeneratedJSONFile = "./testData/generated.json";
 // =======================
 // JSON class namespace
 // =======================
@@ -409,39 +409,47 @@ TEST_CASE("Encode to a file and check result", "[Bencode][Encode][Exceptions]")
   SECTION("Encode object to file and check value", "[JSON][Encode]")
   {
     std::string expected = "{\"City\":\"London\",\"Population\":8000000}";
-    if (std::filesystem::exists(kGeneratedTorrent))
+    if (std::filesystem::exists(kGeneratedJSONFile))
     {
-      std::filesystem::remove(kGeneratedTorrent);
+      std::filesystem::remove(kGeneratedJSONFile);
     }
-    json.encodeFile(json.decodeBuffer(expected), kGeneratedTorrent);
-    REQUIRE(readJSONFromFile(kGeneratedTorrent) == expected);
+    json.encodeFile(json.decodeBuffer(expected), kGeneratedJSONFile);
+    REQUIRE(readJSONFromFile(kGeneratedJSONFile) == expected);
   }
   SECTION("Encode array to file and check value", "[JSON][ENcode]")
   {
     std::string expected = "[999,\"Time\",null,true]";
-    if (std::filesystem::exists(kGeneratedTorrent))
+    if (std::filesystem::exists(kGeneratedJSONFile))
     {
-      std::filesystem::remove(kGeneratedTorrent);
+      std::filesystem::remove(kGeneratedJSONFile);
     }
-    json.encodeFile(json.decodeBuffer(expected), kGeneratedTorrent);
-    REQUIRE(readJSONFromFile(kGeneratedTorrent) == expected);
+    json.encodeFile(json.decodeBuffer(expected), kGeneratedJSONFile);
+    REQUIRE(readJSONFromFile(kGeneratedJSONFile) == expected);
   }
 }
 TEST_CASE("Encode generated exceptions", "[JSON][Encode][Exceptions]")
 {
   JSON json;
-  
+
   SECTION("Encode passed nullptr", "[JSON][Encode][Exceptions]")
   {
-    REQUIRE_THROWS_AS(json.encodeBuffer(nullptr), std::invalid_argument);
-    REQUIRE_THROWS_WITH(json.encodeBuffer(nullptr), "Nullptr passed as JNode root to be encoded.");
     REQUIRE_THROWS_AS(json.encodeBuffer(std::unique_ptr<JNode>(nullptr)), std::invalid_argument);
-    REQUIRE_THROWS_WITH(json.encodeBuffer(std::unique_ptr<JNode>(nullptr)),"Nullptr passed as JNode root to be encoded.");
+    REQUIRE_THROWS_WITH(json.encodeBuffer(std::unique_ptr<JNode>(nullptr)), "Nullptr passed as JNode root to be encoded.");
   }
   SECTION("Encode passed invalid JNode type", "[JSON][Encode][Exceptions]")
   {
     REQUIRE_THROWS_AS(json.encodeBuffer(std::unique_ptr<JNode>(new JNode())), std::runtime_error);
     REQUIRE_THROWS_WITH(json.encodeBuffer(std::unique_ptr<JNode>(new JNode())), "Unknown JNode type encountered during encode.");
+  }
+  SECTION("Encode file passed invalid JNode type", "[JSON][Encode][Exceptions]")
+  {
+    REQUIRE_THROWS_AS(json.encodeFile(std::unique_ptr<JNode>(nullptr), kGeneratedJSONFile), std::invalid_argument);
+    REQUIRE_THROWS_WITH(json.encodeFile(std::unique_ptr<JNode>(nullptr), kGeneratedJSONFile), "Nullptr passed as JNode root to be encoded.");
+  }
+  SECTION("Encode file passed empty string for file name", "[JSON][Encode][Exceptions]")
+  {
+    REQUIRE_THROWS_AS(json.encodeFile(std::unique_ptr<JNode>(new JNode()), ""), std::invalid_argument);
+    REQUIRE_THROWS_WITH(json.encodeFile(std::unique_ptr<JNode>(new JNode()), ""), "Empty file name passed to be encoded.");
   }
 
 }
@@ -459,12 +467,12 @@ TEST_CASE("Creation and use of JSON for encode of a list of example JSON files."
   }
   SECTION("Encode to file and check value", "[JSON][ENcode]")
   {
-    if (std::filesystem::exists(kGeneratedTorrent))
+    if (std::filesystem::exists(kGeneratedJSONFile))
     {
-      std::filesystem::remove(kGeneratedTorrent);
+      std::filesystem::remove(kGeneratedJSONFile);
     }
     std::string jsonFileBuffer = readJSONFromFile(testFile);
-    json.encodeFile(json.decodeBuffer(jsonFileBuffer), kGeneratedTorrent);
-    REQUIRE(readJSONFromFile(kGeneratedTorrent) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
+    json.encodeFile(json.decodeBuffer(jsonFileBuffer), kGeneratedJSONFile);
+    REQUIRE(readJSONFromFile(kGeneratedJSONFile) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
   }
 }
