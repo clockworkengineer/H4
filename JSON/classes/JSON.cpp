@@ -319,10 +319,10 @@ namespace H4
     // PUBLIC METHODS
     // ==============
     /// <summary>
-    ///
+    /// Create JNode structure by recursively parsing JSON in a buffer.
     /// </summary>
-    /// <param name="aa"></param>
-    /// <returns></returns>
+    /// <param name=jsonBuffer>Buffer contains JSON to be parsed.</param>
+    /// <returns>JNode structure.</returns>
     std::unique_ptr<JNode> JSON::decodeBuffer(const std::string &jsonBuffer)
     {
         if (jsonBuffer.empty())
@@ -333,10 +333,10 @@ namespace H4
         return (decodeJNodes(&source));
     }
     /// <summary>
-    ///
+    /// Create JNode structure by recursively parsing JSON in a file.
     /// </summary>
-    /// <param name="aa"></param>
-    /// <returns></returns>
+    /// <param name=sourceFileName>JSON source file name</param>
+    /// <returns>JNode structure.</returns>
     std::unique_ptr<JNode> JSON::decodeFile(const std::string &sourceFileName)
     {
         if (sourceFileName.empty())
