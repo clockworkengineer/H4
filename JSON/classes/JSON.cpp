@@ -350,10 +350,10 @@ namespace H4
         return (decodeJNodes(&source));
     }
     /// <summary>
-    ///
+    /// Recursively parse JNode structure and building its JSON before returning it.
     /// </summary>
-    /// <param name="aa"></param>
-    /// <returns></returns>
+    /// <param name="jNodeRoot">Root of JNode structure.</param>
+    /// <returns>JSON string</returns>
     std::string JSON::encodeBuffer(std::unique_ptr<JNode> jNodeRoot)
     {
         if (jNodeRoot == nullptr)
@@ -365,9 +365,10 @@ namespace H4
         return (destination.getBuffer());
     }
     /// <summary>
-    ///
+    /// Recursively parse JNode structure and building its JSON and writing it to a file.
     /// </summary>
-    /// <param name="aa"></param>
+    /// <param name="jNodeRoot">Root of JNode structure.</param>
+    /// <param name="destination">Destination JSON file.</param>
     /// <returns></returns>
     void JSON::encodeFile(std::unique_ptr<JNode> jNodeRoot, const std::string &destinationFileName)
     {
@@ -383,10 +384,10 @@ namespace H4
         encodeJNodes(jNodeRoot.get(), &destination);
     }
     /// <summary>
-    ///
+    /// Remove all whitespace from a JSOn encoded buffer.
     /// </summary>
-    /// <param name="aa"></param>
-    /// <returns></returns>
+    /// <param name="jsonBuffer">Buffer of encoded JSON</param>
+    /// <returns>Whitespace free JSON.</returns>
     std::string JSON::stripWhiteSpaceBuffer(const std::string &jsonBuffer)
     {
         BufferSource source(jsonBuffer);
