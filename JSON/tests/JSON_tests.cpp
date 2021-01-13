@@ -25,6 +25,8 @@
 // Unit test constants
 // ===================
 const char *kGeneratedJSONFile = "./testData/generated.json";
+const char *kSIngleJSONFile = "./testData/testfile001.json";
+const char *kNonExistantJSONFile = "./testData/doesntexist.json";
 // =======================
 // JSON class namespace
 // =======================
@@ -32,25 +34,11 @@ using namespace H4;
 // =======================
 // Local support functions
 // =======================
-bool compareFiles(const std::string &fileName1, const std::string &fileName2)
-{
-  std::ifstream file1(fileName1, std::ifstream::binary | std::ifstream::ate);
-  std::ifstream file2(fileName2, std::ifstream::binary | std::ifstream::ate);
-  if (file1.fail() || file2.fail())
-  {
-    return false; //file problem
-  }
-  if (file1.tellg() != file2.tellg())
-  {
-    return false; //size mismatch
-  }
-  //seek back to beginning and use std::equal to compare contents
-  file1.seekg(0, std::ifstream::beg);
-  file2.seekg(0, std::ifstream::beg);
-  return std::equal(std::istreambuf_iterator<char>(file1.rdbuf()),
-                    std::istreambuf_iterator<char>(),
-                    std::istreambuf_iterator<char>(file2.rdbuf()));
-}
+/// <summary>
+///
+/// </summary>
+/// <param name="aa"></param>
+/// <returns></returns>
 std::string readJSONFromFile(const std::string &jsonFileName)
 {
   std::ifstream jsonFile;
@@ -59,6 +47,11 @@ std::string readJSONFromFile(const std::string &jsonFileName)
   jsonFileBuffer << jsonFile.rdbuf();
   return (jsonFileBuffer.str());
 }
+/// <summary>
+///
+/// </summary>
+/// <param name="aa"></param>
+/// <returns></returns>
 void checkArray(JNode *jNode)
 { // Array [\"Dog\",1964,true,null]
   JNodeArray *jNodeArray = static_cast<JNodeArray *>(jNode);
@@ -73,6 +66,11 @@ void checkArray(JNode *jNode)
   REQUIRE(static_cast<JNodeBoolean *>(jNodeArray->value[2].get())->value == true);
   REQUIRE(static_cast<JNodeNull *>(jNodeArray->value[3].get())->value == nullptr);
 }
+/// <summary>
+///
+/// </summary>
+/// <param name="aa"></param>
+/// <returns></returns>
 void checkObject(JNode *jNode)
 { // {\"City\":\"Southampton\",\"Population\":500000}
   JNodeObject *jNodeObject = (JNodeObject *)jNode;
@@ -403,7 +401,7 @@ TEST_CASE("Creation and use of JSON for encode of collection types (object, arra
     REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
   }
 }
-TEST_CASE("Encode to a file and check result", "[Bencode][Encode][Exceptions]")
+TEST_CASE("Encode to a file and check result", "[JSON][Encode][Exceptions]")
 {
   JSON json;
   SECTION("Encode object to file and check value", "[JSON][Encode]")
@@ -451,7 +449,6 @@ TEST_CASE("Encode generated exceptions", "[JSON][Encode][Exceptions]")
     REQUIRE_THROWS_AS(json.encodeFile(std::unique_ptr<JNode>(new JNode()), ""), std::invalid_argument);
     REQUIRE_THROWS_WITH(json.encodeFile(std::unique_ptr<JNode>(new JNode()), ""), "Empty file name passed to be encoded.");
   }
-
 }
 TEST_CASE("Creation and use of JSON for encode of a list of example JSON files.", "[JSON][Encode]")
 {
@@ -476,3 +473,159 @@ TEST_CASE("Creation and use of JSON for encode of a list of example JSON files."
     REQUIRE(readJSONFromFile(kGeneratedJSONFile) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
   }
 }
+TEST_CASE("Creation and use of ISource (File) interface.", "[JSON][Decode][ISource]")
+{
+  SECTION("Create FileSource with testfile001.json.", "[JSON][Decode][ISource]")
+  {
+    REQUIRE_NOTHROW(FileSource(kGeneratedJSONFile));
+  }
+  SECTION("Create FileSource with non existants file.", "[JSON][Decode][ISource]")
+  {
+    REQUIRE_THROWS_AS(FileSource(kNonExistantJSONFile), std::runtime_error);
+    REQUIRE_THROWS_WITH(FileSource(kNonExistantJSONFile), "JSON file input stream failed to open or does not exist.");
+  }
+  SECTION("Create FileSource with testfile001.json. and positioned on the correct first character", "[JSOND][Decode][ISource]")
+  {
+    FileSource source = FileSource(kSIngleJSONFile);
+    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE((char)source.currentByte() == '{');
+  }
+  SECTION("Create FileSource with testfile001.json and then check moveToNextByte positions to correct next character", "[JSON][Decode][ISource]")
+  {
+    FileSource source = FileSource(kSIngleJSONFile);
+    source.moveToNextByte();
+    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE((char)source.currentByte() == '\n');
+  }
+  SECTION("Create FileSource with testfile001.json  move past last character, check it and the bytes moved.", "[JSON][Decode][ISource]")
+  {
+    FileSource source = FileSource(kSIngleJSONFile);
+    long length = 0;
+    while (source.bytesToDecode())
+    {
+      source.moveToNextByte();
+      length++;
+    }
+    REQUIRE(length == 583);                       // eof
+    REQUIRE(source.currentByte() == (char) 0xff); // eof
+  }
+ }
+TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file testfile001.json).", "[JSON][Decode][ISource]")
+{
+  std::string buffer = readJSONFromFile(kSIngleJSONFile);
+  SECTION("Create BufferSource.", "[JSON][Decode][ISource]")
+  {
+    REQUIRE_NOTHROW(BufferSource(buffer));
+  }
+  SECTION("Create BufferSource with empty buffer.", "[JSON][Decode][ISource]")
+  {
+    REQUIRE_THROWS_AS(BufferSource(""), std::invalid_argument);
+    REQUIRE_THROWS_WITH(BufferSource(""), "Empty source buffer passed to be encoded.");
+  }
+  SECTION("Create BufferSource with testfile001.json and that it is positioned on the correct first character", "[JSON][Decode][ISource]")
+  {
+    BufferSource source = BufferSource(buffer);
+    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE((char)source.currentByte() == '{');
+  }
+  SECTION("Create BufferSource with testfile001.json and then check moveToNextByte positions to correct next character", "[JSON][Decode][ISource]")
+  {
+    BufferSource source = BufferSource(buffer);
+    source.moveToNextByte();
+    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE((char)source.currentByte() == '\n');
+  }
+  SECTION("Create BufferSource with testfile001.json move past last character, check it and the bytes moved.", "[JSON][Decode][ISource]")
+  {
+    BufferSource source = BufferSource(buffer);
+    long length = 0;
+    while (source.bytesToDecode())
+    {
+      source.moveToNextByte();
+      length++;
+    }
+    REQUIRE(length == 583);                      // eof
+    REQUIRE(source.currentByte() == (char) 255); // eof
+  }
+ }
+TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[JSON][Decode][ISource]")
+{
+  SECTION("Create BufferDesination.", "[JSON][Encode][IDesination]")
+  {
+    REQUIRE_NOTHROW(BufferDestination());
+  }
+  SECTION("Create BufferDestination and get buffer which should be empty.", "[JSON][Encode][IDesination]")
+  {
+    BufferDestination buffer;
+    REQUIRE_FALSE(!buffer.getBuffer().empty());
+  }
+  SECTION("Create BufferDestination and add one character.", "[JSON][Encode][IDesination]")
+  {
+    BufferDestination buffer;
+    buffer.addBytes("i");
+    REQUIRE(buffer.getBuffer().size() == 1);
+  }
+  SECTION("Create BufferDestination and add an encoded integer and check result.", "[JSON][Encode][IDesination]")
+  {
+    BufferDestination buffer;
+    buffer.addBytes("65767");
+    REQUIRE(buffer.getBuffer().size() == 5);
+    REQUIRE(buffer.getBuffer() == ("65767"));
+  }
+ }
+TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Decode][ISource]")
+ {
+//   SECTION("Create FileDestination.", "[JSON][Encode][IDesination]")
+//   {
+//     if (std::filesystem::exists(kGeneratedJSONFile))
+//     {
+//       std::filesystem::remove(kGeneratedJSONFile);
+//     }
+//     REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
+//   }
+//   SECTION("Create FileDestination when file already exists.", "[JSON][Encode][IDesination]")
+//   {
+//     FileDestination file(kGeneratedJSONFile);
+//     if (!std::filesystem::exists(kGeneratedJSONFile))
+//     {
+//       file = FileDestination(kGeneratedJSONFile);
+//     }
+//     REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
+//   }
+//   SECTION("Create FileDestination and test file exists and should be empty.", "[JSON][Encode][IDesination]")
+//   {
+//     if (std::filesystem::exists(kGeneratedJSONFile))
+//     {
+//       std::filesystem::remove(kGeneratedJSONFile);
+//     }
+//     FileDestination file(kGeneratedJSONFile);
+//     REQUIRE_FALSE(!std::filesystem::exists(kGeneratedJSONFile));
+//     std::filesystem::path filePath(kGeneratedJSONFile);
+//     REQUIRE(std::filesystem::file_size(filePath) == 0);
+//   }
+//   SECTION("Create FileDestination and add one character.", "[JSON][Encode][IDesination]")
+//   {
+//     if (std::filesystem::exists(kGeneratedJSONFile))
+//     {
+//       std::filesystem::remove(kGeneratedJSONFile);
+//     }
+//     FileDestination file(kGeneratedJSONFile);
+//     file.addBytes("i");
+//     std::filesystem::path filePath(kGeneratedJSONFile);
+//     REQUIRE(std::filesystem::file_size(filePath) == 1);
+//   }
+//   SECTION("Create FileDestination, add an encoded integer and check result.", "[JSON][Encode][IDesination]")
+//   {
+//     if (std::filesystem::exists(kGeneratedJSONFile))
+//     {
+//       std::filesystem::remove(kGeneratedJSONFile);
+//     }
+//     FileDestination file(kGeneratedJSONFile);
+//     file.addBytes("i65767e");
+//     std::filesystem::path filePath(kGeneratedJSONFile);
+//     REQUIRE(std::filesystem::file_size(filePath) == 7);
+//     std::ifstream torrentFile{kGeneratedJSONFile};
+//     std::ostringstream expected;
+//     expected << torrentFile.rdbuf();
+//     REQUIRE(expected.str() == "i65767e");
+   }

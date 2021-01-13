@@ -45,6 +45,11 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     inline void JSON::ignoreWhiteSpace(ISource *source)
     {
         while (source->bytesToDecode() && std::iswspace(source->currentByte()))
@@ -52,6 +57,11 @@ namespace H4
             source->moveToNextByte();
         }
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::string JSON::extractString(ISource *source)
     {
         std::string value;
@@ -68,10 +78,20 @@ namespace H4
         source->moveToNextByte();
         return (value);
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeString(ISource *source)
     {
         return (std::make_unique<JNodeString>(JNodeString(extractString(source))));
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeNumber(ISource *source)
     {
         std::set<char> validCharacters{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', '-', '+', 'E', 'e'};
@@ -88,6 +108,11 @@ namespace H4
         }
         return (std::make_unique<JNodeNumber>(JNodeNumber(value)));
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeBoolean(ISource *source)
     {
         std::string value{source->currentByte()};
@@ -107,6 +132,11 @@ namespace H4
         }
         throw std::runtime_error("JSON syntax error detected.");
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeNull(ISource *source)
     {
         std::string value{source->currentByte()};
@@ -122,6 +152,11 @@ namespace H4
         }
         throw std::runtime_error("JSON syntax error detected.");
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeObject(ISource *source)
     {
         JNodeObject object;
@@ -148,6 +183,11 @@ namespace H4
         source->moveToNextByte();
         return (std::make_unique<JNodeObject>(std::move(object)));
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeArray(ISource *source)
     {
         JNodeArray array;
@@ -165,6 +205,11 @@ namespace H4
         source->moveToNextByte();
         return (std::make_unique<JNodeArray>(std::move(array)));
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeJNodes(ISource *source)
     {
         ignoreWhiteSpace(source);
@@ -185,6 +230,11 @@ namespace H4
             return (decodeNumber(source));
         }
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     void JSON::encodeJNodes(JNode *jNode, IDestination *destination)
     {
         switch (jNode->nodeType)
@@ -258,6 +308,11 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeBuffer(const std::string &jsonBuffer)
     {
         if (jsonBuffer.empty())
@@ -267,6 +322,11 @@ namespace H4
         BufferSource source(jsonBuffer);
         return (decodeJNodes(&source));
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeFile(const std::string &sourceFileName)
     {
         if (sourceFileName.empty())
@@ -276,9 +336,14 @@ namespace H4
         FileSource source(sourceFileName);
         return (decodeJNodes(&source));
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::string JSON::encodeBuffer(std::unique_ptr<JNode> jNodeRoot)
     {
-        if (jNodeRoot == nullptr) 
+        if (jNodeRoot == nullptr)
         {
             throw std::invalid_argument("Nullptr passed as JNode root to be encoded.");
         }
@@ -286,6 +351,11 @@ namespace H4
         encodeJNodes(jNodeRoot.get(), &destination);
         return (destination.getBuffer());
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     void JSON::encodeFile(std::unique_ptr<JNode> jNodeRoot, const std::string &destinationFileName)
     {
         if (jNodeRoot == nullptr)
@@ -299,6 +369,11 @@ namespace H4
         FileDestination destination(std::move(destinationFileName));
         encodeJNodes(jNodeRoot.get(), &destination);
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aa"></param>
+    /// <returns></returns>
     std::string JSON::stripWhiteSpaceBuffer(const std::string &jsonBuffer)
     {
         BufferSource source(jsonBuffer);

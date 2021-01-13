@@ -22,6 +22,7 @@ set (JSON_SOURCES
 )
 
 set (JSON_INCLUDES
+    JSONCOnfig.hpp
     ./include/JSON.hpp
     ./include/JSONSources.hpp
     ./include/JSONDestinations.hpp
@@ -36,4 +37,10 @@ target_link_libraries(${JSON_LIBRARY_NAME})
 # Add tests
 
 add_subdirectory(tests)
+
+# install
+
+install(TARGETS ${JSON_LIBRARY_NAME} DESTINATION lib)
+install(FILES JSON.hpp JSONConfig.hpp DESTINATION include)
+
 

@@ -41,7 +41,9 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    /// <summary>Decode a positive Integer from the input stream of characters referenced by ISource.</summary>
+    /// <summary>
+    /// Decode a positive Integer from the input stream of characters referenced by ISource.
+    /// </summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
     /// <returns>Positive integers value.</returns>
     inline long Bencode::decodePositiveInteger(ISource *source)
@@ -54,7 +56,9 @@ namespace H4
         }
         return (std::stol(m_workBuffer));
     }
-    /// <summary>Decode a byte string from the input stream of characters referenced by ISource.</summary>
+    /// <summary>
+    /// Decode a byte string from the input stream of characters referenced by ISource.
+    /// </summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
     /// <returns>String value decoded.</returns>
     inline std::string Bencode::decodeString(ISource *source)
@@ -73,8 +77,10 @@ namespace H4
         }
         return (m_workBuffer);
     }
-    /// <summary>Decode a BNode from the input stream of characters referenced by ISource.In order to traverse
-    //  and decode complex encodings this method is called recursively to build up a BNode structure.</summary>
+    /// <summary>
+    /// Decode a BNode from the input stream of characters referenced by ISource.In order to traverse
+    //  and decode complex encodings this method is called recursively to build up a BNode structure.
+    /// </summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
     /// <returns></returns>
     std::unique_ptr<BNode> Bencode::decodeBNodes(ISource *source)
@@ -137,8 +143,10 @@ namespace H4
             return (std::make_unique<BNodeString>(BNodeString(decodeString(source))));
         }
     }
-    /// <summary>Recursively traverse a BNode structure and produce an Bencode encoding of it on the output
-    //  stream referenced through the IDestination interface.</summary>
+    /// <summary>
+    /// Recursively traverse a BNode structure and produce an Bencode encoding of it on the output
+    //  stream referenced through the IDestination interface.
+    /// </summary>
     /// <param name="bNode">Pointer to root of current BNode structure.</param>
     /// <param name="desination ">Pointer to interface used to facilitate the output stream.</param>
     /// <returns></returns>
@@ -179,7 +187,9 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-    /// <summary>Decode Bencoded source buffer into BNode(s).</summary>
+    /// <summary>
+    /// Decode Bencoded source buffer into BNode(s).
+    /// </summary>
     /// <param name="sourceBuffer">Source byte buffer containing Bencoding.</param>
     /// <returns>BNode structure root.</returns>
     std::unique_ptr<BNode> Bencode::decodeBuffer(const Bencoding &sourceBuffer)
@@ -191,7 +201,9 @@ namespace H4
         BufferSource source(sourceBuffer);
         return decodeBNodes(&source);
     }
-    /// <summary>Decode Bencoded source file into BNode(s)</summary>
+    /// <summary>
+    /// Decode Bencoded source file into BNode(s)
+    /// </summary>
     /// <param name="sourceFileName">Input source file name</param>
     /// <returns>BNode structure root.</returns>
     std::unique_ptr<BNode> Bencode::decodeFile(std::string sourceFileName)
@@ -199,7 +211,9 @@ namespace H4
         FileSource source(std::move(sourceFileName));
         return decodeBNodes(&source);
     }
-    /// <summary>Take BNode structure and create an Bencode encoding for it in a destination buffer.</summary>
+    /// <summary>
+    /// Take BNode structure and create an Bencode encoding for it in a destination buffer.
+    /// </summary>
     /// <param name="bNodeRoot">Bnode structure root.</param>
     /// <returns>Encoded data buffer.</returns>
     Bencode::Bencoding Bencode::encodeBuffer(std::unique_ptr<BNode> bNodeRoot)
@@ -212,7 +226,9 @@ namespace H4
         encodeBNodes(bNodeRoot.get(), &destination);
         return (destination.getBuffer());
     }
-    /// <summary>Take BNode structure and create an Bencode encoding for it in a destination file.</summary>
+    /// <summary>
+    /// Take BNode structure and create an Bencode encoding for it in a destination file.
+    /// </summary>
     /// <param name="bNodeRoot">Bnode structure root.</param>
     /// <param name="destinationFileName">Destination file name.</param>
     void Bencode::encodeFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName)
