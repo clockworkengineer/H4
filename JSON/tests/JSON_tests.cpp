@@ -408,20 +408,14 @@ TEST_CASE("Encode to a file and check result", "[JSON][Encode][Exceptions]")
   SECTION("Encode object to file and check value", "[JSON][Encode]")
   {
     std::string expected = "{\"City\":\"London\",\"Population\":8000000}";
-    if (std::filesystem::exists(kGeneratedTorrentFile))
-    {
-      std::filesystem::remove(kGeneratedTorrentFile);
-    }
+    std::filesystem::remove(kGeneratedTorrentFile);
     json.encodeFile(json.decodeBuffer(expected), kGeneratedTorrentFile);
     REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == expected);
   }
   SECTION("Encode array to file and check value", "[JSON][ENcode]")
   {
     std::string expected = "[999,\"Time\",null,true]";
-    if (std::filesystem::exists(kGeneratedTorrentFile))
-    {
-      std::filesystem::remove(kGeneratedTorrentFile);
-    }
+    std::filesystem::remove(kGeneratedTorrentFile);
     json.encodeFile(json.decodeBuffer(expected), kGeneratedTorrentFile);
     REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == expected);
   }
@@ -429,7 +423,6 @@ TEST_CASE("Encode to a file and check result", "[JSON][Encode][Exceptions]")
 TEST_CASE("Encode generated exceptions", "[JSON][Encode][Exceptions]")
 {
   JSON json;
-
   SECTION("Encode passed nullptr", "[JSON][Encode][Exceptions]")
   {
     REQUIRE_THROWS_AS(json.encodeBuffer(std::unique_ptr<JNode>(nullptr)), std::invalid_argument);
@@ -465,10 +458,7 @@ TEST_CASE("Creation and use of JSON for encode of a list of example JSON files."
   }
   SECTION("Encode to file and check value", "[JSON][ENcode]")
   {
-    if (std::filesystem::exists(kGeneratedTorrentFile))
-    {
-      std::filesystem::remove(kGeneratedTorrentFile);
-    }
+    std::filesystem::remove(kGeneratedTorrentFile);
     std::string jsonFileBuffer = readJSONFromFile(testFile);
     json.encodeFile(json.decodeBuffer(jsonFileBuffer), kGeneratedTorrentFile);
     REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
@@ -578,27 +568,18 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Decode][
 {
   SECTION("Create FileDestination.", "[JSON][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedTorrentFile))
-    {
-      std::filesystem::remove(kGeneratedTorrentFile);
-    }
+    std::filesystem::remove(kGeneratedTorrentFile);
     REQUIRE_NOTHROW(FileDestination(kGeneratedTorrentFile));
   }
   SECTION("Create FileDestination when file already exists.", "[JSON][Encode][IDesination]")
   {
     FileDestination file(kGeneratedTorrentFile);
-    if (!std::filesystem::exists(kGeneratedTorrentFile))
-    {
-      file = FileDestination(kGeneratedTorrentFile);
-    }
+    file = FileDestination(kGeneratedTorrentFile);
     REQUIRE_NOTHROW(FileDestination(kGeneratedTorrentFile));
   }
   SECTION("Create FileDestination and test file exists and should be empty.", "[JSON][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedTorrentFile))
-    {
-      std::filesystem::remove(kGeneratedTorrentFile);
-    }
+    std::filesystem::remove(kGeneratedTorrentFile);
     FileDestination file(kGeneratedTorrentFile);
     REQUIRE_FALSE(!std::filesystem::exists(kGeneratedTorrentFile));
     std::filesystem::path filePath(kGeneratedTorrentFile);
@@ -606,10 +587,7 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Decode][
   }
   SECTION("Create FileDestination and add one character.", "[JSON][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedTorrentFile))
-    {
-      std::filesystem::remove(kGeneratedTorrentFile);
-    }
+    std::filesystem::remove(kGeneratedTorrentFile);
     FileDestination file(kGeneratedTorrentFile);
     file.addBytes("t");
     std::filesystem::path filePath(kGeneratedTorrentFile);
@@ -617,10 +595,7 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Decode][
   }
   SECTION("Create FileDestination, add an encoded integer and check result.", "[JSON][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedTorrentFile))
-    {
-      std::filesystem::remove(kGeneratedTorrentFile);
-    }
+    std::filesystem::remove(kGeneratedTorrentFile);
     FileDestination file(kGeneratedTorrentFile);
     file.addBytes("65767");
     std::filesystem::path filePath(kGeneratedTorrentFile);
