@@ -35,9 +35,10 @@ using namespace H4;
 // Local support functions
 // =======================
 /// <summary>
-///
+/// Open a JSON file, read its contents into a string buffer and return
+/// the buffer.
 /// </summary>
-/// <param name="aa"></param>
+/// <param name="jsonFileName">JSON file name</param>
 /// <returns></returns>
 std::string readJSONFromFile(const std::string &jsonFileName)
 {
@@ -48,9 +49,9 @@ std::string readJSONFromFile(const std::string &jsonFileName)
   return (jsonFileBuffer.str());
 }
 /// <summary>
-///
+/// Verify that an JNodeArray has the correct decoded format.
 /// </summary>
-/// <param name="aa"></param>
+/// <param name="jNode">Pointer to JNNodeArray</param>
 /// <returns></returns>
 void checkArray(JNode *jNode)
 { // Array [\"Dog\",1964,true,null]
@@ -67,9 +68,9 @@ void checkArray(JNode *jNode)
   REQUIRE(static_cast<JNodeNull *>(jNodeArray->value[3].get())->value == nullptr);
 }
 /// <summary>
-///
+/// Verify that an JNodeObject has the correct decoded format.
 /// </summary>
-/// <param name="aa"></param>
+/// <param name="jNode">Pointer to JNodeObject</param>
 /// <returns></returns>
 void checkObject(JNode *jNode)
 { // {\"City\":\"Southampton\",\"Population\":500000}
@@ -610,7 +611,7 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Decode][
       std::filesystem::remove(kGeneratedJSONFile);
     }
     FileDestination file(kGeneratedJSONFile);
-    file.addBytes("i");
+    file.addBytes("t");
     std::filesystem::path filePath(kGeneratedJSONFile);
     REQUIRE(std::filesystem::file_size(filePath) == 1);
   }
