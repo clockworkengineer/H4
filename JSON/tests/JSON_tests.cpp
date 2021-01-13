@@ -506,10 +506,10 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[JSON][Decode][ISour
       source.moveToNextByte();
       length++;
     }
-    REQUIRE(length == 583);                       // eof
-    REQUIRE(source.currentByte() == (char) 0xff); // eof
+    REQUIRE(length == 583);                      // eof
+    REQUIRE(source.currentByte() == (char)0xff); // eof
   }
- }
+}
 TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file testfile001.json).", "[JSON][Decode][ISource]")
 {
   std::string buffer = readJSONFromFile(kSIngleJSONFile);
@@ -544,10 +544,10 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       source.moveToNextByte();
       length++;
     }
-    REQUIRE(length == 583);                      // eof
-    REQUIRE(source.currentByte() == (char) 255); // eof
+    REQUIRE(length == 583);                     // eof
+    REQUIRE(source.currentByte() == (char)255); // eof
   }
- }
+}
 TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[JSON][Decode][ISource]")
 {
   SECTION("Create BufferDesination.", "[JSON][Encode][IDesination]")
@@ -572,60 +572,59 @@ TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[JSON][Decode
     REQUIRE(buffer.getBuffer().size() == 5);
     REQUIRE(buffer.getBuffer() == ("65767"));
   }
- }
+}
 TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Decode][ISource]")
- {
-//   SECTION("Create FileDestination.", "[JSON][Encode][IDesination]")
-//   {
-//     if (std::filesystem::exists(kGeneratedJSONFile))
-//     {
-//       std::filesystem::remove(kGeneratedJSONFile);
-//     }
-//     REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
-//   }
-//   SECTION("Create FileDestination when file already exists.", "[JSON][Encode][IDesination]")
-//   {
-//     FileDestination file(kGeneratedJSONFile);
-//     if (!std::filesystem::exists(kGeneratedJSONFile))
-//     {
-//       file = FileDestination(kGeneratedJSONFile);
-//     }
-//     REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
-//   }
-//   SECTION("Create FileDestination and test file exists and should be empty.", "[JSON][Encode][IDesination]")
-//   {
-//     if (std::filesystem::exists(kGeneratedJSONFile))
-//     {
-//       std::filesystem::remove(kGeneratedJSONFile);
-//     }
-//     FileDestination file(kGeneratedJSONFile);
-//     REQUIRE_FALSE(!std::filesystem::exists(kGeneratedJSONFile));
-//     std::filesystem::path filePath(kGeneratedJSONFile);
-//     REQUIRE(std::filesystem::file_size(filePath) == 0);
-//   }
-//   SECTION("Create FileDestination and add one character.", "[JSON][Encode][IDesination]")
-//   {
-//     if (std::filesystem::exists(kGeneratedJSONFile))
-//     {
-//       std::filesystem::remove(kGeneratedJSONFile);
-//     }
-//     FileDestination file(kGeneratedJSONFile);
-//     file.addBytes("i");
-//     std::filesystem::path filePath(kGeneratedJSONFile);
-//     REQUIRE(std::filesystem::file_size(filePath) == 1);
-//   }
-//   SECTION("Create FileDestination, add an encoded integer and check result.", "[JSON][Encode][IDesination]")
-//   {
-//     if (std::filesystem::exists(kGeneratedJSONFile))
-//     {
-//       std::filesystem::remove(kGeneratedJSONFile);
-//     }
-//     FileDestination file(kGeneratedJSONFile);
-//     file.addBytes("i65767e");
-//     std::filesystem::path filePath(kGeneratedJSONFile);
-//     REQUIRE(std::filesystem::file_size(filePath) == 7);
-//     std::ifstream torrentFile{kGeneratedJSONFile};
-//     std::ostringstream expected;
-//     expected << torrentFile.rdbuf();
-//     REQUIRE(expected.str() == "i65767e");
-   }
+{
+  SECTION("Create FileDestination.", "[JSON][Encode][IDesination]")
+  {
+    if (std::filesystem::exists(kGeneratedJSONFile))
+    {
+      std::filesystem::remove(kGeneratedJSONFile);
+    }
+    REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
+  }
+  SECTION("Create FileDestination when file already exists.", "[JSON][Encode][IDesination]")
+  {
+    FileDestination file(kGeneratedJSONFile);
+    if (!std::filesystem::exists(kGeneratedJSONFile))
+    {
+      file = FileDestination(kGeneratedJSONFile);
+    }
+    REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
+  }
+  SECTION("Create FileDestination and test file exists and should be empty.", "[JSON][Encode][IDesination]")
+  {
+    if (std::filesystem::exists(kGeneratedJSONFile))
+    {
+      std::filesystem::remove(kGeneratedJSONFile);
+    }
+    FileDestination file(kGeneratedJSONFile);
+    REQUIRE_FALSE(!std::filesystem::exists(kGeneratedJSONFile));
+    std::filesystem::path filePath(kGeneratedJSONFile);
+    REQUIRE(std::filesystem::file_size(filePath) == 0);
+  }
+  SECTION("Create FileDestination and add one character.", "[JSON][Encode][IDesination]")
+  {
+    if (std::filesystem::exists(kGeneratedJSONFile))
+    {
+      std::filesystem::remove(kGeneratedJSONFile);
+    }
+    FileDestination file(kGeneratedJSONFile);
+    file.addBytes("i");
+    std::filesystem::path filePath(kGeneratedJSONFile);
+    REQUIRE(std::filesystem::file_size(filePath) == 1);
+  }
+  SECTION("Create FileDestination, add an encoded integer and check result.", "[JSON][Encode][IDesination]")
+  {
+    if (std::filesystem::exists(kGeneratedJSONFile))
+    {
+      std::filesystem::remove(kGeneratedJSONFile);
+    }
+    FileDestination file(kGeneratedJSONFile);
+    file.addBytes("65767");
+    std::filesystem::path filePath(kGeneratedJSONFile);
+    REQUIRE(std::filesystem::file_size(filePath) == 5);
+    std::string expected = readJSONFromFile(kGeneratedJSONFile);
+    REQUIRE(expected == "65767");
+  }
+}
