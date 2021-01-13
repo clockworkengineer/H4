@@ -64,11 +64,11 @@ namespace H4
     /// <returns>Extracted string</returns>
     std::string JSON::extractString(ISource *source)
     {
-        std::string value;
+        m_workBuffer.clear();
         source->moveToNextByte();
         while (source->bytesToDecode() && source->currentByte() != '"')
         {
-            value += source->currentByte();
+            m_workBuffer += source->currentByte();
             source->moveToNextByte();
         }
         if (!source->bytesToDecode())
@@ -76,7 +76,7 @@ namespace H4
             throw std::runtime_error("JSON syntax error detected.");
         }
         source->moveToNextByte();
-        return (value);
+        return (m_workBuffer);
     }
     /// <summary>
     /// Decode a string from a JSON source stream.
@@ -99,14 +99,15 @@ namespace H4
         {
             throw std::runtime_error("JSON syntax error detected.");
         }
-        std::string value{source->currentByte()};
+        m_workBuffer.clear();
+        m_workBuffer += source->currentByte();
         source->moveToNextByte();
         while (source->bytesToDecode() && validCharacters.count(source->currentByte()) > 0)
         {
-            value += source->currentByte();
+            m_workBuffer += source->currentByte();
             source->moveToNextByte();
         }
-        return (std::make_unique<JNodeNumber>(JNodeNumber(value)));
+        return (std::make_unique<JNodeNumber>(JNodeNumber(m_workBuffer)));
     }
     /// <summary>
     /// Decode a boolean from a JSON source stream.
@@ -115,18 +116,19 @@ namespace H4
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeBoolean(ISource *source)
     {
-        std::string value{source->currentByte()};
+        m_workBuffer.clear();
+        m_workBuffer += source->currentByte();
         source->moveToNextByte();
         while (source->bytesToDecode() && std::isalpha(source->currentByte()))
         {
-            value += source->currentByte();
+            m_workBuffer += source->currentByte();
             source->moveToNextByte();
         }
-        if (value == "true")
+        if (m_workBuffer == "true")
         {
             return (std::make_unique<JNodeBoolean>(JNodeBoolean(true)));
         }
-        else if (value == "false")
+        else if (m_workBuffer == "false")
         {
             return (std::make_unique<JNodeBoolean>(JNodeBoolean(false)));
         }
@@ -139,14 +141,15 @@ namespace H4
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeNull(ISource *source)
     {
-        std::string value{source->currentByte()};
+        m_workBuffer.clear();
+        m_workBuffer += source->currentByte();
         source->moveToNextByte();
         while (source->bytesToDecode() && std::isalpha(source->currentByte()))
         {
-            value += source->currentByte();
+            m_workBuffer += source->currentByte();
             source->moveToNextByte();
         }
-        if (value == "null")
+        if (m_workBuffer == "null")
         {
             return (std::make_unique<JNodeNull>(JNodeNull()));
         }

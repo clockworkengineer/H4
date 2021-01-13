@@ -175,6 +175,7 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
+        std::string m_workBuffer;
     };
     //
     // Shortcuts for JNode structure and Bencoding type
