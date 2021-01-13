@@ -37,4 +37,9 @@ target_link_libraries(${BENCODE_LIBRARY_NAME})
 
 add_subdirectory(tests)
 
+# install
+
+install(TARGETS ${BENCODE_LIBRARY_NAME} DESTINATION lib)
+install(FILES Bencode.hpp BencodeConfig.hpp DESTINATION include)
+
 

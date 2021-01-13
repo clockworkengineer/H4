@@ -29,7 +29,7 @@ const char *kMultiFileTorrent = "./testData/multifile.torrent";
 const char *kSingleFileWithErrorTorrent = "./testData/singlefileerror.torrent";
 const char *kMultiFileWithErrorTorrent = "./testData/multifileerror.torrent";
 const char *kNonExistantTorrent = "./testData/doesntexist.torrent";
-const char *kGeneratedJSONFile = "./testData/generated.torrent";
+const char *kGeneratedTorrentFile = "./testData/generated.torrent";
 // =======================
 // Bencode class namespace
 // =======================
@@ -37,6 +37,12 @@ using namespace H4;
 // =======================
 // Local support functions
 // =======================
+/// <summary>
+/// Compare two Bencoded files.
+/// </summary>
+/// <param name="fileName1">Bencoded file 1</param>
+/// <param name="fileName2">Bencoded file 2</param>
+/// <returns>true if files the same, false otherwise</returns>
 bool compareFiles(const std::string &fileName1, const std::string &fileName2)
 {
   std::ifstream file1(fileName1, std::ifstream::binary | std::ifstream::ate);
@@ -55,6 +61,20 @@ bool compareFiles(const std::string &fileName1, const std::string &fileName2)
   return std::equal(std::istreambuf_iterator<char>(file1.rdbuf()),
                     std::istreambuf_iterator<char>(),
                     std::istreambuf_iterator<char>(file2.rdbuf()));
+}
+/// <summary>
+/// Open a Bencoded file, read its contents into a string buffer and return
+/// the buffer.
+/// </summary>
+/// <param name="bencodedFileName">Bencoded file name</param>
+/// <returns></returns>
+std::string readBencodedBytesFromFile(const std::string &bencodedFileName)
+{
+  std::ifstream bencodedFile;
+  bencodedFile.open(bencodedFileName);
+  std::ostringstream bencodedFileBuffer;
+  bencodedFileBuffer << bencodedFile.rdbuf();
+  return (bencodedFileBuffer.str());
 }
 // ==========
 // Test cases
@@ -101,18 +121,18 @@ TEST_CASE("Creation and use of Bencode for decode of simple types (number, strin
 }
 TEST_CASE("Creation and use of Bencode for decode of a table of integer test data", "[Bencode][Decode]")
 {
-  auto [test_input, expected] = GENERATE(table<std::string, long>({{"i277e", 277},
-                                                                   {"i32767e", 32767}}));
+  auto [testInput, expected] = GENERATE(table<std::string, long>({{"i277e", 277},
+                                                                  {"i32767e", 32767}}));
   Bencode bEncode;
-  std::unique_ptr<BNode> bNode = bEncode.decodeBuffer(test_input.c_str());
+  std::unique_ptr<BNode> bNode = bEncode.decodeBuffer(testInput.c_str());
   REQUIRE(static_cast<BNodeInteger *>(bNode.get())->value == expected);
 }
 TEST_CASE("Creation and use of Bencode for decode of a table of string test data", "[Bencode][Decode]")
 {
-  auto [test_input, expected] = GENERATE(table<std::string, std::string>({{"13:qwertyuiopasd", "qwertyuiopasd"},
-                                                                          {"6:mnbvcx", "mnbvcx"}}));
+  auto [testInput, expected] = GENERATE(table<std::string, std::string>({{"13:qwertyuiopasd", "qwertyuiopasd"},
+                                                                         {"6:mnbvcx", "mnbvcx"}}));
   Bencode bEncode;
-  std::unique_ptr<BNode> bNode = bEncode.decodeBuffer(test_input.c_str());
+  std::unique_ptr<BNode> bNode = bEncode.decodeBuffer(testInput.c_str());
   REQUIRE(static_cast<BNodeString *>(bNode.get())->value == expected);
 }
 TEST_CASE("Creation and use of Bencode for decode of collection types (list, dictionary) ", "[Bencode][Decode]")
@@ -197,18 +217,18 @@ TEST_CASE("Creation and use of Bencode for encode of simple types (number, strin
 }
 TEST_CASE("Creation and use of Bencode for encode of a table of integer test data", "[Bencode][Encode]")
 {
-  auto [test_input, expected] = GENERATE(table<long, Bencode::Bencoding>({{277, "i277e"},
-                                                                          {32767, "i32767e"}}));
+  auto [testInput, expected] = GENERATE(table<long, Bencode::Bencoding>({{277, "i277e"},
+                                                                         {32767, "i32767e"}}));
   Bencode bEncode;
-  Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeInteger>(BNodeInteger(test_input)));
+  Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeInteger>(BNodeInteger(testInput)));
   REQUIRE(actual == expected);
 }
 TEST_CASE("Creation and use of Bencode for encode of a table of string test data", "[Bencode][Encode]")
 {
-  auto [test_input, expected] = GENERATE(table<std::string, Bencode::Bencoding>({{"qwertyuiopasd", "13:qwertyuiopasd"},
-                                                                                 {"mnbvcx", "6:mnbvcx"}}));
+  auto [testInput, expected] = GENERATE(table<std::string, Bencode::Bencoding>({{"qwertyuiopasd", "13:qwertyuiopasd"},
+                                                                                {"mnbvcx", "6:mnbvcx"}}));
   Bencode bEncode;
-  Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeString>(BNodeString(test_input)));
+  Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeString>(BNodeString(testInput)));
   REQUIRE(actual == expected);
 }
 TEST_CASE("Creation and use of Bencode for encode of collection types (list, dictionary) ", "[Bencode][Encode]")
@@ -295,10 +315,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   }
   SECTION("Decode singlefile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
-    std::ifstream torrentFile{kSingleFileTorrent};
-    std::ostringstream expected;
-    expected << torrentFile.rdbuf();
-    REQUIRE(bEncode.encodeBuffer(bEncode.decodeFile(kSingleFileTorrent)) == Bencode::Bencoding(expected.str()));
+    REQUIRE(bEncode.encodeBuffer(bEncode.decodeFile(kSingleFileTorrent)) == Bencode::Bencoding(readBencodedBytesFromFile(kSingleFileTorrent)));
   }
   SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
   {
@@ -307,10 +324,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   }
   SECTION("Decode multifile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
-    std::ifstream torrentFile{kMultiFileTorrent};
-    std::ostringstream expected;
-    expected << torrentFile.rdbuf();
-    REQUIRE(bEncode.encodeBuffer(bEncode.decodeFile(kMultiFileTorrent)) == Bencode::Bencoding(expected.str()));
+    REQUIRE(bEncode.encodeBuffer(bEncode.decodeFile(kMultiFileTorrent)) == Bencode::Bencoding(readBencodedBytesFromFile(kMultiFileTorrent)));
   }
 }
 TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][Torrents]")
@@ -337,21 +351,15 @@ TEST_CASE("Encode torrent files using encodeToFile", "[Bencode][Encode][Torrents
   Bencode bEncode;
   SECTION("Encode singlefile.torrent and check value", "[Bencode][Encode][Torrents]")
   {
-    if (std::filesystem::exists(kGeneratedJSONFile))
-    {
-      std::filesystem::remove(kGeneratedJSONFile);
-    }
-    bEncode.encodeFile(bEncode.decodeFile(kSingleFileTorrent), kGeneratedJSONFile);
-    REQUIRE_FALSE(!compareFiles(kSingleFileTorrent, kGeneratedJSONFile));
+    std::filesystem::remove(kGeneratedTorrentFile);
+    bEncode.encodeFile(bEncode.decodeFile(kSingleFileTorrent), kGeneratedTorrentFile);
+    REQUIRE_FALSE(!compareFiles(kSingleFileTorrent, kGeneratedTorrentFile));
   }
   SECTION("Encode multifile.torrent and check value", "[Bencode][Encode][Torrents]")
   {
-    if (std::filesystem::exists(kGeneratedJSONFile))
-    {
-      std::filesystem::remove(kGeneratedJSONFile);
-    }
-    bEncode.encodeFile(bEncode.decodeFile(kMultiFileTorrent), kGeneratedJSONFile);
-    REQUIRE_FALSE(!compareFiles(kMultiFileTorrent, kGeneratedJSONFile));
+    std::filesystem::remove(kGeneratedTorrentFile);
+    bEncode.encodeFile(bEncode.decodeFile(kMultiFileTorrent), kGeneratedTorrentFile);
+    REQUIRE_FALSE(!compareFiles(kMultiFileTorrent, kGeneratedTorrentFile));
   }
 }
 TEST_CASE("Creation and use of ISource (File) interface.", "[Bencode][Decode][ISource]")
@@ -393,12 +401,10 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[Bencode][Decode][IS
 }
 TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file singlefile.torrent).", "[Bencode][Decode][ISource]")
 {
-  std::ifstream torrentFile{kSingleFileTorrent};
-  std::ostringstream buffer;
-  buffer << torrentFile.rdbuf();
+  std::string bencodedBuffer = readBencodedBytesFromFile(kSingleFileTorrent);
   SECTION("Create BufferSource.", "[Bencode][Decode][ISource]")
   {
-    REQUIRE_NOTHROW(BufferSource(buffer.str()));
+    REQUIRE_NOTHROW(BufferSource(bencodedBuffer));
   }
   SECTION("Create BufferSource with empty buffer.", "[Bencode][Decode][ISource]")
   {
@@ -407,20 +413,20 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
   }
   SECTION("Create BufferSource with singlefile.torrent and that it is positioned on the correct first character", "[Bencode][Decode][ISource]")
   {
-    BufferSource source = BufferSource(buffer.str());
+    BufferSource source = BufferSource(bencodedBuffer);
     REQUIRE_FALSE(!source.bytesToDecode());
     REQUIRE((char)source.currentByte() == 'd');
   }
   SECTION("Create BufferSource with singlefile.torrent and then check moveToNextByte positions to correct next character", "[Bencode][Decode][ISource]")
   {
-    BufferSource source = BufferSource(buffer.str());
+    BufferSource source = BufferSource(bencodedBuffer);
     source.moveToNextByte();
     REQUIRE_FALSE(!source.bytesToDecode());
     REQUIRE((char)source.currentByte() == '8');
   }
   SECTION("Create BufferSource with singlefile.torrent move past last character, check it and the bytes moved.", "[Bencode][Decode][ISource]")
   {
-    BufferSource source = BufferSource(buffer.str());
+    BufferSource source = BufferSource(bencodedBuffer);
     long length = 0;
     while (source.bytesToDecode())
     {
@@ -460,56 +466,39 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[Bencode][Decod
 {
   SECTION("Create FileDestination.", "[Bencode][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedJSONFile))
-    {
-      std::filesystem::remove(kGeneratedJSONFile);
-    }
-    REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
+    std::filesystem::remove(kGeneratedTorrentFile);
+    REQUIRE_NOTHROW(FileDestination(kGeneratedTorrentFile));
   }
   SECTION("Create FileDestination when file already exists.", "[Bencode][Encode][IDesination]")
   {
-    FileDestination file(kGeneratedJSONFile);
-    if (!std::filesystem::exists(kGeneratedJSONFile))
-    {
-      file = FileDestination(kGeneratedJSONFile);
-    }
-    REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
+    FileDestination file(kGeneratedTorrentFile);
+    file = FileDestination(kGeneratedTorrentFile);
+    REQUIRE_NOTHROW(FileDestination(kGeneratedTorrentFile));
   }
   SECTION("Create FileDestination and test file exists and should be empty.", "[Bencode][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedJSONFile))
-    {
-      std::filesystem::remove(kGeneratedJSONFile);
-    }
-    FileDestination file(kGeneratedJSONFile);
-    REQUIRE_FALSE(!std::filesystem::exists(kGeneratedJSONFile));
-    std::filesystem::path filePath(kGeneratedJSONFile);
+    std::filesystem::remove(kGeneratedTorrentFile);
+    FileDestination file(kGeneratedTorrentFile);
+    REQUIRE_FALSE(!std::filesystem::exists(kGeneratedTorrentFile));
+    std::filesystem::path filePath(kGeneratedTorrentFile);
     REQUIRE(std::filesystem::file_size(filePath) == 0);
   }
   SECTION("Create FileDestination and add one character.", "[Bencode][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedJSONFile))
-    {
-      std::filesystem::remove(kGeneratedJSONFile);
-    }
-    FileDestination file(kGeneratedJSONFile);
+    std::filesystem::remove(kGeneratedTorrentFile);
+    FileDestination file(kGeneratedTorrentFile);
     file.addBytes("i");
-    std::filesystem::path filePath(kGeneratedJSONFile);
+    std::filesystem::path filePath(kGeneratedTorrentFile);
     REQUIRE(std::filesystem::file_size(filePath) == 1);
   }
   SECTION("Create FileDestination, add an encoded integer and check result.", "[Bencode][Encode][IDesination]")
   {
-    if (std::filesystem::exists(kGeneratedJSONFile))
-    {
-      std::filesystem::remove(kGeneratedJSONFile);
-    }
-    FileDestination file(kGeneratedJSONFile);
+    std::filesystem::remove(kGeneratedTorrentFile);
+    FileDestination file(kGeneratedTorrentFile);
     file.addBytes("i65767e");
-    std::filesystem::path filePath(kGeneratedJSONFile);
+    std::filesystem::path filePath(kGeneratedTorrentFile);
     REQUIRE(std::filesystem::file_size(filePath) == 7);
-    std::ifstream torrentFile{kGeneratedJSONFile};
-    std::ostringstream expected;
-    expected << torrentFile.rdbuf();
-    REQUIRE(expected.str() == "i65767e");
+    std::string expected = readBencodedBytesFromFile(kGeneratedTorrentFile);
+    REQUIRE(expected == "i65767e");
   }
 }
