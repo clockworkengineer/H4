@@ -13,9 +13,9 @@ namespace H4
         }
         void addBytes(std::string bytes)
         {
-            for (auto b : bytes)
+            for (auto byte : bytes)
             {
-                m_encodeBuffer.bEncodedBuffer.push_back((std::byte)b);
+                m_encodeBuffer.add((std::byte)byte);
             }
         }
         Bencoding getBuffer()

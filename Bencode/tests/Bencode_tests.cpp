@@ -446,19 +446,19 @@ TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[Bencode][Dec
   SECTION("Create BufferDestination and get buffer which should be empty.", "[Bencode][Encode][IDesination]")
   {
     BufferDestination buffer;
-    REQUIRE_FALSE(!buffer.getBuffer().bEncodedBuffer.empty());
+    REQUIRE_FALSE(!buffer.getBuffer().isEmpty());
   }
   SECTION("Create BufferDestination and add one character.", "[Bencode][Encode][IDesination]")
   {
     BufferDestination buffer;
     buffer.addBytes("i");
-    REQUIRE(buffer.getBuffer().bEncodedBuffer.size() == 1);
+    REQUIRE(buffer.getBuffer().size() == 1);
   }
   SECTION("Create BufferDestination and add an encoded integer and chekc result.", "[Bencode][Encode][IDesination]")
   {
     BufferDestination buffer;
     buffer.addBytes("i65767e");
-    REQUIRE(buffer.getBuffer().bEncodedBuffer.size() == 7);
+    REQUIRE(buffer.getBuffer().size() == 7);
     REQUIRE(buffer.getBuffer() == Bencoding("i65767e"));
   }
 }

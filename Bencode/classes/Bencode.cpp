@@ -3,7 +3,9 @@
 //
 // Description: Class to perform Bencode encoding encode/decode to/from
 // a byte buffer or file. It is also  possible to customize this with the
-// ISource and IDestination interfaces if required.
+// ISource and IDestination interfaces if required. Note: Although bencoded
+// data is treated as std::byte externally this library used char and std::string 
+// internally.
 //
 // Dependencies:   C17++ - Language standard features used.
 //
@@ -194,7 +196,7 @@ namespace H4
     /// <returns>BNode structure root.</returns>
     std::unique_ptr<BNode> Bencode::decodeBuffer(const Bencoding &sourceBuffer)
     {
-        if (sourceBuffer.bEncodedBuffer.empty())
+        if (sourceBuffer.isEmpty())
         {
             throw std::invalid_argument("Empty string passed to be decoded.");
         }

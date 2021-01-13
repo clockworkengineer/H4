@@ -37,18 +37,39 @@ namespace H4
             {
                 while (*bEncodedData != '\0')
                 {
-                    bEncodedBuffer.push_back((std::byte)*bEncodedData);
+                    m_Buffer.push_back((std::byte)*bEncodedData);
                     bEncodedData++;
                 }
             }
-            Bencoding(const std::string bEncodedData)
+            Bencoding(const std::string &bEncodedData)
             {
                 for (auto byte : bEncodedData)
                 {
-                    bEncodedBuffer.push_back((std::byte)byte);
+                    m_Buffer.push_back((std::byte)byte);
                 }
             }
-            std::vector<std::byte> bEncodedBuffer;
+            bool operator==(const Bencoding &rhs) const
+            {
+                return (std::equal(m_Buffer.begin(), m_Buffer.end(), rhs.m_Buffer.begin()));
+            }
+            std::byte &operator[](int index)
+            {
+                return m_Buffer[index];
+            }
+            bool isEmpty() const
+            {
+                return (m_Buffer.empty());
+            }
+            std::size_t size() const
+            {
+                return (m_Buffer.size());
+            }
+            void add(std::byte byte)
+            {
+                m_Buffer.push_back(byte);
+            }
+        private:
+            std::vector<std::byte> m_Buffer;
         };
         //
         // BNode structure.
@@ -173,12 +194,5 @@ namespace H4
     using BNodeList = Bencode::BNodeList;
     using BNodeDict = Bencode::BNodeDict;
     using Bencoding = Bencode::Bencoding;
-    //
-    // Bencoding comparison operator
-    //
-    inline bool operator==(const Bencode::Bencoding &lhs, const Bencode::Bencoding &rhs)
-    {
-        return (std::equal(lhs.bEncodedBuffer.begin(), lhs.bEncodedBuffer.end(), rhs.bEncodedBuffer.begin()));
-    }
 } // namespace H4
 #endif /* BENCODE_HPP */
