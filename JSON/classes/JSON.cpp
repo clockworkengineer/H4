@@ -46,9 +46,9 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    ///
+    /// Move to next non-whitespace character in JSON encoded source stream.
     /// </summary>
-    /// <param name="aa"></param>
+    /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
     inline void JSON::ignoreWhiteSpace(ISource *source)
     {
@@ -58,10 +58,10 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Extract a string from a JSON encoed source stream.
     /// </summary>
-    /// <param name="aa"></param>
-    /// <returns></returns>
+    /// <param name="source">Source for JSON encoded bytes.</param>
+    /// <returns>Extracted string</returns>
     std::string JSON::extractString(ISource *source)
     {
         std::string value;
@@ -79,18 +79,18 @@ namespace H4
         return (value);
     }
     /// <summary>
-    ///
+    /// Decode a string from a JSON source stream.
     /// </summary>
-    /// <param name="aa"></param>
+    /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeString(ISource *source)
     {
         return (std::make_unique<JNodeString>(JNodeString(extractString(source))));
     }
     /// <summary>
-    ///
+    /// Decode a number from a JSON source stream.
     /// </summary>
-    /// <param name="aa"></param>
+    /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeNumber(ISource *source)
     {
@@ -109,9 +109,9 @@ namespace H4
         return (std::make_unique<JNodeNumber>(JNodeNumber(value)));
     }
     /// <summary>
-    ///
+    /// Decode a boolean from a JSON source stream.
     /// </summary>
-    /// <param name="aa"></param>
+    /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeBoolean(ISource *source)
     {
@@ -133,9 +133,9 @@ namespace H4
         throw std::runtime_error("JSON syntax error detected.");
     }
     /// <summary>
-    ///
+    /// Decode a null from a JSON source stream.
     /// </summary>
-    /// <param name="aa"></param>
+    /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeNull(ISource *source)
     {
@@ -153,9 +153,9 @@ namespace H4
         throw std::runtime_error("JSON syntax error detected.");
     }
     /// <summary>
-    ///
+    /// Decode an object from a JSON source stream.
     /// </summary>
-    /// <param name="aa"></param>
+    /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeObject(ISource *source)
     {
@@ -184,9 +184,9 @@ namespace H4
         return (std::make_unique<JNodeObject>(std::move(object)));
     }
     /// <summary>
-    ///
+    /// Decode an array from a JSON source stream.
     /// </summary>
-    /// <param name="aa"></param>
+    /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeArray(ISource *source)
     {
@@ -206,9 +206,10 @@ namespace H4
         return (std::make_unique<JNodeArray>(std::move(array)));
     }
     /// <summary>
-    ///
+    /// Recursively decode JSON source stream producing a JNode structure
+    /// reprentation  of it.
     /// </summary>
-    /// <param name="aa"></param>
+    /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeJNodes(ISource *source)
     {
@@ -231,9 +232,11 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Recursively traverse JNode structure encoding it into JSON on
+    /// the destination stream passed in.
     /// </summary>
-    /// <param name="aa"></param>
+    /// <param name=jNode>JNode structure to be traversed</param>
+    /// <param name=desination>destination stream for encoded JSON</param>
     /// <returns></returns>
     void JSON::encodeJNodes(JNode *jNode, IDestination *destination)
     {
@@ -286,6 +289,13 @@ namespace H4
             throw std::runtime_error("Unknown JNode type encountered during encode.");
         }
     }
+    /// <summary>
+    /// Remove all whitespace characters from a JSON source stream and
+    /// write them out to a JSON destination stream.
+    /// </summary>
+    /// <param name=source>JSON source stream</param>
+    /// <param name=jNode>JSON destination stream</param>
+    /// <returns></returns>
     void JSON::stripWhiteSpace(ISource *source, IDestination *destination)
     {
         while (source->bytesToDecode())
