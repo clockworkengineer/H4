@@ -95,7 +95,7 @@ namespace H4
             //
             // Convert BNode refence to correct type
             //
-            static BNodeInteger &integerRef(BNode &bNode)
+            static BNodeInteger &refBNodeInteger(BNode &bNode)
             {
                 if (bNode.nodeType == Bencode::BNodeType::integer)
                 {
@@ -103,7 +103,7 @@ namespace H4
                 }
                 throw std::runtime_error("Failure trying to access non BNodeInteger reference.");
             }
-            static BNodeString &stringRef(BNode &bNode)
+            static BNodeString &refBNodeString(BNode &bNode)
             {
                 if (bNode.nodeType == Bencode::BNodeType::string)
                 {
@@ -111,7 +111,7 @@ namespace H4
                 }
                 throw std::runtime_error("Failure trying to access non BNodeString reference.");
             }
-            static BNodeList &listRef(BNode &bNode)
+            static BNodeList &refBNodeList(BNode &bNode)
             {
                 if (bNode.nodeType == Bencode::BNodeType::list)
                 {
@@ -119,13 +119,13 @@ namespace H4
                 }
                 throw std::runtime_error("Failure trying to access non BNodeList reference.");
             }
-            static BNodeDict &dictRef(BNode &bNode)
+            static BNodeDict &refBNodeDict(BNode &bNode)
             {
                 if (bNode.nodeType == Bencode::BNodeType::dictionary)
                 {
                     return (static_cast<BNodeDict &>(bNode));
                 }
-                throw std::runtime_error("Failure trying to access non BNodeDIct reference.");
+                throw std::runtime_error("Failure trying to access non BNodeDict reference.");
             }
             BNode(BNodeType nodeType = BNodeType::base)
             {
