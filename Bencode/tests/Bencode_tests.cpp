@@ -279,22 +279,22 @@ TEST_CASE("Decode generated exceptions", "[Bencode][Decode][Exceptions]")
   SECTION("Decode an string without terminating ':' on its length", "[Bencode][Decode]")
   {
     REQUIRE_THROWS_AS(bEncode.decodeBuffer("26abcdefghijklmnopqrstuvwxyz"), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.decodeBuffer("26abcdefghijklmnopqrstuvwxyz"), "Missing terminating ':' on string length.");
+    REQUIRE_THROWS_WITH(bEncode.decodeBuffer("26abcdefghijklmnopqrstuvwxyz"), "Bencoding syntax error detected.");
   }
   SECTION("Decode an integer without a terminating end", "[Bencode][Decode]")
   {
     REQUIRE_THROWS_AS(bEncode.decodeBuffer("i266"), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.decodeBuffer("i266"), "Missing terminating 'e' on integer.");
+    REQUIRE_THROWS_WITH(bEncode.decodeBuffer("i266"), "Bencoding syntax error detected.");
   }
   SECTION("Decode an list without a terminating end", "[Bencode][Decode]")
   {
     REQUIRE_THROWS_AS(bEncode.decodeBuffer("li266ei6780ei88e"), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.decodeBuffer("li266ei6780ei88e"), "Missing terminating 'e' on list.");
+    REQUIRE_THROWS_WITH(bEncode.decodeBuffer("li266ei6780ei88e"), "Bencoding syntax error detected.");
   }
   SECTION("Decode an diictionary without a terminating end", "[Bencode][Decode]")
   {
     REQUIRE_THROWS_AS(bEncode.decodeBuffer("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkl"), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.decodeBuffer("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkl"), "Missing terminating 'e' on dictionary.");
+    REQUIRE_THROWS_WITH(bEncode.decodeBuffer("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkl"), "Bencoding syntax error detected.");
   }
   SECTION("Decode an string that terminates prematurely", "[Bencode][Decode]")
   {
@@ -347,12 +347,12 @@ TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][T
   SECTION("Decode singlefileerror.torrent", "[Bencode][Decode][Torrents]")
   {
     REQUIRE_THROWS_AS(bEncode.decodeFile(kSingleFileWithErrorTorrent), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.decodeFile(kSingleFileWithErrorTorrent), "Missing terminating ':' on string length.");
+    REQUIRE_THROWS_WITH(bEncode.decodeFile(kSingleFileWithErrorTorrent), "Bencoding syntax error detected.");
   }
   SECTION("Decode multifileerror.torrent", "[Bencode][Decode][Torrents]")
   {
     REQUIRE_THROWS_AS(bEncode.decodeFile(kMultiFileWithErrorTorrent), std::runtime_error);
-    REQUIRE_THROWS_WITH(bEncode.decodeFile(kMultiFileWithErrorTorrent), "Missing terminating ':' on string length.");
+    REQUIRE_THROWS_WITH(bEncode.decodeFile(kMultiFileWithErrorTorrent), "Bencoding syntax error detected.");
   }
   SECTION("Decode doesntexist.torrent", "[Bencode][Decode][Torrents]")
   {
@@ -585,25 +585,25 @@ TEST_CASE("Check BNode reference function generated exceptions.", "[Bencode][BNo
 {
   Bencode bEncode;
   std::unique_ptr<BNode> bNode;
-  SECTION("Trying to access an BNodeInteger though BNodeString refence.", "[Bencode][BNode][Reference]")
+  SECTION("Trying to access an BNodeInteger though BNodeString refence.", "[Bencode][BNode][Reference][Exceptions]")
   {
     bNode = bEncode.decodeBuffer("i45500e");
     REQUIRE_THROWS_AS(BNode::refBNodeString((*bNode)).value == "455000", std::runtime_error);
     REQUIRE_THROWS_WITH(BNode::refBNodeString((*bNode)).value == "45500", "Failure trying to access non BNodeString reference.");
   }
-  SECTION("Trying to access an BNodeString through BNodeInteger refence.", "[Bencode][BNode][Reference]")
+  SECTION("Trying to access an BNodeString through BNodeInteger refence.", "[Bencode][BNode][Reference][Exceptions]")
   {
     bNode = bEncode.decodeBuffer("10:0123456789");
     REQUIRE_THROWS_AS(BNode::refBNodeInteger((*bNode)).value == 123456789, std::runtime_error);
     REQUIRE_THROWS_WITH(BNode::refBNodeInteger((*bNode)).value == 123456789, "Failure trying to access non BNodeInteger reference.");
   }
-  SECTION("Trying to access an BNodeList through BNodeDict refence.", "[Bencode][BNode][Reference]")
+  SECTION("Trying to access an BNodeList through BNodeDict refence.", "[Bencode][BNode][Reference][Exceptions]")
   {
     bNode = bEncode.decodeBuffer("l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze");
     REQUIRE_THROWS_AS(BNode::refBNodeDict((*bNode)).value.size() == 3, std::runtime_error);
     REQUIRE_THROWS_WITH(BNode::refBNodeDict((*bNode)).value.size() == 3, "Failure trying to access non BNodeDict reference.");
   }
-  SECTION("Trying to access an BNodeDict through BNodeList refence.", "[Bencode][BNode][Reference]")
+  SECTION("Trying to access an BNodeDict through BNodeList refence.", "[Bencode][BNode][Reference][Exceptions]")
   {
     bNode = bEncode.decodeBuffer("d3:one10:01234567894:four8:123456785:three6:qwerty3:two9:asdfghjkle");
     REQUIRE_THROWS_AS(BNode::refBNodeList((*bNode)).value.size() == 3, std::runtime_error);

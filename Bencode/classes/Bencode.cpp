@@ -3,9 +3,12 @@
 //
 // Description: Class to perform Bencode encoding encode/decode to/from
 // a byte buffer or file. It is also  possible to customize this with the
-// ISource and IDestination interfaces if required. Note: Although bencoded
-// data is treated as std::byte externally this library used char and std::string 
-// internally.
+// ISource and IDestination interfaces if required. Although bencoded
+// data is treated as std::byte externally this library used char and 
+// std::string internally.Note: At present it will report incorrect Bencode 
+// syntax but will not be specific about what error has occurred; this 
+// is reasoned to add too much overhead to the process of parsing for the 
+// requirements of this library (this might change in future versions).
 //
 // Dependencies:   C17++ - Language standard features used.
 //
@@ -69,7 +72,7 @@ namespace H4
         long stringLength = decodePositiveInteger(source);
         if (source->currentByte() != (std::byte)':')
         {
-            throw std::runtime_error("Missing terminating ':' on string length.");
+            throw std::runtime_error("Bencoding syntax error detected.");
         }
         source->moveToNextByte();
         m_workBuffer.clear();
@@ -102,7 +105,7 @@ namespace H4
             }
             if (!source->bytesToDecode())
             {
-                throw std::runtime_error("Missing terminating 'e' on dictionary.");
+                throw std::runtime_error("Bencoding syntax error detected.");
             }
             source->moveToNextByte();
             return (std::make_unique<BNodeDict>(std::move(bNodeDictionary)));
@@ -118,7 +121,7 @@ namespace H4
             }
             if (!source->bytesToDecode())
             {
-                throw std::runtime_error("Missing terminating 'e' on list.");
+                throw std::runtime_error("Bencoding syntax error detected.");
             }
             source->moveToNextByte();
             return (std::make_unique<BNodeList>(std::move(bNodeList)));
@@ -136,7 +139,7 @@ namespace H4
             integer *= decodePositiveInteger(source);
             if (source->currentByte() != (std::byte)'e')
             {
-                throw std::runtime_error("Missing terminating 'e' on integer.");
+                throw std::runtime_error("Bencoding syntax error detected.");
             }
             source->moveToNextByte();
             return (std::make_unique<BNodeInteger>(BNodeInteger(integer)));
