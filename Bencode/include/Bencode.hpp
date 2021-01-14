@@ -68,6 +68,7 @@ namespace H4
             {
                 m_Buffer.push_back(byte);
             }
+
         private:
             std::vector<std::byte> m_Buffer;
         };
@@ -83,13 +84,71 @@ namespace H4
             string = 4
         };
         //
-        // Base BNode/
+        // Base BNode
         //
+        struct BNodeInteger;
+        struct BNodeString;
+        struct BNodeList;
+        struct BNodeDict;
         struct BNode
         {
+            //
+            // Convert BNode refence to correct type
+            // 
+            static BNodeInteger &integerRef(BNode &bNode)
+            {
+                if (bNode.nodeType == Bencode::BNodeType::integer)
+                {
+                    return (static_cast<BNodeInteger &>(bNode));
+                }
+                throw std::runtime_error("Failure trying to access non BNodeInteger reference.");
+            }
+            static BNodeString &stringRef(BNode &bNode)
+            {
+                if (bNode.nodeType == Bencode::BNodeType::string)
+                {
+                    return (static_cast<BNodeString &>(bNode));
+                }
+                throw std::runtime_error("Failure trying to access non BNodeString reference.");
+            }
+            static BNodeList &listRef(BNode &bNode)
+            {
+                if (bNode.nodeType == Bencode::BNodeType::list)
+                {
+                    return (static_cast<BNodeList &>(bNode));
+                }
+                throw std::runtime_error("Failure trying to access non BNodeList reference.");
+            }
+            static BNodeDict &dictRef(BNode &bNode)
+            {
+                if (bNode.nodeType == Bencode::BNodeType::dictionary)
+                {
+                    return (static_cast<BNodeDict &>(bNode));
+                }
+                throw std::runtime_error("Failure trying to access non BNodeDIct reference.");
+            }
             BNode(BNodeType nodeType = BNodeType::base)
             {
                 this->nodeType = nodeType;
+            }
+            //
+            // Index for correct BNode type
+            //
+            BNode &operator[](std::string key) //Dicionary
+            {
+                if (nodeType == BNodeType::dictionary)
+                {
+                    return (*static_cast<BNode *>((static_cast<BNodeDict *>(this)->value[key].get())));
+                }
+                throw std::runtime_error("Invalid key used in dictionary");
+            }
+            BNode &operator[](int index) // List
+            {
+                if (nodeType == BNodeType::list)
+                {
+                    return (*static_cast<BNode *>((static_cast<BNodeList *>(this)->value[index].get())));
+                }
+                throw std::runtime_error("Invalid key used in ");
             }
             BNodeType nodeType;
         };
@@ -107,7 +166,7 @@ namespace H4
         struct BNodeList : BNode
         {
             BNodeList() : BNode(BNodeType::list) {}
-            std::list<std::unique_ptr<BNode>> value;
+            std::vector<std::unique_ptr<BNode>> value;
         };
         //
         // Integer BNode.
