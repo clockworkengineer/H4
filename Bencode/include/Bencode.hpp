@@ -9,10 +9,6 @@
 #include <list>
 #include <memory>
 #include <fstream>
-//
-// Bencode config
-//
-#include "BencodeConfig.hpp"
 // =========
 // NAMESPACE
 // =========

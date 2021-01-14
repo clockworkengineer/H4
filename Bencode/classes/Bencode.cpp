@@ -12,6 +12,7 @@
 // =================
 // CLASS DEFINITIONS
 // =================
+#include "BencodeConfig.hpp"
 #include "Bencode.hpp"
 #include "BencodeSources.hpp"
 #include "BencodeDestinations.hpp"

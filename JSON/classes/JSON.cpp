@@ -13,6 +13,7 @@
 // =================
 // CLASS DEFINITIONS
 // =================
+#include "JSONConfig.hpp"
 #include "JSON.hpp"
 #include "JSONSources.hpp"
 #include "JSONDestinations.hpp"

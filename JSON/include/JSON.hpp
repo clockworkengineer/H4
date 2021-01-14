@@ -9,10 +9,6 @@
 #include <list>
 #include <memory>
 #include <fstream>
-//
-// JSON version details
-//
-#include "JSONConfig.hpp"
 // =========
 // NAMESPACE
 // =========
