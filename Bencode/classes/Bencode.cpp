@@ -4,7 +4,7 @@
 // Description: Class to perform Bencode encoding encode/decode to/from
 // a byte buffer or file. It is also  possible to customize this with the
 // ISource and IDestination interfaces if required. Although bencoded
-// data is treated as std::byte externally this library used char and 
+// data is treated as std::byte externally this library uses char and 
 // std::string internally.Note: At present it will report incorrect Bencode 
 // syntax but will not be specific about what error has occurred; this 
 // is reasoned to add too much overhead to the process of parsing for the 
@@ -171,18 +171,18 @@ namespace H4
             break;
         case BNodeType::list:
             destination->addBytes("l");
-            for (auto &bNodeEntry : ((BNodeList *)bNode)->value)
+            for (auto &bNodeEntry : BNode::refBNodeList(*bNode).value)
             {
                 encodeBNodes(bNodeEntry.get(), destination);
             }
             destination->addBytes("e");
             break;
         case BNodeType::integer:
-            destination->addBytes("i" + std::to_string(((BNodeInteger *)(bNode))->value) + "e");
+            destination->addBytes("i" + std::to_string(BNode::refBNodeInteger(*bNode).value) + "e");
             break;
         case BNodeType::string:
         {
-            std::string stringToEncode = ((BNodeString *)(bNode))->value;
+            std::string stringToEncode = BNode::refBNodeString(*bNode).value;
             destination->addBytes(std::to_string((int)stringToEncode.length()) + ":" + stringToEncode);
             break;
         }

@@ -69,7 +69,7 @@ namespace H4
             std::vector<std::byte> m_Buffer;
         };
         //
-        // BNode structure.
+        // BNode types.
         //
         enum BNodeType
         {

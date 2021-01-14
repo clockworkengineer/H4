@@ -13,6 +13,8 @@ set(TEST_EXECUTABLE ${BENCODE_LIBRARY_NAME}_Unit_Tests)
 
 set(TEST_SOURCES
     Bencode_tests.cpp
+    Bencode_tests_decode.cpp
+    Bencode_tests_encode.cpp
 )
 
 add_executable(${TEST_EXECUTABLE} ${TEST_SOURCES})
