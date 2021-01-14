@@ -516,3 +516,42 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[Bencode][Decod
     REQUIRE(expected == "i65767e");
   }
 }
+TEST_CASE("Use of BNode indexing operators", "[Bencode][BNode][Index]")
+{
+  Bencode bEncode;
+  SECTION("Decode dictionary and check its components using indexing", "[Bencode][BNode][Index]")
+  {
+    std::unique_ptr<BNode> bNode = bEncode.decodeBuffer("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle");
+    REQUIRE(BNode::stringRef((*bNode)["one"]).value == "0123456789");
+    REQUIRE(BNode::stringRef((*bNode)["two"]).value == "asdfghjkl");
+    REQUIRE(BNode::stringRef((*bNode)["three"]).value == "qwerty");
+  }
+  SECTION("Decode list and check its components using indexing", "[Bencode][BNode][Index]")
+  {
+    std::unique_ptr<BNode> bNode = bEncode.decodeBuffer("l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze");
+    REQUIRE(BNode::stringRef((*bNode)[0]).value == "sillyy");
+    REQUIRE(BNode::stringRef((*bNode)[1]).value == "poiuytrewqas");
+    REQUIRE(BNode::stringRef((*bNode)[2]).value == "abcdefghijklmnopqrstuvwxyz");
+  }
+  SECTION("Decode list with embedded dictioanry and check its components using indexing", "[Bencode][BNode][Index]")
+  {
+    std::unique_ptr<BNode> bNode = bEncode.decodeBuffer("l6:sillyyd3:one10:01234567895:three6:qwerty3:two9:asdfghjkle26:abcdefghijklmnopqrstuvwxyze");
+    REQUIRE(BNode::stringRef((*bNode)[0]).value == "sillyy");
+    REQUIRE(BNode::stringRef((*bNode)[1]["one"]).value == "0123456789");
+    REQUIRE(BNode::stringRef((*bNode)[1]["two"]).value == "asdfghjkl");
+    REQUIRE(BNode::stringRef((*bNode)[1]["three"]).value == "qwerty");
+    REQUIRE(BNode::stringRef((*bNode)[2]).value == "abcdefghijklmnopqrstuvwxyz");
+  }
+  SECTION("Decode dictionary and check an invalid key generates exception", "[Bencode][BNode][Index]")
+  {
+    std::unique_ptr<BNode> bNode = bEncode.decodeBuffer("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle");
+    REQUIRE_THROWS_AS((*bNode)["onee"].nodeType == Bencode::BNodeType::dictionary, std::runtime_error);
+    REQUIRE_THROWS_WITH((*bNode)["onee"].nodeType == Bencode::BNodeType::dictionary, "Invalid key used in dictionary.");
+  }
+  SECTION("Decode list and check an invalid index generates exception", "[Bencode][BNode][Index]")
+  {
+    std::unique_ptr<BNode> bNode = bEncode.decodeBuffer("l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze");
+    REQUIRE_THROWS_AS((*bNode)[3].nodeType == Bencode::BNodeType::list, std::runtime_error);
+    REQUIRE_THROWS_WITH((*bNode)[3].nodeType == Bencode::BNodeType::list, "Invalid index used in list.");
+  }
+}

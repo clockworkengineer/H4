@@ -94,7 +94,7 @@ namespace H4
         {
             //
             // Convert BNode refence to correct type
-            // 
+            //
             static BNodeInteger &integerRef(BNode &bNode)
             {
                 if (bNode.nodeType == Bencode::BNodeType::integer)
@@ -138,17 +138,23 @@ namespace H4
             {
                 if (nodeType == BNodeType::dictionary)
                 {
-                    return (*static_cast<BNode *>((static_cast<BNodeDict *>(this)->value[key].get())));
+                    if (static_cast<BNodeDict *>(this)->value.count(key) > 0)
+                    {
+                        return (*static_cast<BNode *>((static_cast<BNodeDict *>(this)->value[key].get())));
+                    }
                 }
-                throw std::runtime_error("Invalid key used in dictionary");
+                throw std::runtime_error("Invalid key used in dictionary.");
             }
             BNode &operator[](int index) // List
             {
                 if (nodeType == BNodeType::list)
                 {
-                    return (*static_cast<BNode *>((static_cast<BNodeList *>(this)->value[index].get())));
+                    if ((index >= 0) && (index <  ((int)static_cast<BNodeList *>(this)->value.size())))
+                    {
+                        return (*static_cast<BNode *>((static_cast<BNodeList *>(this)->value[index].get())));
+                    }
                 }
-                throw std::runtime_error("Invalid key used in ");
+                throw std::runtime_error("Invalid index used in list.");
             }
             BNodeType nodeType;
         };
