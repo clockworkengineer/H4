@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 set(TEST_EXECUTABLE ${BENCODE_LIBRARY_NAME}_Unit_Tests)
 
 set(TEST_SOURCES
-    Bencode_tests.cpp
+    Bencode_tests_main.cpp
     Bencode_tests_decode.cpp
     Bencode_tests_encode.cpp
 )
