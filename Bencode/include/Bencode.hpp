@@ -82,46 +82,12 @@ namespace H4
         //
         // Base BNode
         //
-        struct BNodeInteger;
-        struct BNodeString;
-        struct BNodeList;
-        struct BNodeDict;
         struct BNode
         {
-            //
-            // Convert BNode refence to correct type
-            //
-            static BNodeInteger &refBNodeInteger(BNode &bNode)
+            template <typename T>
+            static T &ref(Bencode::BNode &bNode)
             {
-                if (bNode.nodeType == Bencode::BNodeType::integer)
-                {
-                    return (static_cast<BNodeInteger &>(bNode));
-                }
-                throw std::runtime_error("Failure trying to access non BNodeInteger reference.");
-            }
-            static BNodeString &refBNodeString(BNode &bNode)
-            {
-                if (bNode.nodeType == Bencode::BNodeType::string)
-                {
-                    return (static_cast<BNodeString &>(bNode));
-                }
-                throw std::runtime_error("Failure trying to access non BNodeString reference.");
-            }
-            static BNodeList &refBNodeList(BNode &bNode)
-            {
-                if (bNode.nodeType == Bencode::BNodeType::list)
-                {
-                    return (static_cast<BNodeList &>(bNode));
-                }
-                throw std::runtime_error("Failure trying to access non BNodeList reference.");
-            }
-            static BNodeDict &refBNodeDict(BNode &bNode)
-            {
-                if (bNode.nodeType == Bencode::BNodeType::dictionary)
-                {
-                    return (static_cast<BNodeDict &>(bNode));
-                }
-                throw std::runtime_error("Failure trying to access non BNodeDict reference.");
+                return (static_cast<T &>(bNode));
             }
             BNode(BNodeType nodeType = BNodeType::base)
             {
@@ -145,7 +111,7 @@ namespace H4
             {
                 if (nodeType == BNodeType::list)
                 {
-                    if ((index >= 0) && (index <  ((int)static_cast<BNodeList *>(this)->value.size())))
+                    if ((index >= 0) && (index < ((int)static_cast<BNodeList *>(this)->value.size())))
                     {
                         return (*static_cast<BNode *>((static_cast<BNodeList *>(this)->value[index].get())));
                     }

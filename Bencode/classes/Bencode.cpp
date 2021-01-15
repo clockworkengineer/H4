@@ -171,18 +171,18 @@ namespace H4
             break;
         case BNodeType::list:
             destination->addBytes("l");
-            for (auto &bNodeEntry : BNode::refBNodeList(*bNode).value)
+            for (auto &bNodeEntry : BNode::ref<BNodeList>(*bNode).value)
             {
                 encodeBNodes(bNodeEntry.get(), destination);
             }
             destination->addBytes("e");
             break;
         case BNodeType::integer:
-            destination->addBytes("i" + std::to_string(BNode::refBNodeInteger(*bNode).value) + "e");
+            destination->addBytes("i" + std::to_string(BNode::ref<BNodeInteger>(*bNode).value) + "e");
             break;
         case BNodeType::string:
         {
-            std::string stringToEncode = BNode::refBNodeString(*bNode).value;
+            std::string stringToEncode = BNode::ref<BNodeString>(*bNode).value;
             destination->addBytes(std::to_string((int)stringToEncode.length()) + ":" + stringToEncode);
             break;
         }
