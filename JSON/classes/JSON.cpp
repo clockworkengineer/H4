@@ -247,25 +247,25 @@ namespace H4
         switch (jNode->nodeType)
         {
         case JNodeType::number:
-            destination->addBytes(static_cast<JNodeNumber *>(jNode)->value);
+            destination->addBytes(JNode::refJNodeNumber(*jNode).value);
             break;
         case JNodeType::string:
-            destination->addBytes("\"" + static_cast<JNodeString *>(jNode)->value + "\"");
+            destination->addBytes("\"" + JNode::refJNodeString(*jNode).value + "\"");
             break;
         case JNodeType::boolean:
-            destination->addBytes(static_cast<JNodeBoolean *>(jNode)->value ? "true" : "false");
+            destination->addBytes(JNode::refJNodeBoolean(*jNode).value ? "true" : "false");
             break;
         case JNodeType::null:
             destination->addBytes("null");
             break;
         case JNodeType::object:
         {
-            int commaCount = static_cast<JNodeObject *>(jNode)->value.size() - 1;
+            int commaCount = JNode::refJNodeObject(*jNode).value.size() - 1;
             destination->addBytes("{");
-            for (auto key : static_cast<JNodeObject *>(jNode)->keys)
+            for (auto key : JNode::refJNodeObject(*jNode).keys)
             {
                 destination->addBytes("\"" + key + "\"" + ":");
-                encodeJNodes(static_cast<JNodeObject *>(jNode)->value[key].get(), destination);
+                encodeJNodes(JNode::refJNodeObject(*jNode).value[key].get(), destination);
                 if (commaCount-- > 0)
                 {
                     destination->addBytes(",");
@@ -276,9 +276,9 @@ namespace H4
         }
         case JNodeType::array:
         {
-            int commaCount = static_cast<JNodeArray *>(jNode)->value.size() - 1;
+            int commaCount = JNode::refJNodeArray(*jNode).value.size() - 1;
             destination->addBytes("[");
-            for (auto &bNodeEntry : static_cast<JNodeArray *>(jNode)->value)
+            for (auto &bNodeEntry : JNode::refJNodeArray(*jNode).value)
             {
                 encodeJNodes(bNodeEntry.get(), destination);
                 if (commaCount-- > 0)
