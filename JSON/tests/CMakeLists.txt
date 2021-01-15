@@ -12,7 +12,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 set(TEST_EXECUTABLE ${JSON_LIBRARY_NAME}_Unit_Tests)
 
 set(TEST_SOURCES
-    JSON_tests.cpp
+    JSON_tests_main.cpp
+    JSON_tests_decode.cpp
+    JSON_tests_encode.cpp
 )
 
 add_executable(${TEST_EXECUTABLE} ${TEST_SOURCES})
