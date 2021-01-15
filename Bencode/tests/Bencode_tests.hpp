@@ -1,5 +1,15 @@
 #ifndef BENCODE_TESTS_HPP
 #define BENCODE_TESTS_HPP
+// ======================
+// Test framework include
+// ======================
+#include "catch.hpp"
+// =========================
+// Class under test includes
+// =========================
+#include "Bencode.hpp"
+#include "BencodeSources.hpp"
+#include "BencodeDestinations.hpp"
 // ============
 // STL includes
 // ============

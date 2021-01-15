@@ -3,16 +3,6 @@
 //
 // Description: Encode unit tests for Bencode class using the Catch2 test framework.
 //
-// ======================
-// Test framework include
-// ======================
-#include "catch.hpp"
-// =========================
-// Class under test includes
-// =========================
-#include "Bencode.hpp"
-#include "BencodeSources.hpp"
-#include "BencodeDestinations.hpp"
 // ================
 // Test definitions
 // ================
