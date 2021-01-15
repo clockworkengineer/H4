@@ -1,9 +1,12 @@
 //
 // Unit Tests: JSON
 //
-// Description: ISource, IDestination and JNode unit tests for 
+// Description: ISource, IDestination and JNode unit tests for
 // JSON class using the Catch2 test framework.
 //
+// ================
+// Test definitions
+// =================
 #include "JSON_tests.hpp"
 // =======================
 // JSON class namespace
@@ -33,17 +36,16 @@ std::string readJSONFromFile(const std::string &jsonFileName)
 /// <returns></returns>
 void checkArray(JNode *jNode)
 { // Array [\"Dog\",1964,true,null]
-  JNodeArray *jNodeArray = static_cast<JNodeArray *>(jNode);
-  REQUIRE(jNodeArray->nodeType == JSON::JNodeType::array);
-  REQUIRE(jNodeArray->value.size() == 4);
-  REQUIRE(jNodeArray->value[0]->nodeType == JSON::JNodeType::string);
-  REQUIRE(jNodeArray->value[1]->nodeType == JSON::JNodeType::number);
-  REQUIRE(jNodeArray->value[2]->nodeType == JSON::JNodeType::boolean);
-  REQUIRE(jNodeArray->value[3]->nodeType == JSON::JNodeType::null);
-  REQUIRE(static_cast<JNodeString *>(jNodeArray->value[0].get())->value == "Dog");
-  REQUIRE(static_cast<JNodeString *>(jNodeArray->value[1].get())->value == "1964");
-  REQUIRE(static_cast<JNodeBoolean *>(jNodeArray->value[2].get())->value == true);
-  REQUIRE(static_cast<JNodeNull *>(jNodeArray->value[3].get())->value == nullptr);
+  REQUIRE(jNode->nodeType == JSON::JNodeType::array);
+  REQUIRE(JNode::refJNodeArray(*jNode).value.size() == 4);
+  REQUIRE((*jNode)[0].nodeType == JSON::JNodeType::string);
+  REQUIRE((*jNode)[1].nodeType == JSON::JNodeType::number);
+  REQUIRE((*jNode)[2].nodeType == JSON::JNodeType::boolean);
+  REQUIRE((*jNode)[3].nodeType == JSON::JNodeType::null);
+  REQUIRE(JNode::refJNodeString((*jNode)[0]).value == "Dog");
+  REQUIRE(JNode::refJNodeNumber((*jNode)[1]).value == "1964");
+  REQUIRE(JNode::refJNodeBoolean((*jNode)[2]).value == true);
+  REQUIRE(JNode::refJNodeNull((*jNode)[3]).value == nullptr);
 }
 /// <summary>
 /// Verify that an JNodeObject has the correct decoded format.
@@ -52,15 +54,14 @@ void checkArray(JNode *jNode)
 /// <returns></returns>
 void checkObject(JNode *jNode)
 { // {\"City\":\"Southampton\",\"Population\":500000}
-  JNodeObject *jNodeObject = (JNodeObject *)jNode;
   REQUIRE(jNode->nodeType == JSON::JNodeType::object);
-  REQUIRE(jNodeObject->value.size() == 2);
-  REQUIRE(jNodeObject->value.count("City") > 0);
-  REQUIRE(jNodeObject->value.count("Population") > 0);
-  REQUIRE(jNodeObject->value["City"]->nodeType == JSON::JNodeType::string);
-  REQUIRE(jNodeObject->value["Population"]->nodeType == JSON::JNodeType::number);
-  REQUIRE(static_cast<JNodeString *>(jNodeObject->value["City"].get())->value == "Southampton");
-  REQUIRE(static_cast<JNodeNumber *>(jNodeObject->value["Population"].get())->value == "500000");
+  REQUIRE(JNode::refJNodeObject(*jNode).value.size() == 2);
+  REQUIRE(JNode::refJNodeObject(*jNode).value.count("City") > 0);
+  REQUIRE(JNode::refJNodeObject(*jNode).value.count("Population") > 0);
+  REQUIRE((*jNode)["City"].nodeType == JSON::JNodeType::string);
+  REQUIRE((*jNode)["Population"].nodeType == JSON::JNodeType::number);
+  REQUIRE(JNode::refJNodeString((*jNode)["City"]).value == "Southampton");
+  REQUIRE(JNode::refJNodeNumber((*jNode)["Population"]).value == "500000");
 }
 // ==========
 // Test cases

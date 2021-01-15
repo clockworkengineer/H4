@@ -4,6 +4,9 @@
 // Description: JSON decode unit tests for JSON class
 // using the Catch2 test framework.
 //
+// ================
+// Test definitions
+// =================
 #include "JSON_tests.hpp"
 // =======================
 // JSON class namespace
@@ -49,37 +52,37 @@ TEST_CASE("Creation and use of JSON for decode of simple types (number, string, 
     SECTION("Decode an string (example string) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("\"example string\"");
-        REQUIRE(static_cast<JNodeString *>(jNode.get())->value == "example string");
+        REQUIRE(JNode::refJNodeString(*jNode).value == "example string");
     }
     SECTION("Decode an string (another example string) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("\"another example string\"");
-        REQUIRE(static_cast<JNodeString *>(jNode.get())->value == "another example string");
+        REQUIRE(JNode::refJNodeString(*jNode).value == "another example string");
     }
     SECTION("Decode an number (6767) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("6767");
-        REQUIRE(static_cast<JNodeNumber *>(jNode.get())->value == "6767");
+        REQUIRE(JNode::refJNodeNumber(*jNode).value == "6767");
     }
     SECTION("Decode an number (190000) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("190000");
-        REQUIRE(static_cast<JNodeNumber *>(jNode.get())->value == "190000");
+        REQUIRE(JNode::refJNodeNumber(*jNode).value == "190000");
     }
     SECTION("Decode an boolean (true) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("true");
-        REQUIRE(static_cast<JNodeBoolean *>(jNode.get())->value == true);
+        REQUIRE(JNode::refJNodeBoolean(*jNode).value == true);
     }
     SECTION("Decode an boolean (false) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("false");
-        REQUIRE(static_cast<JNodeBoolean *>(jNode.get())->value == false);
+        REQUIRE(JNode::refJNodeBoolean(*jNode).value == false);
     }
     SECTION("Decode an null and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("null");
-        REQUIRE(static_cast<JNodeNull *>(jNode.get())->value == nullptr);
+        REQUIRE(JNode::refJNodeNull(*jNode).value == nullptr);
     }
 }
 TEST_CASE("Creation and use of JSON for decode of collection types (array, object) ", "[JSON][Decode]")
@@ -104,28 +107,26 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
     SECTION("Decode an object {\"name\":\"Robert\",\"Age\":15} and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("{\"Name\":\"Robert\",\"Age\":15}");
-        JNodeObject *jNodeObject = (JNodeObject *)jNode.get();
-        REQUIRE(jNodeObject->nodeType == JSON::JNodeType::object);
-        REQUIRE(jNodeObject->value.size() == 2);
-        REQUIRE(jNodeObject->value.count("Name") > 0);
-        REQUIRE(jNodeObject->value.count("Age") > 0);
-        REQUIRE(jNodeObject->value["Name"]->nodeType == JSON::JNodeType::string);
-        REQUIRE(jNodeObject->value["Age"]->nodeType == JSON::JNodeType::number);
-        REQUIRE(static_cast<JNodeString *>(jNodeObject->value["Name"].get())->value == "Robert");
-        REQUIRE(static_cast<JNodeNumber *>(jNodeObject->value["Age"].get())->value == "15");
+        REQUIRE(jNode->nodeType == JSON::JNodeType::object);
+        REQUIRE(JNode::refJNodeObject(*jNode).value.size() == 2);
+        REQUIRE(JNode::refJNodeObject(*jNode).value.count("Name") > 0);
+        REQUIRE(JNode::refJNodeObject(*jNode).value.count("Age") > 0);
+        REQUIRE(JNode::refJNodeString((*jNode)["Name"]).nodeType == JSON::JNodeType::string);
+        REQUIRE(JNode::refJNodeNumber((*jNode)["Age"]).nodeType == JSON::JNodeType::number);
+        REQUIRE(JNode::refJNodeString((*jNode)["Name"]).value == "Robert");
+        REQUIRE(JNode::refJNodeNumber((*jNode)["Age"]).value == "15");
     }
     SECTION("Decode an array [777,9000,\"apples\"] and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("[777,9000,\"apples\"]");
-        JNodeArray *jNodeArray = (JNodeArray *)jNode.get();
-        REQUIRE(jNodeArray->nodeType == JSON::JNodeType::array);
-        REQUIRE(jNodeArray->value.size() == 3);
-        REQUIRE(jNodeArray->value[0]->nodeType == JSON::JNodeType::number);
-        REQUIRE(jNodeArray->value[1]->nodeType == JSON::JNodeType::number);
-        REQUIRE(jNodeArray->value[2]->nodeType == JSON::JNodeType::string);
-        REQUIRE(static_cast<JNodeNumber *>(jNodeArray->value[0].get())->value == "777");
-        REQUIRE(static_cast<JNodeNumber *>(jNodeArray->value[1].get())->value == "9000");
-        REQUIRE(static_cast<JNodeString *>(jNodeArray->value[2].get())->value == "apples");
+        REQUIRE(jNode->nodeType == JSON::JNodeType::array);
+        REQUIRE(JNode::refJNodeArray(*jNode).value.size() == 3);
+        REQUIRE(JNode::refJNodeNumber((*jNode)[0]).nodeType == JSON::JNodeType::number);
+        REQUIRE(JNode::refJNodeNumber((*jNode)[1]).nodeType == JSON::JNodeType::number);
+        REQUIRE(JNode::refJNodeString((*jNode)[2]).nodeType == JSON::JNodeType::string);
+        REQUIRE(JNode::refJNodeNumber((*jNode)[0]).value == "777");
+        REQUIRE(JNode::refJNodeNumber((*jNode)[1]).value == "9000");
+        REQUIRE(JNode::refJNodeString((*jNode)[2]).value == "apples");
     }
     SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} and check its value", "[JSON][Decode]")
     {

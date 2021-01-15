@@ -4,6 +4,9 @@
 // Description: JSON encode unit tests for JSON class
 // using the Catch2 test framework.
 //
+// ================
+// Test definitions
+// =================
 #include "JSON_tests.hpp"
 // =======================
 // JSON class namespace
