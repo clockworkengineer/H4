@@ -39,11 +39,93 @@ namespace H4
         //
         // Base JNode/
         //
+        struct JNodeNumber;
+        struct JNodeString;
+        struct JNodeBoolean;
+        struct JNodeNull;
+        struct JNodeArray;
+        struct JNodeObject;
         struct JNode
         {
+            //
+            // Convert JNode refence to correct type
+            //
+            static JNodeNumber &refJNodeNumber(JNode &jNode)
+            {
+                if (jNode.nodeType == JSON::JNodeType::number)
+                {
+                    return (static_cast<JNodeNumber &>(jNode));
+                }
+                throw std::runtime_error("Failure trying to access non JNodeNumber reference.");
+            }
+            static JNodeString &refJNodeString(JNode &jNode)
+            {
+                if (jNode.nodeType == JSON::JNodeType::string)
+                {
+                    return (static_cast<JNodeString &>(jNode));
+                }
+                throw std::runtime_error("Failure trying to access non JNodeString reference.");
+            }
+            static JNodeBoolean &refJNodeBoolean(JNode &jNode)
+            {
+                if (jNode.nodeType == JSON::JNodeType::boolean)
+                {
+                    return (static_cast<JNodeBoolean &>(jNode));
+                }
+                throw std::runtime_error("Failure trying to access non JNodeBoolean reference.");
+            }
+            static JNodeNull &refJNodeNull(JNode &jNode)
+            {
+                if (jNode.nodeType == JSON::JNodeType::null)
+                {
+                    return (static_cast<JNodeNull &>(jNode));
+                }
+                throw std::runtime_error("Failure trying to access non JNodeNull reference.");
+            }
+            static JNodeArray &refJNodeArray(JNode &jNode)
+            {
+                if (jNode.nodeType == JSON::JNodeType::array)
+                {
+                    return (static_cast<JNodeArray &>(jNode));
+                }
+                throw std::runtime_error("Failure trying to access non JNodeArray reference.");
+            }
+            static JNodeObject &refJNodeObject(JNode &jNode)
+            {
+                if (jNode.nodeType == JSON::JNodeType::object)
+                {
+                    return (static_cast<JNodeObject &>(jNode));
+                }
+                throw std::runtime_error("Failure trying to access non JNodeObject reference.");
+            }
             JNode(JNodeType nodeType = JNodeType::base)
             {
                 this->nodeType = nodeType;
+            }
+            //
+            // Index for correct JNode type
+            //
+            JNode &operator[](std::string key) // Object
+            {
+                if (nodeType == JNodeType::object)
+                {
+                    if (static_cast<JNodeObject *>(this)->value.count(key) > 0)
+                    {
+                        return (*static_cast<JNode *>((static_cast<JNodeObject *>(this)->value[key].get())));
+                    }
+                }
+                throw std::runtime_error("Invalid key used in object.");
+            }
+            JNode &operator[](int index) // Array
+            {
+                if (nodeType == JNodeType::array)
+                {
+                    if ((index >= 0) && (index < ((int)static_cast<JNodeArray *>(this)->value.size())))
+                    {
+                        return (*static_cast<JNode *>((static_cast<JNodeArray *>(this)->value[index].get())));
+                    }
+                }
+                throw std::runtime_error("Invalid index used in array.");
             }
             JNodeType nodeType;
         };
@@ -142,7 +224,7 @@ namespace H4
         std::unique_ptr<JNode> decodeBuffer(const std::string &jsonBuffer);
         std::unique_ptr<JNode> decodeFile(const std::string &sourceFileName);
         std::string encodeBuffer(std::unique_ptr<JNode> jNodeRoot);
-        void encodeFile(std::unique_ptr<JNode> bNodeRoot, const std::string &destinationFileName);
+        void encodeFile(std::unique_ptr<JNode> jNodeRoot, const std::string &destinationFileName);
         std::string stripWhiteSpaceBuffer(const std::string &jsonBuffer);
         // ================
         // PUBLIC VARIABLES
