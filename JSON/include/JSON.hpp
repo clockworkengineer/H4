@@ -39,69 +39,12 @@ namespace H4
         //
         // Base JNode/
         //
-        struct JNodeNumber;
-        struct JNodeString;
-        struct JNodeBoolean;
-        struct JNodeNull;
-        struct JNodeArray;
-        struct JNodeObject;
         struct JNode
         {
             template <typename T>
             static T &ref(JSON::JNode &jNode)
             {
                 return (static_cast<T &>(jNode));
-            }
-            //
-            // Convert JNode refence to correct type
-            //
-            static JNodeNumber &refJNodeNumber(JNode &jNode)
-            {
-                if (jNode.nodeType == JSON::JNodeType::number)
-                {
-                    return (static_cast<JNodeNumber &>(jNode));
-                }
-                throw std::runtime_error("Failure trying to access non JNodeNumber reference.");
-            }
-            static JNodeString &refJNodeString(JNode &jNode)
-            {
-                if (jNode.nodeType == JSON::JNodeType::string)
-                {
-                    return (static_cast<JNodeString &>(jNode));
-                }
-                throw std::runtime_error("Failure trying to access non JNodeString reference.");
-            }
-            static JNodeBoolean &refJNodeBoolean(JNode &jNode)
-            {
-                if (jNode.nodeType == JSON::JNodeType::boolean)
-                {
-                    return (static_cast<JNodeBoolean &>(jNode));
-                }
-                throw std::runtime_error("Failure trying to access non JNodeBoolean reference.");
-            }
-            static JNodeNull &refJNodeNull(JNode &jNode)
-            {
-                if (jNode.nodeType == JSON::JNodeType::null)
-                {
-                    return (static_cast<JNodeNull &>(jNode));
-                }
-                throw std::runtime_error("Failure trying to access non JNodeNull reference.");
-            }
-            static JNodeArray &refJNodeArray(JNode &jNode)
-            {
-                if (jNode.nodeType == JSON::JNodeType::array)
-                {
-                    return (static_cast<JNodeArray &>(jNode));
-                }
-                throw std::runtime_error("Failure trying to access non JNodeArray reference.");
-            }
-            static JNodeObject &refJNodeObject(JNode &jNode)
-            {
-                if (jNode.nodeType == JSON::JNodeType::object)
-                {
-                    return (static_cast<JNodeObject &>(jNode));
-                }
-                throw std::runtime_error("Failure trying to access non JNodeObject reference.");
             }
             JNode(JNodeType nodeType = JNodeType::base)
             {

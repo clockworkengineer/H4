@@ -37,15 +37,15 @@ std::string readJSONFromFile(const std::string &jsonFileName)
 void checkArray(JNode *jNode)
 { // Array [\"Dog\",1964,true,null]
   REQUIRE(jNode->nodeType == JSON::JNodeType::array);
-  REQUIRE(JNode::refJNodeArray(*jNode).value.size() == 4);
+  REQUIRE(JNode::ref<JNodeArray>(*jNode).value.size() == 4);
   REQUIRE((*jNode)[0].nodeType == JSON::JNodeType::string);
   REQUIRE((*jNode)[1].nodeType == JSON::JNodeType::number);
   REQUIRE((*jNode)[2].nodeType == JSON::JNodeType::boolean);
   REQUIRE((*jNode)[3].nodeType == JSON::JNodeType::null);
-  REQUIRE(JNode::refJNodeString((*jNode)[0]).value == "Dog");
-  REQUIRE(JNode::refJNodeNumber((*jNode)[1]).value == "1964");
-  REQUIRE(JNode::refJNodeBoolean((*jNode)[2]).value == true);
-  REQUIRE(JNode::refJNodeNull((*jNode)[3]).value == nullptr);
+  REQUIRE(JNode::ref<JNodeString>((*jNode)[0]).value == "Dog");
+  REQUIRE(JNode::ref<JNodeNumber>((*jNode)[1]).value == "1964");
+  REQUIRE(JNode::ref<JNodeBoolean>((*jNode)[2]).value == true);
+  REQUIRE(JNode::ref<JNodeNull>((*jNode)[3]).value == nullptr);
 }
 /// <summary>
 /// Verify that an JNodeObject has the correct decoded format.
@@ -55,13 +55,13 @@ void checkArray(JNode *jNode)
 void checkObject(JNode *jNode)
 { // {\"City\":\"Southampton\",\"Population\":500000}
   REQUIRE(jNode->nodeType == JSON::JNodeType::object);
-  REQUIRE(JNode::refJNodeObject(*jNode).value.size() == 2);
-  REQUIRE(JNode::refJNodeObject(*jNode).value.count("City") > 0);
-  REQUIRE(JNode::refJNodeObject(*jNode).value.count("Population") > 0);
+  REQUIRE(JNode::ref<JNodeObject>(*jNode).value.size() == 2);
+  REQUIRE(JNode::ref<JNodeObject>(*jNode).value.count("City") > 0);
+  REQUIRE(JNode::ref<JNodeObject>(*jNode).value.count("Population") > 0);
   REQUIRE((*jNode)["City"].nodeType == JSON::JNodeType::string);
   REQUIRE((*jNode)["Population"].nodeType == JSON::JNodeType::number);
-  REQUIRE(JNode::refJNodeString((*jNode)["City"]).value == "Southampton");
-  REQUIRE(JNode::refJNodeNumber((*jNode)["Population"]).value == "500000");
+  REQUIRE(JNode::ref<JNodeString>((*jNode)["City"]).value == "Southampton");
+  REQUIRE(JNode::ref<JNodeNumber>((*jNode)["Population"]).value == "500000");
 }
 // ==========
 // Test cases
