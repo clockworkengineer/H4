@@ -47,6 +47,11 @@ namespace H4
         struct JNodeObject;
         struct JNode
         {
+            template <typename T>
+            static T &ref(JSON::JNode &jNode)
+            {
+                return (static_cast<T &>(jNode));
+            }
             //
             // Convert JNode refence to correct type
             //
