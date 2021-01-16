@@ -62,7 +62,7 @@ namespace H4
                         return (*static_cast<JNode *>((static_cast<JNodeObject *>(this)->value[key].get())));
                     }
                 }
-                throw std::runtime_error("Invalid key used in object.");
+                throw std::runtime_error("Invalid key used to access object.");
             }
             JNode &operator[](int index) // Array
             {
@@ -73,7 +73,7 @@ namespace H4
                         return (*static_cast<JNode *>((static_cast<JNodeArray *>(this)->value[index].get())));
                     }
                 }
-                throw std::runtime_error("Invalid index used in array.");
+                throw std::runtime_error("Invalid index used to access array.");
             }
             JNodeType nodeType;
         };

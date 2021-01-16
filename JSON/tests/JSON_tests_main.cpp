@@ -206,3 +206,70 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Decode][
     REQUIRE(expected == "65767");
   }
 }
+// Implement these for JSON
+TEST_CASE("Use of JNode indexing operators", "[JSON][JNode][Index]")
+{
+  JSON json;
+  std::unique_ptr<JNode> jNode;
+  SECTION("Decode dictionary and check its components using indexing", "[JSON][JNode][Index]")
+  {
+    jNode = json.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
+    checkObject(jNode.get());
+    REQUIRE(JNode::ref<JNodeString>((*jNode)["City"]).value == "Southampton");
+    REQUIRE(JNode::ref<JNodeNumber>((*jNode)["Population"]).value == "500000");
+  }
+  SECTION("Decode list and check its components using indexing", "[JSON][JNode][Index]")
+  {
+    jNode = json.decodeBuffer("[777,9000,\"apples\"]");
+    REQUIRE(JNode::ref<JNodeNumber>((*jNode)[0]).value == "777");
+    REQUIRE(JNode::ref<JNodeNumber>((*jNode)[1]).value == "9000");
+    REQUIRE(JNode::ref<JNodeString>((*jNode)[2]).value == "apples");
+  }
+  SECTION("Decode list with embedded dictioanry and check its components using indexing", "[JSON][JNode][Index]")
+  {
+    jNode = json.decodeBuffer("[777,{\"City\":\"Southampton\",\"Population\":500000},\"apples\"]");
+    REQUIRE(JNode::ref<JNodeNumber>((*jNode)[0]).value == "777");
+    REQUIRE(JNode::ref<JNodeString>((*jNode)[1]["City"]).value == "Southampton");
+    REQUIRE(JNode::ref<JNodeNumber>((*jNode)[1]["Population"]).value == "500000");
+    REQUIRE(JNode::ref<JNodeString>((*jNode)[2]).value == "apples");
+  }
+  SECTION("Decode dictionary and check an invalid key generates exception", "[JSON][JNode][Index]")
+  {
+    jNode = json.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
+    REQUIRE_THROWS_AS((*jNode)["Cityy"].nodeType == JSON::JNodeType::object, std::runtime_error);
+    REQUIRE_THROWS_WITH((*jNode)["Cityy"].nodeType == JSON::JNodeType::object, "Invalid key used to access object.");
+  }
+  SECTION("Decode list and check an invalid index generates exception", "[JSON][JNode][Index]")
+  {
+    jNode = json.decodeBuffer("[777,9000,\"apples\"]");
+    REQUIRE_THROWS_AS((*jNode)[3].nodeType == JSON::JNodeType::array, std::runtime_error);
+    REQUIRE_THROWS_WITH((*jNode)[3].nodeType == JSON::JNodeType::array, "Invalid index used to access array.");
+  }
+}
+TEST_CASE("Check JNode reference functions work.", "[JSON][JNode][Reference]")
+{
+  JSON bEncode;
+  std::unique_ptr<JNode> jNode;
+  SECTION("Integer reference.", "[JSON][JNode][Reference]")
+  {
+    jNode = bEncode.decodeBuffer("45500");
+    REQUIRE(JNode::ref<JNodeNumber>((*jNode)).value == "45500");
+  }
+  SECTION("String reference.", "[JSON][JNode][Reference]")
+  {
+    jNode = bEncode.decodeBuffer("0123456789");
+    REQUIRE(JNode::ref<JNodeString>((*jNode)).value == "0123456789");
+  }
+  SECTION("Array reference.", "[JSON][JNode][Reference]")
+  {
+    jNode = bEncode.decodeBuffer("[777,9000,\"apples\"]");
+    REQUIRE(JNode::ref<JNodeArray>((*jNode)).value.size() == 3);
+    REQUIRE(JNode::ref<JNodeString>((*jNode)[2]).value == "apples");
+  }
+  SECTION("Dictionary reference.", "[JSON][JNode][Reference]")
+  {
+    jNode = bEncode.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
+    REQUIRE(JNode::ref<JNodeObject>((*jNode)).value.size() == 2);
+    REQUIRE(JNode::ref<JNodeString>((*jNode)["City"]).value == "Southampton");
+  }
+}
