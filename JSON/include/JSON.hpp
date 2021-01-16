@@ -110,17 +110,21 @@ namespace H4
             {
                 this->value = value;
             }
+            // Convert to long returning true on success
+            // Note: Can still return a long value for floating point
+            // but false as the number is not in integer format
             bool getInteger(long &longValue)
             {
                 char *end;
                 longValue = std::strtoll(value.c_str(), &end, 10);
-                return (*end == '\0');
+                return (*end == '\0'); // If not all characters used then not success
             }
+             // Convert to double returning true on success
             bool getFloatingPoint(double &doubleValue)
             {
                 char *end;
                 doubleValue = std::strtod(value.c_str(), &end);
-                return (*end == '\0');
+                return (*end == '\0'); // If not all characters used then not success
             }
         };
         //
