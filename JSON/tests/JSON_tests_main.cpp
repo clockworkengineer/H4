@@ -72,7 +72,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[JSON][Decode][ISour
   {
     REQUIRE_NOTHROW(FileSource(kGeneratedTorrentFile));
   }
-  SECTION("Create FileSource with non existants file.", "[JSON][Decode][ISource]")
+  SECTION("Create FileSource with non existants file.", "[JSON][Decode][ISource][Exception]")
   {
     REQUIRE_THROWS_AS(FileSource(kNonExistantJSONFile), std::runtime_error);
     REQUIRE_THROWS_WITH(FileSource(kNonExistantJSONFile), "JSON file input stream failed to open or does not exist.");
@@ -110,7 +110,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
   {
     REQUIRE_NOTHROW(BufferSource(buffer));
   }
-  SECTION("Create BufferSource with empty buffer.", "[JSON][Decode][ISource]")
+  SECTION("Create BufferSource with empty buffer.", "[JSON][Decode][ISource][Exception]")
   {
     REQUIRE_THROWS_AS(BufferSource(""), std::invalid_argument);
     REQUIRE_THROWS_WITH(BufferSource(""), "Empty source buffer passed to be encoded.");
@@ -302,5 +302,19 @@ TEST_CASE("Check JNodeNumber number conversion", "[JSON][JNode][JNodeNumber]")
     double doubleValue;
     jNode = json.decodeBuffer("78989");
     REQUIRE_FALSE(!JNode::ref<JNodeNumber>(*jNode).getFloatingPoint(doubleValue));
+  }
+  SECTION("Check  flaoing point with exponent", "[JSON][JNode][JNodeNumber][Exception")
+  {
+    REQUIRE_NOTHROW(jNode = json.decodeBuffer("78.43e-2"));
+  }
+  SECTION("Check floaing point with invalid exponent", "[JSON][JNode][JNodeNumber][Exception]")
+  {
+    REQUIRE_THROWS_AS(jNode = json.decodeBuffer("78.e43e-2"), std::runtime_error);
+    REQUIRE_THROWS_WITH(jNode = json.decodeBuffer("78.e43e-2"), "JSON syntax error detected.");
+  }
+  SECTION("Check floaing point with multiple decimal points", "[JSON][JNode][JNodeNumber][Exception]")
+  {
+    REQUIRE_THROWS_AS(jNode = json.decodeBuffer("78.5454.545"), std::runtime_error);
+    REQUIRE_THROWS_WITH(jNode = json.decodeBuffer("78.5454.545"), "JSON syntax error detected.");
   }
 }

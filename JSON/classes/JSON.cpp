@@ -108,6 +108,17 @@ namespace H4
             m_workBuffer += source->currentByte();
             source->moveToNextByte();
         }
+        // Throw error if not valid integer or floating point
+        char *end;
+        std::strtoll(m_workBuffer.c_str(), &end, 10);
+        if (*end != '\0')
+        {
+            std::strtod(m_workBuffer.c_str(), &end);
+            if (*end != '\0')
+            {
+                throw std::runtime_error("JSON syntax error detected.");
+            }
+        }
         return (std::make_unique<JNodeNumber>(JNodeNumber(m_workBuffer)));
     }
     /// <summary>
