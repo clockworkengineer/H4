@@ -41,6 +41,7 @@ namespace H4
         //
         struct JNode
         {
+        public:
             template <typename T>
             static T &ref(JSON::JNode &jNode)
             {
@@ -82,6 +83,7 @@ namespace H4
         //
         struct JNodeObject : JNode
         {
+        public:
             JNodeObject() : JNode(JNodeType::object) {}
             std::map<std::string, std::unique_ptr<JNode>> value;
             // Note: Store keys so when write away keep key order
@@ -93,18 +95,32 @@ namespace H4
         //
         struct JNodeArray : JNode
         {
+        public:
             JNodeArray() : JNode(JNodeType::array) {}
             std::vector<std::unique_ptr<JNode>> value;
         };
         //
-        // Integer JNode.
+        // Number JNode.
         //
         struct JNodeNumber : JNode
         {
+        public:
             std::string value;
             JNodeNumber(const std::string &value) : JNode(JNodeType::number)
             {
                 this->value = value;
+            }
+            bool getInteger(long &longValue)
+            {
+                char *end;
+                longValue = std::strtoll(value.c_str(), &end, 10);
+                return (*end == '\0');
+            }
+            bool getFloatingPoint(double &doubleValue)
+            {
+                char *end;
+                doubleValue = std::strtod(value.c_str(), &end);
+                return (*end == '\0');
             }
         };
         //

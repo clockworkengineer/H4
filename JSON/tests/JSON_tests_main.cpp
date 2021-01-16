@@ -1,7 +1,7 @@
 //
 // Unit Tests: JSON
 //
-// Description: ISource, IDestination and JNode index/reference 
+// Description: ISource, IDestination and JNode index/reference
 // unit tests for JSON class using the Catch2 test framework.
 //
 // ================
@@ -271,5 +271,36 @@ TEST_CASE("Check JNode reference functions work.", "[JSON][JNode][Reference]")
     jNode = bEncode.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
     REQUIRE(JNode::ref<JNodeObject>((*jNode)).value.size() == 2);
     REQUIRE(JNode::ref<JNodeString>((*jNode)["City"]).value == "Southampton");
+  }
+}
+TEST_CASE("Check JNodeNumber number conversion", "[JSON][JNode][JNodeNumber]")
+{
+  JSON json;
+  std::unique_ptr<JNode> jNode;
+  SECTION("Floating point not converted to Integer", "[JSON][JNode][JNodeNumber]")
+  {
+    long longValue;
+    jNode = json.decodeBuffer("678.8990");
+    REQUIRE_FALSE(JNode::ref<JNodeNumber>(*jNode).getInteger(longValue));
+  }
+  SECTION("Floating point converted to double", "[JSON][JNode][JNodeNumber]")
+  {
+    double doubleValue;
+    jNode = json.decodeBuffer("678.8990");
+    REQUIRE_FALSE(!JNode::ref<JNodeNumber>(*jNode).getFloatingPoint(doubleValue));
+    REQUIRE(doubleValue == 678.8990);
+  }
+  SECTION("Integer point converted to Long", "[JSON][JNode][JNodeNumber]")
+  {
+    long longValue;
+    jNode = json.decodeBuffer("78989");
+    REQUIRE_FALSE(!JNode::ref<JNodeNumber>(*jNode).getInteger(longValue));
+    REQUIRE(longValue == 78989);
+  }
+  SECTION("Integer point not converted to double", "[JSON][JNode][JNodeNumber]")
+  {
+    double doubleValue;
+    jNode = json.decodeBuffer("78989");
+    REQUIRE_FALSE(!JNode::ref<JNodeNumber>(*jNode).getFloatingPoint(doubleValue));
   }
 }
