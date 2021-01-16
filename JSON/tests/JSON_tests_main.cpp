@@ -1,8 +1,8 @@
 //
 // Unit Tests: JSON
 //
-// Description: ISource, IDestination and JNode unit tests for
-// JSON class using the Catch2 test framework.
+// Description: ISource, IDestination and JNode index/reference 
+// unit tests for JSON class using the Catch2 test framework.
 //
 // ================
 // Test definitions
