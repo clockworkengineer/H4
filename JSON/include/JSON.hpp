@@ -119,7 +119,7 @@ namespace H4
                 longValue = std::strtoll(value.c_str(), &end, 10);
                 return (*end == '\0'); // If not all characters used then not success
             }
-             // Convert to double returning true on success
+            // Convert to double returning true on success
             bool getFloatingPoint(double &doubleValue)
             {
                 char *end;
