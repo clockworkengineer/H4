@@ -37,15 +37,15 @@ std::string readJSONFromFile(const std::string &jsonFileName)
 void checkArray(JNode *jNode)
 { // Array [\"Dog\",1964,true,null]
   REQUIRE(jNode->nodeType == JNodeType::array);
-  REQUIRE(JNodeRef<JNodeArray>(*jNode).value.size() == 4);
+  REQUIRE(JNodeRef<JNodeArray>(*jNode).size() == 4);
   REQUIRE((*jNode)[0].nodeType == JNodeType::string);
   REQUIRE((*jNode)[1].nodeType == JNodeType::number);
   REQUIRE((*jNode)[2].nodeType == JNodeType::boolean);
   REQUIRE((*jNode)[3].nodeType == JNodeType::null);
-  REQUIRE(JNodeRef<JNodeString>((*jNode)[0]).value == "Dog");
-  REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]).value == "1964");
-  REQUIRE(JNodeRef<JNodeBoolean>((*jNode)[2]).value == true);
-  REQUIRE(JNodeRef<JNodeNull>((*jNode)[3]).value == nullptr);
+  REQUIRE(JNodeRef<JNodeString>((*jNode)[0]).getString() == "Dog");
+  REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]).getNumber() == "1964");
+  REQUIRE(JNodeRef<JNodeBoolean>((*jNode)[2]).getBoolean() == true);
+  REQUIRE(JNodeRef<JNodeNull>((*jNode)[3]).getNull() == nullptr);
 }
 /// <summary>
 /// Verify that an JNodeObject has the correct decoded format.
@@ -55,13 +55,13 @@ void checkArray(JNode *jNode)
 void checkObject(JNode *jNode)
 { // {\"City\":\"Southampton\",\"Population\":500000}
   REQUIRE(jNode->nodeType == JNodeType::object);
-  REQUIRE(JNodeRef<JNodeObject>(*jNode).value.size() == 2);
-  REQUIRE(JNodeRef<JNodeObject>(*jNode).value.count("City") > 0);
-  REQUIRE(JNodeRef<JNodeObject>(*jNode).value.count("Population") > 0);
+  REQUIRE(JNodeRef<JNodeObject>(*jNode).size() == 2);
+  REQUIRE(JNodeRef<JNodeObject>(*jNode).containsKey("City"));
+  REQUIRE(JNodeRef<JNodeObject>(*jNode).containsKey("Population"));
   REQUIRE((*jNode)["City"].nodeType == JNodeType::string);
   REQUIRE((*jNode)["Population"].nodeType == JNodeType::number);
-  REQUIRE(JNodeRef<JNodeString>((*jNode)["City"]).value == "Southampton");
-  REQUIRE(JNodeRef<JNodeNumber>((*jNode)["Population"]).value == "500000");
+  REQUIRE(JNodeRef<JNodeString>((*jNode)["City"]).getString() == "Southampton");
+  REQUIRE(JNodeRef<JNodeNumber>((*jNode)["Population"]).getNumber() == "500000");
 }
 // ==========
 // Test cases
@@ -215,23 +215,23 @@ TEST_CASE("Use of JNode indexing operators", "[JSON][JNode][Index]")
   {
     jNode = json.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
     checkObject(jNode.get());
-    REQUIRE(JNodeRef<JNodeString>((*jNode)["City"]).value == "Southampton");
-    REQUIRE(JNodeRef<JNodeNumber>((*jNode)["Population"]).value == "500000");
+    REQUIRE(JNodeRef<JNodeString>((*jNode)["City"]).getString() == "Southampton");
+    REQUIRE(JNodeRef<JNodeNumber>((*jNode)["Population"]).getNumber() == "500000");
   }
   SECTION("Decode list and check its components using indexing", "[JSON][JNode][Index]")
   {
     jNode = json.decodeBuffer("[777,9000,\"apples\"]");
-    REQUIRE(JNodeRef<JNodeNumber>((*jNode)[0]).value == "777");
-    REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]).value == "9000");
-    REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).value == "apples");
+    REQUIRE(JNodeRef<JNodeNumber>((*jNode)[0]).getNumber() == "777");
+    REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]).getNumber() == "9000");
+    REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).getString() == "apples");
   }
   SECTION("Decode list with embedded dictioanry and check its components using indexing", "[JSON][JNode][Index]")
   {
     jNode = json.decodeBuffer("[777,{\"City\":\"Southampton\",\"Population\":500000},\"apples\"]");
-    REQUIRE(JNodeRef<JNodeNumber>((*jNode)[0]).value == "777");
-    REQUIRE(JNodeRef<JNodeString>((*jNode)[1]["City"]).value == "Southampton");
-    REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]["Population"]).value == "500000");
-    REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).value == "apples");
+    REQUIRE(JNodeRef<JNodeNumber>((*jNode)[0]).getNumber() == "777");
+    REQUIRE(JNodeRef<JNodeString>((*jNode)[1]["City"]).getString() == "Southampton");
+    REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]["Population"]).getNumber() == "500000");
+    REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).getString() == "apples");
   }
   SECTION("Decode dictionary and check an invalid key generates exception", "[JSON][JNode][Index]")
   {
@@ -253,24 +253,24 @@ TEST_CASE("Check JNode reference functions work.", "[JSON][JNode][Reference]")
   SECTION("Integer reference.", "[JSON][JNode][Reference]")
   {
     jNode = bEncode.decodeBuffer("45500");
-    REQUIRE(JNodeRef<JNodeNumber>((*jNode)).value == "45500");
+    REQUIRE(JNodeRef<JNodeNumber>((*jNode)).getNumber() == "45500");
   }
   SECTION("String reference.", "[JSON][JNode][Reference]")
   {
     jNode = bEncode.decodeBuffer("0123456789");
-    REQUIRE(JNodeRef<JNodeString>((*jNode)).value == "0123456789");
+    REQUIRE(JNodeRef<JNodeString>((*jNode)).getString() == "0123456789");
   }
   SECTION("Array reference.", "[JSON][JNode][Reference]")
   {
     jNode = bEncode.decodeBuffer("[777,9000,\"apples\"]");
-    REQUIRE(JNodeRef<JNodeArray>((*jNode)).value.size() == 3);
-    REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).value == "apples");
+    REQUIRE(JNodeRef<JNodeArray>((*jNode)).size() == 3);
+    REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).getString() == "apples");
   }
   SECTION("Dictionary reference.", "[JSON][JNode][Reference]")
   {
     jNode = bEncode.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
-    REQUIRE(JNodeRef<JNodeObject>((*jNode)).value.size() == 2);
-    REQUIRE(JNodeRef<JNodeString>((*jNode)["City"]).value == "Southampton");
+    REQUIRE(JNodeRef<JNodeObject>((*jNode)).size() == 2);
+    REQUIRE(JNodeRef<JNodeString>((*jNode)["City"]).getString() == "Southampton");
   }
 }
 TEST_CASE("Check JNodeNumber number conversion", "[JSON][JNode][JNodeNumber]")

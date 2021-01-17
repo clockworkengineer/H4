@@ -50,10 +50,32 @@ namespace H4
     {
     public:
         JNodeObject() : JNode(JNodeType::object) {}
-        std::map<std::string, std::unique_ptr<JNode>> value;
+        bool containsKey(const std::string &key)
+        {
+            return (m_value.count(key) > 0);
+        }
+        int size()
+        {
+            return ((int)m_value.size());
+        }
+        void addEntry(const std::string key, std::unique_ptr<JNode> entry)
+        {
+            m_value[key] = std::move(entry);
+            m_keys.push_back(key);
+        }
+        JNode *getEntry(const std::string &key)
+        {
+            return (m_value[key].get());
+        }
+        std::vector<std::string> &getKeys()
+        {
+            return (m_keys);
+        }
+    protected:
+        std::map<std::string, std::unique_ptr<JNode>> m_value;
         // Note: Store keys so when write away keep key order
         // that they have had in the source form be it file/network/buffer.
-        std::vector<std::string> keys;
+        std::vector<std::string> m_keys;
     };
     //
     // List JNode.
@@ -62,7 +84,24 @@ namespace H4
     {
     public:
         JNodeArray() : JNode(JNodeType::array) {}
-        std::vector<std::unique_ptr<JNode>> value;
+        int size()
+        {
+            return ((int)m_value.size());
+        }
+        void addEntry(std::unique_ptr<JNode> jNode)
+        {
+            m_value.push_back(std::move(jNode));
+        }
+        std::vector<std::unique_ptr<JNode>> &getArray()
+        {
+            return (m_value);
+        }
+        JNode *getEntry(int index)
+        {
+            return (m_value[index].get());
+        }
+    protected:
+        std::vector<std::unique_ptr<JNode>> m_value;
     };
     //
     // Number JNode.
@@ -70,10 +109,9 @@ namespace H4
     struct JNodeNumber : JNode
     {
     public:
-        std::string value;
         JNodeNumber(const std::string &value) : JNode(JNodeType::number)
         {
-            this->value = value;
+            this->m_value = value;
         }
         // Convert to long returning true on success
         // Note: Can still return a long value for floating point
@@ -81,16 +119,22 @@ namespace H4
         bool getInteger(long &longValue)
         {
             char *end;
-            longValue = std::strtoll(value.c_str(), &end, 10);
+            longValue = std::strtoll(m_value.c_str(), &end, 10);
             return (*end == '\0'); // If not all characters used then not success
         }
         // Convert to double returning true on success
         bool getFloatingPoint(double &doubleValue)
         {
             char *end;
-            doubleValue = std::strtod(value.c_str(), &end);
+            doubleValue = std::strtod(m_value.c_str(), &end);
             return (*end == '\0'); // If not all characters used then not success
         }
+        std::string &getNumber()
+        {
+            return (m_value);
+        }
+    protected:
+        std::string m_value;
     };
     //
     // String JNode.
@@ -98,11 +142,16 @@ namespace H4
     struct JNodeString : JNode
     {
     public:
-        std::string value;
         JNodeString(const std::string &value) : JNode(JNodeType::string)
         {
-            this->value = value;
+            this->m_value = value;
         }
+        std::string &getString()
+        {
+            return (m_value);
+        }
+    protected:
+        std::string m_value;
     };
     //
     // Boolean JNode.
@@ -110,11 +159,16 @@ namespace H4
     struct JNodeBoolean : JNode
     {
     public:
-        bool value;
         JNodeBoolean(bool value) : JNode(JNodeType::boolean)
         {
-            this->value = value;
+            this->m_value = value;
         }
+        bool getBoolean()
+        {
+            return (m_value);
+        }
+    protected:
+        bool m_value;
     };
     //
     // Boolean JNode.
@@ -122,9 +176,12 @@ namespace H4
     struct JNodeNull : JNode
     {
     public:
-        const void *value = nullptr;
         JNodeNull() : JNode(JNodeType::null)
         {
+        }
+        void *getNull()
+        {
+            return (nullptr);
         }
     };
     //
@@ -134,9 +191,9 @@ namespace H4
     {
         if (nodeType == JNodeType::object)
         {
-            if (static_cast<JNodeObject *>(this)->value.count(key) > 0)
+            if (static_cast<JNodeObject *>(this)->containsKey(key))
             {
-                return (*static_cast<JNode *>((static_cast<JNodeObject *>(this)->value[key].get())));
+                return (*static_cast<JNode *>(static_cast<JNodeObject *>(this)->getEntry(key)));
             }
         }
         throw std::runtime_error("Invalid key used to access object.");
@@ -145,9 +202,9 @@ namespace H4
     {
         if (nodeType == JNodeType::array)
         {
-            if ((index >= 0) && (index < ((int)static_cast<JNodeArray *>(this)->value.size())))
+            if ((index >= 0) && (index < ((int)static_cast<JNodeArray *>(this)->size())))
             {
-                return (*static_cast<JNode *>((static_cast<JNodeArray *>(this)->value[index].get())));
+                return (*static_cast<JNode *>((static_cast<JNodeArray *>(this)->getEntry(index))));
             }
         }
         throw std::runtime_error("Invalid index used to access array.");

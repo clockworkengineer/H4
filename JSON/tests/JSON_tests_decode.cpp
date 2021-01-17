@@ -52,37 +52,37 @@ TEST_CASE("Creation and use of JSON for decode of simple types (number, string, 
     SECTION("Decode an string (example string) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("\"example string\"");
-        REQUIRE(JNodeRef<JNodeString>(*jNode).value == "example string");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "example string");
     }
     SECTION("Decode an string (another example string) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("\"another example string\"");
-        REQUIRE(JNodeRef<JNodeString>(*jNode).value == "another example string");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "another example string");
     }
     SECTION("Decode an number (6767) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("6767");
-        REQUIRE(JNodeRef<JNodeNumber>(*jNode).value == "6767");
+        REQUIRE(JNodeRef<JNodeNumber>(*jNode).getNumber() == "6767");
     }
     SECTION("Decode an number (190000) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("190000");
-        REQUIRE(JNodeRef<JNodeNumber>(*jNode).value == "190000");
+        REQUIRE(JNodeRef<JNodeNumber>(*jNode).getNumber() == "190000");
     }
     SECTION("Decode an boolean (true) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("true");
-        REQUIRE(JNodeRef<JNodeBoolean>(*jNode).value == true);
+        REQUIRE(JNodeRef<JNodeBoolean>(*jNode).getBoolean() == true);
     }
     SECTION("Decode an boolean (false) and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("false");
-        REQUIRE(JNodeRef<JNodeBoolean>(*jNode).value == false);
+        REQUIRE(JNodeRef<JNodeBoolean>(*jNode).getBoolean() == false);
     }
     SECTION("Decode an null and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("null");
-        REQUIRE(JNodeRef<JNodeNull>(*jNode).value == nullptr);
+        REQUIRE(JNodeRef<JNodeNull>(*jNode).getNull() == nullptr);
     }
 }
 TEST_CASE("Creation and use of JSON for decode of collection types (array, object) ", "[JSON][Decode]")
@@ -108,25 +108,25 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
     {
         jNode = json.decodeBuffer("{\"Name\":\"Robert\",\"Age\":15}");
         REQUIRE(jNode->nodeType == JNodeType::object);
-        REQUIRE(JNodeRef<JNodeObject>(*jNode).value.size() == 2);
-        REQUIRE(JNodeRef<JNodeObject>(*jNode).value.count("Name") > 0);
-        REQUIRE(JNodeRef<JNodeObject>(*jNode).value.count("Age") > 0);
+        REQUIRE(JNodeRef<JNodeObject>(*jNode).size() == 2);
+        REQUIRE(JNodeRef<JNodeObject>(*jNode).containsKey("Name"));
+        REQUIRE(JNodeRef<JNodeObject>(*jNode).containsKey("Age"));
         REQUIRE(JNodeRef<JNodeString>((*jNode)["Name"]).nodeType == JNodeType::string);
         REQUIRE(JNodeRef<JNodeNumber>((*jNode)["Age"]).nodeType == JNodeType::number);
-        REQUIRE(JNodeRef<JNodeString>((*jNode)["Name"]).value == "Robert");
-        REQUIRE(JNodeRef<JNodeNumber>((*jNode)["Age"]).value == "15");
+        REQUIRE(JNodeRef<JNodeString>((*jNode)["Name"]).getString() == "Robert");
+        REQUIRE(JNodeRef<JNodeNumber>((*jNode)["Age"]).getNumber() == "15");
     }
     SECTION("Decode an array [777,9000,\"apples\"] and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("[777,9000,\"apples\"]");
         REQUIRE(jNode->nodeType == JNodeType::array);
-        REQUIRE(JNodeRef<JNodeArray>(*jNode).value.size() == 3);
+        REQUIRE(JNodeRef<JNodeArray>(*jNode).size() == 3);
         REQUIRE(JNodeRef<JNodeNumber>((*jNode)[0]).nodeType == JNodeType::number);
         REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]).nodeType == JNodeType::number);
         REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).nodeType == JNodeType::string);
-        REQUIRE(JNodeRef<JNodeNumber>((*jNode)[0]).value == "777");
-        REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]).value == "9000");
-        REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).value == "apples");
+        REQUIRE(JNodeRef<JNodeNumber>((*jNode)[0]).getNumber() == "777");
+        REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]).getNumber() == "9000");
+        REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).getString() == "apples");
     }
     SECTION("Decode object {\"City\":\"Southampton\",\"Population\":500000} and check its value", "[JSON][Decode]")
     {

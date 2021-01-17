@@ -187,8 +187,8 @@ namespace H4
             }
             source->moveToNextByte();
             ignoreWhiteSpace(source);
-            object.value[key] = decodeJNodes(source);
-            object.keys.push_back(key);
+            object.addEntry(key,decodeJNodes(source));
+ 
             ignoreWhiteSpace(source);
         } while (source->currentByte() == ',');
         if (source->currentByte() != '}')
@@ -210,7 +210,7 @@ namespace H4
         {
             source->moveToNextByte();
             ignoreWhiteSpace(source);
-            array.value.push_back(decodeJNodes(source));
+            array.addEntry(decodeJNodes(source));
             ignoreWhiteSpace(source);
         } while (source->currentByte() == ',');
         if (source->currentByte() != ']')
@@ -258,25 +258,25 @@ namespace H4
         switch (jNode->nodeType)
         {
         case JNodeType::number:
-            destination->addBytes(JNodeRef<JNodeNumber>(*jNode).value);
+            destination->addBytes(JNodeRef<JNodeNumber>(*jNode).getNumber());
             break;
         case JNodeType::string:
-            destination->addBytes("\"" + JNodeRef<JNodeString>(*jNode).value + "\"");
+            destination->addBytes("\"" + JNodeRef<JNodeString>(*jNode).getString() + "\"");
             break;
         case JNodeType::boolean:
-            destination->addBytes(JNodeRef<JNodeBoolean>(*jNode).value ? "true" : "false");
+            destination->addBytes(JNodeRef<JNodeBoolean>(*jNode).getBoolean() ? "true" : "false");
             break;
         case JNodeType::null:
             destination->addBytes("null");
             break;
         case JNodeType::object:
         {
-            int commaCount = JNodeRef<JNodeObject>(*jNode).value.size() - 1;
+            int commaCount = JNodeRef<JNodeObject>(*jNode).size() - 1;
             destination->addBytes("{");
-            for (auto key : JNodeRef<JNodeObject>(*jNode).keys)
+            for (auto key : JNodeRef<JNodeObject>(*jNode).getKeys())
             {
                 destination->addBytes("\"" + key + "\"" + ":");
-                encodeJNodes(JNodeRef<JNodeObject>(*jNode).value[key].get(), destination);
+                encodeJNodes(JNodeRef<JNodeObject>(*jNode).getEntry(key), destination);
                 if (commaCount-- > 0)
                 {
                     destination->addBytes(",");
@@ -287,9 +287,9 @@ namespace H4
         }
         case JNodeType::array:
         {
-            int commaCount = JNodeRef<JNodeArray>(*jNode).value.size() - 1;
+            int commaCount = JNodeRef<JNodeArray>(*jNode).size() - 1;
             destination->addBytes("[");
-            for (auto &bNodeEntry : JNodeRef<JNodeArray>(*jNode).value)
+            for (auto &bNodeEntry : JNodeRef<JNodeArray>(*jNode).getArray())
             {
                 encodeJNodes(bNodeEntry.get(), destination);
                 if (commaCount-- > 0)
