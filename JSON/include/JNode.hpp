@@ -186,15 +186,23 @@ namespace H4
         }
     };
     //
+    //
+    // Convert base JNode reference
+        template <typename T>
+    T &JNodeRef(JNode &jNode)
+    {
+        return (static_cast<T &>(jNode));
+    }
+    //
     // Index overloads
     //
     inline JNode &JNode::operator[](std::string key) // Object
     {
         if (nodeType == JNodeType::object)
         {
-            if (static_cast<JNodeObject *>(this)->containsKey(key))
+            if (JNodeRef<JNodeObject>(*this).containsKey(key))
             {
-                return (*static_cast<JNode *>(static_cast<JNodeObject *>(this)->getEntry(key)));
+                return (*(JNodeRef<JNodeObject>(*this).getEntry(key)));
             }
         }
         throw std::runtime_error("Invalid key used to access object.");
@@ -203,17 +211,13 @@ namespace H4
     {
         if (nodeType == JNodeType::array)
         {
-            if ((index >= 0) && (index < ((int)static_cast<JNodeArray *>(this)->size())))
+            if ((index >= 0) && (index < ((int)JNodeRef<JNodeArray>(*this).size())))
             {
-                return (*static_cast<JNode *>((static_cast<JNodeArray *>(this)->getEntry(index))));
+                return (*((JNodeRef<JNodeArray>(*this).getEntry(index))));
             }
         }
         throw std::runtime_error("Invalid index used to access array.");
     }
-    template <typename T>
-    T &JNodeRef(JNode &jNode)
-    {
-        return (static_cast<T &>(jNode));
-    }
+
 } // namespace H4
 #endif /* JNODE_HPP */

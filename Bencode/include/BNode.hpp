@@ -6,7 +6,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <list>
 #include <memory>
 // =========
 // NAMESPACE
@@ -62,7 +61,6 @@ namespace H4
         {
             return (m_value);
         }
-
     protected:
         std::map<std::string, std::unique_ptr<BNode>> m_value;
     };
@@ -88,7 +86,6 @@ namespace H4
         {
             return (m_value[index].get());
         }
-
     protected:
         std::vector<std::unique_ptr<BNode>> m_value;
     };
@@ -105,7 +102,6 @@ namespace H4
         {
             return (m_value);
         }
-
     protected:
         long m_value;
     };
@@ -123,7 +119,6 @@ namespace H4
         {
             return (m_value);
         }
-
     protected:
         std::string m_value;
     };
@@ -160,6 +155,5 @@ namespace H4
         }
         throw std::runtime_error("Invalid index used in list.");
     }
-
 } // namespace H4
 #endif /* BNODE_HPP */
