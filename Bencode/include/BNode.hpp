@@ -29,16 +29,13 @@ namespace H4
     //
     struct BNode
     {
-
-        BNode(BNodeType nodeType = BNodeType::base)
+        BNode(BNodeType nodeType = BNodeType::base) : nodeType(nodeType)
         {
-            this->nodeType = nodeType;
         }
         BNode &operator[](std::string key);
         BNode &operator[](int index);
-        BNodeType nodeType;
+        const BNodeType nodeType;
     };
-
     //
     // Dictionary BNode.
     //

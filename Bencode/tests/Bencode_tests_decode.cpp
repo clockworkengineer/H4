@@ -21,12 +21,12 @@ TEST_CASE("Creation and use of Bencode for decode of simple types (number, strin
   SECTION("Decode an integer", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("i266e");
-    bNode->nodeType = BNodeType::integer;
+    REQUIRE(bNode->nodeType == BNodeType::integer);
   }
   SECTION("Decode an string", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("12:qwertyuiopas");
-    bNode->nodeType = BNodeType::string;
+    REQUIRE(bNode->nodeType == BNodeType::string);
   }
   SECTION("Decode an integer (266) and check value", "[Bencode][Decode]")
   {
@@ -179,7 +179,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   SECTION("Decode singlefile.torrent", "[Bencode][Decode][Torrents]")
   {
     bNode = bEncode.decodeFile(kSingleFileTorrent);
-    bNode->nodeType = BNodeType::dictionary;
+    REQUIRE(bNode->nodeType == BNodeType::dictionary);
   }
   SECTION("Decode singlefile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
@@ -188,7 +188,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
   {
     bNode = bEncode.decodeFile(kMultiFileTorrent);
-    bNode->nodeType = BNodeType::dictionary;
+    REQUIRE(bNode->nodeType == BNodeType::dictionary);
   }
   SECTION("Decode multifile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
