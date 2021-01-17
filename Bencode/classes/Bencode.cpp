@@ -101,7 +101,7 @@ namespace H4
             while (source->bytesToDecode() && source->currentByte() != (std::byte)'e')
             {
                 std::string key = decodeString(source);
-                bNodeDictionary.value[key] = decodeBNodes(source);
+                bNodeDictionary.addEntry(key, decodeBNodes(source));
             }
             if (!source->bytesToDecode())
             {
@@ -117,7 +117,7 @@ namespace H4
             BNodeList bNodeList;
             while (source->bytesToDecode() && source->currentByte() != (std::byte)'e')
             {
-                bNodeList.value.push_back(decodeBNodes(source));
+                bNodeList.addEntry(decodeBNodes(source));
             }
             if (!source->bytesToDecode())
             {
@@ -162,7 +162,7 @@ namespace H4
         {
         case BNodeType::dictionary:
             destination->addBytes("d");
-            for (auto &bNodeEntry : ((BNodeDict *)bNode)->value)
+            for (auto &bNodeEntry : ((BNodeDict *)bNode)->getDict())
             {
                 destination->addBytes(std::to_string(bNodeEntry.first.length()) + ":" + bNodeEntry.first);
                 encodeBNodes(bNodeEntry.second.get(), destination);
@@ -171,18 +171,18 @@ namespace H4
             break;
         case BNodeType::list:
             destination->addBytes("l");
-            for (auto &bNodeEntry : BNodeRef<BNodeList>(*bNode).value)
+            for (auto &bNodeEntry : BNodeRef<BNodeList>(*bNode).getArray())
             {
                 encodeBNodes(bNodeEntry.get(), destination);
             }
             destination->addBytes("e");
             break;
         case BNodeType::integer:
-            destination->addBytes("i" + std::to_string(BNodeRef<BNodeInteger>(*bNode).value) + "e");
+            destination->addBytes("i" + std::to_string(BNodeRef<BNodeInteger>(*bNode).getInteger()) + "e");
             break;
         case BNodeType::string:
         {
-            std::string stringToEncode = BNodeRef<BNodeString>(*bNode).value;
+            std::string stringToEncode = BNodeRef<BNodeString>(*bNode).getString();
             destination->addBytes(std::to_string((int)stringToEncode.length()) + ":" + stringToEncode);
             break;
         }

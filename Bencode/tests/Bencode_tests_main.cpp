@@ -204,25 +204,25 @@ TEST_CASE("Use of BNode indexing operators", "[Bencode][BNode][Index]")
   SECTION("Decode dictionary and check its components using indexing", "[Bencode][BNode][Index]")
   {
     bNode = bEncode.decodeBuffer("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)["one"]).value == "0123456789");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)["two"]).value == "asdfghjkl");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)["three"]).value == "qwerty");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)["one"]).getString() == "0123456789");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)["two"]).getString() == "asdfghjkl");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)["three"]).getString() == "qwerty");
   }
   SECTION("Decode list and check its components using indexing", "[Bencode][BNode][Index]")
   {
     bNode = bEncode.decodeBuffer("l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)[0]).value == "sillyy");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)[1]).value == "poiuytrewqas");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)[2]).value == "abcdefghijklmnopqrstuvwxyz");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)[0]).getString() == "sillyy");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)[1]).getString() == "poiuytrewqas");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)[2]).getString() == "abcdefghijklmnopqrstuvwxyz");
   }
   SECTION("Decode list with embedded dictioanry and check its components using indexing", "[Bencode][BNode][Index]")
   {
     bNode = bEncode.decodeBuffer("l6:sillyyd3:one10:01234567895:three6:qwerty3:two9:asdfghjkle26:abcdefghijklmnopqrstuvwxyze");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)[0]).value == "sillyy");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)[1]["one"]).value == "0123456789");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)[1]["two"]).value == "asdfghjkl");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)[1]["three"]).value == "qwerty");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)[2]).value == "abcdefghijklmnopqrstuvwxyz");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)[0]).getString() == "sillyy");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)[1]["one"]).getString() == "0123456789");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)[1]["two"]).getString() == "asdfghjkl");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)[1]["three"]).getString() == "qwerty");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)[2]).getString() == "abcdefghijklmnopqrstuvwxyz");
   }
   SECTION("Decode dictionary and check an invalid key generates exception", "[Bencode][BNode][Index]")
   {
@@ -244,21 +244,21 @@ TEST_CASE("Check BNode reference functions work.", "[Bencode][BNode][Reference]"
   SECTION("Integer reference.", "[Bencode][BNode][Reference]")
   {
     bNode = bEncode.decodeBuffer("i45500e");
-    REQUIRE(BNodeRef<BNodeInteger>((*bNode)).value == 45500);
+    REQUIRE(BNodeRef<BNodeInteger>((*bNode)).getInteger() == 45500);
   }
   SECTION("String reference.", "[Bencode][BNode][Reference]")
   {
     bNode = bEncode.decodeBuffer("10:0123456789");
-    REQUIRE(BNodeRef<BNodeString>((*bNode)).value == "0123456789");
+    REQUIRE(BNodeRef<BNodeString>((*bNode)).getString() == "0123456789");
   }
   SECTION("List reference.", "[Bencode][BNode][Reference]")
   {
     bNode = bEncode.decodeBuffer("l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze");
-    REQUIRE(BNodeRef<BNodeList>((*bNode)).value.size() == 3);
+    REQUIRE(BNodeRef<BNodeList>((*bNode)).size() == 3);
   }
   SECTION("Dictionary reference.", "[Bencode][BNode][Reference]")
   {
     bNode = bEncode.decodeBuffer("d3:one10:01234567894:four8:123456785:three6:qwerty3:two9:asdfghjkle");
-    REQUIRE(BNodeRef<BNodeDict>((*bNode)).value.size() == 4);
+    REQUIRE(BNodeRef<BNodeDict>((*bNode)).size() == 4);
   }
 }

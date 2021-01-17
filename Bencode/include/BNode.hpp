@@ -42,7 +42,28 @@ namespace H4
     struct BNodeDict : BNode
     {
         BNodeDict() : BNode(BNodeType::dictionary) {}
-        std::map<std::string, std::unique_ptr<BNode>> value;
+        bool containsKey(const std::string &key)
+        {
+            return (m_value.count(key) > 0);
+        }
+        int size()
+        {
+            return ((int)m_value.size());
+        }
+        void addEntry(const std::string key, std::unique_ptr<BNode> entry)
+        {
+            m_value[key] = std::move(entry);
+        }
+        BNode *getEntry(const std::string &key)
+        {
+            return (m_value[key].get());
+        }
+        std::map<std::string, std::unique_ptr<BNode>> &getDict()
+        {
+            return (m_value);
+        }
+    protected:
+        std::map<std::string, std::unique_ptr<BNode>> m_value;
     };
     //
     // List BNode.
@@ -50,18 +71,40 @@ namespace H4
     struct BNodeList : BNode
     {
         BNodeList() : BNode(BNodeType::list) {}
-        std::vector<std::unique_ptr<BNode>> value;
+        int size()
+        {
+            return ((int)m_value.size());
+        }
+        void addEntry(std::unique_ptr<BNode> jNode)
+        {
+            m_value.push_back(std::move(jNode));
+        }
+        std::vector<std::unique_ptr<BNode>> &getArray()
+        {
+            return (m_value);
+        }
+        BNode *getEntry(int index)
+        {
+            return (m_value[index].get());
+        }
+    protected:
+        std::vector<std::unique_ptr<BNode>> m_value;
     };
     //
     // Integer BNode.
     //
     struct BNodeInteger : BNode
     {
-        long value;
         BNodeInteger(long value) : BNode(BNodeType::integer)
         {
-            this->value = value;
+            this->m_value = value;
         }
+        long getInteger()
+        {
+            return (m_value);
+        }
+    protected:
+        long m_value;
     };
     //
     // String BNode.
@@ -69,11 +112,16 @@ namespace H4
     struct BNodeString : BNode
     {
     public:
-        std::string value;
         BNodeString(std::string value) : BNode(BNodeType::string)
         {
-            this->value = value;
+            this->m_value = value;
         }
+        std::string getString()
+        {
+            return (m_value);
+        }
+    protected:
+        std::string m_value;
     };
     //
     // Index overloads
@@ -82,9 +130,9 @@ namespace H4
     {
         if (nodeType == BNodeType::dictionary)
         {
-            if (static_cast<BNodeDict *>(this)->value.count(key) > 0)
+            if (static_cast<BNodeDict *>(this)->containsKey(key))
             {
-                return (*static_cast<BNode *>((static_cast<BNodeDict *>(this)->value[key].get())));
+                return (*static_cast<BNode *>((static_cast<BNodeDict *>(this)->getEntry(key))));
             }
         }
         throw std::runtime_error("Invalid key used in dictionary.");
@@ -93,9 +141,9 @@ namespace H4
     {
         if (nodeType == BNodeType::list)
         {
-            if ((index >= 0) && (index < ((int)static_cast<BNodeList *>(this)->value.size())))
+            if ((index >= 0) && (index < ((int)static_cast<BNodeList *>(this)->size())))
             {
-                return (*static_cast<BNode *>((static_cast<BNodeList *>(this)->value[index].get())));
+                return (*static_cast<BNode *>((static_cast<BNodeList *>(this)->getEntry(index))));
             }
         }
         throw std::runtime_error("Invalid index used in list.");
