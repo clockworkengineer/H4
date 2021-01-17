@@ -32,16 +32,12 @@ namespace H4
     struct JNode
     {
     public:
-        JNode(JNodeType nodeType = JNodeType::base)
+        JNode(JNodeType nodeType = JNodeType::base) : nodeType(nodeType)
         {
-            this->nodeType = nodeType;
         }
-        //
-        // Index for correct JNode type
-        //
         JNode &operator[](std::string key);
         JNode &operator[](int index);
-        JNodeType nodeType;
+        const JNodeType nodeType;
     };
     //
     // Dictionary JNode.
@@ -71,6 +67,7 @@ namespace H4
         {
             return (m_keys);
         }
+
     protected:
         std::map<std::string, std::unique_ptr<JNode>> m_value;
         // Note: Store keys so when write away keep key order
@@ -100,6 +97,7 @@ namespace H4
         {
             return (m_value[index].get());
         }
+
     protected:
         std::vector<std::unique_ptr<JNode>> m_value;
     };
@@ -133,6 +131,7 @@ namespace H4
         {
             return (m_value);
         }
+
     protected:
         std::string m_value;
     };
@@ -150,6 +149,7 @@ namespace H4
         {
             return (m_value);
         }
+
     protected:
         std::string m_value;
     };
@@ -167,6 +167,7 @@ namespace H4
         {
             return (m_value);
         }
+
     protected:
         bool m_value;
     };

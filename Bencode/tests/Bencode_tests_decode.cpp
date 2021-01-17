@@ -21,37 +21,37 @@ TEST_CASE("Creation and use of Bencode for decode of simple types (number, strin
   SECTION("Decode an integer", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("i266e");
-    bNode->nodeType = Bencode::BNodeType::integer;
+    bNode->nodeType = BNodeType::integer;
   }
   SECTION("Decode an string", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("12:qwertyuiopas");
-    bNode->nodeType = Bencode::BNodeType::string;
+    bNode->nodeType = BNodeType::string;
   }
   SECTION("Decode an integer (266) and check value", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("i266e");
-    REQUIRE(BNode::ref<BNodeInteger>(*bNode).value == 266);
+    REQUIRE(BNodeRef<BNodeInteger>(*bNode).value == 266);
   }
   SECTION("Decode an integer (1000) and check value", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("i1000e");
-    REQUIRE(BNode::ref<BNodeInteger>(*bNode).value == 1000);
+    REQUIRE(BNodeRef<BNodeInteger>(*bNode).value == 1000);
   }
   SECTION("Decode an negative integer (-666) and check value", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("i-666e");
-    REQUIRE(BNode::ref<BNodeInteger>(*bNode).value == -666);
+    REQUIRE(BNodeRef<BNodeInteger>(*bNode).value == -666);
   }
   SECTION("Decode an string ('qwertyuiopas') and check value", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("12:qwertyuiopas");
-    REQUIRE(BNode::ref<BNodeString>(*bNode).value == "qwertyuiopas");
+    REQUIRE(BNodeRef<BNodeString>(*bNode).value == "qwertyuiopas");
   }
   SECTION("Decode an string ('abcdefghijklmnopqrstuvwxyz') and check value", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("26:abcdefghijklmnopqrstuvwxyz");
-    REQUIRE(BNode::ref<BNodeString>(*bNode).value == "abcdefghijklmnopqrstuvwxyz");
+    REQUIRE(BNodeRef<BNodeString>(*bNode).value == "abcdefghijklmnopqrstuvwxyz");
   }
 }
 TEST_CASE("Creation and use of Bencode for decode of a table of integer test data", "[Bencode][Decode]")
@@ -60,7 +60,7 @@ TEST_CASE("Creation and use of Bencode for decode of a table of integer test dat
                                                                   {"i32767e", 32767}}));
   Bencode bEncode;
   std::unique_ptr<BNode> bNode = bEncode.decodeBuffer(testInput.c_str());
-  REQUIRE(BNode::ref<BNodeInteger>(*bNode).value == expected);
+  REQUIRE(BNodeRef<BNodeInteger>(*bNode).value == expected);
 }
 TEST_CASE("Creation and use of Bencode for decode of a table of string test data", "[Bencode][Decode]")
 {
@@ -68,7 +68,7 @@ TEST_CASE("Creation and use of Bencode for decode of a table of string test data
                                                                          {"6:mnbvcx", "mnbvcx"}}));
   Bencode bEncode;
   std::unique_ptr<BNode> bNode = bEncode.decodeBuffer(testInput.c_str());
-  REQUIRE(BNode::ref<BNodeString>(*bNode).value == expected);
+  REQUIRE(BNodeRef<BNodeString>(*bNode).value == expected);
 }
 TEST_CASE("Creation and use of Bencode for decode of collection types (list, dictionary) ", "[Bencode][Decode]")
 {
@@ -77,34 +77,34 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
   SECTION("Decode an List", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("li266ei6780ei88e5:threee");
-    REQUIRE(bNode->nodeType == Bencode::BNodeType::list);
-    REQUIRE((*bNode)[0].nodeType == Bencode::BNodeType::integer);
-    REQUIRE((*bNode)[1].nodeType == Bencode::BNodeType::integer);
-    REQUIRE((*bNode)[2].nodeType == Bencode::BNodeType::integer);
-    REQUIRE((*bNode)[3].nodeType == Bencode::BNodeType::string);
-    REQUIRE(BNode::ref<BNodeInteger>((*bNode)[0]).value == 266);
-    REQUIRE(BNode::ref<BNodeInteger>((*bNode)[1]).value == 6780);
-    REQUIRE(BNode::ref<BNodeInteger>((*bNode)[2]).value == 88);
-    REQUIRE(BNode::ref<BNodeString>((*bNode)[3]).value == "three");
+    REQUIRE(bNode->nodeType == BNodeType::list);
+    REQUIRE((*bNode)[0].nodeType == BNodeType::integer);
+    REQUIRE((*bNode)[1].nodeType == BNodeType::integer);
+    REQUIRE((*bNode)[2].nodeType == BNodeType::integer);
+    REQUIRE((*bNode)[3].nodeType == BNodeType::string);
+    REQUIRE(BNodeRef<BNodeInteger>((*bNode)[0]).value == 266);
+    REQUIRE(BNodeRef<BNodeInteger>((*bNode)[1]).value == 6780);
+    REQUIRE(BNodeRef<BNodeInteger>((*bNode)[2]).value == 88);
+    REQUIRE(BNodeRef<BNodeString>((*bNode)[3]).value == "three");
   }
   SECTION("Decode an Dictionary", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("d3:onei1e5:threei3e3:twoi2ee");
-    REQUIRE(bNode->nodeType == Bencode::BNodeType::dictionary);
-    REQUIRE((*bNode)["one"].nodeType == Bencode::BNodeType::integer);
-    REQUIRE((*bNode)["two"].nodeType == Bencode::BNodeType::integer);
-    REQUIRE((*bNode)["three"].nodeType == Bencode::BNodeType::integer);
-    REQUIRE(BNode::ref<BNodeInteger>((*bNode)["one"]).value == 1);
-    REQUIRE(BNode::ref<BNodeInteger>((*bNode)["two"]).value == 2);
-    REQUIRE(BNode::ref<BNodeInteger>((*bNode)["three"]).value == 3);
+    REQUIRE(bNode->nodeType == BNodeType::dictionary);
+    REQUIRE((*bNode)["one"].nodeType == BNodeType::integer);
+    REQUIRE((*bNode)["two"].nodeType == BNodeType::integer);
+    REQUIRE((*bNode)["three"].nodeType == BNodeType::integer);
+    REQUIRE(BNodeRef<BNodeInteger>((*bNode)["one"]).value == 1);
+    REQUIRE(BNodeRef<BNodeInteger>((*bNode)["two"]).value == 2);
+    REQUIRE(BNodeRef<BNodeInteger>((*bNode)["three"]).value == 3);
   }
   SECTION("Decode an list of integers and check values", "[Bencode][Decode]")
   {
     bNode = bEncode.decodeBuffer("li266ei6780ei88ee");
     std::vector<long> numbers;
-    for (const auto &bNode : BNode::ref<BNodeList>(*bNode).value)
+    for (const auto &bNode : BNodeRef<BNodeList>(*bNode).value)
     {
-      numbers.push_back(BNode::ref<BNodeInteger>(*bNode).value);
+      numbers.push_back(BNodeRef<BNodeInteger>(*bNode).value);
     }
     REQUIRE(numbers == std::vector<long>{266, 6780, 88});
   }
@@ -112,9 +112,9 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
   {
     bNode = bEncode.decodeBuffer("l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze");
     std::vector<std::string> strings;
-    for (const auto &bNode : BNode::ref<BNodeList>(*bNode).value)
+    for (const auto &bNode : BNodeRef<BNodeList>(*bNode).value)
     {
-      strings.push_back(BNode::ref<BNodeString>(*bNode).value);
+      strings.push_back(BNodeRef<BNodeString>(*bNode).value);
     }
     REQUIRE(strings == std::vector<std::string>{"sillyy", "poiuytrewqas", "abcdefghijklmnopqrstuvwxyz"});
   }
@@ -122,9 +122,9 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
   {
     bNode = bEncode.decodeBuffer("d3:onei1e5:threei3e3:twoi2ee");
     std::map<std::string, long> entries;
-    for (const auto &bNode : BNode::ref<BNodeDict>(*bNode).value)
+    for (const auto &bNode : BNodeRef<BNodeDict>(*bNode).value)
     {
-      entries[bNode.first] = BNode::ref<BNodeInteger>(*bNode.second).value;
+      entries[bNode.first] = BNodeRef<BNodeInteger>(*bNode.second).value;
     }
     REQUIRE(entries == std::map<std::string, long>{{"one", 1}, {"two", 2}, {"three", 3}});
   }
@@ -132,9 +132,9 @@ TEST_CASE("Creation and use of Bencode for decode of collection types (list, dic
   {
     bNode = bEncode.decodeBuffer("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle");
     std::map<std::string, std::string> entries;
-    for (const auto &bNode : BNode::ref<BNodeDict>(*bNode).value)
+    for (const auto &bNode : BNodeRef<BNodeDict>(*bNode).value)
     {
-      entries[bNode.first] = BNode::ref<BNodeString>(*bNode.second).value;
+      entries[bNode.first] = BNodeRef<BNodeString>(*bNode.second).value;
     }
     REQUIRE(entries == std::map<std::string, std::string>{{"one", "0123456789"}, {"two", "asdfghjkl"}, {"three", "qwerty"}});
   }
@@ -179,7 +179,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   SECTION("Decode singlefile.torrent", "[Bencode][Decode][Torrents]")
   {
     bNode = bEncode.decodeFile(kSingleFileTorrent);
-    bNode->nodeType = Bencode::BNodeType::dictionary;
+    bNode->nodeType = BNodeType::dictionary;
   }
   SECTION("Decode singlefile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
@@ -188,7 +188,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
   {
     bNode = bEncode.decodeFile(kMultiFileTorrent);
-    bNode->nodeType = Bencode::BNodeType::dictionary;
+    bNode->nodeType = BNodeType::dictionary;
   }
   SECTION("Decode multifile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
