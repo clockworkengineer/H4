@@ -22,27 +22,27 @@ TEST_CASE("Creation and use of JSON for decode of simple types (number, string, 
     SECTION("Decode an string (example string)", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("\"example string\"");
-        REQUIRE(jNode->nodeType == JSON::JNodeType::string);
+        REQUIRE(jNode->nodeType == JNodeType::string);
     }
     SECTION("Decode an number (6767)", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("6767");
-        REQUIRE(jNode->nodeType == JSON::JNodeType::number);
+        REQUIRE(jNode->nodeType == JNodeType::number);
     }
     SECTION("Decode an boolean (true)", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("true");
-        REQUIRE(jNode->nodeType == JSON::JNodeType::boolean);
+        REQUIRE(jNode->nodeType == JNodeType::boolean);
     }
     SECTION("Decode an boolean (false)", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("false");
-        REQUIRE(jNode->nodeType == JSON::JNodeType::boolean);
+        REQUIRE(jNode->nodeType == JNodeType::boolean);
     }
     SECTION("Decode an null", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("null");
-        REQUIRE(jNode->nodeType == JSON::JNodeType::null);
+        REQUIRE(jNode->nodeType == JNodeType::null);
     }
 }
 TEST_CASE("Creation and use of JSON for decode of simple types (number, string, boolean, null) and check values.", "[JSON][Decode]")
@@ -92,12 +92,12 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
     SECTION("Decode an object ({\"name\":\"Robert\",\"Age\":15})", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("{\"name\":\"Robert\",\"Age\":15}");
-        REQUIRE(jNode->nodeType == JSON::JNodeType::object);
+        REQUIRE(jNode->nodeType == JNodeType::object);
     }
     SECTION("Decode an array ([ 777,9000,\"apples\"]) ", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("[777,9000,\"apples\"]");
-        REQUIRE(jNode->nodeType == JSON::JNodeType::array);
+        REQUIRE(jNode->nodeType == JNodeType::array);
     }
 }
 TEST_CASE("Creation and use of JSON for decode of collection types (array, object) and check values", "[JSON][Decode]")
@@ -107,23 +107,23 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
     SECTION("Decode an object {\"name\":\"Robert\",\"Age\":15} and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("{\"Name\":\"Robert\",\"Age\":15}");
-        REQUIRE(jNode->nodeType == JSON::JNodeType::object);
+        REQUIRE(jNode->nodeType == JNodeType::object);
         REQUIRE(JNode::ref<JNodeObject>(*jNode).value.size() == 2);
         REQUIRE(JNode::ref<JNodeObject>(*jNode).value.count("Name") > 0);
         REQUIRE(JNode::ref<JNodeObject>(*jNode).value.count("Age") > 0);
-        REQUIRE(JNode::ref<JNodeString>((*jNode)["Name"]).nodeType == JSON::JNodeType::string);
-        REQUIRE(JNode::ref<JNodeNumber>((*jNode)["Age"]).nodeType == JSON::JNodeType::number);
+        REQUIRE(JNode::ref<JNodeString>((*jNode)["Name"]).nodeType == JNodeType::string);
+        REQUIRE(JNode::ref<JNodeNumber>((*jNode)["Age"]).nodeType == JNodeType::number);
         REQUIRE(JNode::ref<JNodeString>((*jNode)["Name"]).value == "Robert");
         REQUIRE(JNode::ref<JNodeNumber>((*jNode)["Age"]).value == "15");
     }
     SECTION("Decode an array [777,9000,\"apples\"] and check its value", "[JSON][Decode]")
     {
         jNode = json.decodeBuffer("[777,9000,\"apples\"]");
-        REQUIRE(jNode->nodeType == JSON::JNodeType::array);
+        REQUIRE(jNode->nodeType == JNodeType::array);
         REQUIRE(JNode::ref<JNodeArray>(*jNode).value.size() == 3);
-        REQUIRE(JNode::ref<JNodeNumber>((*jNode)[0]).nodeType == JSON::JNodeType::number);
-        REQUIRE(JNode::ref<JNodeNumber>((*jNode)[1]).nodeType == JSON::JNodeType::number);
-        REQUIRE(JNode::ref<JNodeString>((*jNode)[2]).nodeType == JSON::JNodeType::string);
+        REQUIRE(JNode::ref<JNodeNumber>((*jNode)[0]).nodeType == JNodeType::number);
+        REQUIRE(JNode::ref<JNodeNumber>((*jNode)[1]).nodeType == JNodeType::number);
+        REQUIRE(JNode::ref<JNodeString>((*jNode)[2]).nodeType == JNodeType::string);
         REQUIRE(JNode::ref<JNodeNumber>((*jNode)[0]).value == "777");
         REQUIRE(JNode::ref<JNodeNumber>((*jNode)[1]).value == "9000");
         REQUIRE(JNode::ref<JNodeString>((*jNode)[2]).value == "apples");
@@ -211,13 +211,13 @@ TEST_CASE("Creation and use of JSON for decode of a list of example JSON files."
         std::string jsonFileBuffer = readJSONFromFile(testFile);
         REQUIRE_NOTHROW(json.decodeBuffer(jsonFileBuffer));
         std::unique_ptr<JNode> jNode = json.decodeBuffer(jsonFileBuffer);
-        REQUIRE(jNode->nodeType == JSON::JNodeType::object);
+        REQUIRE(jNode->nodeType == JNodeType::object);
     }
     SECTION("Decode from file directly", "[JSON][Decode]")
     {
         REQUIRE_NOTHROW(json.decodeFile(testFile));
         std::unique_ptr<JNode> jNode = json.decodeFile(testFile);
-        REQUIRE(jNode->nodeType == JSON::JNodeType::object);
+        REQUIRE(jNode->nodeType == JNodeType::object);
     }
 }
 TEST_CASE("Decode generated exceptions.", "[JSON][Decode][Exceptions]")
@@ -262,6 +262,6 @@ TEST_CASE("Decode generated exceptions.", "[JSON][Decode][Exceptions]")
     SECTION("Decode object with missing closing '}'.", "[JSON][Decode]")
     {
         REQUIRE_THROWS_AS(json.decodeBuffer("{  \"one\" : 18987"), std::runtime_error);
-        REQUIRE_THROWS_WITH(json.decodeBuffer("{ \"one\" : 18987 "), "JSON syntax error detected.");
+        REQUIRE_THROWS_WITH(json.decodeBuffer("{ \"one\" : 18987"), "JSON syntax error detected.");
     }
 }

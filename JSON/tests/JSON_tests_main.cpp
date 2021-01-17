@@ -36,12 +36,12 @@ std::string readJSONFromFile(const std::string &jsonFileName)
 /// <returns></returns>
 void checkArray(JNode *jNode)
 { // Array [\"Dog\",1964,true,null]
-  REQUIRE(jNode->nodeType == JSON::JNodeType::array);
+  REQUIRE(jNode->nodeType == JNodeType::array);
   REQUIRE(JNode::ref<JNodeArray>(*jNode).value.size() == 4);
-  REQUIRE((*jNode)[0].nodeType == JSON::JNodeType::string);
-  REQUIRE((*jNode)[1].nodeType == JSON::JNodeType::number);
-  REQUIRE((*jNode)[2].nodeType == JSON::JNodeType::boolean);
-  REQUIRE((*jNode)[3].nodeType == JSON::JNodeType::null);
+  REQUIRE((*jNode)[0].nodeType == JNodeType::string);
+  REQUIRE((*jNode)[1].nodeType == JNodeType::number);
+  REQUIRE((*jNode)[2].nodeType == JNodeType::boolean);
+  REQUIRE((*jNode)[3].nodeType == JNodeType::null);
   REQUIRE(JNode::ref<JNodeString>((*jNode)[0]).value == "Dog");
   REQUIRE(JNode::ref<JNodeNumber>((*jNode)[1]).value == "1964");
   REQUIRE(JNode::ref<JNodeBoolean>((*jNode)[2]).value == true);
@@ -54,12 +54,12 @@ void checkArray(JNode *jNode)
 /// <returns></returns>
 void checkObject(JNode *jNode)
 { // {\"City\":\"Southampton\",\"Population\":500000}
-  REQUIRE(jNode->nodeType == JSON::JNodeType::object);
+  REQUIRE(jNode->nodeType == JNodeType::object);
   REQUIRE(JNode::ref<JNodeObject>(*jNode).value.size() == 2);
   REQUIRE(JNode::ref<JNodeObject>(*jNode).value.count("City") > 0);
   REQUIRE(JNode::ref<JNodeObject>(*jNode).value.count("Population") > 0);
-  REQUIRE((*jNode)["City"].nodeType == JSON::JNodeType::string);
-  REQUIRE((*jNode)["Population"].nodeType == JSON::JNodeType::number);
+  REQUIRE((*jNode)["City"].nodeType == JNodeType::string);
+  REQUIRE((*jNode)["Population"].nodeType == JNodeType::number);
   REQUIRE(JNode::ref<JNodeString>((*jNode)["City"]).value == "Southampton");
   REQUIRE(JNode::ref<JNodeNumber>((*jNode)["Population"]).value == "500000");
 }
@@ -236,14 +236,14 @@ TEST_CASE("Use of JNode indexing operators", "[JSON][JNode][Index]")
   SECTION("Decode dictionary and check an invalid key generates exception", "[JSON][JNode][Index]")
   {
     jNode = json.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
-    REQUIRE_THROWS_AS((*jNode)["Cityy"].nodeType == JSON::JNodeType::object, std::runtime_error);
-    REQUIRE_THROWS_WITH((*jNode)["Cityy"].nodeType == JSON::JNodeType::object, "Invalid key used to access object.");
+    REQUIRE_THROWS_AS((*jNode)["Cityy"].nodeType == JNodeType::object, std::runtime_error);
+    REQUIRE_THROWS_WITH((*jNode)["Cityy"].nodeType == JNodeType::object, "Invalid key used to access object.");
   }
   SECTION("Decode list and check an invalid index generates exception", "[JSON][JNode][Index]")
   {
     jNode = json.decodeBuffer("[777,9000,\"apples\"]");
-    REQUIRE_THROWS_AS((*jNode)[3].nodeType == JSON::JNodeType::array, std::runtime_error);
-    REQUIRE_THROWS_WITH((*jNode)[3].nodeType == JSON::JNodeType::array, "Invalid index used to access array.");
+    REQUIRE_THROWS_AS((*jNode)[3].nodeType == JNodeType::array, std::runtime_error);
+    REQUIRE_THROWS_WITH((*jNode)[3].nodeType == JNodeType::array, "Invalid index used to access array.");
   }
 }
 TEST_CASE("Check JNode reference functions work.", "[JSON][JNode][Reference]")
