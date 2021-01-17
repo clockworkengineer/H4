@@ -24,6 +24,7 @@ set (BENCODE_SOURCES
 set (BENCODE_INCLUDES
     ./include/Bencode.hpp
     ./include/BNode.hpp
+    ./include/Bencoding.hpp
     ./include/BencodeSources.hpp
     ./include/BencodeDestinations.hpp
 )

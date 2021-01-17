@@ -1,5 +1,5 @@
-#ifndef BNCODING_HPP
-#define BNCODING_HPP
+#ifndef BENCODING_HPP
+#define BENCODING_HPP
 //
 // C++ STL
 //
@@ -56,4 +56,4 @@ namespace H4
         std::vector<std::byte> m_Buffer;
     };
 } // namespace H4
-#endif /* BNCODING_HPP */
+#endif /* BENCODING_HPP */
