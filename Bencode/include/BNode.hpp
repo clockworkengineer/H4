@@ -62,6 +62,7 @@ namespace H4
         {
             return (m_value);
         }
+
     protected:
         std::map<std::string, std::unique_ptr<BNode>> m_value;
     };
@@ -87,6 +88,7 @@ namespace H4
         {
             return (m_value[index].get());
         }
+
     protected:
         std::vector<std::unique_ptr<BNode>> m_value;
     };
@@ -103,6 +105,7 @@ namespace H4
         {
             return (m_value);
         }
+
     protected:
         long m_value;
     };
@@ -120,9 +123,18 @@ namespace H4
         {
             return (m_value);
         }
+
     protected:
         std::string m_value;
     };
+    //
+    // Convert base reference
+    //
+    template <typename T>
+    T &BNodeRef(BNode &bNode)
+    {
+        return (static_cast<T &>(bNode));
+    }
     //
     // Index overloads
     //
@@ -130,9 +142,9 @@ namespace H4
     {
         if (nodeType == BNodeType::dictionary)
         {
-            if (static_cast<BNodeDict *>(this)->containsKey(key))
+            if (BNodeRef<BNodeDict>(*this).containsKey(key))
             {
-                return (*static_cast<BNode *>((static_cast<BNodeDict *>(this)->getEntry(key))));
+                return (*((BNodeRef<BNodeDict>(*this).getEntry(key))));
             }
         }
         throw std::runtime_error("Invalid key used in dictionary.");
@@ -141,17 +153,13 @@ namespace H4
     {
         if (nodeType == BNodeType::list)
         {
-            if ((index >= 0) && (index < ((int)static_cast<BNodeList *>(this)->size())))
+            if ((index >= 0) && (index < ((int)BNodeRef<BNodeList>(*this).size())))
             {
-                return (*static_cast<BNode *>((static_cast<BNodeList *>(this)->getEntry(index))));
+                return (*((BNodeRef<BNodeList>(*this).getEntry(index))));
             }
         }
         throw std::runtime_error("Invalid index used in list.");
     }
-    template <typename T>
-    T &BNodeRef(BNode &bNode)
-    {
-        return (static_cast<T &>(bNode));
-    }
+
 } // namespace H4
 #endif /* BNODE_HPP */
