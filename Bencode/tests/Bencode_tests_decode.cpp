@@ -183,7 +183,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   }
   SECTION("Decode singlefile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
-    REQUIRE(bEncode.encodeBuffer(bEncode.decodeFile(kSingleFileTorrent)) == Bencode::Bencoding(readBencodedBytesFromFile(kSingleFileTorrent)));
+    REQUIRE(bEncode.encodeBuffer(bEncode.decodeFile(kSingleFileTorrent)) == Bencoding(readBencodedBytesFromFile(kSingleFileTorrent)));
   }
   SECTION("Decode multifile.torrent", "[Bencode][Decode][Torrents]")
   {
@@ -192,7 +192,7 @@ TEST_CASE("Decode torrent files using decodeFile", "[Bencode][Decode][Torrents]"
   }
   SECTION("Decode multifile.torrent and check value ", "[Bencode][Decode][Torrents]")
   {
-    REQUIRE(bEncode.encodeBuffer(bEncode.decodeFile(kMultiFileTorrent)) == Bencode::Bencoding(readBencodedBytesFromFile(kMultiFileTorrent)));
+    REQUIRE(bEncode.encodeBuffer(bEncode.decodeFile(kMultiFileTorrent)) == Bencoding(readBencodedBytesFromFile(kMultiFileTorrent)));
   }
 }
 TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][Torrents]")

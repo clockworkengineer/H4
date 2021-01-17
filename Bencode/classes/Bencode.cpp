@@ -222,7 +222,7 @@ namespace H4
     /// </summary>
     /// <param name="bNodeRoot">Bnode structure root.</param>
     /// <returns>Encoded data buffer.</returns>
-    Bencode::Bencoding Bencode::encodeBuffer(std::unique_ptr<BNode> bNodeRoot)
+    Bencoding Bencode::encodeBuffer(std::unique_ptr<BNode> bNodeRoot)
     {
         if (bNodeRoot == nullptr)
         {

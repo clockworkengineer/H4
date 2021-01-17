@@ -18,42 +18,42 @@ using namespace H4;
 TEST_CASE("Creation and use of Bencode for encode of simple types (number, string) ", "[Bencode][Encode]")
 {
     Bencode bEncode;
-    Bencode::Bencoding actual;
+    Bencoding actual;
     SECTION("Encode an integer (266) and check value", "[Bencode][Encode]")
     {
         actual = bEncode.encodeBuffer(std::make_unique<BNodeInteger>(BNodeInteger(266)));
-        REQUIRE(actual == Bencode::Bencoding("i266e"));
+        REQUIRE(actual == Bencoding("i266e"));
     }
     SECTION("Encode an integer (10000) and check value", "[Bencode][Encode]")
     {
         actual = bEncode.encodeBuffer(std::make_unique<BNodeInteger>(BNodeInteger(10000)));
-        REQUIRE(actual == Bencode::Bencoding("i10000e"));
+        REQUIRE(actual == Bencoding("i10000e"));
     }
     SECTION("Encode an string ('qwertyuiopas') and check its value", "[Bencode][Encode]")
     {
         actual = bEncode.encodeBuffer(std::make_unique<BNodeString>(BNodeString("qwertyuiopas")));
-        REQUIRE(actual == Bencode::Bencoding("12:qwertyuiopas"));
+        REQUIRE(actual == Bencoding("12:qwertyuiopas"));
     }
     SECTION("Encode an string ('abcdefghijklmnopqrstuvwxyz') and check its value", "[Bencode][Encode]")
     {
         actual = bEncode.encodeBuffer(std::make_unique<BNodeString>(BNodeString("abcdefghijklmnopqrstuvwxyz")));
-        REQUIRE(actual == Bencode::Bencoding("26:abcdefghijklmnopqrstuvwxyz"));
+        REQUIRE(actual == Bencoding("26:abcdefghijklmnopqrstuvwxyz"));
     }
 }
 TEST_CASE("Creation and use of Bencode for encode of a table of integer test data", "[Bencode][Encode]")
 {
-    auto [testInput, expected] = GENERATE(table<long, Bencode::Bencoding>({{277, "i277e"},
+    auto [testInput, expected] = GENERATE(table<long, Bencoding>({{277, "i277e"},
                                                                            {32767, "i32767e"}}));
     Bencode bEncode;
-    Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeInteger>(BNodeInteger(testInput)));
+    Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeInteger>(BNodeInteger(testInput)));
     REQUIRE(actual == expected);
 }
 TEST_CASE("Creation and use of Bencode for encode of a table of string test data", "[Bencode][Encode]")
 {
-    auto [testInput, expected] = GENERATE(table<std::string, Bencode::Bencoding>({{"qwertyuiopasd", "13:qwertyuiopasd"},
+    auto [testInput, expected] = GENERATE(table<std::string, Bencoding>({{"qwertyuiopasd", "13:qwertyuiopasd"},
                                                                                   {"mnbvcx", "6:mnbvcx"}}));
     Bencode bEncode;
-    Bencode::Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeString>(BNodeString(testInput)));
+    Bencoding actual = bEncode.encodeBuffer(std::make_unique<BNodeString>(BNodeString(testInput)));
     REQUIRE(actual == expected);
 }
 TEST_CASE("Creation and use of Bencode for encode of collection types (list, dictionary) ", "[Bencode][Encode]")
@@ -61,22 +61,22 @@ TEST_CASE("Creation and use of Bencode for encode of collection types (list, dic
     Bencode bEncode;
     SECTION("Encode an List of integers('li266ei6780ei88ee') and check value", "[Bencode][Encode]")
     {
-        Bencode::Bencoding expected("li266ei6780ei88ee");
+        Bencoding expected("li266ei6780ei88ee");
         REQUIRE(bEncode.encodeBuffer(bEncode.decodeBuffer(expected)) == expected);
     }
     SECTION("Encode an List of strings ('l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze') and check value", "[Bencode][Encode]")
     {
-        Bencode::Bencoding expected = "l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze";
+        Bencoding expected = "l6:sillyy12:poiuytrewqas26:abcdefghijklmnopqrstuvwxyze";
         REQUIRE(bEncode.encodeBuffer(bEncode.decodeBuffer(expected)) == expected);
     }
     SECTION("Encode an Dictionary of integers and check balue", "[Bencode][Encode]")
     {
-        Bencode::Bencoding expected = "d3:onei1e5:threei3e3:twoi2ee";
+        Bencoding expected = "d3:onei1e5:threei3e3:twoi2ee";
         REQUIRE(bEncode.encodeBuffer(bEncode.decodeBuffer(expected)) == expected);
     }
     SECTION("Encode an Dictionary of strings and check balue", "[Bencode][Encode]")
     {
-        Bencode::Bencoding expected = "d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle";
+        Bencoding expected = "d3:one10:01234567895:three6:qwerty3:two9:asdfghjkle";
         REQUIRE(bEncode.encodeBuffer(bEncode.decodeBuffer(expected)) == expected);
     }
 }
