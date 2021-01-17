@@ -128,7 +128,7 @@ namespace H4
         std::string m_value;
     };
     //
-    // Convert base reference
+    // Convert base BNode reference
     //
     template <typename T>
     T &BNodeRef(BNode &bNode)
