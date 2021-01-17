@@ -32,11 +32,6 @@ namespace H4
     struct JNode
     {
     public:
-        template <typename T>
-        static T &ref(JNode &jNode)
-        {
-            return (static_cast<T &>(jNode));
-        }
         JNode(JNodeType nodeType = JNodeType::base)
         {
             this->nodeType = nodeType;
@@ -156,6 +151,11 @@ namespace H4
             }
         }
         throw std::runtime_error("Invalid index used to access array.");
+    }
+    template <typename T>
+    T &JNodeRef(JNode &jNode)
+    {
+        return (static_cast<T &>(jNode));
     }
 } // namespace H4
 #endif /* JNODE_HPP */

@@ -86,7 +86,7 @@ namespace H4
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeString(ISource *source)
     {
-        return (std::make_unique<JNodeString>(JNodeString(extractString(source))));
+        return (std::make_unique<JNodeString>(extractString(source)));
     }
     /// <summary>
     /// Decode a number from a JSON source stream.
@@ -119,7 +119,7 @@ namespace H4
                 throw std::runtime_error("JSON syntax error detected.");
             }
         }
-        return (std::make_unique<JNodeNumber>(JNodeNumber(m_workBuffer)));
+        return (std::make_unique<JNodeNumber>(m_workBuffer));
     }
     /// <summary>
     /// Decode a boolean from a JSON source stream.
@@ -138,11 +138,11 @@ namespace H4
         }
         if (m_workBuffer == "true")
         {
-            return (std::make_unique<JNodeBoolean>(JNodeBoolean(true)));
+            return (std::make_unique<JNodeBoolean>(true));
         }
         else if (m_workBuffer == "false")
         {
-            return (std::make_unique<JNodeBoolean>(JNodeBoolean(false)));
+            return (std::make_unique<JNodeBoolean>(false));
         }
         throw std::runtime_error("JSON syntax error detected.");
     }
@@ -163,7 +163,7 @@ namespace H4
         }
         if (m_workBuffer == "null")
         {
-            return (std::make_unique<JNodeNull>(JNodeNull()));
+            return (std::make_unique<JNodeNull>());
         }
         throw std::runtime_error("JSON syntax error detected.");
     }
@@ -258,25 +258,25 @@ namespace H4
         switch (jNode->nodeType)
         {
         case JNodeType::number:
-            destination->addBytes(JNode::ref<JNodeNumber>(*jNode).value);
+            destination->addBytes(JNodeRef<JNodeNumber>(*jNode).value);
             break;
         case JNodeType::string:
-            destination->addBytes("\"" + JNode::ref<JNodeString>(*jNode).value + "\"");
+            destination->addBytes("\"" + JNodeRef<JNodeString>(*jNode).value + "\"");
             break;
         case JNodeType::boolean:
-            destination->addBytes(JNode::ref<JNodeBoolean>(*jNode).value ? "true" : "false");
+            destination->addBytes(JNodeRef<JNodeBoolean>(*jNode).value ? "true" : "false");
             break;
         case JNodeType::null:
             destination->addBytes("null");
             break;
         case JNodeType::object:
         {
-            int commaCount = JNode::ref<JNodeObject>(*jNode).value.size() - 1;
+            int commaCount = JNodeRef<JNodeObject>(*jNode).value.size() - 1;
             destination->addBytes("{");
-            for (auto key : JNode::ref<JNodeObject>(*jNode).keys)
+            for (auto key : JNodeRef<JNodeObject>(*jNode).keys)
             {
                 destination->addBytes("\"" + key + "\"" + ":");
-                encodeJNodes(JNode::ref<JNodeObject>(*jNode).value[key].get(), destination);
+                encodeJNodes(JNodeRef<JNodeObject>(*jNode).value[key].get(), destination);
                 if (commaCount-- > 0)
                 {
                     destination->addBytes(",");
@@ -287,9 +287,9 @@ namespace H4
         }
         case JNodeType::array:
         {
-            int commaCount = JNode::ref<JNodeArray>(*jNode).value.size() - 1;
+            int commaCount = JNodeRef<JNodeArray>(*jNode).value.size() - 1;
             destination->addBytes("[");
-            for (auto &bNodeEntry : JNode::ref<JNodeArray>(*jNode).value)
+            for (auto &bNodeEntry : JNodeRef<JNodeArray>(*jNode).value)
             {
                 encodeJNodes(bNodeEntry.get(), destination);
                 if (commaCount-- > 0)
