@@ -26,6 +26,10 @@
 #include <stdexcept>
 #include <utility>
 #include <set>
+#include <sstream>
+#include <codecvt>
+#include <locale>
+#include <string>
 // =========
 // NAMESPACE
 // =========
@@ -46,6 +50,26 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    std::string toEscaped(std::string const &utf8String)
+    {
+        std::ostringstream escapedString;
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utf8ToUnicode;
+        std::u32string utf32String = utf8ToUnicode.from_bytes(utf8String);
+        escapedString << "\"";
+        for (char32_t unicodeCharacter : utf32String)
+        {
+            if (unicodeCharacter < 128)
+            {
+                escapedString << (char)unicodeCharacter;
+            }
+            else
+            {
+                escapedString << "\\u" << std::hex << std::uppercase << (std::int32_t)unicodeCharacter;
+            }
+        }
+        escapedString << "\"";
+        return (escapedString.str());
+    }
     /// <summary>
     /// Move to next non-whitespace character in JSON encoded source stream.
     /// </summary>
@@ -187,8 +211,8 @@ namespace H4
             }
             source->moveToNextByte();
             ignoreWhiteSpace(source);
-            object.addEntry(key,decodeJNodes(source));
- 
+            object.addEntry(key, decodeJNodes(source));
+
             ignoreWhiteSpace(source);
         } while (source->currentByte() == ',');
         if (source->currentByte() != '}')
