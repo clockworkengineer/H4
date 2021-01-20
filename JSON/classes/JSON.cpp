@@ -97,6 +97,28 @@ namespace H4
                     {
                         result += '\t';
                     }
+                    else if (*it == 'u')
+                    {
+                        it++;
+                        std::string hexDigits;
+                        for (auto number = 0; number < 4; number++)
+                        {
+                            hexDigits += *it;
+                            it++;
+                            if (it == m_workBuffer.end())
+                            {
+                                throw std::runtime_error("JSON syntax error detected.");
+                            }
+                        }
+                        int utf32char = (int)std::stoi(hexDigits.c_str(), 0, 16);
+                        std::string utf8String = m_utf8ToUnicode.to_bytes(utf32char);
+                        result += utf8String;
+                        continue;
+                    }
+                    else
+                    {
+                        throw std::runtime_error("JSON syntax error detected.");
+                    }
                 }
             }
             it++;

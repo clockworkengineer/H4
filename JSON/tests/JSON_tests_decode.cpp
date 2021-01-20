@@ -268,49 +268,59 @@ TEST_CASE("Decode generated exceptions.", "[JSON][Decode][Exceptions]")
 TEST_CASE("Creation and use of JSON object for decoding of strings with escape characters.", "[JSON][Decode]")
 {
     JSON json;
-    SECTION("Encode string with escapes '\t' to buffer and check value", "[JSON][Decode]")
+    SECTION("Encode string with escapes '\\t' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\t \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \t ");
     }
-    SECTION("Encode string with escapes '\"' to buffer and check value", "[JSON][Decode]")
+    SECTION("Encode string with escapes '\\\"' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\\" \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \" ");
     }
-    SECTION("Encode string with escapes '\\' to buffer and check value", "[JSON][Decode]")
+    SECTION("Encode string with escapes '\\\\' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\\\ \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \\ ");
     }
-    SECTION("Encode string with escapes '\b' to buffer and check value", "[JSON][Decode]")
+    SECTION("Encode string with escapes '\\b' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\b \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \b ");
     }
-    SECTION("Encode string with escapes '/' to buffer and check value", "[JSON][Decode]")
+    SECTION("Encode string with escapes '\\/' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\/ \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String / ");
     }
-    SECTION("Encode string with escapes '\f' to buffer and check value", "[JSON][Decode]")
+    SECTION("Encode string with escapes '\\f' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\f \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \f ");
     }
-    SECTION("Encode string with escapes '\n' to buffer and check value", "[JSON][Decode]")
+    SECTION("Encode string with escapes '\\n' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\n \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \n ");
     }
-    SECTION("Encode string with escapes '\r' to buffer and check value", "[JSON][Decode]")
+    SECTION("Encode string with escapes '\\r' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\r \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \r ");
     }
-    SECTION("Encode string with escapes '\t' to buffer and check value", "[JSON][Decode]")
+    SECTION("Encode string with escapes '\\t' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\t \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \t ");
+    }
+    SECTION("Encode string with escapes '\\u0123' to buffer and check value","[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\u0123 \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \u0123 ");
+    }
+       SECTION("Encode string with escapes '\\u0123 \\u0456' to buffer and check value","[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\u0123 \\u0456 \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \u0123 \u0456 ");
     }
 }
