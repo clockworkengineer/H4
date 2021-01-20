@@ -46,73 +46,77 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    std::string JSON::translateStringEscapes()
+    /// <summary>
+    /// Convert any escape sequences in string to their correct sequence
+    //  of characters (UTF-8).
+    /// </summary>
+    /// <param name="jsonString">JSON string to process.</param>
+    /// <returns>Converted string.</returns>
+    std::string JSON::translateEscapesFromString(const std::string &jsonString)
     {
-        std::string result;
-        auto it = m_workBuffer.begin();
-        while (it != m_workBuffer.end())
+        m_escapedString.str("");
+        m_escapedString.clear();
+        auto it = jsonString.begin();
+        while (it != jsonString.end())
         {
             if (*it != '\\')
             {
-                result += *it;
+                m_escapedString << *it;
             }
             else
             {
                 it++;
-                if (it != m_workBuffer.end())
+                if (it != jsonString.end())
                 {
                     if (*it == 't')
                     {
-                        result += '\t';
+                        m_escapedString << '\t';
                     }
                     else if (*it == '\"')
                     {
-                        result += '\"';
+                        m_escapedString << '\"';
                     }
                     else if (*it == '\\')
                     {
-                        result += '\\';
+                        m_escapedString << '\\';
                     }
                     else if (*it == '/')
                     {
-                        result += '/';
+                        m_escapedString << '/';
                     }
                     else if (*it == 'b')
                     {
-                        result += '\b';
+                        m_escapedString << '\b';
                     }
                     else if (*it == 'f')
                     {
-                        result += '\f';
+                        m_escapedString << '\f';
                     }
                     else if (*it == 'n')
                     {
-                        result += '\n';
+                        m_escapedString << '\n';
                     }
                     else if (*it == 'r')
                     {
-                        result += '\r';
+                        m_escapedString << '\r';
                     }
                     else if (*it == 't')
                     {
-                        result += '\t';
+                        m_escapedString << '\t';
                     }
                     else if (*it == 'u')
                     {
                         it++;
-                        std::string hexDigits;
+                        char hexDigits[5];
                         for (auto number = 0; number < 4; number++)
                         {
-                            hexDigits += *it;
-                            it++;
-                            if (it == m_workBuffer.end())
+                            hexDigits[number] = *it++;
+                            if (it == jsonString.end() || (std::isxdigit(hexDigits[number]) == 0))
                             {
                                 throw std::runtime_error("JSON syntax error detected.");
                             }
                         }
-                        int utf32char = (int)std::stoi(hexDigits.c_str(), 0, 16);
-                        std::string utf8String = m_utf8ToUnicode.to_bytes(utf32char);
-                        result += utf8String;
+                        m_escapedString << m_utf8ToUnicode.to_bytes((int)std::stoi(hexDigits, 0, 16));
                         continue;
                     }
                     else
@@ -123,14 +127,14 @@ namespace H4
             }
             it++;
         }
-        return (result);
+        return (m_escapedString.str());
     }
     /// <summary>
-    /// Escape any characters that require it.
+    /// Convert any escapable character sequence to their escape sequence representation.
     /// </summary>
     /// <param name="utf8String">String to convert.</param>
     /// <returns>Converted string.</returns>
-    std::string JSON::addEscapesToString(std::string const &utf8String)
+    std::string JSON::translateEscapeToString(std::string const &utf8String)
     {
         m_escapedString.str("");
         m_escapedString.clear();
@@ -217,7 +221,7 @@ namespace H4
             throw std::runtime_error("JSON syntax error detected.");
         }
         source->moveToNextByte();
-        return (translateStringEscapes());
+        return (translateEscapesFromString(m_workBuffer));
     }
     /// <summary>
     /// Decode a string from a JSON source stream.
@@ -328,7 +332,6 @@ namespace H4
             source->moveToNextByte();
             ignoreWhiteSpace(source);
             object.addEntry(key, decodeJNodes(source));
-
             ignoreWhiteSpace(source);
         } while (source->currentByte() == ',');
         if (source->currentByte() != '}')
@@ -401,7 +404,7 @@ namespace H4
             destination->addBytes(JNodeRef<JNodeNumber>(*jNode).getNumber());
             break;
         case JNodeType::string:
-            destination->addBytes("\"" + addEscapesToString(JNodeRef<JNodeString>(*jNode).getString()) + "\"");
+            destination->addBytes("\"" + translateEscapeToString(JNodeRef<JNodeString>(*jNode).getString()) + "\"");
             break;
         case JNodeType::boolean:
             destination->addBytes(JNodeRef<JNodeBoolean>(*jNode).getBoolean() ? "true" : "false");
@@ -415,7 +418,7 @@ namespace H4
             destination->addBytes("{");
             for (auto key : JNodeRef<JNodeObject>(*jNode).getKeys())
             {
-                destination->addBytes("\"" + addEscapesToString(key) + "\"" + ":");
+                destination->addBytes("\"" + translateEscapeToString(key) + "\"" + ":");
                 encodeJNodes(JNodeRef<JNodeObject>(*jNode).getEntry(key), destination);
                 if (commaCount-- > 0)
                 {
