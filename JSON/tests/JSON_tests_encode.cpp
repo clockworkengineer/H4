@@ -120,32 +120,71 @@ TEST_CASE("Encode generated exceptions", "[JSON][Encode][Exceptions]")
         REQUIRE_THROWS_WITH(json.encodeFile(std::unique_ptr<JNode>(new JNode()), ""), "Empty file name passed to be encoded.");
     }
 }
-TEST_CASE("Creation and use of JSON object for encode of a list of example JSON files.", "[JSON][Encode]")
-{
-    auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
-                                                  "./testData/testfile002.json",
-                                                  "./testData/testfile003.json",
-                                                  "./testData/testfile004.json"}));
-    JSON json;
-    SECTION("Encode to  buffer and check value", "[JSON][Encode]")
-    {
-        std::string jsonFileBuffer = readJSONFromFile(testFile);
-        REQUIRE(json.encodeBuffer(json.decodeBuffer(jsonFileBuffer)) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
-    }
-    SECTION("Encode to file and check value", "[JSON][ENcode]")
-    {
-        std::filesystem::remove(kGeneratedTorrentFile);
-        std::string jsonFileBuffer = readJSONFromFile(testFile);
-        json.encodeFile(json.decodeBuffer(jsonFileBuffer), kGeneratedTorrentFile);
-        REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
-    }
-}
-
+// TEST_CASE("Creation and use of JSON object for encode of a list of example JSON files.", "[JSON][Encode]")
+// {
+//     auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
+//                                                   "./testData/testfile002.json",
+//                                                   "./testData/testfile003.json",
+//                                                   "./testData/testfile004.json"}));
+//     JSON json;
+//     SECTION("Encode to  buffer and check value", "[JSON][Encode]")
+//     {
+//         std::string jsonFileBuffer = readJSONFromFile(testFile);
+//         REQUIRE(json.encodeBuffer(json.decodeBuffer(jsonFileBuffer)) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
+//     }
+//     SECTION("Encode to file and check value", "[JSON][ENcode]")
+//     {
+//         std::filesystem::remove(kGeneratedTorrentFile);
+//         std::string jsonFileBuffer = readJSONFromFile(testFile);
+//         json.encodeFile(json.decodeBuffer(jsonFileBuffer), kGeneratedTorrentFile);
+//         REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
+//     }
+// }
 TEST_CASE("Creation and use of JSON object for encoding of strings with escape characters.", "[JSON][Encode]")
 {
     JSON json;
-    SECTION("Encode string with escapes '\"' to buffer and check value", "[JSON][Encode]")
+    SECTION("Encode string with escapes '\\t' to buffer and check value", "[JSON][Decode]")
     {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\t \"")) == "\"Test String \\t \"");
     }
-
+    SECTION("Encode string with escapes '\\\"' to buffer and check value", "[JSON][Decode]")
+    {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\\" \"")) == "\"Test String \\\" \"");
+    }
+    SECTION("Encode string with escapes '\\\\' to buffer and check value", "[JSON][Decode]")
+    {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\\\ \"")) == "\"Test String \\\\ \"");
+    }
+    SECTION("Encode string with escapes '\\b' to buffer and check value", "[JSON][Decode]")
+    {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\b \"")) == "\"Test String \\b \"");
+    }
+    SECTION("Encode string with escapes '\\/' to buffer and check value", "[JSON][Decode]")
+    {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\/ \"")) == "\"Test String \\/ \"");
+    }
+    SECTION("Encode string with escapes '\\f' to buffer and check value", "[JSON][Decode]")
+    {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\f \"")) == "\"Test String \\f \"");
+    }
+    SECTION("Encode string with escapes '\\n' to buffer and check value", "[JSON][Decode]")
+    {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\n \"")) == "\"Test String \\n \"");
+    }
+    SECTION("Encode string with escapes '\\r' to buffer and check value", "[JSON][Decode]")
+    {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\r \"")) == "\"Test String \\r \"");
+    }
+    SECTION("Encode string with escapes '\\t' to buffer and check value", "[JSON][Decode]")
+    {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\t \"")) == "\"Test String \\t \"");
+    }
+    SECTION("Encode string with escapes '\\u0123' to buffer and check value", "[JSON][Decode]")
+    {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\u0123 \"")) == "\"Test String \\u0123 \"");
+    }
+    SECTION("Encode string with escapes '\\u0123 \\u0456' to buffer and check value", "[JSON][Decode]")
+    {
+        REQUIRE(json.encodeBuffer(json.decodeBuffer("\"Test String \\u0123 \\u0456 \"")) == "\"Test String \\u0123 \\u0456 \"");
+    }
 }

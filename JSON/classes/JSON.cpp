@@ -26,6 +26,9 @@
 #include <stdexcept>
 #include <utility>
 #include <set>
+#include <iomanip>
+#include <iostream>
+
 // =========
 // NAMESPACE
 // =========
@@ -142,13 +145,13 @@ namespace H4
         for (char32_t unicodeCharacter : utf32String)
         { // ASCII and control characters
             if (unicodeCharacter == '\\')
-            {
+            { 
                 m_escapedString << "\\\\";
             }
-            // else if (unicodeCharacter == '/')
-            // {
-            //     m_escapedString << "\\/";
-            // }
+            else if (unicodeCharacter == '/')
+            {
+                m_escapedString << "\\/";
+            }
             else if (unicodeCharacter == '"')
             {
                 m_escapedString << "\\\"";
@@ -180,7 +183,7 @@ namespace H4
             // UTF8 escaped
             else
             {
-                m_escapedString << "\\u" << std::hex << std::uppercase << (std::int32_t)unicodeCharacter;
+                m_escapedString << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << (std::int32_t)unicodeCharacter;
             }
         }
         return (m_escapedString.str());
