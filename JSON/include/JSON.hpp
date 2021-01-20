@@ -9,6 +9,9 @@
 #include <list>
 #include <memory>
 #include <fstream>
+#include <codecvt>
+#include <locale>
+#include <sstream>
 //
 // JSON JNodes
 //
@@ -72,6 +75,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        std::string addEscapedToString(std::string const &utf8String);
         void ignoreWhiteSpace(ISource *source);
         std::string extractString(ISource *source);
         std::unique_ptr<JNode> decodeJNodes(ISource *source);
@@ -87,6 +91,8 @@ namespace H4
         // PRIVATE VARIABLES
         // =================
         std::string m_workBuffer;
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> m_utf8ToUnicode;
+        std::ostringstream m_escapedString;
     };
 } // namespace H4
 #endif /* JSON_HPP */

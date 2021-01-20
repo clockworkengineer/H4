@@ -26,10 +26,6 @@
 #include <stdexcept>
 #include <utility>
 #include <set>
-#include <sstream>
-#include <codecvt>
-#include <locale>
-#include <string>
 // =========
 // NAMESPACE
 // =========
@@ -50,25 +46,61 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    std::string toEscaped(std::string const &utf8String)
+    /// <summary>
+    /// Escape any characters that require it.
+    /// </summary>
+    /// <param name="utf8String">String to convert.</param>
+    /// <returns>Converted string.</returns>
+    std::string JSON::addEscapedToString(std::string const &utf8String)
     {
-        std::ostringstream escapedString;
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utf8ToUnicode;
-        std::u32string utf32String = utf8ToUnicode.from_bytes(utf8String);
-        escapedString << "\"";
+        m_escapedString.str("");
+        m_escapedString.clear();
+        std::u32string utf32String = m_utf8ToUnicode.from_bytes(utf8String);
         for (char32_t unicodeCharacter : utf32String)
         {
-            if (unicodeCharacter < 128)
+            // ASCII and control characters
+            if ((unicodeCharacter > 0x1F) && (unicodeCharacter < 0x80))
             {
-                escapedString << (char)unicodeCharacter;
+                if (unicodeCharacter == '\\')
+                {
+                    m_escapedString << "\\\\";
+                }
+                else if (unicodeCharacter == '"')
+                {
+                    m_escapedString << "\\\"";
+                }
+                else if (unicodeCharacter == '\b')
+                {
+                    m_escapedString << "\\\b";
+                }
+                else if (unicodeCharacter == '\f')
+                {
+                    m_escapedString << "\\\f";
+                }
+                else if (unicodeCharacter == '\n')
+                {
+                    m_escapedString << "\\\n";
+                }
+                else if (unicodeCharacter == '\r')
+                {
+                    m_escapedString << "\\\r";
+                }
+                else if (unicodeCharacter == '\t')
+                {
+                    m_escapedString << "\\\t";
+                }
+                else
+                {
+                    m_escapedString << (char)unicodeCharacter;
+                }
             }
+            // UTF8 escaped
             else
             {
-                escapedString << "\\u" << std::hex << std::uppercase << (std::int32_t)unicodeCharacter;
+                m_escapedString << "\\u" << std::hex << std::uppercase << (std::int32_t)unicodeCharacter;
             }
         }
-        escapedString << "\"";
-        return (escapedString.str());
+        return (m_escapedString.str());
     }
     /// <summary>
     /// Move to next non-whitespace character in JSON encoded source stream.
@@ -285,7 +317,7 @@ namespace H4
             destination->addBytes(JNodeRef<JNodeNumber>(*jNode).getNumber());
             break;
         case JNodeType::string:
-            destination->addBytes("\"" + JNodeRef<JNodeString>(*jNode).getString() + "\"");
+            destination->addBytes("\"" + addEscapedToString(JNodeRef<JNodeString>(*jNode).getString()) + "\"");
             break;
         case JNodeType::boolean:
             destination->addBytes(JNodeRef<JNodeBoolean>(*jNode).getBoolean() ? "true" : "false");
@@ -299,7 +331,7 @@ namespace H4
             destination->addBytes("{");
             for (auto key : JNodeRef<JNodeObject>(*jNode).getKeys())
             {
-                destination->addBytes("\"" + key + "\"" + ":");
+                destination->addBytes("\"" + addEscapedToString(key) + "\"" + ":");
                 encodeJNodes(JNodeRef<JNodeObject>(*jNode).getEntry(key), destination);
                 if (commaCount-- > 0)
                 {
