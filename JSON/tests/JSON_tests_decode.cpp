@@ -15,7 +15,7 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Creation and use of JSON for decode of simple types (number, string, boolean, null) ", "[JSON][Decode]")
+TEST_CASE("Creation and use of JSON object for decode of simple types (number, string, boolean, null) ", "[JSON][Decode]")
 {
     JSON json;
     std::unique_ptr<JNode> jNode;
@@ -45,7 +45,7 @@ TEST_CASE("Creation and use of JSON for decode of simple types (number, string, 
         REQUIRE(jNode->nodeType == JNodeType::null);
     }
 }
-TEST_CASE("Creation and use of JSON for decode of simple types (number, string, boolean, null) and check values.", "[JSON][Decode]")
+TEST_CASE("Creation and use of JSON object for decode of simple types (number, string, boolean, null) and check values.", "[JSON][Decode]")
 {
     JSON json;
     std::unique_ptr<JNode> jNode;
@@ -85,7 +85,7 @@ TEST_CASE("Creation and use of JSON for decode of simple types (number, string, 
         REQUIRE(JNodeRef<JNodeNull>(*jNode).getNull() == nullptr);
     }
 }
-TEST_CASE("Creation and use of JSON for decode of collection types (array, object) ", "[JSON][Decode]")
+TEST_CASE("Creation and use of JSON object for decode of collection types (array, object) ", "[JSON][Decode]")
 {
     JSON json;
     std::unique_ptr<JNode> jNode;
@@ -100,7 +100,7 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
         REQUIRE(jNode->nodeType == JNodeType::array);
     }
 }
-TEST_CASE("Creation and use of JSON for decode of collection types (array, object) and check values", "[JSON][Decode]")
+TEST_CASE("Creation and use of JSON object for decode of collection types (array, object) and check values", "[JSON][Decode]")
 {
     JSON json;
     std::unique_ptr<JNode> jNode;
@@ -139,7 +139,7 @@ TEST_CASE("Creation and use of JSON for decode of collection types (array, objec
         checkArray(jNode.get());
     }
 }
-TEST_CASE("Creation and use of JSON for decode checking various whitespace characters are ignored.", "[JSON][Decode]")
+TEST_CASE("Creation and use of JSON object for decode checking various whitespace characters are ignored.", "[JSON][Decode]")
 {
     JSON json;
     std::unique_ptr<JNode> jNode;
@@ -199,7 +199,7 @@ TEST_CASE("Creation and use of JSON for decode checking various whitespace chara
         checkObject(jNode.get());
     }
 }
-TEST_CASE("Creation and use of JSON for decode of a list of example JSON files.", "[JSON][Decode]")
+TEST_CASE("Creation and use of JSON object for decode of a list of example JSON files.", "[JSON][Decode]")
 {
     auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
                                                   "./testData/testfile002.json",
@@ -263,5 +263,54 @@ TEST_CASE("Decode generated exceptions.", "[JSON][Decode][Exceptions]")
     {
         REQUIRE_THROWS_AS(json.decodeBuffer("{  \"one\" : 18987"), std::runtime_error);
         REQUIRE_THROWS_WITH(json.decodeBuffer("{ \"one\" : 18987"), "JSON syntax error detected.");
+    }
+}
+TEST_CASE("Creation and use of JSON object for decoding of strings with escape characters.", "[JSON][Decode]")
+{
+    JSON json;
+    SECTION("Encode string with escapes '\t' to buffer and check value", "[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\t \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \t ");
+    }
+    SECTION("Encode string with escapes '\"' to buffer and check value", "[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\\" \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \" ");
+    }
+    SECTION("Encode string with escapes '\\' to buffer and check value", "[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\\\ \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \\ ");
+    }
+    SECTION("Encode string with escapes '\b' to buffer and check value", "[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\b \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \b ");
+    }
+    SECTION("Encode string with escapes '/' to buffer and check value", "[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\/ \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String / ");
+    }
+    SECTION("Encode string with escapes '\f' to buffer and check value", "[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\f \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \f ");
+    }
+    SECTION("Encode string with escapes '\n' to buffer and check value", "[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\n \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \n ");
+    }
+    SECTION("Encode string with escapes '\r' to buffer and check value", "[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\r \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \r ");
+    }
+    SECTION("Encode string with escapes '\t' to buffer and check value", "[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\t \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \t ");
     }
 }

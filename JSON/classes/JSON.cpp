@@ -46,53 +46,110 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    std::string JSON::translateStringEscapes()
+    {
+        std::string result;
+        auto it = m_workBuffer.begin();
+        while (it != m_workBuffer.end())
+        {
+            if (*it != '\\')
+            {
+                result += *it;
+            }
+            else
+            {
+                it++;
+                if (it != m_workBuffer.end())
+                {
+                    if (*it == 't')
+                    {
+                        result += '\t';
+                    }
+                    else if (*it == '\"')
+                    {
+                        result += '\"';
+                    }
+                    else if (*it == '\\')
+                    {
+                        result += '\\';
+                    }
+                    else if (*it == '/')
+                    {
+                        result += '/';
+                    }
+                    else if (*it == 'b')
+                    {
+                        result += '\b';
+                    }
+                    else if (*it == 'f')
+                    {
+                        result += '\f';
+                    }
+                    else if (*it == 'n')
+                    {
+                        result += '\n';
+                    }
+                    else if (*it == 'r')
+                    {
+                        result += '\r';
+                    }
+                    else if (*it == 't')
+                    {
+                        result += '\t';
+                    }
+                }
+            }
+            it++;
+        }
+        return (result);
+    }
     /// <summary>
     /// Escape any characters that require it.
     /// </summary>
     /// <param name="utf8String">String to convert.</param>
     /// <returns>Converted string.</returns>
-    std::string JSON::addEscapedToString(std::string const &utf8String)
+    std::string JSON::addEscapesToString(std::string const &utf8String)
     {
         m_escapedString.str("");
         m_escapedString.clear();
         std::u32string utf32String = m_utf8ToUnicode.from_bytes(utf8String);
         for (char32_t unicodeCharacter : utf32String)
-        {
-            // ASCII and control characters
-            if ((unicodeCharacter > 0x1F) && (unicodeCharacter < 0x80))
+        { // ASCII and control characters
+            if (unicodeCharacter == '\\')
             {
-                if (unicodeCharacter == '\\')
-                {
-                    m_escapedString << "\\\\";
-                }
-                else if (unicodeCharacter == '"')
-                {
-                    m_escapedString << "\\\"";
-                }
-                else if (unicodeCharacter == '\b')
-                {
-                    m_escapedString << "\\\b";
-                }
-                else if (unicodeCharacter == '\f')
-                {
-                    m_escapedString << "\\\f";
-                }
-                else if (unicodeCharacter == '\n')
-                {
-                    m_escapedString << "\\\n";
-                }
-                else if (unicodeCharacter == '\r')
-                {
-                    m_escapedString << "\\\r";
-                }
-                else if (unicodeCharacter == '\t')
-                {
-                    m_escapedString << "\\\t";
-                }
-                else
-                {
-                    m_escapedString << (char)unicodeCharacter;
-                }
+                m_escapedString << "\\\\";
+            }
+            // else if (unicodeCharacter == '/')
+            // {
+            //     m_escapedString << "\\/";
+            // }
+            else if (unicodeCharacter == '"')
+            {
+                m_escapedString << "\\\"";
+            }
+            else if (unicodeCharacter == '\b')
+            {
+                m_escapedString << "\\b";
+            }
+            else if (unicodeCharacter == '\f')
+            {
+                m_escapedString << "\\f";
+            }
+            else if (unicodeCharacter == '\n')
+            {
+                m_escapedString << "\\n";
+            }
+            else if (unicodeCharacter == '\r')
+            {
+                m_escapedString << "\\r";
+            }
+            else if (unicodeCharacter == '\t')
+            {
+                m_escapedString << "\\t";
+            }
+            else if ((unicodeCharacter > 0x1F) && (unicodeCharacter < 0x80))
+            {
+                m_escapedString << (char)unicodeCharacter;
             }
             // UTF8 escaped
             else
@@ -115,7 +172,7 @@ namespace H4
         }
     }
     /// <summary>
-    /// Extract a string from a JSON encoed source stream.
+    /// Extract a string from a JSON encoded source stream.
     /// </summary>
     /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns>Extracted string</returns>
@@ -125,6 +182,11 @@ namespace H4
         source->moveToNextByte();
         while (source->bytesToDecode() && source->currentByte() != '"')
         {
+            if (source->currentByte() == '\\')
+            {
+                m_workBuffer += source->currentByte();
+                source->moveToNextByte();
+            }
             m_workBuffer += source->currentByte();
             source->moveToNextByte();
         }
@@ -133,7 +195,7 @@ namespace H4
             throw std::runtime_error("JSON syntax error detected.");
         }
         source->moveToNextByte();
-        return (m_workBuffer);
+        return (translateStringEscapes());
     }
     /// <summary>
     /// Decode a string from a JSON source stream.
@@ -317,7 +379,7 @@ namespace H4
             destination->addBytes(JNodeRef<JNodeNumber>(*jNode).getNumber());
             break;
         case JNodeType::string:
-            destination->addBytes("\"" + addEscapedToString(JNodeRef<JNodeString>(*jNode).getString()) + "\"");
+            destination->addBytes("\"" + addEscapesToString(JNodeRef<JNodeString>(*jNode).getString()) + "\"");
             break;
         case JNodeType::boolean:
             destination->addBytes(JNodeRef<JNodeBoolean>(*jNode).getBoolean() ? "true" : "false");
@@ -331,7 +393,7 @@ namespace H4
             destination->addBytes("{");
             for (auto key : JNodeRef<JNodeObject>(*jNode).getKeys())
             {
-                destination->addBytes("\"" + addEscapedToString(key) + "\"" + ":");
+                destination->addBytes("\"" + addEscapesToString(key) + "\"" + ":");
                 encodeJNodes(JNodeRef<JNodeObject>(*jNode).getEntry(key), destination);
                 if (commaCount-- > 0)
                 {

@@ -15,7 +15,7 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Creation and use of JSON for encode of simple types (number, string, boolean, null) and check its value", "[JSON][Encode]")
+TEST_CASE("Creation and use of JSON object for encode of simple types (number, string, boolean, null) and check its value", "[JSON][Encode]")
 {
     JSON json;
     SECTION("Encode a string (Test string) and check its value", "[JSON][Encode]")
@@ -54,7 +54,7 @@ TEST_CASE("Creation and use of JSON for encode of simple types (number, string, 
         REQUIRE(json.encodeBuffer(json.decodeBuffer(expected)) == expected);
     }
 }
-TEST_CASE("Creation and use of JSON for encode of collection types (object, array) and check its value", "[JSON][Encode]")
+TEST_CASE("Creation and use of JSON object for encode of collection types (object, array) and check its value", "[JSON][Encode]")
 {
     JSON json;
     SECTION("Encode an object ({\"Age\":77,\"Name\":\"Rob\"}) and check its value", "[JSON][Encode]")
@@ -120,7 +120,7 @@ TEST_CASE("Encode generated exceptions", "[JSON][Encode][Exceptions]")
         REQUIRE_THROWS_WITH(json.encodeFile(std::unique_ptr<JNode>(new JNode()), ""), "Empty file name passed to be encoded.");
     }
 }
-TEST_CASE("Creation and use of JSON for encode of a list of example JSON files.", "[JSON][Encode]")
+TEST_CASE("Creation and use of JSON object for encode of a list of example JSON files.", "[JSON][Encode]")
 {
     auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
                                                   "./testData/testfile002.json",
@@ -139,4 +139,13 @@ TEST_CASE("Creation and use of JSON for encode of a list of example JSON files."
         json.encodeFile(json.decodeBuffer(jsonFileBuffer), kGeneratedTorrentFile);
         REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
     }
+}
+
+TEST_CASE("Creation and use of JSON object for encoding of strings with escape characters.", "[JSON][Encode]")
+{
+    JSON json;
+    SECTION("Encode string with escapes '\"' to buffer and check value", "[JSON][Encode]")
+    {
+    }
+
 }

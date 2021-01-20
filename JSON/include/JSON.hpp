@@ -75,7 +75,8 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        std::string addEscapedToString(std::string const &utf8String);
+        std::string translateStringEscapes();
+        std::string addEscapesToString(std::string const &utf8String);
         void ignoreWhiteSpace(ISource *source);
         std::string extractString(ISource *source);
         std::unique_ptr<JNode> decodeJNodes(ISource *source);
