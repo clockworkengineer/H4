@@ -224,7 +224,7 @@ namespace H4
             throw std::runtime_error("JSON syntax error detected.");
         }
         source->moveToNextByte();
-        return (translateEscapesFromString(m_workBuffer));
+        return (m_workBuffer);
     }
     /// <summary>
     /// Decode a string from a JSON source stream.
@@ -233,7 +233,7 @@ namespace H4
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeString(ISource *source)
     {
-        return (std::make_unique<JNodeString>(extractString(source)));
+        return (std::make_unique<JNodeString>(translateEscapesFromString(extractString(source))));
     }
     /// <summary>
     /// Decode a number from a JSON source stream.
@@ -326,7 +326,7 @@ namespace H4
         {
             source->moveToNextByte();
             ignoreWhiteSpace(source);
-            std::string key = extractString(source);
+            std::string key = translateEscapesFromString(extractString(source));
             ignoreWhiteSpace(source);
             if (source->currentByte() != ':')
             {

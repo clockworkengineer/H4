@@ -7,7 +7,7 @@
         "height": 500
     },
     "image": { 
-        "src": "Images/Sun.png",
+        "src": "Images\/Sun.png",
         "name": "sun1",
         "hOffset": 250,
         "vOffset": 250,
@@ -21,6 +21,6 @@
         "hOffset": 250,
         "vOffset": 100,
         "alignment": "center",
-        "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
+        "onMouseUp": "sun1.opacity = (sun1.opacity \/ 100) * 90;"
     }
 }}

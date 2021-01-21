@@ -120,26 +120,26 @@ TEST_CASE("Encode generated exceptions", "[JSON][Encode][Exceptions]")
         REQUIRE_THROWS_WITH(json.encodeFile(std::unique_ptr<JNode>(new JNode()), ""), "Empty file name passed to be encoded.");
     }
 }
-// TEST_CASE("Creation and use of JSON object for encode of a list of example JSON files.", "[JSON][Encode]")
-// {
-//     auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
-//                                                   "./testData/testfile002.json",
-//                                                   "./testData/testfile003.json",
-//                                                   "./testData/testfile004.json"}));
-//     JSON json;
-//     SECTION("Encode to  buffer and check value", "[JSON][Encode]")
-//     {
-//         std::string jsonFileBuffer = readJSONFromFile(testFile);
-//         REQUIRE(json.encodeBuffer(json.decodeBuffer(jsonFileBuffer)) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
-//     }
-//     SECTION("Encode to file and check value", "[JSON][ENcode]")
-//     {
-//         std::filesystem::remove(kGeneratedTorrentFile);
-//         std::string jsonFileBuffer = readJSONFromFile(testFile);
-//         json.encodeFile(json.decodeBuffer(jsonFileBuffer), kGeneratedTorrentFile);
-//         REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
-//     }
-// }
+TEST_CASE("Creation and use of JSON object for encode of a list of example JSON files.", "[JSON][Encode]")
+{
+    auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
+                                                  "./testData/testfile002.json",
+                                                  "./testData/testfile003.json",
+                                                  "./testData/testfile004.json"}));
+    JSON json;
+    SECTION("Encode to  buffer and check value", "[JSON][Encode]")
+    {
+        std::string jsonFileBuffer = readJSONFromFile(testFile);  
+        REQUIRE(json.encodeBuffer(json.decodeBuffer(jsonFileBuffer)) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
+    }
+    SECTION("Encode to file and check value", "[JSON][ENcode]")
+    {
+        std::filesystem::remove(kGeneratedTorrentFile);
+        std::string jsonFileBuffer = readJSONFromFile(testFile);
+        json.encodeFile(json.decodeBuffer(jsonFileBuffer), kGeneratedTorrentFile);
+        REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
+    }
+}
 TEST_CASE("Creation and use of JSON object for encoding of strings with escape characters.", "[JSON][Encode]")
 {
     JSON json;
