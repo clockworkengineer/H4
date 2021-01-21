@@ -11,7 +11,6 @@
 // =================
 #include "JSONConfig.hpp"
 #include "JSON.hpp"
-#include "JSONTranslator.hpp"
 // ====================
 // CLASS IMPLEMENTATION
 // ====================

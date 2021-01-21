@@ -42,6 +42,7 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
+    JSONTranslator JSON::m_defaultTranslator;
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -93,7 +94,7 @@ namespace H4
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeString(ISource *source)
     {
-        return (std::make_unique<JNodeString>(m_jsonTranslator.fromEscapeSequences(extractString(source))));
+        return (std::make_unique<JNodeString>(m_jsonTranslator->fromEscapeSequences(extractString(source))));
     }
     /// <summary>
     /// Decode a number from a JSON source stream.
@@ -186,7 +187,7 @@ namespace H4
         {
             source->moveToNextByte();
             ignoreWhiteSpace(source);
-            std::string key = m_jsonTranslator.fromEscapeSequences(extractString(source));
+            std::string key = m_jsonTranslator->fromEscapeSequences(extractString(source));
             ignoreWhiteSpace(source);
             if (source->currentByte() != ':')
             {
@@ -267,7 +268,7 @@ namespace H4
             destination->addBytes(JNodeRef<JNodeNumber>(*jNode).getNumber());
             break;
         case JNodeType::string:
-            destination->addBytes("\"" + m_jsonTranslator.toEscapeSequences(JNodeRef<JNodeString>(*jNode).getString()) + "\"");
+            destination->addBytes("\"" + m_jsonTranslator->toEscapeSequences(JNodeRef<JNodeString>(*jNode).getString()) + "\"");
             break;
         case JNodeType::boolean:
             destination->addBytes(JNodeRef<JNodeBoolean>(*jNode).getBoolean() ? "true" : "false");
@@ -281,7 +282,7 @@ namespace H4
             destination->addBytes("{");
             for (auto key : JNodeRef<JNodeObject>(*jNode).getKeys())
             {
-                destination->addBytes("\"" + m_jsonTranslator.toEscapeSequences(key) + "\"" + ":");
+                destination->addBytes("\"" + m_jsonTranslator->toEscapeSequences(key) + "\"" + ":");
                 encodeJNodes(JNodeRef<JNodeObject>(*jNode).getEntry(key), destination);
                 if (commaCount-- > 0)
                 {
