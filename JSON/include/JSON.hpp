@@ -16,6 +16,7 @@
 // JSON JNodes
 //
 #include "JNode.hpp"
+#include "JSONTranslator.hpp"
 // =========
 // NAMESPACE
 // =========
@@ -75,8 +76,8 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        std::string translateEscapesFromString(const std::string &jsonString);
-        std::string translateEscapeToString(const std::string &utf8String);
+        // std::string translateEscapesFromString(const std::string &jsonString);
+        // std::string translateEscapeToString(const std::string &utf8String);
         void ignoreWhiteSpace(ISource *source);
         std::string extractString(ISource *source);
         std::unique_ptr<JNode> decodeJNodes(ISource *source);
@@ -92,8 +93,9 @@ namespace H4
         // PRIVATE VARIABLES
         // =================
         std::string m_workBuffer;
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> m_utf8ToUnicode;
-        std::ostringstream m_escapedString;
+        // std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> m_utf8ToUnicode;
+        // std::ostringstream m_escapedString;
+        JSONTranslator m_jsonTranslator;
     };
 } // namespace H4
 #endif /* JSON_HPP */

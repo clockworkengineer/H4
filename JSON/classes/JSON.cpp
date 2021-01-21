@@ -28,7 +28,6 @@
 #include <set>
 #include <iomanip>
 #include <iostream>
-
 // =========
 // NAMESPACE
 // =========
@@ -49,145 +48,6 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    /// <summary>
-    /// Convert any escape sequences in string to their correct sequence
-    //  of characters (UTF-8).
-    /// </summary>
-    /// <param name="jsonString">JSON string to process.</param>
-    /// <returns>Converted string.</returns>
-    std::string JSON::translateEscapesFromString(const std::string &jsonString)
-    {
-        m_escapedString.str("");
-        m_escapedString.clear();
-        auto it = jsonString.begin();
-        while (it != jsonString.end())
-        {
-            if (*it != '\\')
-            {
-                m_escapedString << *it;
-            }
-            else
-            {
-                it++;
-                if (it != jsonString.end())
-                {
-                    if (*it == 't')
-                    {
-                        m_escapedString << '\t';
-                    }
-                    else if (*it == '\"')
-                    {
-                        m_escapedString << '\"';
-                    }
-                    else if (*it == '\\')
-                    {
-                        m_escapedString << '\\';
-                    }
-                    else if (*it == '/')
-                    {
-                        m_escapedString << '/';
-                    }
-                    else if (*it == 'b')
-                    {
-                        m_escapedString << '\b';
-                    }
-                    else if (*it == 'f')
-                    {
-                        m_escapedString << '\f';
-                    }
-                    else if (*it == 'n')
-                    {
-                        m_escapedString << '\n';
-                    }
-                    else if (*it == 'r')
-                    {
-                        m_escapedString << '\r';
-                    }
-                    else if (*it == 't')
-                    {
-                        m_escapedString << '\t';
-                    }
-                    else if (*it == 'u')
-                    {
-                        it++;
-                        char hexDigits[5];
-                        for (auto number = 0; number < 4; number++)
-                        {
-                            hexDigits[number] = *it++;
-                            if (it == jsonString.end() || (std::isxdigit(hexDigits[number]) == 0))
-                            {
-                                throw std::runtime_error("JSON syntax error detected.");
-                            }
-                        }
-                        m_escapedString << m_utf8ToUnicode.to_bytes((int)std::stoi(hexDigits, 0, 16));
-                        continue;
-                    }
-                    else
-                    {
-                        throw std::runtime_error("JSON syntax error detected.");
-                    }
-                }
-            }
-            it++;
-        }
-        return (m_escapedString.str());
-    }
-    /// <summary>
-    /// Convert any escapable character sequence to their escape sequence representation.
-    /// </summary>
-    /// <param name="utf8String">String to convert.</param>
-    /// <returns>Converted string.</returns>
-    std::string JSON::translateEscapeToString(std::string const &utf8String)
-    {
-        m_escapedString.str("");
-        m_escapedString.clear();
-        std::u32string utf32String = m_utf8ToUnicode.from_bytes(utf8String);
-        for (char32_t unicodeCharacter : utf32String)
-        { // ASCII and control characters
-            if (unicodeCharacter == '\\')
-            { 
-                m_escapedString << "\\\\";
-            }
-            else if (unicodeCharacter == '/')
-            {
-                m_escapedString << "\\/";
-            }
-            else if (unicodeCharacter == '"')
-            {
-                m_escapedString << "\\\"";
-            }
-            else if (unicodeCharacter == '\b')
-            {
-                m_escapedString << "\\b";
-            }
-            else if (unicodeCharacter == '\f')
-            {
-                m_escapedString << "\\f";
-            }
-            else if (unicodeCharacter == '\n')
-            {
-                m_escapedString << "\\n";
-            }
-            else if (unicodeCharacter == '\r')
-            {
-                m_escapedString << "\\r";
-            }
-            else if (unicodeCharacter == '\t')
-            {
-                m_escapedString << "\\t";
-            }
-            else if ((unicodeCharacter > 0x1F) && (unicodeCharacter < 0x80))
-            {
-                m_escapedString << (char)unicodeCharacter;
-            }
-            // UTF8 escaped
-            else
-            {
-                m_escapedString << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << (std::int32_t)unicodeCharacter;
-            }
-        }
-        return (m_escapedString.str());
-    }
     /// <summary>
     /// Move to next non-whitespace character in JSON encoded source stream.
     /// </summary>
@@ -233,7 +93,7 @@ namespace H4
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::decodeString(ISource *source)
     {
-        return (std::make_unique<JNodeString>(translateEscapesFromString(extractString(source))));
+        return (std::make_unique<JNodeString>(m_jsonTranslator.translateEscapesFromString(extractString(source))));
     }
     /// <summary>
     /// Decode a number from a JSON source stream.
@@ -326,7 +186,7 @@ namespace H4
         {
             source->moveToNextByte();
             ignoreWhiteSpace(source);
-            std::string key = translateEscapesFromString(extractString(source));
+            std::string key = m_jsonTranslator.translateEscapesFromString(extractString(source));
             ignoreWhiteSpace(source);
             if (source->currentByte() != ':')
             {
@@ -407,7 +267,7 @@ namespace H4
             destination->addBytes(JNodeRef<JNodeNumber>(*jNode).getNumber());
             break;
         case JNodeType::string:
-            destination->addBytes("\"" + translateEscapeToString(JNodeRef<JNodeString>(*jNode).getString()) + "\"");
+            destination->addBytes("\"" + m_jsonTranslator.translateEscapeToString(JNodeRef<JNodeString>(*jNode).getString()) + "\"");
             break;
         case JNodeType::boolean:
             destination->addBytes(JNodeRef<JNodeBoolean>(*jNode).getBoolean() ? "true" : "false");
@@ -421,7 +281,7 @@ namespace H4
             destination->addBytes("{");
             for (auto key : JNodeRef<JNodeObject>(*jNode).getKeys())
             {
-                destination->addBytes("\"" + translateEscapeToString(key) + "\"" + ":");
+                destination->addBytes("\"" + m_jsonTranslator.translateEscapeToString(key) + "\"" + ":");
                 encodeJNodes(JNodeRef<JNodeObject>(*jNode).getEntry(key), destination);
                 if (commaCount-- > 0)
                 {

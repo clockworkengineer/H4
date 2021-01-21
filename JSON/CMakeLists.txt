@@ -19,6 +19,7 @@ enable_testing()
 
 set (JSON_SOURCES
     ./classes/JSON.cpp
+    ./classes/JSONTranslator.cpp
 )
 
 set (JSON_INCLUDES
@@ -27,6 +28,7 @@ set (JSON_INCLUDES
     ./include/JNode.hpp
     ./include/JSONSources.hpp
     ./include/JSONDestinations.hpp
+    ./include/JSONTranslator.cpp
 )
 
 # JSON library
