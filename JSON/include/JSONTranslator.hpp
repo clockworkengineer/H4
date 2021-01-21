@@ -15,7 +15,7 @@ namespace H4
     // ================
     // CLASS DEFINITION
     // ================
-    class JSONTranslator
+    class JSONTranslator : public JSON::ITranslator
     {
     public:
         // ==========================

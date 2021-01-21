@@ -17,6 +17,7 @@
 #include "JSON.hpp"
 #include "JSONSources.hpp"
 #include "JSONDestinations.hpp"
+#include "JSONTranslator.hpp"
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
@@ -42,7 +43,7 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
-    JSONTranslator JSON::m_defaultTranslator;
+    static JSONTranslator defaultTranslator;
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -340,6 +341,17 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
+    JSON::JSON(ITranslator *translator)
+    {
+        if (translator == nullptr)
+        {
+            m_jsonTranslator = &defaultTranslator;
+        }
+        else
+        {
+            m_jsonTranslator = translator;
+        }
+    }
     /// <summary>
     /// Create JNode structure by recursively parsing JSON in a buffer.
     /// </summary>

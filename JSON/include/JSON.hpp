@@ -16,7 +16,6 @@
 // JSON JNodes
 //
 #include "JNode.hpp"
-#include "JSONTranslator.hpp"
 // =========
 // NAMESPACE
 // =========
@@ -31,6 +30,12 @@ namespace H4
         // ==========================
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
+        class ITranslator
+        {
+        public:
+            virtual std::string fromEscapeSequences(const std::string &jsonString) = 0;
+            virtual std::string toEscapeSequences(const std::string &utf8String) = 0;
+        };
         //
         // Source interface
         //
@@ -52,10 +57,7 @@ namespace H4
         // ============
         // CONSTRUCTORS
         // ============
-        JSON()
-        {
-            m_jsonTranslator = &m_defaultTranslator;
-        }
+        JSON(ITranslator *translator=nullptr);
         // ==========
         // DESTRUCTOR
         // ==========
@@ -94,9 +96,8 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        static JSONTranslator m_defaultTranslator;
         std::string m_workBuffer;
-        JSONTranslator *m_jsonTranslator;
+        ITranslator *m_jsonTranslator;
     };
 } // namespace H4
 #endif /* JSON_HPP */
