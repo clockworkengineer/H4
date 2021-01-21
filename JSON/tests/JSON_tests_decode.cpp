@@ -204,7 +204,8 @@ TEST_CASE("Creation and use of JSON object for decode of a list of example JSON 
     auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
                                                   "./testData/testfile002.json",
                                                   "./testData/testfile003.json",
-                                                  "./testData/testfile004.json"}));
+                                                  "./testData/testfile004.json",
+                                                  "./testData/testfile005.json"}));
     JSON json;
     SECTION("Decode from buffer", "[JSON][Decode]")
     {

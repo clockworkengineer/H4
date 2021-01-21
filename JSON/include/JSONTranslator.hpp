@@ -50,7 +50,6 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void initialiseTranslationMaps();
-        auto createCharacterFromEscape(std::string::const_iterator current);
         // =================
         // PRIVATE VARIABLES
         // =================

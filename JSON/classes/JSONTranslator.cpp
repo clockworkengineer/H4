@@ -48,41 +48,19 @@ namespace H4
         m_fromMap['t'] = "\t";
         m_fromMap['\"'] = "\"";
         m_fromMap['/'] = "/";
-        m_fromMap['t'] = "\t";
         m_fromMap['b'] = "\b";
         m_fromMap['f'] = "\f";
         m_fromMap['n'] = "\n";
         m_fromMap['r'] = "\r";
         // To Escape sequence
         m_toMap['\\'] = "\\\\";
-        m_toMap['/'] = "\\/";
+        m_toMap['\t'] = "\\t";
         m_toMap['"'] = "\\\"";
+        m_toMap['/'] = "\\/";
         m_toMap['\b'] = "\\b";
         m_toMap['\f'] = "\\f";
         m_toMap['\n'] = "\\n";
         m_toMap['\r'] = "\\r";
-        m_toMap['\t'] = "\\t";
-    }
-    /// <summary>
-    /// Convert any escape sequences in a string to their correct sequence
-    //  of characters (UTF-8).
-    /// </summary>
-    /// <param name="jsonString">JSON string to process.</param>
-    /// <returns>Converted string.</returns>
-    auto JSONTranslator::createCharacterFromEscape(std::string::const_iterator current)
-    {
-        current++;
-        char hexDigits[5];
-        for (auto number = 0; number < 4; number++)
-        {
-            hexDigits[number] = *current++;
-            if (std::isxdigit(hexDigits[number]) == 0)
-            {
-                throw std::runtime_error("JSON syntax error detected.");
-            }
-        }
-        m_escapedString << m_utf8ToUnicode.to_bytes((int)std::stoi(hexDigits, 0, 16));
-        return (current);
     }
     // ==============
     // PUBLIC METHODS
@@ -115,7 +93,15 @@ namespace H4
                     }
                     else if ((*current == 'u') && (current + 4 < jsonString.end()))
                     {
-                        current = createCharacterFromEscape(current);
+                        char hexDigits[5] = {current[1], current[2], current[3], current[4], '\0'};
+                        char *end;
+                        std::strtoll(hexDigits, &end, 16);
+                        if (*end != '\0')
+                        {
+                            throw std::runtime_error("JSON syntax error detected.");
+                        }
+                        m_escapedString << m_utf8ToUnicode.to_bytes((int)std::stoi(hexDigits, 0, 16));
+                        current += 5; // Move paste the \uxxxx
                     }
                     else
                     {
@@ -127,7 +113,7 @@ namespace H4
         return (m_escapedString.str());
     }
     /// <summary>
-    /// Convert a string from raw charater values (UTF8) so that it has character 
+    /// Convert a string from raw charater values (UTF8) so that it has character
     /// escapes where applicable for its JSON form.
     /// </summary>
     /// <param name="utf8String">String to convert.</param>
@@ -138,11 +124,12 @@ namespace H4
         m_escapedString.clear();
         std::u32string utf32String = m_utf8ToUnicode.from_bytes(utf8String);
         for (char32_t utf32char : utf32String)
-        { // ASCII and control characters
+        { // Control characters
             if (m_toMap.count(utf32char) > 0)
             {
                 m_escapedString << m_toMap[utf32char];
             }
+            // ASCII
             else if ((utf32char > 0x1F) && (utf32char < 0x80))
             {
                 m_escapedString << (char)utf32char;
@@ -150,7 +137,7 @@ namespace H4
             // UTF8 escaped
             else
             {
-                m_escapedString << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << (std::int32_t)utf32char;
+                m_escapedString << "\\u" << std::hex << std::setfill('0') << std::setw(4) << (std::int32_t)utf32char;
             }
         }
         return (m_escapedString.str());
