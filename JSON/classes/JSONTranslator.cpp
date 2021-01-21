@@ -1,7 +1,8 @@
 //
 // Class: JSONTranslator
 //
-// Description:
+// Description: Translate to/from JSON string escapes within source
+// strings.
 //
 // Dependencies:   C17++ - Language standard features used.
 //
@@ -40,81 +41,81 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    // ==============
-    // PUBLIC METHODS
-    // ==============
+    void JSONTranslator::initialiseTranslationMaps()
+    {
+        // From Escape sequence
+        m_fromMap['\\'] = "\\";
+        m_fromMap['t'] = "\t";
+        m_fromMap['\"'] = "\"";
+        m_fromMap['/'] = "/";
+        m_fromMap['t'] = "\t";
+        m_fromMap['b'] = "\b";
+        m_fromMap['f'] = "\f";
+        m_fromMap['n'] = "\n";
+        m_fromMap['r'] = "\r";
+        // To Escape sequence
+        m_toMap['\\'] = "\\\\";
+        m_toMap['/'] = "\\/";
+        m_toMap['"'] = "\\\"";
+        m_toMap['\b'] = "\\b";
+        m_toMap['\f'] = "\\f";
+        m_toMap['\n'] = "\\n";
+        m_toMap['\r'] = "\\r";
+        m_toMap['\t'] = "\\t";
+    }
     /// <summary>
-    /// Convert any escape sequences in string to their correct sequence
+    /// Convert any escape sequences in a string to their correct sequence
     //  of characters (UTF-8).
     /// </summary>
     /// <param name="jsonString">JSON string to process.</param>
     /// <returns>Converted string.</returns>
-    std::string JSONTranslator ::translateEscapesFromString(const std::string &jsonString)
+    auto JSONTranslator::createCharacterFromEscape(std::string::const_iterator current)
+    {
+        current++;
+        char hexDigits[5];
+        for (auto number = 0; number < 4; number++)
+        {
+            hexDigits[number] = *current++;
+            if (std::isxdigit(hexDigits[number]) == 0)
+            {
+                throw std::runtime_error("JSON syntax error detected.");
+            }
+        }
+        m_escapedString << m_utf8ToUnicode.to_bytes((int)std::stoi(hexDigits, 0, 16));
+        return (current);
+    }
+    // ==============
+    // PUBLIC METHODS
+    // ==============
+    /// <summary>
+    /// Convert any escape sequences in a string to their correct sequence
+    //  of characters (UTF-8).
+    /// </summary>
+    /// <param name="jsonString">JSON string to process.</param>
+    /// <returns>String with escapes translated.</returns>
+    std::string JSONTranslator::fromEscapeSequences(const std::string &jsonString)
     {
         m_escapedString.str("");
         m_escapedString.clear();
-        auto it = jsonString.begin();
-        while (it != jsonString.end())
+        auto current = jsonString.begin();
+        while (current != jsonString.end())
         {
-            if (*it != '\\')
+            if (*current != '\\')
             {
-                m_escapedString << *it;
+                m_escapedString << *current++;
             }
             else
             {
-                it++;
-                if (it != jsonString.end())
+                current++;
+                if (current != jsonString.end())
                 {
-                    if (*it == 't')
+                    if (m_fromMap.count(*current) > 0)
                     {
-                        m_escapedString << '\t';
+                        m_escapedString << m_fromMap[*current++];
                     }
-                    else if (*it == '\"')
+                    else if ((*current == 'u') && (current + 4 < jsonString.end()))
                     {
-                        m_escapedString << '\"';
-                    }
-                    else if (*it == '\\')
-                    {
-                        m_escapedString << '\\';
-                    }
-                    else if (*it == '/')
-                    {
-                        m_escapedString << '/';
-                    }
-                    else if (*it == 'b')
-                    {
-                        m_escapedString << '\b';
-                    }
-                    else if (*it == 'f')
-                    {
-                        m_escapedString << '\f';
-                    }
-                    else if (*it == 'n')
-                    {
-                        m_escapedString << '\n';
-                    }
-                    else if (*it == 'r')
-                    {
-                        m_escapedString << '\r';
-                    }
-                    else if (*it == 't')
-                    {
-                        m_escapedString << '\t';
-                    }
-                    else if (*it == 'u')
-                    {
-                        it++;
-                        char hexDigits[5];
-                        for (auto number = 0; number < 4; number++)
-                        {
-                            hexDigits[number] = *it++;
-                            if (it == jsonString.end() || (std::isxdigit(hexDigits[number]) == 0))
-                            {
-                                throw std::runtime_error("JSON syntax error detected.");
-                            }
-                        }
-                        m_escapedString << m_utf8ToUnicode.to_bytes((int)std::stoi(hexDigits, 0, 16));
-                        continue;
+                        current = createCharacterFromEscape(current);
                     }
                     else
                     {
@@ -122,62 +123,34 @@ namespace H4
                     }
                 }
             }
-            it++;
         }
         return (m_escapedString.str());
     }
     /// <summary>
-    /// Convert any escapable character sequence to their escape sequence representation.
+    /// Convert a string from raw charater values (UTF8) so that it has character 
+    /// escapes where applicable for its JSON form.
     /// </summary>
     /// <param name="utf8String">String to convert.</param>
-    /// <returns>Converted string.</returns>
-    std::string JSONTranslator::translateEscapeToString(std::string const &utf8String)
+    /// <returns>JSON string with escapes.</returns>
+    std::string JSONTranslator::toEscapeSequences(std::string const &utf8String)
     {
         m_escapedString.str("");
         m_escapedString.clear();
         std::u32string utf32String = m_utf8ToUnicode.from_bytes(utf8String);
-        for (char32_t unicodeCharacter : utf32String)
+        for (char32_t utf32char : utf32String)
         { // ASCII and control characters
-            if (unicodeCharacter == '\\')
+            if (m_toMap.count(utf32char) > 0)
             {
-                m_escapedString << "\\\\";
+                m_escapedString << m_toMap[utf32char];
             }
-            else if (unicodeCharacter == '/')
+            else if ((utf32char > 0x1F) && (utf32char < 0x80))
             {
-                m_escapedString << "\\/";
-            }
-            else if (unicodeCharacter == '"')
-            {
-                m_escapedString << "\\\"";
-            }
-            else if (unicodeCharacter == '\b')
-            {
-                m_escapedString << "\\b";
-            }
-            else if (unicodeCharacter == '\f')
-            {
-                m_escapedString << "\\f";
-            }
-            else if (unicodeCharacter == '\n')
-            {
-                m_escapedString << "\\n";
-            }
-            else if (unicodeCharacter == '\r')
-            {
-                m_escapedString << "\\r";
-            }
-            else if (unicodeCharacter == '\t')
-            {
-                m_escapedString << "\\t";
-            }
-            else if ((unicodeCharacter > 0x1F) && (unicodeCharacter < 0x80))
-            {
-                m_escapedString << (char)unicodeCharacter;
+                m_escapedString << (char)utf32char;
             }
             // UTF8 escaped
             else
             {
-                m_escapedString << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << (std::int32_t)unicodeCharacter;
+                m_escapedString << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << (std::int32_t)utf32char;
             }
         }
         return (m_escapedString.str());

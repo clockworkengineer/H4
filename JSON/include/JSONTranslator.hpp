@@ -24,14 +24,18 @@ namespace H4
         // ============
         // CONSTRUCTORS
         // ============
+        JSONTranslator()
+        {
+            initialiseTranslationMaps();
+        }
         // ==========
         // DESTRUCTOR
         // ==========
         // ==============
         // PUBLIC METHODS
         // ==============
-        std::string translateEscapesFromString(const std::string &jsonString);
-        std::string translateEscapeToString(const std::string &utf8String);
+        std::string fromEscapeSequences(const std::string &jsonString);
+        std::string toEscapeSequences(const std::string &utf8String);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -45,11 +49,15 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        void initialiseTranslationMaps();
+        auto createCharacterFromEscape(std::string::const_iterator current);
         // =================
         // PRIVATE VARIABLES
         // =================
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> m_utf8ToUnicode;
         std::ostringstream m_escapedString;
+        std::map<char, std::string> m_fromMap;
+        std::map<char, std::string> m_toMap;
     };
 } // namespace H4
 #endif /* JSONTRANSLATOR_HPP */
