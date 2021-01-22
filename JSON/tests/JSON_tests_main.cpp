@@ -318,34 +318,31 @@ TEST_CASE("Check JNodeNumber number conversion", "[JSON][JNode][JNodeNumber]")
     REQUIRE_THROWS_WITH(jNode = json.decodeBuffer("78.5454.545"), "JSON syntax error detected.");
   }
 }
-TEST_CASE("Check string escape translation", "[JSON][DefaultTranslator]")
+TEST_CASE("Check translation of surrogate pairs", "[JSON][DefaultTranslator]")
 {
   JSONTranslator translator;
-  SECTION("Translate from escape sequences 'Begin \\uD834\\uDD1E End' and check value", "[JSON][Decode]")
+  SECTION("Translate from escape sequences valid surrogate pair 'Begin \\uD834\\uDD1E End' and check value", "[JSON][DefaultTranslator]")
   {
     REQUIRE(translator.fromEscapeSequences("Begin \\uD834\\uDD1E End") == "Begin \U0001D11E End");
   }
-  SECTION("Translate from escape sequences 'Begin \\uD834 \\uDD1E End' expect excpetion", "[JSON][Decode]")
+  SECTION("Translate from escape sequences surrogate pair 'Begin \\uD834 \\uDD1E End' in error then expect exception", "[JSON][DefaultTranslator][Exception]")
   {
     REQUIRE_THROWS_AS(translator.fromEscapeSequences("Begin \\uD834 \\uDD1E End"), std::runtime_error);
     REQUIRE_THROWS_WITH(translator.fromEscapeSequences("Begin \\uD834 \\uDD1E End"), "JSON syntax error detected.");
   }
-
-  SECTION("Translate from escape sequences 'Begin \\uD834\\u0045 End' expect excpetion", "[JSON][Decode]")
+  SECTION("Translate from escape sequences surrogate pair 'Begin \\uD834\\u0045 End' in error then expect exception", "[JSON][DefaultTranslator][Exception]")
   {
     REQUIRE_THROWS_AS(translator.fromEscapeSequences("Begin \\uD834\\u0045 End"), std::runtime_error);
     REQUIRE_THROWS_WITH(translator.fromEscapeSequences("Begin \\uD834\\u0045 End"), "JSON syntax error detected.");
   }
-  SECTION("Translate from escape sequences 'Begin \\uD834 End' expect excpetion", "[JSON][Decode]")
+  SECTION("Translate from escape sequences surrogate pair 'Begin \\uD834 End' in error then expect exception", "[JSON][DefaultTranslator][Exception]")
   {
     REQUIRE_THROWS_AS(translator.fromEscapeSequences("Begin \\uD834 End"), std::runtime_error);
     REQUIRE_THROWS_WITH(translator.fromEscapeSequences("Begin \\uD834 End"), "JSON syntax error detected.");
   }
-    SECTION("Translate from escape sequences 'Begin \\uDD1E End' expect excpetion", "[JSON][Decode]")
+  SECTION("Translate from escape sequences surrogate pair 'Begin \\uDD1E End' in error then expect exception", "[JSON][DefaultTranslator][Exception]")
   {
     REQUIRE_THROWS_AS(translator.fromEscapeSequences("Begin \\uDD1E End"), std::runtime_error);
     REQUIRE_THROWS_WITH(translator.fromEscapeSequences("Begin \\uDD1E End"), "JSON syntax error detected.");
   }
-  
-
 }
