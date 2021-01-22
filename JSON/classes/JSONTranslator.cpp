@@ -38,6 +38,10 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    /// <summary>
+    /// Initialise tables used to convert to/from single character
+    /// escape sequences within a JSON string.
+    /// </summary>
     void JSONTranslator::initialiseTranslationMaps()
     {
         // From Escape sequence
@@ -74,19 +78,23 @@ namespace H4
         auto current = jsonString.begin();
         while (current != jsonString.end())
         {
+            // Normal character
             if (*current != '\\')
             {
                 m_utf16workBuffer += *current++;
             }
             else
             {
+                // Escape sequence
                 current++;
                 if (current != jsonString.end())
                 {
+                    // Single character
                     if (m_fromMap.count(*current) > 0)
                     {
                         m_utf16workBuffer += m_fromMap[*current++];
                     }
+                    // UTF16 "\uxxxx" 
                     else if ((*current == 'u') && ((current + 4) < jsonString.end()))
                     {
                         char hexDigits[5] = {current[1], current[2], current[3], current[4], '\0'};
@@ -94,7 +102,7 @@ namespace H4
                         m_utf16workBuffer += std::strtol(hexDigits, &end, 16);
                         if (*end != '\0')
                         {
-                            throw std::runtime_error("JSON syntax error detected.");
+                            throw std::runtime_error("JSON 1 syntax error detected.");
                         }
                         current += 5; // Move paste the \uxxxx
                     }
@@ -103,10 +111,16 @@ namespace H4
                         throw std::runtime_error("JSON syntax error detected.");
                     }
                 }
+                else
+                {
+                    throw std::runtime_error("JSON syntax error detected.");
+                }
             }
         }
+        // Check that there are no single unpaired UTF-16 surrogates.From wht I see this is
+        // meant to be an error but from searching the web I have not found a definitive answer.
         int index = 0;
-        while (index < ((int)m_utf16workBuffer.size() - 1))
+        while (index <= ((int)m_utf16workBuffer.size() - 1))
         {
             if (isValidSurrogateUpper(m_utf16workBuffer[index]) && isValidSurrogateLower(m_utf16workBuffer[index + 1]))
             {
