@@ -35,6 +35,16 @@ namespace H4
         public:
             virtual std::string fromEscapeSequences(const std::string &jsonString) = 0;
             virtual std::string toEscapeSequences(const std::string &utf8String) = 0;
+
+        protected:
+            bool isValidSurrogateUpper(char16_t c)
+            {
+                return ((c >= 0xD800) && (c <= 0xDBFF));
+            }
+            bool isValidSurrogateLower(char16_t c)
+            {
+                return ((c >= 0xDC00) && (c <= 0xDFFF));
+            }
         };
         //
         // Source interface
@@ -57,7 +67,7 @@ namespace H4
         // ============
         // CONSTRUCTORS
         // ============
-        JSON(ITranslator *translator=nullptr);
+        JSON(ITranslator *translator = nullptr);
         // ==========
         // DESTRUCTOR
         // ==========

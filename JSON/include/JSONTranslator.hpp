@@ -6,7 +6,6 @@
 #include <string>
 #include <codecvt>
 #include <locale>
-#include <sstream>
 // =========
 // NAMESPACE
 // =========
@@ -54,8 +53,8 @@ namespace H4
         // PRIVATE VARIABLES
         // =================
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_utf8Toutf16;
-        std::u16string m_workBuffer;
-        std::ostringstream m_escapedString;
+        std::u16string m_utf16workBuffer;
+        std::string m_utf8workBuffer;
         std::map<char, std::u16string> m_fromMap;
         std::map<char, std::string> m_toMap;
     };

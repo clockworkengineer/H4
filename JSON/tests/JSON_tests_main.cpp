@@ -345,4 +345,8 @@ TEST_CASE("Check translation of surrogate pairs", "[JSON][DefaultTranslator]")
     REQUIRE_THROWS_AS(translator.fromEscapeSequences("Begin \\uDD1E End"), std::runtime_error);
     REQUIRE_THROWS_WITH(translator.fromEscapeSequences("Begin \\uDD1E End"), "JSON syntax error detected.");
   }
+  SECTION("Translate to escape sequences valid surrogate pair 'Begin \\uD834\\uDD1E End' and check value", "[JSON][DefaultTranslator]")
+  {
+    REQUIRE(translator.toEscapeSequences("Begin \U0001D11E End") == "Begin \\uD834\\uDD1E End");
+  }
 }
