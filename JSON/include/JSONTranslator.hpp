@@ -53,7 +53,8 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> m_utf8ToUnicode;
+     //   std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> m_utf8ToUtf32;
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_utf8Toutf16;
         std::ostringstream m_escapedString;
         std::map<char, std::string> m_fromMap;
         std::map<char, std::string> m_toMap;

@@ -41,6 +41,17 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    long convertHexToLong(std::string::const_iterator current)
+    {
+        char hexDigits[5] = {current[1], current[2], current[3], current[4], '\0'};
+        char *end;
+        long hex = std::strtol(hexDigits, &end, 16);
+        if (*end != '\0')
+        {
+            throw std::runtime_error("JSON syntax error detected.");
+        }
+        return (hex);
+    }
     void JSONTranslator::initialiseTranslationMaps()
     {
         // From Escape sequence
@@ -93,16 +104,9 @@ namespace H4
                     }
                     else if ((*current == 'u') && ((current + 4) < jsonString.end()))
                     {
-                        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_utf8ToUTF16;
-                        char hexDigits[5] = {current[1], current[2], current[3], current[4], '\0'};
-                        char *end;
-                        long character1 = std::strtol(hexDigits, &end, 16);
-                        long character2;
-                        if (*end != '\0')
-                        {
-                            throw std::runtime_error("JSON syntax error detected.");
-                        }
-                        if ((character1 >= 0xD800) && (character1 <= 0xDBFF))
+                        std::u16string utf16String;
+                        utf16String += convertHexToLong(current);
+                        if ((utf16String[0] >= 0xD800) && (utf16String[0] <= 0xDBFF))
                         {
                             current += 5;
                             if (*current == '\\')
@@ -110,22 +114,15 @@ namespace H4
                                 current++;
                                 if ((*current == 'u') && ((current + 4) < jsonString.end()))
                                 {
-                                    char hexDigits[5] = {current[1], current[2], current[3], current[4], '\0'};
-                                    char *end;
-                                    character2 = std::strtol(hexDigits, &end, 16);
-                                    if (*end != '\0')
+                                    utf16String += convertHexToLong(current);
+                                    if ((utf16String[1] < 0xDC00) || (utf16String[1] > 0xDFFF))
                                     {
                                         throw std::runtime_error("JSON syntax error detected.");
                                     }
-                                    if ((character2 >= 0xDC00) && (character2 <= 0xDFFF))
-                                    {
-                                        std::u16string utf16String{(char16_t)character1, (char16_t)character2};
-                                        m_escapedString << m_utf8ToUTF16.to_bytes(utf16String);
-                                    }
-                                    else
-                                    {
-                                        throw std::runtime_error("JSON syntax error detected.");
-                                    }
+                                }
+                                else
+                                {
+                                    throw std::runtime_error("JSON syntax error detected.");
                                 }
                             }
                             else
@@ -133,14 +130,12 @@ namespace H4
                                 throw std::runtime_error("JSON syntax error detected.");
                             }
                         }
-                        else if ((character1 >= 0xDC00) && (character1 <= 0xDFFF))
+                        else if ((utf16String[0] >= 0xDC00) && (utf16String[0] <= 0xDFFF))
                         {
                             throw std::runtime_error("JSON syntax error detected.");
                         }
-                        else
-                        {
-                            m_escapedString << m_utf8ToUnicode.to_bytes((int)std::stoi(hexDigits, 0, 16));
-                        }
+
+                        m_escapedString << m_utf8Toutf16.to_bytes(utf16String);
                         current += 5; // Move paste the \uxxxx
                     }
                     else
@@ -162,22 +157,22 @@ namespace H4
     {
         m_escapedString.str("");
         m_escapedString.clear();
-        std::u32string utf32String = m_utf8ToUnicode.from_bytes(utf8String);
-        for (char32_t utf32char : utf32String)
+        std::u16string utf16String = m_utf8Toutf16.from_bytes(utf8String);
+        for (char16_t utf16char : utf16String)
         { // Control characters
-            if (m_toMap.count(utf32char) > 0)
+            if (m_toMap.count(utf16char) > 0)
             {
-                m_escapedString << m_toMap[utf32char];
+                m_escapedString << m_toMap[utf16char];
             }
             // ASCII
-            else if ((utf32char > 0x1F) && (utf32char < 0x80))
+            else if ((utf16char > 0x1F) && (utf16char < 0x80))
             {
-                m_escapedString << (char)utf32char;
+                m_escapedString << (char)utf16char;
             }
             // UTF8 escaped
             else
             {
-                m_escapedString << "\\u" << std::hex << std::setfill('0') << std::setw(4) << (std::int32_t)utf32char;
+                m_escapedString << "\\u" << std::hex << std::setfill('0') << std::setw(4) << (std::int32_t)utf16char;
             }
         }
         return (m_escapedString.str());
