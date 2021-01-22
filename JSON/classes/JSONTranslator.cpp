@@ -91,21 +91,51 @@ namespace H4
                     {
                         m_escapedString << m_fromMap[*current++];
                     }
-                    else if ((*current == 'u') && (current + 4 < jsonString.end()))
+                    else if ((*current == 'u') && ((current + 4) < jsonString.end()))
                     {
+                        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_utf8ToUTF16;
                         char hexDigits[5] = {current[1], current[2], current[3], current[4], '\0'};
                         char *end;
-                        std::strtoll(hexDigits, &end, 16);
+                        long character1 = std::strtol(hexDigits, &end, 16);
+                        long character2;
                         if (*end != '\0')
                         {
-                            throw std::runtime_error("JSON syntax error detected.");
+                            throw std::runtime_error("JSON 1 syntax error detected.");
                         }
-                        m_escapedString << m_utf8ToUnicode.to_bytes((int)std::stoi(hexDigits, 0, 16));
+                        if ((character1 >= 0xD800) && (character1 <= 0xDBFF))
+                        {
+                            current += 5;
+                            if (*current == '\\')
+                            {
+                                current++;
+                                if ((*current == 'u') && ((current + 4)< jsonString.end()))
+                                {
+                                    char hexDigits[5] = {current[1], current[2], current[3], current[4], '\0'};
+                                    char *end;
+                                    character2 = std::strtol(hexDigits, &end, 16);
+                                    if (*end != '\0')
+                                    {
+                                        throw std::runtime_error("JSON 2 syntax error detected.");
+                                    }
+                                    if ((character2 >= 0xDC00) && (character2 <= 0xDFFF))
+                                    {
+                                        std::u16string utf16String{(char16_t)character1, (char16_t)character2};
+                                        m_escapedString << m_utf8ToUTF16.to_bytes(utf16String);
+                                    }
+                                }
+                            } else {
+                                throw std::runtime_error("JSON 3 syntax error detected.");
+                            }
+                        }
+                        else
+                        {
+                            m_escapedString << m_utf8ToUnicode.to_bytes((int)std::stoi(hexDigits, 0, 16));
+                        }
                         current += 5; // Move paste the \uxxxx
                     }
                     else
                     {
-                        throw std::runtime_error("JSON syntax error detected.");
+                        throw std::runtime_error("JSON 4 syntax error detected.");
                     }
                 }
             }

@@ -314,14 +314,19 @@ TEST_CASE("Creation and use of JSON object for decoding of strings with escape c
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\t \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \t ");
     }
-    SECTION("Encode string with escapes '\\u0123' to buffer and check value","[JSON][Decode]")
+    SECTION("Encode string with escapes '\\u0123' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\u0123 \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \u0123 ");
     }
-       SECTION("Encode string with escapes '\\u0123 \\u0456' to buffer and check value","[JSON][Decode]")
+    SECTION("Encode string with escapes '\\u0123 \\u0456' to buffer and check value", "[JSON][Decode]")
     {
         std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String \\u0123 \\u0456 \"");
         REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String \u0123 \u0456 ");
+    }
+        SECTION("Encode string with escapes  '\\uD834\\uDD1E' to buffer and check value", "[JSON][Decode]")
+    {
+        std::unique_ptr<JNode> jNode = json.decodeBuffer("\"Test String  \\uD834\\uDD1E \"");
+        REQUIRE(JNodeRef<JNodeString>(*jNode).getString() == "Test String  \U0001D11E ");
     }
 }

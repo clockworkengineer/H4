@@ -341,6 +341,11 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
+    /// <summary>
+    /// JSON constructor.
+    /// </summary>
+    /// <param name=translator>Custom JSON string translator.</param>
+    /// <returns></returns>
     JSON::JSON(ITranslator *translator)
     {
         if (translator == nullptr)
