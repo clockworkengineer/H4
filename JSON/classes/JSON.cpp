@@ -86,7 +86,7 @@ namespace H4
         }
         if (!source->bytesToParse())
         {
-            throw std::runtime_error("JSON syntax error detected.");
+            throw JSON::SyntaxError();
         }
         source->moveToNextByte();
         return (m_workBuffer);
@@ -110,7 +110,7 @@ namespace H4
         std::set<char> validCharacters{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', '-', '+', 'E', 'e'};
         if (validCharacters.count(source->currentByte()) == 0)
         {
-            throw std::runtime_error("JSON syntax error detected.");
+            throw JSON::SyntaxError();
         }
         m_workBuffer.clear();
         m_workBuffer += source->currentByte();
@@ -128,7 +128,7 @@ namespace H4
             std::strtod(m_workBuffer.c_str(), &end);
             if (*end != '\0')
             {
-                throw std::runtime_error("JSON syntax error detected.");
+                throw JSON::SyntaxError();
             }
         }
         return (std::make_unique<JNodeNumber>(m_workBuffer));
@@ -156,7 +156,7 @@ namespace H4
         {
             return (std::make_unique<JNodeBoolean>(false));
         }
-        throw std::runtime_error("JSON syntax error detected.");
+        throw JSON::SyntaxError();
     }
     /// <summary>
     /// Parse a null from a JSON source stream.
@@ -177,7 +177,7 @@ namespace H4
         {
             return (std::make_unique<JNodeNull>());
         }
-        throw std::runtime_error("JSON syntax error detected.");
+        throw JSON::SyntaxError();
     }
     /// <summary>
     /// Parse an object from a JSON source stream.
@@ -195,7 +195,7 @@ namespace H4
             ignoreWhiteSpace(source);
             if (source->currentByte() != ':')
             {
-                throw std::runtime_error("JSON syntax error detected.");
+                throw JSON::SyntaxError();
             }
             source->moveToNextByte();
             ignoreWhiteSpace(source);
@@ -204,7 +204,7 @@ namespace H4
         } while (source->currentByte() == ',');
         if (source->currentByte() != '}')
         {
-            throw std::runtime_error("JSON syntax error detected.");
+            throw JSON::SyntaxError();
         }
         source->moveToNextByte();
         return (std::make_unique<JNodeObject>(std::move(object)));
@@ -226,7 +226,7 @@ namespace H4
         } while (source->currentByte() == ',');
         if (source->currentByte() != ']')
         {
-            throw std::runtime_error("JSON syntax error detected.");
+            throw JSON::SyntaxError();
         }
         source->moveToNextByte();
         return (std::make_unique<JNodeArray>(std::move(array)));

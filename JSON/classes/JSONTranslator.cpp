@@ -104,18 +104,18 @@ namespace H4
                         m_utf16workBuffer += std::strtol(hexDigits, &end, 16);
                         if (*end != '\0')
                         {
-                            throw std::runtime_error("JSON 1 syntax error detected.");
+                            throw JSON::SyntaxError();
                         }
                         current += 5; // Move paste the \uxxxx
                     }
                     else
                     {
-                        throw std::runtime_error("JSON syntax error detected.");
+                        throw JSON::SyntaxError();
                     }
                 }
                 else
                 {
-                    throw std::runtime_error("JSON syntax error detected.");
+                    throw JSON::SyntaxError();
                 }
             }
         }
@@ -130,7 +130,7 @@ namespace H4
             }
             else if (isValidSurrogateUpper(m_utf16workBuffer[index]) || isValidSurrogateLower(m_utf16workBuffer[index + 1]))
             {
-                throw std::runtime_error("JSON syntax error detected.");
+                throw JSON::SyntaxError();
             }
             index++;
         }

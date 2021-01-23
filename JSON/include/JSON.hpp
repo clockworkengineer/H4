@@ -11,7 +11,8 @@
 #include <fstream>
 #include <codecvt>
 #include <locale>
-#include <sstream>
+// #include <sstream>
+#include <stdexcept>
 //
 // JSON JNodes
 //
@@ -30,12 +31,28 @@ namespace H4
         // ==========================
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
+        //
+        // JSON syntax error.
+        //
+        struct SyntaxError : public std::exception
+        {
+        public:
+            SyntaxError(const std::string &errorMessage="") : errorMessage(errorMessage) {}
+            virtual const char *what() const throw()
+            {
+                return ("JSON syntax error detected.");
+            }
+        private:
+            std::string errorMessage;
+        };
+        //
+        // JSON translator interface
+        //
         class ITranslator
         {
         public:
             virtual std::string fromEscapeSequences(const std::string &jsonString) = 0;
             virtual std::string toEscapeSequences(const std::string &utf8String) = 0;
-
         protected:
             bool isValidSurrogateUpper(char16_t c)
             {

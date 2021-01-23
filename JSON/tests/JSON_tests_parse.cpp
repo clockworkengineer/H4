@@ -237,32 +237,32 @@ TEST_CASE("Parse generated exceptions.", "[JSON][Parse][Exceptions]")
     }
     SECTION("Parse missing terminating '\"' in string", "[JSON][Parse]")
     {
-        REQUIRE_THROWS_AS(json.parseBuffer("{ \"one\" : \"Apple }"), std::runtime_error);
+        REQUIRE_THROWS_AS(json.parseBuffer("{ \"one\" : \"Apple }"), JSON::SyntaxError);
         REQUIRE_THROWS_WITH(json.parseBuffer("{ \"one\" : \"Apple }"), "JSON syntax error detected.");
     }
     SECTION("Parse number with starting with invalid character", "[JSON][Parse]")
     {
-        REQUIRE_THROWS_AS(json.parseBuffer("{ \"one\" : z19034}"), std::runtime_error);
+        REQUIRE_THROWS_AS(json.parseBuffer("{ \"one\" : z19034}"), JSON::SyntaxError);
         REQUIRE_THROWS_WITH(json.parseBuffer("{ \"one\" : z19034 }"), "JSON syntax error detected.");
     }
     SECTION("Parse object with invalid value field (number).", "[JSON][Parse]")
     {
-        REQUIRE_THROWS_AS(json.parseBuffer("{ \"one\" : 18987u3 }"), std::runtime_error);
+        REQUIRE_THROWS_AS(json.parseBuffer("{ \"one\" : 18987u3 }"), JSON::SyntaxError);
         REQUIRE_THROWS_WITH(json.parseBuffer("{ \"one\" : 18987u3 }"), "JSON syntax error detected.");
     }
     SECTION("Parse object with missing value field.", "[JSON][Parse]")
     {
-        REQUIRE_THROWS_AS(json.parseBuffer("{ \"one\" : }"), std::runtime_error);
+        REQUIRE_THROWS_AS(json.parseBuffer("{ \"one\" : }"), JSON::SyntaxError);
         REQUIRE_THROWS_WITH(json.parseBuffer("{ \"one\" : }"), "JSON syntax error detected.");
     }
     SECTION("Parse object with missing key field.", "[JSON][Parse]")
     {
-        REQUIRE_THROWS_AS(json.parseBuffer("{  : 89012 }"), std::runtime_error);
+        REQUIRE_THROWS_AS(json.parseBuffer("{  : 89012 }"), JSON::SyntaxError);
         REQUIRE_THROWS_WITH(json.parseBuffer("{ : }"), "JSON syntax error detected.");
     }
     SECTION("Parse object with missing closing '}'.", "[JSON][Parse]")
     {
-        REQUIRE_THROWS_AS(json.parseBuffer("{  \"one\" : 18987"), std::runtime_error);
+        REQUIRE_THROWS_AS(json.parseBuffer("{  \"one\" : 18987"), JSON::SyntaxError);
         REQUIRE_THROWS_WITH(json.parseBuffer("{ \"one\" : 18987"), "JSON syntax error detected.");
     }
 }
