@@ -74,7 +74,7 @@ namespace H4
         long stringLength = decodePositiveInteger(source);
         if (source->currentByte() != (std::byte)':')
         {
-            throw std::runtime_error("Bencoding syntax error detected.");
+            throw Bencode::SyntaxError();
         }
         source->moveToNextByte();
         m_workBuffer.clear();
@@ -107,7 +107,7 @@ namespace H4
             }
             if (!source->bytesToDecode())
             {
-                throw std::runtime_error("Bencoding syntax error detected.");
+                throw Bencode::SyntaxError();
             }
             source->moveToNextByte();
             return (std::make_unique<BNodeDict>(std::move(bNodeDictionary)));
@@ -123,7 +123,7 @@ namespace H4
             }
             if (!source->bytesToDecode())
             {
-                throw std::runtime_error("Bencoding syntax error detected.");
+                throw Bencode::SyntaxError();
             }
             source->moveToNextByte();
             return (std::make_unique<BNodeList>(std::move(bNodeList)));
@@ -141,7 +141,7 @@ namespace H4
             integer *= decodePositiveInteger(source);
             if (source->currentByte() != (std::byte)'e')
             {
-                throw std::runtime_error("Bencoding syntax error detected.");
+                throw Bencode::SyntaxError();
             }
             source->moveToNextByte();
             return (std::make_unique<BNodeInteger>(BNodeInteger(integer)));

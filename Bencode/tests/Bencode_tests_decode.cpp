@@ -148,22 +148,22 @@ TEST_CASE("Decode generated exceptions", "[Bencode][Decode][Exceptions]")
   }
   SECTION("Decode an string without terminating ':' on its length", "[Bencode][Decode]")
   {
-    REQUIRE_THROWS_AS(bEncode.decodeBuffer("26abcdefghijklmnopqrstuvwxyz"), std::runtime_error);
+    REQUIRE_THROWS_AS(bEncode.decodeBuffer("26abcdefghijklmnopqrstuvwxyz"), Bencode::SyntaxError);
     REQUIRE_THROWS_WITH(bEncode.decodeBuffer("26abcdefghijklmnopqrstuvwxyz"), "Bencoding syntax error detected.");
   }
   SECTION("Decode an integer without a terminating end", "[Bencode][Decode]")
   {
-    REQUIRE_THROWS_AS(bEncode.decodeBuffer("i266"), std::runtime_error);
+    REQUIRE_THROWS_AS(bEncode.decodeBuffer("i266"), Bencode::SyntaxError);
     REQUIRE_THROWS_WITH(bEncode.decodeBuffer("i266"), "Bencoding syntax error detected.");
   }
   SECTION("Decode an list without a terminating end", "[Bencode][Decode]")
   {
-    REQUIRE_THROWS_AS(bEncode.decodeBuffer("li266ei6780ei88e"), std::runtime_error);
+    REQUIRE_THROWS_AS(bEncode.decodeBuffer("li266ei6780ei88e"), Bencode::SyntaxError);
     REQUIRE_THROWS_WITH(bEncode.decodeBuffer("li266ei6780ei88e"), "Bencoding syntax error detected.");
   }
   SECTION("Decode an diictionary without a terminating end", "[Bencode][Decode]")
   {
-    REQUIRE_THROWS_AS(bEncode.decodeBuffer("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkl"), std::runtime_error);
+    REQUIRE_THROWS_AS(bEncode.decodeBuffer("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkl"), Bencode::SyntaxError);
     REQUIRE_THROWS_WITH(bEncode.decodeBuffer("d3:one10:01234567895:three6:qwerty3:two9:asdfghjkl"), "Bencoding syntax error detected.");
   }
   SECTION("Decode an string that terminates prematurely", "[Bencode][Decode]")
@@ -200,12 +200,12 @@ TEST_CASE("Decode erronous torrent files using decodeFile", "[Bencode][Decode][T
   Bencode bEncode;
   SECTION("Decode singlefileerror.torrent", "[Bencode][Decode][Torrents]")
   {
-    REQUIRE_THROWS_AS(bEncode.decodeFile(kSingleFileWithErrorTorrent), std::runtime_error);
+    REQUIRE_THROWS_AS(bEncode.decodeFile(kSingleFileWithErrorTorrent), Bencode::SyntaxError);
     REQUIRE_THROWS_WITH(bEncode.decodeFile(kSingleFileWithErrorTorrent), "Bencoding syntax error detected.");
   }
   SECTION("Decode multifileerror.torrent", "[Bencode][Decode][Torrents]")
   {
-    REQUIRE_THROWS_AS(bEncode.decodeFile(kMultiFileWithErrorTorrent), std::runtime_error);
+    REQUIRE_THROWS_AS(bEncode.decodeFile(kMultiFileWithErrorTorrent), Bencode::SyntaxError);
     REQUIRE_THROWS_WITH(bEncode.decodeFile(kMultiFileWithErrorTorrent), "Bencoding syntax error detected.");
   }
   SECTION("Decode doesntexist.torrent", "[Bencode][Decode][Torrents]")

@@ -28,6 +28,20 @@ namespace H4
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
         //
+        // Bencode syntax error.
+        //
+        struct SyntaxError : public std::exception
+        {
+        public:
+            SyntaxError(const std::string &errorMessage = "") : errorMessage(errorMessage) {}
+            virtual const char *what() const throw()
+            {
+                return ("Bencoding syntax error detected.");
+            }
+        private:
+            std::string errorMessage;
+        };
+        //
         // Source interface
         //
         class ISource
