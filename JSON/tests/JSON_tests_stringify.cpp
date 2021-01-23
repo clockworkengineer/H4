@@ -1,7 +1,7 @@
 //
 // Unit Tests: JSON
 //
-// Description: JSON encode unit tests for JSON class
+// Description: JSON stringification unit tests for JSON class
 // using the Catch2 test framework.
 //
 // ================
@@ -15,7 +15,7 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Creation and use of JSON object for encode of simple types (number, string, boolean, null) and check its value", "[JSON][Stringify]")
+TEST_CASE("Creation and use of JSON object for stringification of simple types (number, string, boolean, null) and check its value", "[JSON][Stringify]")
 {
     JSON json;
     SECTION("Stringify a string (Test string) and check its value", "[JSON][Stringify]")
@@ -54,7 +54,7 @@ TEST_CASE("Creation and use of JSON object for encode of simple types (number, s
         REQUIRE(json.stringifyToBuffer(json.parseBuffer(expected)) == expected);
     }
 }
-TEST_CASE("Creation and use of JSON object for encode of collection types (object, array) and check its value", "[JSON][Stringify]")
+TEST_CASE("Creation and use of JSON object for stringification of collection types (object, array) and check its value", "[JSON][Stringify]")
 {
     JSON json;
     SECTION("Stringify an object ({\"Age\":77,\"Name\":\"Rob\"}) and check its value", "[JSON][Stringify]")
@@ -107,7 +107,7 @@ TEST_CASE("Stringify generated exceptions", "[JSON][Stringify][Exceptions]")
     SECTION("Stringify passed invalid JNode type", "[JSON][Stringify][Exceptions]")
     {
         REQUIRE_THROWS_AS(json.stringifyToBuffer(std::unique_ptr<JNode>(new JNode())), std::runtime_error);
-        REQUIRE_THROWS_WITH(json.stringifyToBuffer(std::unique_ptr<JNode>(new JNode())), "Unknown JNode type encountered during encode.");
+        REQUIRE_THROWS_WITH(json.stringifyToBuffer(std::unique_ptr<JNode>(new JNode())), "Unknown JNode type encountered during stringification.");
     }
     SECTION("Stringify file passed invalid JNode type", "[JSON][Stringify][Exceptions]")
     {
@@ -120,7 +120,7 @@ TEST_CASE("Stringify generated exceptions", "[JSON][Stringify][Exceptions]")
         REQUIRE_THROWS_WITH(json.stringifyToFile(std::unique_ptr<JNode>(new JNode()), ""), "Empty file name passed to be stringified.");
     }
 }
-TEST_CASE("Creation and use of JSON object for encode of a list of example JSON files.", "[JSON][Stringify]")
+TEST_CASE("Creation and use of JSON object for stringification of a list of example JSON files.", "[JSON][Stringify]")
 {
     auto testFile = GENERATE(values<std::string>({"./testData/testfile001.json",
                                                   "./testData/testfile002.json",
@@ -144,47 +144,47 @@ TEST_CASE("Creation and use of JSON object for encode of a list of example JSON 
 TEST_CASE("Creation and use of JSON object for stringification of strings with escape characters.", "[JSON][Stringify]")
 {
     JSON json;
-    SECTION("Stringify string with escapes '\\t' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\t' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\t \"")) == "\"Test String \\t \"");
     }
-    SECTION("Stringify string with escapes '\\\"' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\\"' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\\" \"")) == "\"Test String \\\" \"");
     }
-    SECTION("Stringify string with escapes '\\\\' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\\\' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\\\ \"")) == "\"Test String \\\\ \"");
     }
-    SECTION("Stringify string with escapes '\\b' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\b' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\b \"")) == "\"Test String \\b \"");
     }
-    SECTION("Stringify string with escapes '\\/' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\/' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\/ \"")) == "\"Test String \\/ \"");
     }
-    SECTION("Stringify string with escapes '\\f' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\f' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\f \"")) == "\"Test String \\f \"");
     }
-    SECTION("Stringify string with escapes '\\n' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\n' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\n \"")) == "\"Test String \\n \"");
     }
-    SECTION("Stringify string with escapes '\\r' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\r' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\r \"")) == "\"Test String \\r \"");
     }
-    SECTION("Stringify string with escapes '\\t' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\t' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\t \"")) == "\"Test String \\t \"");
     }
-    SECTION("Stringify string with escapes '\\u0123' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\u0123' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\u0123 \"")) == "\"Test String \\u0123 \"");
     }
-    SECTION("Stringify string with escapes '\\u0123 \\u0456' to buffer and check value", "[JSON][Stringify]")
+    SECTION("Stringify JSON string with escapes '\\u0123 \\u0456' to buffer and check value", "[JSON][Stringify]")
     {
         REQUIRE(json.stringifyToBuffer(json.parseBuffer("\"Test String \\u0123 \\u0456 \"")) == "\"Test String \\u0123 \\u0456 \"");
     }

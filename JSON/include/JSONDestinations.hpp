@@ -3,7 +3,7 @@
 namespace H4
 {
     //
-    // Destination classes for encoders.
+    // Destination classes for stringification.
     //
     class BufferDestination : public JSON::IDestination
     {
@@ -15,15 +15,15 @@ namespace H4
         {
             for (auto b : bytes)
             {
-                m_encodeBuffer.push_back(b);
+                m_stringifyBuffer.push_back(b);
             }
         }
         std::string getBuffer()
         {
-            return (m_encodeBuffer);
+            return (m_stringifyBuffer);
         }
     private:
-        std::string m_encodeBuffer;
+        std::string m_stringifyBuffer;
     };
     class FileDestination : public JSON::IDestination
     {

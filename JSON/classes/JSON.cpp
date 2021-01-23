@@ -1,7 +1,7 @@
 //
 // Class: JSON
 //
-// Description: Class to perform JSON  encode/parse to/from a byte 
+// Description: Class to perform JSON  stringify/parse to/from a byte 
 // or file. It is also  possible to customize this with the ISource
 // and IDestination interfaces if required. Note: At present it will
 // report incorrect JSON syntax but will not be specific about what 
@@ -262,7 +262,7 @@ namespace H4
     /// the destination stream passed in.
     /// </summary>
     /// <param name=jNode>JNode structure to be traversed</param>
-    /// <param name=desination>destination stream for encoded JSON</param>
+    /// <param name=desination>destination stream for stringified JSON</param>
     /// <returns></returns>
     void JSON::stringifyJNodes(JNode *jNode, IDestination *destination)
     {
@@ -312,7 +312,7 @@ namespace H4
             break;
         }
         default:
-            throw std::runtime_error("Unknown JNode type encountered during encode.");
+            throw std::runtime_error("Unknown JNode type encountered during stringification.");
         }
     }
     /// <summary>
@@ -423,9 +423,9 @@ namespace H4
         stringifyJNodes(jNodeRoot.get(), &destination);
     }
     /// <summary>
-    /// Remove all whitespace from a JSOn encoded buffer.
+    /// Remove all whitespace from a JSON buffer.
     /// </summary>
-    /// <param name="jsonBuffer">Buffer of encoded JSON</param>
+    /// <param name="jsonBuffer">Buffer of JSON</param>
     /// <returns>Whitespace free JSON.</returns>
     std::string JSON::stripWhiteSpaceBuffer(const std::string &jsonBuffer)
     {
