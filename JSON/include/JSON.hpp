@@ -54,7 +54,7 @@ namespace H4
         public:
             virtual char currentByte() = 0;
             virtual void moveToNextByte() = 0;
-            virtual bool bytesToDecode() = 0;
+            virtual bool bytesToParse() = 0;
         };
         //
         // Destination interface
@@ -74,10 +74,10 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        std::unique_ptr<JNode> decodeBuffer(const std::string &jsonBuffer);
-        std::unique_ptr<JNode> decodeFile(const std::string &sourceFileName);
-        std::string encodeBuffer(std::unique_ptr<JNode> jNodeRoot);
-        void encodeFile(std::unique_ptr<JNode> jNodeRoot, const std::string &destinationFileName);
+        std::unique_ptr<JNode> parseBuffer(const std::string &jsonBuffer);
+        std::unique_ptr<JNode> parseFile(const std::string &sourceFileName);
+        std::string stringifyToBuffer(std::unique_ptr<JNode> jNodeRoot);
+        void stringifyToFile(std::unique_ptr<JNode> jNodeRoot, const std::string &destinationFileName);
         std::string stripWhiteSpaceBuffer(const std::string &jsonBuffer);
         // ================
         // PUBLIC VARIABLES
@@ -94,14 +94,14 @@ namespace H4
         // ===============
         void ignoreWhiteSpace(ISource *source);
         std::string extractString(ISource *source);
-        std::unique_ptr<JNode> decodeJNodes(ISource *source);
-        std::unique_ptr<JNode> decodeString(ISource *source);
-        std::unique_ptr<JNode> decodeNumber(ISource *source);
-        std::unique_ptr<JNode> decodeBoolean(ISource *source);
-        std::unique_ptr<JNode> decodeNull(ISource *source);
-        std::unique_ptr<JNode> decodeObject(ISource *source);
-        std::unique_ptr<JNode> decodeArray(ISource *source);
-        void encodeJNodes(JNode *jNode, IDestination *destination);
+        std::unique_ptr<JNode> parseJNodes(ISource *source);
+        std::unique_ptr<JNode> parseString(ISource *source);
+        std::unique_ptr<JNode> parseNumber(ISource *source);
+        std::unique_ptr<JNode> parseBoolean(ISource *source);
+        std::unique_ptr<JNode> parseNull(ISource *source);
+        std::unique_ptr<JNode> parseObject(ISource *source);
+        std::unique_ptr<JNode> parseArray(ISource *source);
+        void stringifyJNodes(JNode *jNode, IDestination *destination);
         void stripWhiteSpace(ISource *source, IDestination *destination);
         // =================
         // PRIVATE VARIABLES

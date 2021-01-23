@@ -30,7 +30,7 @@ std::string readJSONFromFile(const std::string &jsonFileName)
   return (jsonFileBuffer.str());
 }
 /// <summary>
-/// Verify that an JNodeArray has the correct decoded format.
+/// Verify that an JNodeArray has the correct pasred format.
 /// </summary>
 /// <param name="jNode">Pointer to JNNodeArray</param>
 /// <returns></returns>
@@ -48,7 +48,7 @@ void checkArray(JNode *jNode)
   REQUIRE(JNodeRef<JNodeNull>((*jNode)[3]).getNull() == nullptr);
 }
 /// <summary>
-/// Verify that an JNodeObject has the correct decoded format.
+/// Verify that an JNodeObject has the correct pasred format.
 /// </summary>
 /// <param name="jNode">Pointer to JNodeObject</param>
 /// <returns></returns>
@@ -66,35 +66,35 @@ void checkObject(JNode *jNode)
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Creation and use of ISource (File) interface.", "[JSON][Decode][ISource]")
+TEST_CASE("Creation and use of ISource (File) interface.", "[JSON][Parse][ISource]")
 {
-  SECTION("Create FileSource with testfile001.json.", "[JSON][Decode][ISource]")
+  SECTION("Create FileSource with testfile001.json.", "[JSON][Parse][ISource]")
   {
     REQUIRE_NOTHROW(FileSource(kGeneratedTorrentFile));
   }
-  SECTION("Create FileSource with non existants file.", "[JSON][Decode][ISource][Exception]")
+  SECTION("Create FileSource with non existants file.", "[JSON][Parse][ISource][Exception]")
   {
     REQUIRE_THROWS_AS(FileSource(kNonExistantJSONFile), std::runtime_error);
     REQUIRE_THROWS_WITH(FileSource(kNonExistantJSONFile), "JSON file input stream failed to open or does not exist.");
   }
-  SECTION("Create FileSource with testfile001.json. and positioned on the correct first character", "[JSOND][Decode][ISource]")
+  SECTION("Create FileSource with testfile001.json. and positioned on the correct first character", "[JSOND][Parse][ISource]")
   {
     FileSource source = FileSource(kSIngleJSONFile);
-    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE_FALSE(!source.bytesToParse());
     REQUIRE((char)source.currentByte() == '{');
   }
-  SECTION("Create FileSource with testfile001.json and then check moveToNextByte positions to correct next character", "[JSON][Decode][ISource]")
+  SECTION("Create FileSource with testfile001.json and then check moveToNextByte positions to correct next character", "[JSON][Parse][ISource]")
   {
     FileSource source = FileSource(kSIngleJSONFile);
     source.moveToNextByte();
-    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE_FALSE(!source.bytesToParse());
     REQUIRE((char)source.currentByte() == '\n');
   }
-  SECTION("Create FileSource with testfile001.json  move past last character, check it and the bytes moved.", "[JSON][Decode][ISource]")
+  SECTION("Create FileSource with testfile001.json  move past last character, check it and the bytes moved.", "[JSON][Parse][ISource]")
   {
     FileSource source = FileSource(kSIngleJSONFile);
     long length = 0;
-    while (source.bytesToDecode())
+    while (source.bytesToParse())
     {
       source.moveToNextByte();
       length++;
@@ -103,36 +103,36 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[JSON][Decode][ISour
     REQUIRE(source.currentByte() == (char)0xff); // eof
   }
 }
-TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file testfile001.json).", "[JSON][Decode][ISource]")
+TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file testfile001.json).", "[JSON][Parse][ISource]")
 {
   std::string buffer = readJSONFromFile(kSIngleJSONFile);
-  SECTION("Create BufferSource.", "[JSON][Decode][ISource]")
+  SECTION("Create BufferSource.", "[JSON][Parse][ISource]")
   {
     REQUIRE_NOTHROW(BufferSource(buffer));
   }
-  SECTION("Create BufferSource with empty buffer.", "[JSON][Decode][ISource][Exception]")
+  SECTION("Create BufferSource with empty buffer.", "[JSON][Parse][ISource][Exception]")
   {
     REQUIRE_THROWS_AS(BufferSource(""), std::invalid_argument);
-    REQUIRE_THROWS_WITH(BufferSource(""), "Empty source buffer passed to be encoded.");
+    REQUIRE_THROWS_WITH(BufferSource(""), "Empty source buffer passed to be parsed.");
   }
-  SECTION("Create BufferSource with testfile001.json and that it is positioned on the correct first character", "[JSON][Decode][ISource]")
+  SECTION("Create BufferSource with testfile001.json and that it is positioned on the correct first character", "[JSON][Parse][ISource]")
   {
     BufferSource source = BufferSource(buffer);
-    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE_FALSE(!source.bytesToParse());
     REQUIRE((char)source.currentByte() == '{');
   }
-  SECTION("Create BufferSource with testfile001.json and then check moveToNextByte positions to correct next character", "[JSON][Decode][ISource]")
+  SECTION("Create BufferSource with testfile001.json and then check moveToNextByte positions to correct next character", "[JSON][Parse][ISource]")
   {
     BufferSource source = BufferSource(buffer);
     source.moveToNextByte();
-    REQUIRE_FALSE(!source.bytesToDecode());
+    REQUIRE_FALSE(!source.bytesToParse());
     REQUIRE((char)source.currentByte() == '\n');
   }
-  SECTION("Create BufferSource with testfile001.json move past last character, check it and the bytes moved.", "[JSON][Decode][ISource]")
+  SECTION("Create BufferSource with testfile001.json move past last character, check it and the bytes moved.", "[JSON][Parse][ISource]")
   {
     BufferSource source = BufferSource(buffer);
     long length = 0;
-    while (source.bytesToDecode())
+    while (source.bytesToParse())
     {
       source.moveToNextByte();
       length++;
@@ -141,24 +141,24 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE(source.currentByte() == (char)255); // eof
   }
 }
-TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[JSON][Decode][ISource]")
+TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[JSON][Parse][ISource]")
 {
-  SECTION("Create BufferDesination.", "[JSON][Encode][IDesination]")
+  SECTION("Create BufferDesination.", "[JSON][Stringify][IDesination]")
   {
     REQUIRE_NOTHROW(BufferDestination());
   }
-  SECTION("Create BufferDestination and get buffer which should be empty.", "[JSON][Encode][IDesination]")
+  SECTION("Create BufferDestination and get buffer which should be empty.", "[JSON][Stringify][IDesination]")
   {
     BufferDestination buffer;
     REQUIRE_FALSE(!buffer.getBuffer().empty());
   }
-  SECTION("Create BufferDestination and add one character.", "[JSON][Encode][IDesination]")
+  SECTION("Create BufferDestination and add one character.", "[JSON][Stringify][IDesination]")
   {
     BufferDestination buffer;
     buffer.addBytes("i");
     REQUIRE(buffer.getBuffer().size() == 1);
   }
-  SECTION("Create BufferDestination and add an encoded integer and check result.", "[JSON][Encode][IDesination]")
+  SECTION("Create BufferDestination and add an stringified integer and check result.", "[JSON][Stringify][IDesination]")
   {
     BufferDestination buffer;
     buffer.addBytes("65767");
@@ -166,20 +166,20 @@ TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[JSON][Decode
     REQUIRE(buffer.getBuffer() == ("65767"));
   }
 }
-TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Decode][ISource]")
+TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Parse][ISource]")
 {
-  SECTION("Create FileDestination.", "[JSON][Encode][IDesination]")
+  SECTION("Create FileDestination.", "[JSON][Stringify][IDesination]")
   {
     std::filesystem::remove(kGeneratedTorrentFile);
     REQUIRE_NOTHROW(FileDestination(kGeneratedTorrentFile));
   }
-  SECTION("Create FileDestination when file already exists.", "[JSON][Encode][IDesination]")
+  SECTION("Create FileDestination when file already exists.", "[JSON][Stringify][IDesination]")
   {
     FileDestination file(kGeneratedTorrentFile);
     file = FileDestination(kGeneratedTorrentFile);
     REQUIRE_NOTHROW(FileDestination(kGeneratedTorrentFile));
   }
-  SECTION("Create FileDestination and test file exists and should be empty.", "[JSON][Encode][IDesination]")
+  SECTION("Create FileDestination and test file exists and should be empty.", "[JSON][Stringify][IDesination]")
   {
     std::filesystem::remove(kGeneratedTorrentFile);
     FileDestination file(kGeneratedTorrentFile);
@@ -187,7 +187,7 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Decode][
     std::filesystem::path filePath(kGeneratedTorrentFile);
     REQUIRE(std::filesystem::file_size(filePath) == 0);
   }
-  SECTION("Create FileDestination and add one character.", "[JSON][Encode][IDesination]")
+  SECTION("Create FileDestination and add one character.", "[JSON][Stringify][IDesination]")
   {
     std::filesystem::remove(kGeneratedTorrentFile);
     FileDestination file(kGeneratedTorrentFile);
@@ -195,7 +195,7 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Decode][
     std::filesystem::path filePath(kGeneratedTorrentFile);
     REQUIRE(std::filesystem::file_size(filePath) == 1);
   }
-  SECTION("Create FileDestination, add an encoded integer and check result.", "[JSON][Encode][IDesination]")
+  SECTION("Create FileDestination, add an stringified integer and check result.", "[JSON][Stringify][IDesination]")
   {
     std::filesystem::remove(kGeneratedTorrentFile);
     FileDestination file(kGeneratedTorrentFile);
@@ -211,64 +211,64 @@ TEST_CASE("Use of JNode indexing operators", "[JSON][JNode][Index]")
 {
   JSON json;
   std::unique_ptr<JNode> jNode;
-  SECTION("Decode dictionary and check its components using indexing", "[JSON][JNode][Index]")
+  SECTION("Parse dictionary and check its components using indexing", "[JSON][JNode][Index]")
   {
-    jNode = json.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
+    jNode = json.parseBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
     checkObject(jNode.get());
     REQUIRE(JNodeRef<JNodeString>((*jNode)["City"]).getString() == "Southampton");
     REQUIRE(JNodeRef<JNodeNumber>((*jNode)["Population"]).getNumber() == "500000");
   }
-  SECTION("Decode list and check its components using indexing", "[JSON][JNode][Index]")
+  SECTION("Parse list and check its components using indexing", "[JSON][JNode][Index]")
   {
-    jNode = json.decodeBuffer("[777,9000,\"apples\"]");
+    jNode = json.parseBuffer("[777,9000,\"apples\"]");
     REQUIRE(JNodeRef<JNodeNumber>((*jNode)[0]).getNumber() == "777");
     REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]).getNumber() == "9000");
     REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).getString() == "apples");
   }
-  SECTION("Decode list with embedded dictioanry and check its components using indexing", "[JSON][JNode][Index]")
+  SECTION("Parse list with embedded dictioanry and check its components using indexing", "[JSON][JNode][Index]")
   {
-    jNode = json.decodeBuffer("[777,{\"City\":\"Southampton\",\"Population\":500000},\"apples\"]");
+    jNode = json.parseBuffer("[777,{\"City\":\"Southampton\",\"Population\":500000},\"apples\"]");
     REQUIRE(JNodeRef<JNodeNumber>((*jNode)[0]).getNumber() == "777");
     REQUIRE(JNodeRef<JNodeString>((*jNode)[1]["City"]).getString() == "Southampton");
     REQUIRE(JNodeRef<JNodeNumber>((*jNode)[1]["Population"]).getNumber() == "500000");
     REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).getString() == "apples");
   }
-  SECTION("Decode dictionary and check an invalid key generates exception", "[JSON][JNode][Index]")
+  SECTION("Parse dictionary and check an invalid key generates exception", "[JSON][JNode][Index]")
   {
-    jNode = json.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
+    jNode = json.parseBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
     REQUIRE_THROWS_AS((*jNode)["Cityy"].nodeType == JNodeType::object, std::runtime_error);
     REQUIRE_THROWS_WITH((*jNode)["Cityy"].nodeType == JNodeType::object, "Invalid key used to access object.");
   }
-  SECTION("Decode list and check an invalid index generates exception", "[JSON][JNode][Index]")
+  SECTION("Parse list and check an invalid index generates exception", "[JSON][JNode][Index]")
   {
-    jNode = json.decodeBuffer("[777,9000,\"apples\"]");
+    jNode = json.parseBuffer("[777,9000,\"apples\"]");
     REQUIRE_THROWS_AS((*jNode)[3].nodeType == JNodeType::array, std::runtime_error);
     REQUIRE_THROWS_WITH((*jNode)[3].nodeType == JNodeType::array, "Invalid index used to access array.");
   }
 }
 TEST_CASE("Check JNode reference functions work.", "[JSON][JNode][Reference]")
 {
-  JSON bEncode;
+  JSON json;
   std::unique_ptr<JNode> jNode;
   SECTION("Integer reference.", "[JSON][JNode][Reference]")
   {
-    jNode = bEncode.decodeBuffer("45500");
+    jNode = json.parseBuffer("45500");
     REQUIRE(JNodeRef<JNodeNumber>((*jNode)).getNumber() == "45500");
   }
   SECTION("String reference.", "[JSON][JNode][Reference]")
   {
-    jNode = bEncode.decodeBuffer("0123456789");
+    jNode = json.parseBuffer("0123456789");
     REQUIRE(JNodeRef<JNodeString>((*jNode)).getString() == "0123456789");
   }
   SECTION("Array reference.", "[JSON][JNode][Reference]")
   {
-    jNode = bEncode.decodeBuffer("[777,9000,\"apples\"]");
+    jNode = json.parseBuffer("[777,9000,\"apples\"]");
     REQUIRE(JNodeRef<JNodeArray>((*jNode)).size() == 3);
     REQUIRE(JNodeRef<JNodeString>((*jNode)[2]).getString() == "apples");
   }
   SECTION("Dictionary reference.", "[JSON][JNode][Reference]")
   {
-    jNode = bEncode.decodeBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
+    jNode = json.parseBuffer("{\"City\":\"Southampton\",\"Population\":500000}");
     REQUIRE(JNodeRef<JNodeObject>((*jNode)).size() == 2);
     REQUIRE(JNodeRef<JNodeString>((*jNode)["City"]).getString() == "Southampton");
   }
@@ -280,42 +280,42 @@ TEST_CASE("Check JNodeNumber number conversion", "[JSON][JNode][JNodeNumber]")
   SECTION("Floating point not converted to Integer", "[JSON][JNode][JNodeNumber]")
   {
     long longValue;
-    jNode = json.decodeBuffer("678.8990");
+    jNode = json.parseBuffer("678.8990");
     REQUIRE_FALSE(JNodeRef<JNodeNumber>(*jNode).getInteger(longValue));
   }
   SECTION("Floating point converted to double", "[JSON][JNode][JNodeNumber]")
   {
     double doubleValue;
-    jNode = json.decodeBuffer("678.8990");
+    jNode = json.parseBuffer("678.8990");
     REQUIRE_FALSE(!JNodeRef<JNodeNumber>(*jNode).getFloatingPoint(doubleValue));
     REQUIRE(doubleValue == 678.8990);
   }
   SECTION("Integer point converted to Long", "[JSON][JNode][JNodeNumber]")
   {
     long longValue;
-    jNode = json.decodeBuffer("78989");
+    jNode = json.parseBuffer("78989");
     REQUIRE_FALSE(!JNodeRef<JNodeNumber>(*jNode).getInteger(longValue));
     REQUIRE(longValue == 78989);
   }
   SECTION("Integer point not converted to double", "[JSON][JNode][JNodeNumber]")
   {
     double doubleValue;
-    jNode = json.decodeBuffer("78989");
+    jNode = json.parseBuffer("78989");
     REQUIRE_FALSE(!JNodeRef<JNodeNumber>(*jNode).getFloatingPoint(doubleValue));
   }
   SECTION("Check  flaoing point with exponent", "[JSON][JNode][JNodeNumber][Exception")
   {
-    REQUIRE_NOTHROW(jNode = json.decodeBuffer("78.43e-2"));
+    REQUIRE_NOTHROW(jNode = json.parseBuffer("78.43e-2"));
   }
   SECTION("Check floaing point with invalid exponent", "[JSON][JNode][JNodeNumber][Exception]")
   {
-    REQUIRE_THROWS_AS(jNode = json.decodeBuffer("78.e43e-2"), std::runtime_error);
-    REQUIRE_THROWS_WITH(jNode = json.decodeBuffer("78.e43e-2"), "JSON syntax error detected.");
+    REQUIRE_THROWS_AS(jNode = json.parseBuffer("78.e43e-2"), std::runtime_error);
+    REQUIRE_THROWS_WITH(jNode = json.parseBuffer("78.e43e-2"), "JSON syntax error detected.");
   }
   SECTION("Check floaing point with multiple decimal points", "[JSON][JNode][JNodeNumber][Exception]")
   {
-    REQUIRE_THROWS_AS(jNode = json.decodeBuffer("78.5454.545"), std::runtime_error);
-    REQUIRE_THROWS_WITH(jNode = json.decodeBuffer("78.5454.545"), "JSON syntax error detected.");
+    REQUIRE_THROWS_AS(jNode = json.parseBuffer("78.5454.545"), std::runtime_error);
+    REQUIRE_THROWS_WITH(jNode = json.parseBuffer("78.5454.545"), "JSON syntax error detected.");
   }
 }
 TEST_CASE("Check translation of surrogate pairs", "[JSON][DefaultTranslator]")

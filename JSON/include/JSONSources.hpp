@@ -3,7 +3,7 @@
 namespace H4
 {
     //
-    // Source classes for decoders.
+    // Source classes for parsers.
     //
     class BufferSource : public JSON::ISource
     {
@@ -12,15 +12,15 @@ namespace H4
         {
             if (sourceBuffer.empty())
             {
-                throw std::invalid_argument("Empty source buffer passed to be encoded.");
+                throw std::invalid_argument("Empty source buffer passed to be parsed.");
             }
-            m_decodeBuffer = sourceBuffer;
+            m_parseBuffer = sourceBuffer;
         }
         char currentByte()
         {
-            if (bytesToDecode())
+            if (bytesToParse())
             {
-                return (m_decodeBuffer[m_bufferPosition]);
+                return (m_parseBuffer[m_bufferPosition]);
             }
             else
             {
@@ -29,20 +29,20 @@ namespace H4
         }
         void moveToNextByte()
         {
-            if (!bytesToDecode())
+            if (!bytesToParse())
             {
-                throw std::runtime_error("Decode buffer empty before decode complete.");
+                throw std::runtime_error("Parse buffer empty before parse complete.");
             }
             m_bufferPosition++;
         }
-        bool bytesToDecode()
+        bool bytesToParse()
         {
-            return (m_bufferPosition < m_decodeBuffer.size());
+            return (m_bufferPosition < m_parseBuffer.size());
         }
 
     private:
         std::size_t m_bufferPosition = 0;
-        std::string m_decodeBuffer;
+        std::string m_parseBuffer;
     };
     class FileSource : public JSON::ISource
     {
@@ -64,7 +64,7 @@ namespace H4
             char c;
             m_source.get(c);
         }
-        bool bytesToDecode()
+        bool bytesToParse()
         {
             return (m_source.peek() != EOF);
         }

@@ -13,8 +13,8 @@ set(TEST_EXECUTABLE ${JSON_LIBRARY_NAME}_Unit_Tests)
 
 set(TEST_SOURCES
     JSON_tests_main.cpp
-    JSON_tests_decode.cpp
-    JSON_tests_encode.cpp
+    JSON_tests_parse.cpp
+    JSON_tests_stringify.cpp
 )
 
 add_executable(${TEST_EXECUTABLE} ${TEST_SOURCES})

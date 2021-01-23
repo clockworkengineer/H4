@@ -1,7 +1,7 @@
 //
 // Class: JSON
 //
-// Description: Class to perform JSON  encode/decode to/from a byte 
+// Description: Class to perform JSON  encode/parse to/from a byte 
 // or file. It is also  possible to customize this with the ISource
 // and IDestination interfaces if required. Note: At present it will
 // report incorrect JSON syntax but will not be specific about what 
@@ -60,7 +60,7 @@ namespace H4
     /// <returns></returns>
     inline void JSON::ignoreWhiteSpace(ISource *source)
     {
-        while (source->bytesToDecode() && std::iswspace(source->currentByte()))
+        while (source->bytesToParse() && std::iswspace(source->currentByte()))
         {
             source->moveToNextByte();
         }
@@ -74,7 +74,7 @@ namespace H4
     {
         m_workBuffer.clear();
         source->moveToNextByte();
-        while (source->bytesToDecode() && source->currentByte() != '"')
+        while (source->bytesToParse() && source->currentByte() != '"')
         {
             if (source->currentByte() == '\\')
             {
@@ -84,7 +84,7 @@ namespace H4
             m_workBuffer += source->currentByte();
             source->moveToNextByte();
         }
-        if (!source->bytesToDecode())
+        if (!source->bytesToParse())
         {
             throw std::runtime_error("JSON syntax error detected.");
         }
@@ -92,20 +92,20 @@ namespace H4
         return (m_workBuffer);
     }
     /// <summary>
-    /// Decode a string from a JSON source stream.
+    /// Parse a string from a JSON source stream.
     /// </summary>
     /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
-    std::unique_ptr<JNode> JSON::decodeString(ISource *source)
+    std::unique_ptr<JNode> JSON::parseString(ISource *source)
     {
         return (std::make_unique<JNodeString>(m_jsonTranslator->fromEscapeSequences(extractString(source))));
     }
     /// <summary>
-    /// Decode a number from a JSON source stream.
+    /// Parse a number from a JSON source stream.
     /// </summary>
     /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
-    std::unique_ptr<JNode> JSON::decodeNumber(ISource *source)
+    std::unique_ptr<JNode> JSON::parseNumber(ISource *source)
     {
         std::set<char> validCharacters{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', '-', '+', 'E', 'e'};
         if (validCharacters.count(source->currentByte()) == 0)
@@ -115,7 +115,7 @@ namespace H4
         m_workBuffer.clear();
         m_workBuffer += source->currentByte();
         source->moveToNextByte();
-        while (source->bytesToDecode() && validCharacters.count(source->currentByte()) > 0)
+        while (source->bytesToParse() && validCharacters.count(source->currentByte()) > 0)
         {
             m_workBuffer += source->currentByte();
             source->moveToNextByte();
@@ -134,16 +134,16 @@ namespace H4
         return (std::make_unique<JNodeNumber>(m_workBuffer));
     }
     /// <summary>
-    /// Decode a boolean from a JSON source stream.
+    /// Parse a boolean from a JSON source stream.
     /// </summary>
     /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
-    std::unique_ptr<JNode> JSON::decodeBoolean(ISource *source)
+    std::unique_ptr<JNode> JSON::parseBoolean(ISource *source)
     {
         m_workBuffer.clear();
         m_workBuffer += source->currentByte();
         source->moveToNextByte();
-        while (source->bytesToDecode() && std::isalpha(source->currentByte()))
+        while (source->bytesToParse() && std::isalpha(source->currentByte()))
         {
             m_workBuffer += source->currentByte();
             source->moveToNextByte();
@@ -159,16 +159,16 @@ namespace H4
         throw std::runtime_error("JSON syntax error detected.");
     }
     /// <summary>
-    /// Decode a null from a JSON source stream.
+    /// Parse a null from a JSON source stream.
     /// </summary>
     /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
-    std::unique_ptr<JNode> JSON::decodeNull(ISource *source)
+    std::unique_ptr<JNode> JSON::parseNull(ISource *source)
     {
         m_workBuffer.clear();
         m_workBuffer += source->currentByte();
         source->moveToNextByte();
-        while (source->bytesToDecode() && std::isalpha(source->currentByte()))
+        while (source->bytesToParse() && std::isalpha(source->currentByte()))
         {
             m_workBuffer += source->currentByte();
             source->moveToNextByte();
@@ -180,11 +180,11 @@ namespace H4
         throw std::runtime_error("JSON syntax error detected.");
     }
     /// <summary>
-    /// Decode an object from a JSON source stream.
+    /// Parse an object from a JSON source stream.
     /// </summary>
     /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
-    std::unique_ptr<JNode> JSON::decodeObject(ISource *source)
+    std::unique_ptr<JNode> JSON::parseObject(ISource *source)
     {
         JNodeObject object;
         do
@@ -199,7 +199,7 @@ namespace H4
             }
             source->moveToNextByte();
             ignoreWhiteSpace(source);
-            object.addEntry(key, decodeJNodes(source));
+            object.addEntry(key, parseJNodes(source));
             ignoreWhiteSpace(source);
         } while (source->currentByte() == ',');
         if (source->currentByte() != '}')
@@ -210,18 +210,18 @@ namespace H4
         return (std::make_unique<JNodeObject>(std::move(object)));
     }
     /// <summary>
-    /// Decode an array from a JSON source stream.
+    /// Parse an array from a JSON source stream.
     /// </summary>
     /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
-    std::unique_ptr<JNode> JSON::decodeArray(ISource *source)
+    std::unique_ptr<JNode> JSON::parseArray(ISource *source)
     {
         JNodeArray array;
         do
         {
             source->moveToNextByte();
             ignoreWhiteSpace(source);
-            array.addEntry(decodeJNodes(source));
+            array.addEntry(parseJNodes(source));
             ignoreWhiteSpace(source);
         } while (source->currentByte() == ',');
         if (source->currentByte() != ']')
@@ -232,29 +232,29 @@ namespace H4
         return (std::make_unique<JNodeArray>(std::move(array)));
     }
     /// <summary>
-    /// Recursively decode JSON source stream producing a JNode structure
+    /// Recursively parse JSON source stream producing a JNode structure
     /// reprentation  of it.
     /// </summary>
     /// <param name="source">Source for JSON encoded bytes.</param>
     /// <returns></returns>
-    std::unique_ptr<JNode> JSON::decodeJNodes(ISource *source)
+    std::unique_ptr<JNode> JSON::parseJNodes(ISource *source)
     {
         ignoreWhiteSpace(source);
         switch (source->currentByte())
         {
         case '"':
-            return (decodeString(source));
+            return (parseString(source));
         case 't':
         case 'f':
-            return (decodeBoolean(source));
+            return (parseBoolean(source));
         case 'n':
-            return (decodeNull(source));
+            return (parseNull(source));
         case '{':
-            return (decodeObject(source));
+            return (parseObject(source));
         case '[':
-            return (decodeArray(source));
+            return (parseArray(source));
         default:
-            return (decodeNumber(source));
+            return (parseNumber(source));
         }
     }
     /// <summary>
@@ -264,7 +264,7 @@ namespace H4
     /// <param name=jNode>JNode structure to be traversed</param>
     /// <param name=desination>destination stream for encoded JSON</param>
     /// <returns></returns>
-    void JSON::encodeJNodes(JNode *jNode, IDestination *destination)
+    void JSON::stringifyJNodes(JNode *jNode, IDestination *destination)
     {
         switch (jNode->nodeType)
         {
@@ -287,7 +287,7 @@ namespace H4
             for (auto key : JNodeRef<JNodeObject>(*jNode).getKeys())
             {
                 destination->addBytes("\"" + m_jsonTranslator->toEscapeSequences(key) + "\"" + ":");
-                encodeJNodes(JNodeRef<JNodeObject>(*jNode).getEntry(key), destination);
+                stringifyJNodes(JNodeRef<JNodeObject>(*jNode).getEntry(key), destination);
                 if (commaCount-- > 0)
                 {
                     destination->addBytes(",");
@@ -302,7 +302,7 @@ namespace H4
             destination->addBytes("[");
             for (auto &bNodeEntry : JNodeRef<JNodeArray>(*jNode).getArray())
             {
-                encodeJNodes(bNodeEntry.get(), destination);
+                stringifyJNodes(bNodeEntry.get(), destination);
                 if (commaCount-- > 0)
                 {
                     destination->addBytes(",");
@@ -324,10 +324,10 @@ namespace H4
     /// <returns></returns>
     void JSON::stripWhiteSpace(ISource *source, IDestination *destination)
     {
-        while (source->bytesToDecode())
+        while (source->bytesToParse())
         {
             ignoreWhiteSpace(source);
-            if (source->bytesToDecode())
+            if (source->bytesToParse())
             {
                 if (source->currentByte() == '"')
                 {
@@ -365,42 +365,42 @@ namespace H4
     /// </summary>
     /// <param name=jsonBuffer>Buffer contains JSON to be parsed.</param>
     /// <returns>JNode structure.</returns>
-    std::unique_ptr<JNode> JSON::decodeBuffer(const std::string &jsonBuffer)
+    std::unique_ptr<JNode> JSON::parseBuffer(const std::string &jsonBuffer)
     {
         if (jsonBuffer.empty())
         {
-            throw std::invalid_argument("Empty string passed to be decoded.");
+            throw std::invalid_argument("Empty string passed to be parsed.");
         }
         BufferSource source(jsonBuffer);
-        return (decodeJNodes(&source));
+        return (parseJNodes(&source));
     }
     /// <summary>
     /// Create JNode structure by recursively parsing JSON in a file.
     /// </summary>
     /// <param name=sourceFileName>JSON source file name</param>
     /// <returns>JNode structure.</returns>
-    std::unique_ptr<JNode> JSON::decodeFile(const std::string &sourceFileName)
+    std::unique_ptr<JNode> JSON::parseFile(const std::string &sourceFileName)
     {
         if (sourceFileName.empty())
         {
-            throw std::invalid_argument("Empty file name passed to be decoded.");
+            throw std::invalid_argument("Empty file name passed to be parsed.");
         }
         FileSource source(sourceFileName);
-        return (decodeJNodes(&source));
+        return (parseJNodes(&source));
     }
     /// <summary>
     /// Recursively parse JNode structure and building its JSON before returning it.
     /// </summary>
     /// <param name="jNodeRoot">Root of JNode structure.</param>
     /// <returns>JSON string</returns>
-    std::string JSON::encodeBuffer(std::unique_ptr<JNode> jNodeRoot)
+    std::string JSON::stringifyToBuffer(std::unique_ptr<JNode> jNodeRoot)
     {
         if (jNodeRoot == nullptr)
         {
-            throw std::invalid_argument("Nullptr passed as JNode root to be encoded.");
+            throw std::invalid_argument("Nullptr passed as JNode root to be stringified.");
         }
         BufferDestination destination;
-        encodeJNodes(jNodeRoot.get(), &destination);
+        stringifyJNodes(jNodeRoot.get(), &destination);
         return (destination.getBuffer());
     }
     /// <summary>
@@ -409,18 +409,18 @@ namespace H4
     /// <param name="jNodeRoot">Root of JNode structure.</param>
     /// <param name="destination">Destination JSON file.</param>
     /// <returns></returns>
-    void JSON::encodeFile(std::unique_ptr<JNode> jNodeRoot, const std::string &destinationFileName)
+    void JSON::stringifyToFile(std::unique_ptr<JNode> jNodeRoot, const std::string &destinationFileName)
     {
         if (jNodeRoot == nullptr)
         {
-            throw std::invalid_argument("Nullptr passed as JNode root to be encoded.");
+            throw std::invalid_argument("Nullptr passed as JNode root to be stringified.");
         }
         if (destinationFileName.empty())
         {
-            throw std::invalid_argument("Empty file name passed to be encoded.");
+            throw std::invalid_argument("Empty file name passed to be stringified.");
         }
         FileDestination destination(std::move(destinationFileName));
-        encodeJNodes(jNodeRoot.get(), &destination);
+        stringifyJNodes(jNodeRoot.get(), &destination);
     }
     /// <summary>
     /// Remove all whitespace from a JSOn encoded buffer.
