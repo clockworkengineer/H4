@@ -2,7 +2,8 @@
 // Class: JSONTranslator
 //
 // Description: Translate to/from JSON string escapes within source
-// strings.
+// strings. This is the default translator but is possible to write 
+// a custom one and pass it to the JSON class constructor to be used.
 //
 // Dependencies:   C17++ - Language standard features used.
 //
@@ -68,7 +69,8 @@ namespace H4
     // ==============
     /// <summary>
     /// Convert any escape sequences in a string to their correct sequence
-    //  of characters (UTF-8).
+    //  of UTF-8 characters. If input string contains any unpaired surrogates
+    //  then this is deemed as a syntax error and an error is duely thrown.
     /// </summary>
     /// <param name="jsonString">JSON string to process.</param>
     /// <returns>String with escapes translated.</returns>
