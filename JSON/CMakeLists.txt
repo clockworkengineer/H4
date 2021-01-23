@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.17.0)
 
-project("JSON" VERSION 0.0.1 DESCRIPTION "JSON C++ Static Library")
+project("JSON" VERSION 0.1.0 DESCRIPTION "JSON C++ Static Library")
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
@@ -28,7 +28,7 @@ set (JSON_INCLUDES
     ./include/JNode.hpp
     ./include/JSONSources.hpp
     ./include/JSONDestinations.hpp
-    ./include/JSONTranslator.cpp
+    ./include/JSONTranslator.hpp
 )
 
 # JSON library
@@ -44,6 +44,6 @@ add_subdirectory(tests)
 # install
 
 install(TARGETS ${JSON_LIBRARY_NAME} DESTINATION lib)
-install(FILES JSON.hpp JSONConfig.hpp DESTINATION include)
+install(FILES JSON.hpp JSONConfig.hpp JNode.hpp DESTINATION include)
 
 
