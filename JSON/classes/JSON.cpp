@@ -444,7 +444,7 @@ namespace H4
         return (parseJNodes(source));
     }
     /// <summary>
-    /// Recursively parse JNode structure and building its JSON and writing destination stream.
+    /// Recursively parse JNode structure and building its JSON in destination stream.
     /// </summary>
     /// <param name="jNodeRoot">Root of JNode structure.</param>
     /// <param name=desination>destination stream for stringified JSON</param>
