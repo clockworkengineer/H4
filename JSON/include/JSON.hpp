@@ -79,6 +79,8 @@ namespace H4
         std::string stringifyToBuffer(std::unique_ptr<JNode> jNodeRoot);
         void stringifyToFile(std::unique_ptr<JNode> jNodeRoot, const std::string &destinationFileName);
         std::string stripWhiteSpaceBuffer(const std::string &jsonBuffer);
+        std::unique_ptr<JNode> parse(ISource *source);
+        void stringify(std::unique_ptr<JNode> jNodeRoot, IDestination *destination);
         // ================
         // PUBLIC VARIABLES
         // ================

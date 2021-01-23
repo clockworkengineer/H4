@@ -1,14 +1,14 @@
 //
 // Class: JSON
 //
-// Description: Class to perform JSON  stringify/parse to/from a byte 
+// Description: Class to perform JSON  stringify/parse to/from a byte
 // or file. It is also  possible to customize this with the ISource
 // and IDestination interfaces if required. Note: At present it will
-// report incorrect JSON syntax but will not be specific about what 
-// error has occurred; this is reasoned to add too much overhead to 
-// the process of parsing for the requirements of this library 
+// report incorrect JSON syntax but will not be specific about what
+// error has occurred; this is reasoned to add too much overhead to
+// the process of parsing for the requirements of this library
 // (this might change in future versions). For an indepth desciption
-// of the JSON specification refer to its RFC at web address 
+// of the JSON specification refer to its RFC at web address
 // https://tools.ietf.org/html/rfc8259.
 //
 // Dependencies:   C20++ - Language standard features used.
@@ -433,5 +433,24 @@ namespace H4
         BufferDestination destination;
         stripWhiteSpace(&source, &destination);
         return (destination.getBuffer());
+    }
+    /// <summary>
+    /// Create JNode structure by recursively parsing JSON on the source stream.
+    /// </summary>
+    /// <param name="source">Source for JSON encoded bytes.
+    /// <returns>JNode structure.</returns>
+    std::unique_ptr<JNode> JSON::parse(ISource *source)
+    {
+        return (parseJNodes(source));
+    }
+    /// <summary>
+    /// Recursively parse JNode structure and building its JSON and writing destination stream.
+    /// </summary>
+    /// <param name="jNodeRoot">Root of JNode structure.</param>
+    /// <param name=desination>destination stream for stringified JSON</param>
+    /// <returns></returns>
+    void JSON::stringify(std::unique_ptr<JNode> jNodeRoot, IDestination *destination)
+    {
+        stringifyJNodes(jNodeRoot.get(), destination);
     }
 } // namespace H4
