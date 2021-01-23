@@ -27,7 +27,6 @@ namespace H4
         // ==========================
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
- 
         //
         // Source interface
         //
@@ -59,6 +58,8 @@ namespace H4
         std::unique_ptr<BNode> decodeFile(std::string fileName);
         Bencoding encodeBuffer(std::unique_ptr<BNode> bNodeRoot);
         void encodeFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName);
+        std::unique_ptr<BNode> decode(ISource *source);
+        void encode(std::unique_ptr<BNode> bNodeRoot, IDestination *destination);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -81,9 +82,5 @@ namespace H4
         // =================
         std::string m_workBuffer;
     };
-    //
-    // Shortcuts for BNode structure and Bencoding type
-    //
-//using Bencoding = Bencode::Bencoding;
 } // namespace H4
 #endif /* BENCODE_HPP */
