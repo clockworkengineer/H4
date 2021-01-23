@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.17.0)
 
-project("H4" VERSION 0.0.1 DESCRIPTION "H4 C++ Static Library")
+project("H4" VERSION 0.1.0 DESCRIPTION "H4 C++ Static Library")
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
@@ -20,6 +20,7 @@ set(H4_LIBRARY_NAME H4)
 set (H4_SOURCES
     ./Bencode/classes/Bencode.cpp
     ./JSON/classes/JSON.cpp
+    ./JSON/classes/JSONTranslator.cpp
 )
 
 set (H4_INCLUDES
@@ -29,6 +30,8 @@ set (H4_INCLUDES
     ./JSON/include/JSON.hpp
     ./JSON/include/JSONSources.hpp
     ./JSON/include/JSONDestinations.hpp
+    ./JSON/include/JNode.hpp
+    ./JSON/include/JSONTranslator.hpp
 )
 
 # H4 library
