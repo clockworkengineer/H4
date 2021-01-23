@@ -5,7 +5,7 @@
 // strings. This is the default translator but is possible to write 
 // a custom one and pass it to the JSON class constructor to be used.
 //
-// Dependencies:   C17++ - Language standard features used.
+// Dependencies:   C20++ - Language standard features used.
 //
 // =================
 // CLASS DEFINITIONS

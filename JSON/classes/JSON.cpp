@@ -11,7 +11,7 @@
 // of the JSON specification refer to its RFC at web address 
 // https://tools.ietf.org/html/rfc8259.
 //
-// Dependencies:   C17++ - Language standard features used.
+// Dependencies:   C20++ - Language standard features used.
 //
 // =================
 // CLASS DEFINITIONS

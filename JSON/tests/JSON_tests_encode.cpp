@@ -128,7 +128,7 @@ TEST_CASE("Creation and use of JSON object for encode of a list of example JSON 
                                                   "./testData/testfile004.json",
                                                   "./testData/testfile005.json"}));
     JSON json;
-    SECTION("Encode to  buffer and check value", "[JSON][Encode]")
+    SECTION("Encode to  buffer and check value", "[JSON][Encode]") 
     {
         std::string jsonFileBuffer = readJSONFromFile(testFile);  
         REQUIRE(json.encodeBuffer(json.decodeBuffer(jsonFileBuffer)) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
