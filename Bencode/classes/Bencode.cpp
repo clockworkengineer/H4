@@ -177,9 +177,19 @@ namespace H4
         case 'i':
             return (decodeInteger(source));
         // String BNode
-        default:
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
             return (decodeString(source));
         }
+        throw Bencode::SyntaxError();
     }
     /// <summary>
     /// Recursively traverse a BNode structure and produce an Bencode encoding of it on the output
