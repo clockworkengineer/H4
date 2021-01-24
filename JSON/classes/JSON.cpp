@@ -47,6 +47,7 @@ namespace H4
     // PRIVATE STATIC VARIABLES
     // ========================
     static JSONTranslator defaultTranslator;
+    static std::set<char> validNumeric{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', '-', '+', 'E', 'e'};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -107,15 +108,10 @@ namespace H4
     /// <returns></returns>
     std::unique_ptr<JNode> JSON::parseNumber(ISource &source)
     {
-        std::set<char> validCharacters{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', '-', '+', 'E', 'e'};
-        if (validCharacters.count(source.currentByte()) == 0)
-        {
-            throw JSON::SyntaxError();
-        }
         m_workBuffer.clear();
         m_workBuffer += source.currentByte();
         source.moveToNextByte();
-        while (source.bytesToParse() && validCharacters.count(source.currentByte()) > 0)
+        while (source.bytesToParse() && validNumeric.count(source.currentByte()) > 0)
         {
             m_workBuffer += source.currentByte();
             source.moveToNextByte();

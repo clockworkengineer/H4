@@ -61,6 +61,7 @@ namespace H4
         {
             return (m_value);
         }
+
     protected:
         std::map<std::string, std::unique_ptr<BNode>> m_value;
     };
@@ -86,6 +87,7 @@ namespace H4
         {
             return (m_value[index].get());
         }
+
     protected:
         std::vector<std::unique_ptr<BNode>> m_value;
     };
@@ -94,16 +96,22 @@ namespace H4
     //
     struct BNodeInteger : BNode
     {
+        BNodeInteger() : BNode(BNodeType::integer) {}
         BNodeInteger(long value) : BNode(BNodeType::integer)
         {
-            this->m_value = value;
+            m_value = value;
         }
         long getInteger()
         {
             return (m_value);
         }
+        void setInteger(long value)
+        {
+            m_value = value;
+        }
+
     protected:
-        long m_value;
+        long m_value = 0;
     };
     //
     // String BNode.
@@ -111,7 +119,8 @@ namespace H4
     struct BNodeString : BNode
     {
     public:
-        BNodeString(std::string value) : BNode(BNodeType::string)
+        BNodeString() : BNode(BNodeType::string) {}
+        BNodeString(const std::string &value) : BNode(BNodeType::string)
         {
             this->m_value = value;
         }
@@ -119,6 +128,11 @@ namespace H4
         {
             return (m_value);
         }
+        void setString(const std::string &value)
+        {
+            m_value = value;
+        }
+
     protected:
         std::string m_value;
     };

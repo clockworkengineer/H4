@@ -93,63 +93,64 @@ namespace H4
     /// <returns></returns>
     std::unique_ptr<BNode> Bencode::decodeBNodes(ISource &source)
     {
+        std::unique_ptr<BNode> bNode;
         switch ((char)source.currentByte())
         {
         // Dictionary BNode
         case 'd':
-        {
             source.moveToNextByte();
-            BNodeDict bNodeDictionary;
+            bNode = std::make_unique<BNodeDict>();
             while (source.bytesToDecode() && source.currentByte() != (std::byte)'e')
             {
                 std::string key = decodeString(source);
-                bNodeDictionary.addEntry(key, decodeBNodes(source));
+                BNodeRef<BNodeDict>(*bNode).addEntry(key, decodeBNodes(source));
             }
             if (!source.bytesToDecode())
             {
                 throw Bencode::SyntaxError();
             }
             source.moveToNextByte();
-            return (std::make_unique<BNodeDict>(std::move(bNodeDictionary)));
-        }
+            break;
         // List BNode
         case 'l':
-        {
             source.moveToNextByte();
-            BNodeList bNodeList;
+            bNode = std::make_unique<BNodeList>();
             while (source.bytesToDecode() && source.currentByte() != (std::byte)'e')
             {
-                bNodeList.addEntry(decodeBNodes(source));
+                BNodeRef<BNodeList>(*bNode).addEntry(decodeBNodes(source));
             }
             if (!source.bytesToDecode())
             {
                 throw Bencode::SyntaxError();
             }
             source.moveToNextByte();
-            return (std::make_unique<BNodeList>(std::move(bNodeList)));
-        }
+            break;
         // Integer BNode
         case 'i':
-        {
-            long integer = 1;
             source.moveToNextByte();
             if (source.currentByte() == (std::byte)'-')
             {
                 source.moveToNextByte();
-                integer = -1;
+                bNode = std::make_unique<BNodeInteger>(-1);
             }
-            integer *= decodePositiveInteger(source);
+            else
+            {
+                bNode = std::make_unique<BNodeInteger>(1);
+            }
+            BNodeRef<BNodeInteger>(*bNode).setInteger(BNodeRef<BNodeInteger>(*bNode).getInteger() * decodePositiveInteger(source));
             if (source.currentByte() != (std::byte)'e')
             {
                 throw Bencode::SyntaxError();
             }
             source.moveToNextByte();
-            return (std::make_unique<BNodeInteger>(BNodeInteger(integer)));
-        }
+            break;
         // String BNode
         default:
-            return (std::make_unique<BNodeString>(BNodeString(decodeString(source))));
+            bNode = std::make_unique<BNodeString>();
+            BNodeRef<BNodeString>(*bNode).setString(decodeString(source));
+            break;
         }
+        return (bNode);
     }
     /// <summary>
     /// Recursively traverse a BNode structure and produce an Bencode encoding of it on the output
