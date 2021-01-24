@@ -69,11 +69,11 @@ namespace H4
         // PUBLIC METHODS
         // ==============
         std::unique_ptr<BNode> decodeBuffer(const Bencoding &source);
-        std::unique_ptr<BNode> decodeFile(std::string fileName);
+        std::unique_ptr<BNode> decodeFile(const std::string &fileName);
         Bencoding encodeBuffer(std::unique_ptr<BNode> bNodeRoot);
-        void encodeFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName);
-        std::unique_ptr<BNode> decode(ISource *source);
-        void encode(std::unique_ptr<BNode> bNodeRoot, IDestination *destination);
+        void encodeFile(std::unique_ptr<BNode> bNodeRoot, const std::string &destinationFileName);
+        std::unique_ptr<BNode> decode(ISource &source);
+        void encode(std::unique_ptr<BNode> bNodeRoot, IDestination &destination);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -87,10 +87,10 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        long decodePositiveInteger(ISource *source);
-        std::string decodeString(ISource *source);
-        std::unique_ptr<BNode> decodeBNodes(ISource *source);
-        void encodeBNodes(BNode *bNode, IDestination *destination);
+        long decodePositiveInteger(ISource &source);
+        std::string decodeString(ISource &source);
+        std::unique_ptr<BNode> decodeBNodes(ISource &source);
+        void encodeBNodes(BNode *bNode, IDestination &destination);
         // =================
         // PRIVATE VARIABLES
         // =================

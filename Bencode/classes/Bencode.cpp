@@ -54,13 +54,13 @@ namespace H4
     /// </summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
     /// <returns>Positive integers value.</returns>
-    inline long Bencode::decodePositiveInteger(ISource *source)
+    inline long Bencode::decodePositiveInteger(ISource &source)
     {
         m_workBuffer.clear();
-        while (source->bytesToDecode() && std::isdigit((char)source->currentByte()))
+        while (source.bytesToDecode() && std::isdigit((char)source.currentByte()))
         {
-            m_workBuffer += (char)source->currentByte();
-            source->moveToNextByte();
+            m_workBuffer += (char)source.currentByte();
+            source.moveToNextByte();
         }
         return (std::stol(m_workBuffer));
     }
@@ -69,19 +69,19 @@ namespace H4
     /// </summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
     /// <returns>String value decoded.</returns>
-    inline std::string Bencode::decodeString(ISource *source)
+    inline std::string Bencode::decodeString(ISource &source)
     {
         long stringLength = decodePositiveInteger(source);
-        if (source->currentByte() != (std::byte)':')
+        if (source.currentByte() != (std::byte)':')
         {
             throw Bencode::SyntaxError();
         }
-        source->moveToNextByte();
+        source.moveToNextByte();
         m_workBuffer.clear();
         while (stringLength-- > 0)
         {
-            m_workBuffer += (char)source->currentByte();
-            source->moveToNextByte();
+            m_workBuffer += (char)source.currentByte();
+            source.moveToNextByte();
         }
         return (m_workBuffer);
     }
@@ -91,59 +91,59 @@ namespace H4
     /// </summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
     /// <returns></returns>
-    std::unique_ptr<BNode> Bencode::decodeBNodes(ISource *source)
+    std::unique_ptr<BNode> Bencode::decodeBNodes(ISource &source)
     {
-        switch ((char)source->currentByte())
+        switch ((char)source.currentByte())
         {
         // Dictionary BNode
         case 'd':
         {
-            source->moveToNextByte();
+            source.moveToNextByte();
             BNodeDict bNodeDictionary;
-            while (source->bytesToDecode() && source->currentByte() != (std::byte)'e')
+            while (source.bytesToDecode() && source.currentByte() != (std::byte)'e')
             {
                 std::string key = decodeString(source);
                 bNodeDictionary.addEntry(key, decodeBNodes(source));
             }
-            if (!source->bytesToDecode())
+            if (!source.bytesToDecode())
             {
                 throw Bencode::SyntaxError();
             }
-            source->moveToNextByte();
+            source.moveToNextByte();
             return (std::make_unique<BNodeDict>(std::move(bNodeDictionary)));
         }
         // List BNode
         case 'l':
         {
-            source->moveToNextByte();
+            source.moveToNextByte();
             BNodeList bNodeList;
-            while (source->bytesToDecode() && source->currentByte() != (std::byte)'e')
+            while (source.bytesToDecode() && source.currentByte() != (std::byte)'e')
             {
                 bNodeList.addEntry(decodeBNodes(source));
             }
-            if (!source->bytesToDecode())
+            if (!source.bytesToDecode())
             {
                 throw Bencode::SyntaxError();
             }
-            source->moveToNextByte();
+            source.moveToNextByte();
             return (std::make_unique<BNodeList>(std::move(bNodeList)));
         }
         // Integer BNode
         case 'i':
         {
             long integer = 1;
-            source->moveToNextByte();
-            if (source->currentByte() == (std::byte)'-')
+            source.moveToNextByte();
+            if (source.currentByte() == (std::byte)'-')
             {
-                source->moveToNextByte();
+                source.moveToNextByte();
                 integer = -1;
             }
             integer *= decodePositiveInteger(source);
-            if (source->currentByte() != (std::byte)'e')
+            if (source.currentByte() != (std::byte)'e')
             {
                 throw Bencode::SyntaxError();
             }
-            source->moveToNextByte();
+            source.moveToNextByte();
             return (std::make_unique<BNodeInteger>(BNodeInteger(integer)));
         }
         // String BNode
@@ -158,34 +158,34 @@ namespace H4
     /// <param name="bNode">Pointer to root of current BNode structure.</param>
     /// <param name="desination ">Pointer to interface used to facilitate the output stream.</param>
     /// <returns></returns>
-    void Bencode::encodeBNodes(BNode *bNode, IDestination *destination)
+    void Bencode::encodeBNodes(BNode *bNode, IDestination &destination)
     {
         switch (bNode->nodeType)
         {
         case BNodeType::dictionary:
-            destination->addBytes("d");
+            destination.addBytes("d");
             for (auto &bNodeEntry : ((BNodeDict *)bNode)->getDict())
             {
-                destination->addBytes(std::to_string(bNodeEntry.first.length()) + ":" + bNodeEntry.first);
+                destination.addBytes(std::to_string(bNodeEntry.first.length()) + ":" + bNodeEntry.first);
                 encodeBNodes(bNodeEntry.second.get(), destination);
             }
-            destination->addBytes("e");
+            destination.addBytes("e");
             break;
         case BNodeType::list:
-            destination->addBytes("l");
+            destination.addBytes("l");
             for (auto &bNodeEntry : BNodeRef<BNodeList>(*bNode).getArray())
             {
                 encodeBNodes(bNodeEntry.get(), destination);
             }
-            destination->addBytes("e");
+            destination.addBytes("e");
             break;
         case BNodeType::integer:
-            destination->addBytes("i" + std::to_string(BNodeRef<BNodeInteger>(*bNode).getInteger()) + "e");
+            destination.addBytes("i" + std::to_string(BNodeRef<BNodeInteger>(*bNode).getInteger()) + "e");
             break;
         case BNodeType::string:
         {
             std::string stringToEncode = BNodeRef<BNodeString>(*bNode).getString();
-            destination->addBytes(std::to_string((int)stringToEncode.length()) + ":" + stringToEncode);
+            destination.addBytes(std::to_string((int)stringToEncode.length()) + ":" + stringToEncode);
             break;
         }
         default:
@@ -207,17 +207,17 @@ namespace H4
             throw std::invalid_argument("Empty string passed to be decoded.");
         }
         BufferSource source(sourceBuffer);
-        return decodeBNodes(&source);
+        return decodeBNodes(source);
     }
     /// <summary>
     /// Decode Bencoded source file into BNode(s)
     /// </summary>
     /// <param name="sourceFileName">Input source file name</param>
     /// <returns>BNode structure root.</returns>
-    std::unique_ptr<BNode> Bencode::decodeFile(std::string sourceFileName)
+    std::unique_ptr<BNode> Bencode::decodeFile(const std::string &sourceFileName)
     {
         FileSource source(std::move(sourceFileName));
-        return decodeBNodes(&source);
+        return decodeBNodes(source);
     }
     /// <summary>
     /// Take BNode structure and create an Bencode encoding for it in a destination buffer.
@@ -231,7 +231,7 @@ namespace H4
             throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
         }
         BufferDestination destination;
-        encodeBNodes(bNodeRoot.get(), &destination);
+        encodeBNodes(bNodeRoot.get(), destination);
         return (destination.getBuffer());
     }
     /// <summary>
@@ -239,21 +239,21 @@ namespace H4
     /// </summary>
     /// <param name="bNodeRoot">Bnode structure root.</param>
     /// <param name="destinationFileName">Destination file name.</param>
-    void Bencode::encodeFile(std::unique_ptr<BNode> bNodeRoot, std::string destinationFileName)
+    void Bencode::encodeFile(std::unique_ptr<BNode> bNodeRoot, const std::string &destinationFileName)
     {
         if (bNodeRoot == nullptr)
         {
             throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
         }
         FileDestination destination(std::move(destinationFileName));
-        encodeBNodes(bNodeRoot.get(), &destination);
+        encodeBNodes(bNodeRoot.get(), destination);
     }
     /// <summary>
     /// Decode Bencoded byte string pointed to by source stream into BNode(s).
     /// </summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
     /// <returns>BNode structure root.</returns>
-    std::unique_ptr<BNode> Bencode::decode(ISource *source)
+    std::unique_ptr<BNode> Bencode::decode(ISource &source)
     {
         return decodeBNodes(source);
     }
@@ -262,7 +262,7 @@ namespace H4
     /// </summary>
     /// <param name="bNodeRoot">Bnode structure root.</param>
     /// <param name="desination ">Pointer to interface used to facilitate the output stream.</param>
-    void Bencode::encode(std::unique_ptr<BNode> bNodeRoot, IDestination *destination)
+    void Bencode::encode(std::unique_ptr<BNode> bNodeRoot, IDestination &destination)
     {
         encodeBNodes(bNodeRoot.get(), destination);
     }
