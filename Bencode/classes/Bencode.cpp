@@ -130,7 +130,7 @@ namespace H4
             std::string key = extractString(source);
             BNodeRef<BNodeDict>(*bNode).addEntry(key, decodeBNodes(source));
         }
-        if (!source.bytesToDecode())
+        if (source.currentByte() != (std::byte)'e')
         {
             throw Bencode::SyntaxError();
         }
@@ -150,7 +150,7 @@ namespace H4
         {
             BNodeRef<BNodeList>(*bNode).addEntry(decodeBNodes(source));
         }
-        if (!source.bytesToDecode())
+        if (source.currentByte() != (std::byte)'e')
         {
             throw Bencode::SyntaxError();
         }
@@ -246,6 +246,10 @@ namespace H4
     /// <returns>BNode structure root.</returns>
     std::unique_ptr<BNode> Bencode::decodeFile(const std::string &sourceFileName)
     {
+        if (sourceFileName.empty())
+        {
+            throw std::invalid_argument("Empty string passed for file name.");
+        }
         FileSource source(std::move(sourceFileName));
         return decodeBNodes(source);
     }
@@ -274,6 +278,10 @@ namespace H4
         if (bNodeRoot == nullptr)
         {
             throw std::invalid_argument("Nullptr passed as bNode to be encoded.");
+        }
+        if (destinationFileName.empty())
+        {
+            throw std::invalid_argument("Empty string passed for file name.");
         }
         FileDestination destination(std::move(destinationFileName));
         encodeBNodes(bNodeRoot.get(), destination);
