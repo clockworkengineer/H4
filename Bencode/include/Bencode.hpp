@@ -38,6 +38,7 @@ namespace H4
             {
                 return ("Bencoding syntax error detected.");
             }
+
         private:
             std::string errorMessage;
         };
@@ -87,8 +88,12 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        long decodePositiveInteger(ISource &source);
-        std::string decodeString(ISource &source);
+        long extractPositiveInteger(ISource &source);
+        std::string extractString(ISource &source);
+        std::unique_ptr<BNode> decodeString(ISource &source);
+        std::unique_ptr<BNode> decodeInteger(ISource &source);
+        std::unique_ptr<BNode> decodeDictionary(ISource &source);
+        std::unique_ptr<BNode> decodeList(ISource &source);
         std::unique_ptr<BNode> decodeBNodes(ISource &source);
         void encodeBNodes(BNode *bNode, IDestination &destination);
         // =================

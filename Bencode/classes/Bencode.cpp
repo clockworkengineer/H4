@@ -50,11 +50,11 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    /// Decode a positive Integer from the input stream of characters referenced by ISource.
+    /// Extract a positive Integer from the input stream of characters referenced by ISource.
     /// </summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
     /// <returns>Positive integers value.</returns>
-    inline long Bencode::decodePositiveInteger(ISource &source)
+    inline long Bencode::extractPositiveInteger(ISource &source)
     {
         m_workBuffer.clear();
         while (source.bytesToDecode() && std::isdigit((char)source.currentByte()))
@@ -65,13 +65,13 @@ namespace H4
         return (std::stol(m_workBuffer));
     }
     /// <summary>
-    /// Decode a byte string from the input stream of characters referenced by ISource.
+    /// Extract a byte string from the input stream of characters referenced by ISource.
     /// </summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
     /// <returns>String value decoded.</returns>
-    inline std::string Bencode::decodeString(ISource &source)
+    inline std::string Bencode::extractString(ISource &source)
     {
-        long stringLength = decodePositiveInteger(source);
+        long stringLength = extractPositiveInteger(source);
         if (source.currentByte() != (std::byte)':')
         {
             throw Bencode::SyntaxError();
@@ -86,71 +86,100 @@ namespace H4
         return (m_workBuffer);
     }
     /// <summary>
+    /// Decode a byte string from the input stream of characters referenced by ISource.
+    /// </summary>
+    /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
+    /// <returns>String BNode.</returns>
+    std::unique_ptr<BNode> Bencode::decodeString(ISource &source)
+    {
+        return (std::make_unique<BNodeString>(BNodeString(extractString(source))));
+    }
+    /// <summary>
+    /// Decode an integer from the input stream of characters referenced by ISource.
+    /// </summary>
+    /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
+    /// <returns>Integer BNode.</returns>
+    std::unique_ptr<BNode> Bencode::decodeInteger(ISource &source)
+    {
+        long integer = 1;
+        source.moveToNextByte();
+        if (source.currentByte() == (std::byte)'-')
+        {
+            source.moveToNextByte();
+            integer = -1;
+        }
+        integer *= extractPositiveInteger(source);
+        if (source.currentByte() != (std::byte)'e')
+        {
+            throw Bencode::SyntaxError();
+        }
+        source.moveToNextByte();
+        return (std::make_unique<BNodeInteger>(BNodeInteger(integer)));
+    }
+    /// <summary>
+    /// Decode a dictionary from the input stream of characters referenced by ISource.
+    /// </summary>
+    /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
+    /// <returns>Dictionary BNode.</returns>
+    std::unique_ptr<BNode> Bencode::decodeDictionary(ISource &source)
+    {
+        std::unique_ptr<BNode> bNode = std::make_unique<BNodeDict>();
+        source.moveToNextByte();
+        while (source.bytesToDecode() && source.currentByte() != (std::byte)'e')
+        {
+            std::string key = extractString(source);
+            BNodeRef<BNodeDict>(*bNode).addEntry(key, decodeBNodes(source));
+        }
+        if (!source.bytesToDecode())
+        {
+            throw Bencode::SyntaxError();
+        }
+        source.moveToNextByte();
+        return (bNode);
+    }
+    /// <summary>
+    /// Decode a list from the input stream of characters referenced by ISource.
+    /// </summary>
+    /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
+    /// <returns>List BNode.</returns>
+    std::unique_ptr<BNode> Bencode::decodeList(ISource &source)
+    {
+        std::unique_ptr<BNode> bNode = std::make_unique<BNodeList>();
+        source.moveToNextByte();
+        while (source.bytesToDecode() && source.currentByte() != (std::byte)'e')
+        {
+            BNodeRef<BNodeList>(*bNode).addEntry(decodeBNodes(source));
+        }
+        if (!source.bytesToDecode())
+        {
+            throw Bencode::SyntaxError();
+        }
+        source.moveToNextByte();
+        return (bNode);
+    }
+    /// <summary>
     /// Decode a BNode from the input stream of characters referenced by ISource.In order to traverse
     //  and decode complex encodings this method is called recursively to build up a BNode structure.
     /// </summary>
     /// <param name="source">Pointer to input interface used to decode Bencoded stream.</param>
-    /// <returns></returns>
+    /// <returns>Root BNode.</returns>
     std::unique_ptr<BNode> Bencode::decodeBNodes(ISource &source)
     {
-        std::unique_ptr<BNode> bNode;
         switch ((char)source.currentByte())
         {
         // Dictionary BNode
         case 'd':
-            source.moveToNextByte();
-            bNode = std::make_unique<BNodeDict>();
-            while (source.bytesToDecode() && source.currentByte() != (std::byte)'e')
-            {
-                std::string key = decodeString(source);
-                BNodeRef<BNodeDict>(*bNode).addEntry(key, decodeBNodes(source));
-            }
-            if (!source.bytesToDecode())
-            {
-                throw Bencode::SyntaxError();
-            }
-            source.moveToNextByte();
-            break;
+            return (decodeDictionary(source));
         // List BNode
         case 'l':
-            source.moveToNextByte();
-            bNode = std::make_unique<BNodeList>();
-            while (source.bytesToDecode() && source.currentByte() != (std::byte)'e')
-            {
-                BNodeRef<BNodeList>(*bNode).addEntry(decodeBNodes(source));
-            }
-            if (!source.bytesToDecode())
-            {
-                throw Bencode::SyntaxError();
-            }
-            source.moveToNextByte();
-            break;
+            return (decodeList(source));
         // Integer BNode
         case 'i':
-            source.moveToNextByte();
-            if (source.currentByte() == (std::byte)'-')
-            {
-                source.moveToNextByte();
-                bNode = std::make_unique<BNodeInteger>(-1);
-            }
-            else
-            {
-                bNode = std::make_unique<BNodeInteger>(1);
-            }
-            BNodeRef<BNodeInteger>(*bNode).setInteger(BNodeRef<BNodeInteger>(*bNode).getInteger() * decodePositiveInteger(source));
-            if (source.currentByte() != (std::byte)'e')
-            {
-                throw Bencode::SyntaxError();
-            }
-            source.moveToNextByte();
-            break;
+            return (decodeInteger(source));
         // String BNode
         default:
-            bNode = std::make_unique<BNodeString>();
-            BNodeRef<BNodeString>(*bNode).setString(decodeString(source));
-            break;
+            return (decodeString(source));
         }
-        return (bNode);
     }
     /// <summary>
     /// Recursively traverse a BNode structure and produce an Bencode encoding of it on the output
