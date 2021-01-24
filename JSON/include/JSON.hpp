@@ -96,8 +96,8 @@ namespace H4
         std::string stringifyToBuffer(std::unique_ptr<JNode> jNodeRoot);
         void stringifyToFile(std::unique_ptr<JNode> jNodeRoot, const std::string &destinationFileName);
         std::string stripWhiteSpaceBuffer(const std::string &jsonBuffer);
-        std::unique_ptr<JNode> parse(ISource *source);
-        void stringify(std::unique_ptr<JNode> jNodeRoot, IDestination *destination);
+        std::unique_ptr<JNode> parse(ISource &source);
+        void stringify(std::unique_ptr<JNode> jNodeRoot, IDestination &destination);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -111,17 +111,17 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        void ignoreWhiteSpace(ISource *source);
-        std::string extractString(ISource *source);
-        std::unique_ptr<JNode> parseJNodes(ISource *source);
-        std::unique_ptr<JNode> parseString(ISource *source);
-        std::unique_ptr<JNode> parseNumber(ISource *source);
-        std::unique_ptr<JNode> parseBoolean(ISource *source);
-        std::unique_ptr<JNode> parseNull(ISource *source);
-        std::unique_ptr<JNode> parseObject(ISource *source);
-        std::unique_ptr<JNode> parseArray(ISource *source);
-        void stringifyJNodes(JNode *jNode, IDestination *destination);
-        void stripWhiteSpace(ISource *source, IDestination *destination);
+        void ignoreWhiteSpace(ISource &source);
+        std::string extractString(ISource &source);
+        std::unique_ptr<JNode> parseJNodes(ISource &source);
+        std::unique_ptr<JNode> parseString(ISource &source);
+        std::unique_ptr<JNode> parseNumber(ISource &source);
+        std::unique_ptr<JNode> parseBoolean(ISource &source);
+        std::unique_ptr<JNode> parseNull(ISource &source);
+        std::unique_ptr<JNode> parseObject(ISource &source);
+        std::unique_ptr<JNode> parseArray(ISource &source);
+        void stringifyJNodes(JNode *jNode, IDestination &destination);
+        void stripWhiteSpace(ISource &source, IDestination &destination);
         // =================
         // PRIVATE VARIABLES
         // =================
