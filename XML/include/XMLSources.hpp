@@ -1,5 +1,5 @@
-#ifndef JSONSOURCES_HPP
-#define JSONSOURCES_HPP
+#ifndef XMLSOURCES_HPP
+#define XMLSOURCES_HPP
 #include <fstream>
 #include <string>
 namespace H4
@@ -7,7 +7,7 @@ namespace H4
     //
     // Source classes for parsers.
     //
-    class BufferSource : public JSON::ISource
+    class BufferSource : public XML::ISource
     {
     public:
         BufferSource(std::string sourceBuffer)
@@ -46,7 +46,7 @@ namespace H4
         std::size_t m_bufferPosition = 0;
         std::string m_parseBuffer;
     };
-    class FileSource : public JSON::ISource
+    class FileSource : public XML::ISource
     {
     public:
         FileSource(std::string sourceFileName)
@@ -54,7 +54,7 @@ namespace H4
             m_source.open(sourceFileName.c_str(), std::ios_base::binary);
             if (!m_source.is_open())
             {
-                throw std::runtime_error("JSON file input stream failed to open or does not exist.");
+                throw std::runtime_error("XML file input stream failed to open or does not exist.");
             }
         }
         char currentByte()
@@ -75,4 +75,4 @@ namespace H4
         std::ifstream m_source;
     };
 } // namespace H4
-#endif /* JSONSOURCES_HPP */
+#endif /* XMLSOURCES_HPP */

@@ -1,5 +1,7 @@
 #ifndef BENCODESOURCES_HPP
 #define BENCODESOURCES_HPP
+#include <fstream>
+#include <string>
 namespace H4
 {
     //
@@ -39,7 +41,6 @@ namespace H4
         {
             return (m_bufferPosition < m_decodeBuffer.size());
         }
-
     private:
         std::size_t m_bufferPosition = 0;
         Bencoding m_decodeBuffer;
@@ -68,7 +69,6 @@ namespace H4
         {
             return (m_source.peek() != EOF);
         }
-
     private:
         std::ifstream m_source;
     };

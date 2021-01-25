@@ -1,5 +1,7 @@
 #ifndef JSONSTINATIONS_HPP
 #define JSONSTINATIONS_HPP
+#include <fstream>
+#include <string>
 namespace H4
 {
     //

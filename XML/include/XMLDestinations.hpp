@@ -1,13 +1,13 @@
-#ifndef BENCODESTINATIONS_HPP
-#define BENCODESTINATIONS_HPP
+#ifndef XMLDESTINATIONS_HPP
+#define XMLDESTINATIONS_HPP
 #include <fstream>
 #include <string>
 namespace H4
 {
     //
-    // Destination classes for encoders.
+    // Destination classes for stringification.
     //
-    class BufferDestination : public Bencode::IDestination
+    class BufferDestination : public XML::IDestination
     {
     public:
         BufferDestination()
@@ -15,27 +15,27 @@ namespace H4
         }
         void addBytes(std::string bytes)
         {
-            for (auto byte : bytes)
+            for (auto b : bytes)
             {
-                m_encodeBuffer.add((std::byte)byte);
+                m_stringifyBuffer.push_back(b);
             }
         }
-        Bencoding getBuffer()
+        std::string getBuffer()
         {
-            return (m_encodeBuffer);
+            return (m_stringifyBuffer);
         }
     private:
-        Bencoding m_encodeBuffer;
+        std::string m_stringifyBuffer;
     };
-    class FileDestination : public Bencode::IDestination
-    {
+    class FileDestination : public XML::IDestination
+    { 
     public:
         FileDestination(std::string desinationFileName)
         {
             m_destination.open(desinationFileName.c_str(), std::ios_base::binary);
             if (!m_destination.is_open())
             {
-                throw std::runtime_error("Bencode file output stream failed to open or could not be created.");
+                throw std::runtime_error("XML file output stream failed to open or could not be created.");
             }
         }
         void addBytes(std::string bytes)
@@ -47,4 +47,4 @@ namespace H4
         std::ofstream m_destination;
     };
 } // namespace H4
-#endif /* BENCODESTINATIONS_HPP */
+#endif /* XMLDESTINATIONS_HPP */

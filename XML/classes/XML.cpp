@@ -9,6 +9,8 @@
 // =================
 #include "XMLConfig.hpp"
 #include "XML.hpp"
+#include "XMLSources.hpp"
+#include "XMLDestinations.hpp"
 // ====================
 // CLASS IMPLEMENTATION
 // ====================

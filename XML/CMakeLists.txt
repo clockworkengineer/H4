@@ -24,6 +24,8 @@ set (XML_SOURCES
 set (XML_INCLUDES
     XMLConfig.hpp
     ./include/XML.hpp
+    ./include/XMLSources.hpp
+    ./include/XMLDestinations.hpp
 )
 
 # XML library
