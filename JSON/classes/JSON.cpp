@@ -249,9 +249,21 @@ namespace H4
             return (parseObject(source));
         case '[':
             return (parseArray(source));
-        default:
+        case '-':
+        case '+':
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
             return (parseNumber(source));
         }
+        throw JSON::SyntaxError();
     }
     /// <summary>
     /// Recursively traverse JNode structure encoding it into JSON on

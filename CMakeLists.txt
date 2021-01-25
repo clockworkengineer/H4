@@ -9,9 +9,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 
 add_subdirectory(Bencode)
 add_subdirectory(JSON)
+add_subdirectory(XML)
 
 configure_file(./Bencode/BencodeConfig.h.in BencodeConfig.hpp)
 configure_file(./JSON/JSONConfig.h.in JSONConfig.hpp)
+configure_file(./XML/XMLConfig.h.in XMLConfig.hpp)
 
 set(H4_LIBRARY_NAME H4)
 
@@ -21,6 +23,7 @@ set (H4_SOURCES
     ./Bencode/classes/Bencode.cpp
     ./JSON/classes/JSON.cpp
     ./JSON/classes/JSONTranslator.cpp
+    ./XML/classes/XML.cpp
 )
 
 set (H4_INCLUDES
@@ -32,10 +35,11 @@ set (H4_INCLUDES
     ./JSON/include/JSONDestinations.hpp
     ./JSON/include/JNode.hpp
     ./JSON/include/JSONTranslator.hpp
+    ./XML/include/XML.hpp
 )
 
 # H4 library
 
 add_library(${H4_LIBRARY_NAME} STATIC ${H4_SOURCES})
-target_include_directories(${H4_LIBRARY_NAME} PUBLIC ./Bencode/include ./JSON/include ${PROJECT_BINARY_DIR})
+target_include_directories(${H4_LIBRARY_NAME} PUBLIC ./Bencode/include ./JSON/include ./XML/include ${PROJECT_BINARY_DIR})
 target_link_libraries(${H4_LIBRARY_NAME})
