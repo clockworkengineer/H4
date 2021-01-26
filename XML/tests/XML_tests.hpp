@@ -13,7 +13,9 @@
 // ============
 // ===================
 // Unit test constants
-// 
+// ===================
+#define kXMLDeclaration1 "<?xml version = \1.0\" encoding = \"UTF-8\" standalone = \"no\" ?>"
+#define kXMLDeclaration2 "<?xml version = \1.0\" encoding = \"UTF-16\" standalone = \"yes\" ?>"
 // ==========================
 // Unit test helper functions
 // ==========================

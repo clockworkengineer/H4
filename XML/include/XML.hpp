@@ -5,9 +5,11 @@
 //
 #include <string>
 #include <stdexcept>
+#include <memory>
 //
 // XML XNodes
 //
+#include "XNode.hpp"
 // =========
 // NAMESPACE
 // =========
@@ -28,11 +30,12 @@ namespace H4
         struct SyntaxError : public std::exception
         {
         public:
-            SyntaxError(const std::string &errorMessage="") : errorMessage(errorMessage) {}
+            SyntaxError(const std::string &errorMessage = "") : errorMessage(errorMessage) {}
             virtual const char *what() const throw()
             {
                 return ("XML syntax error detected.");
             }
+
         private:
             std::string errorMessage;
         };
@@ -45,6 +48,7 @@ namespace H4
             virtual char currentByte() = 0;
             virtual void moveToNextByte() = 0;
             virtual bool bytesToParse() = 0;
+            virtual void backupBytes(long length) = 0;
         };
         //
         // Destination interface
@@ -54,15 +58,26 @@ namespace H4
         public:
             virtual void addBytes(std::string bytes) = 0;
         };
+        //
+        // X Attribute
+        //
+        struct XAttribute
+        {
+        public:
+            std::string name;
+            std::string value;
+        };
         // ============
         // CONSTRUCTORS
         // ============
         // ==========
         // DESTRUCTOR
         // ==========
+
         // ==============
         // PUBLIC METHODS
         // ==============
+        XNodeRoot parse(const std::string &xmlToParse);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -76,6 +91,8 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        XNodeRoot parseDelaration(ISource &source);
+        XNodeRoot parseXML(ISource &source);
         // =================
         // PRIVATE VARIABLES
         // =================
