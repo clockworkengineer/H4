@@ -17,6 +17,7 @@
 //
 // C++ STL
 //
+#include <vector>
 // =========
 // NAMESPACE
 // =========
@@ -39,16 +40,20 @@ namespace H4
     // ===============
     inline std::string extractAttributeValue(XML::ISource &source)
     {
-        std::string value;
-        while (source.bytesToParse() && std::isalpha(source.currentByte()))
+        if ((source.currentByte() == '\'') || ((source.currentByte() == '"')))
         {
-            value += source.currentByte();
+            std::string value;
+            char quote = source.currentByte();
+            source.moveToNextByte();
+            while (source.bytesToParse() && (source.currentByte() != quote))
+            {
+                value += source.currentByte();
+                source.moveToNextByte();
+            }
+            source.moveToNextByte();
+            return (value);
         }
-        if (!source.bytesToParse())
-        {
-            throw XML::SyntaxError();
-        }
-        return (value);
+        throw XML::SyntaxError();
     }
     inline std::string extractAttributeName(XML::ISource &source)
     {
@@ -56,11 +61,9 @@ namespace H4
         while (source.bytesToParse() && std::isalpha(source.currentByte()))
         {
             name += source.currentByte();
+            source.moveToNextByte();
         }
-        if (!source.bytesToParse())
-        {
-            throw XML::SyntaxError();
-        }
+        source.moveToNextByte();
         return (name);
     }
     inline bool startsWith(XML::ISource &source, const std::string &targetString)
@@ -68,6 +71,7 @@ namespace H4
         long index = 0;
         while (source.bytesToParse() && source.currentByte() == targetString[index])
         {
+            source.moveToNextByte();
             if (++index == (long)targetString.length())
             {
                 return (true);
@@ -87,9 +91,37 @@ namespace H4
             throw XML::SyntaxError();
         }
     }
-    std::list<XML::XAttribute> parseAttributes(XML::ISource &source, const std::string &endTag)
+    std::vector<XML::XAttribute> validateDeclaration(const std::vector<XML::XAttribute> &attributes)
     {
-        std::list<XML::XAttribute> attributes;
+        std::vector<XML::XAttribute> returned;
+        static XML::XAttribute defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
+        if (attributes.size() <= 3)
+        {
+            long current = 0;
+            for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
+            {
+                if ((current<(int)attributes.size()) && 
+                    (attributes[current].name == defaultAtributes[attrIndex].name))
+                {
+                    returned.push_back(attributes[current]);
+                    current++;
+                }
+                else
+                {
+                    returned.push_back(defaultAtributes[attrIndex]);
+                }
+            }
+            if (current != (long) attributes.size())
+            {
+                throw XML::SyntaxError();
+            }
+        }
+
+        return (returned);
+    }
+    std::vector<XML::XAttribute> parseAttributes(XML::ISource &source, const std::string &endTag)
+    {
+        std::vector<XML::XAttribute> attributes;
         while (!startsWith(source, endTag))
         {
             std::string name = extractAttributeName(source);
@@ -101,17 +133,25 @@ namespace H4
             source.moveToNextByte();
             ignoreWhiteSpace(source);
             std::string value = extractAttributeValue(source);
+            ignoreWhiteSpace(source);
+            attributes.emplace_back(name, value);
         }
         return (attributes);
     }
+
     XNodeRoot XML::parseDelaration(ISource &source)
     {
         XNodeRoot xNodeRoot;
+        std::vector<XAttribute> attributes;
         ignoreWhiteSpace(source);
         if (startsWith(source, "<?xml"))
         {
             ignoreWhiteSpace(source);
-            parseAttributes(source, "?>");
+            attributes = parseAttributes(source, "?>");
+            attributes = validateDeclaration(attributes);
+            xNodeRoot.version = attributes[0].value;
+            xNodeRoot.encoding = attributes[1].value;
+            xNodeRoot.standalone = attributes[2].value;
         }
         return (xNodeRoot);
     }

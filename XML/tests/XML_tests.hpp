@@ -14,8 +14,12 @@
 // ===================
 // Unit test constants
 // ===================
-#define kXMLDeclaration1 "<?xml version = \1.0\" encoding = \"UTF-8\" standalone = \"no\" ?>"
-#define kXMLDeclaration2 "<?xml version = \1.0\" encoding = \"UTF-16\" standalone = \"yes\" ?>"
+#define kXMLDeclaration1 "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\" ?>"
+#define kXMLDeclaration2 "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\" ?>"
+#define kXMLDeclaration3 "<?xml version = \"1.1\" standalone = \"yes\" ?>"
+#define kXMLDeclaration4 "<?xml ?>"
+#define kXMLDeclaration5 "<?xml >"
+#define kXMLDeclaration6 "<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?>"
 // ==========================
 // Unit test helper functions
 // ==========================

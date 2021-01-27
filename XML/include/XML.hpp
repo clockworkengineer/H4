@@ -64,6 +64,9 @@ namespace H4
         struct XAttribute
         {
         public:
+            XAttribute(const std::string &name, const std::string value) : name(name), value(value)
+            {
+            }
             std::string name;
             std::string value;
         };

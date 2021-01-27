@@ -1,7 +1,7 @@
 #ifndef XMLSOURCES_HPP
 #define XMLSOURCES_HPP
 #include <string>
-#include <fstream> 
+#include <fstream>
 namespace H4
 {
     //
@@ -44,8 +44,9 @@ namespace H4
         void backupBytes(long length)
         {
             m_bufferPosition -= length;
-            if (m_bufferPosition<0) {
-                m_bufferPosition=0;
+            if (m_bufferPosition < 0)
+            {
+                m_bufferPosition = 0;
             }
         }
     private:
@@ -76,10 +77,10 @@ namespace H4
         {
             return (m_source.peek() != EOF);
         }
-          void backupBytes(long length)
+        void backupBytes(long length)
         {
-            m_source.seekg(-length,std::ios_base::cur);
-        }  
+            m_source.seekg(-length, std::ios_base::cur);
+        }
     private:
         std::ifstream m_source;
     };
