@@ -32,6 +32,7 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
+    static XAttribute defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -91,37 +92,32 @@ namespace H4
             throw XML::SyntaxError();
         }
     }
-    std::vector<XML::XAttribute> validateDeclaration(const std::vector<XML::XAttribute> &attributes)
+    std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attributes)
     {
-        std::vector<XML::XAttribute> returned;
-        static XML::XAttribute defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
-        if (attributes.size() <= 3)
+        std::vector<XAttribute> validatedAttributes;
+        long currentAttribute = 0;
+        for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
         {
-            long current = 0;
-            for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
+            if ((currentAttribute < (int)attributes.size()) &&
+                (attributes[currentAttribute].name == defaultAtributes[attrIndex].name))
             {
-                if ((current<(int)attributes.size()) && 
-                    (attributes[current].name == defaultAtributes[attrIndex].name))
-                {
-                    returned.push_back(attributes[current]);
-                    current++;
-                }
-                else
-                {
-                    returned.push_back(defaultAtributes[attrIndex]);
-                }
+                validatedAttributes.push_back(attributes[currentAttribute]);
+                currentAttribute++;
             }
-            if (current != (long) attributes.size())
+            else
             {
-                throw XML::SyntaxError();
+                validatedAttributes.push_back(defaultAtributes[attrIndex]);
             }
         }
-
-        return (returned);
+        if (currentAttribute != (long)attributes.size())
+        {
+            throw XML::SyntaxError();
+        }
+        return (validatedAttributes);
     }
-    std::vector<XML::XAttribute> parseAttributes(XML::ISource &source, const std::string &endTag)
+    std::vector<XAttribute> parseAttributes(XML::ISource &source, const std::string &endTag)
     {
-        std::vector<XML::XAttribute> attributes;
+        std::vector<XAttribute> attributes;
         while (!startsWith(source, endTag))
         {
             std::string name = extractAttributeName(source);
@@ -138,26 +134,30 @@ namespace H4
         }
         return (attributes);
     }
-
     XNodeRoot XML::parseDelaration(ISource &source)
     {
         XNodeRoot xNodeRoot;
-        std::vector<XAttribute> attributes;
         ignoreWhiteSpace(source);
         if (startsWith(source, "<?xml"))
         {
             ignoreWhiteSpace(source);
-            attributes = parseAttributes(source, "?>");
-            attributes = validateDeclaration(attributes);
+            std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source, "?>"));
             xNodeRoot.version = attributes[0].value;
             xNodeRoot.encoding = attributes[1].value;
             xNodeRoot.standalone = attributes[2].value;
         }
         return (xNodeRoot);
     }
+    void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)
+    {
+        ignoreWhiteSpace(source);
+        xNodeRoot.elements.push_back(XNodeElement());
+    }
     XNodeRoot XML::parseXML(ISource &source)
     {
-        return (parseDelaration(source));
+        XNodeRoot xNodeRoot = parseDelaration(source);
+        parseRootElement(source, xNodeRoot);
+        return (xNodeRoot);
     }
     // ==============
     // PUBLIC METHODS

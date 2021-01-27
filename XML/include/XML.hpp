@@ -58,18 +58,6 @@ namespace H4
         public:
             virtual void addBytes(std::string bytes) = 0;
         };
-        //
-        // X Attribute
-        //
-        struct XAttribute
-        {
-        public:
-            XAttribute(const std::string &name, const std::string value) : name(name), value(value)
-            {
-            }
-            std::string name;
-            std::string value;
-        };
         // ============
         // CONSTRUCTORS
         // ============
@@ -80,7 +68,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        XNodeRoot parse(const std::string &xmlToParse);
+        XNodeRoot parse(const XMLString &xmlToParse);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -94,6 +82,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        void parseRootElement(ISource &source, XNodeRoot &xNodeRoot);
         XNodeRoot parseDelaration(ISource &source);
         XNodeRoot parseXML(ISource &source);
         // =================
