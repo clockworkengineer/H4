@@ -18,58 +18,78 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse]")
+TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]")
 {
   XML xml;
   SECTION("Parse basic XML declaration. ", "[XML]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\" ?>");
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?> <root></root>");
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
   }
-  SECTION("Parse version 1.0 encoding == UTF-16 standalone == yes XML declaration. ", "[XML][Parse]")
+  SECTION("Parse version 1.0 encoding == UTF-16 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\" ?>");
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> <root></root>");
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-16");
     REQUIRE(xNodeRoot.standalone == "yes");
   }
-  SECTION("Parse version 1.1 encoding == UTF8 standalone == yes XML declaration. ", "[XML][Parse]")
+  SECTION("Parse version 1.1 encoding == UTF8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.1\" standalone = \"yes\" ?>");
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.1\" standalone = \"yes\"?> <root></root>");
     REQUIRE(xNodeRoot.version == "1.1");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "yes");
   }
-  SECTION("Parse empty XML declaration. ", "[XML][Parse]")
+  SECTION("Parse empty XML declaration. ", "[XML][Parse][Declaration]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml ?>");
+    XNodeRoot xNodeRoot = xml.parse("<?xml?> <root></root>");
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
   }
-  SECTION("Parse empty XML declaration no end tag ", "[XML][Parse]")
+  SECTION("Parse empty XML declaration no end tag ", "[XML][Parse][Declaration]")
   {
     XNodeRoot xNodeRoot;
     REQUIRE_THROWS_AS(xml.parse("<?xml >"), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse("<?xml >"), "XML syntax error detected.");
   }
-  SECTION("Parse wrongly ordered attributes in XML declaration. ", "[XML][Parse]")
+  SECTION("Parse wrongly ordered attributes in XML declaration. ", "[XML][Parse][Declaration]")
   {
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?>"), "XML syntax error detected.");
+    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?> <root></root>"), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?> <root></root>"), "XML syntax error detected.");
   }
 }
-TEST_CASE("Use XML object to parse declaration and root element", "[XML][Parse]")
+TEST_CASE("Use XML object to parse declaration and root element", "[XML][Parse][Root]")
 {
   XML xml;
-  SECTION("Empty root element ", "[XML][Parse]")
+  SECTION("Empty root element <contact-info> ", "[XML][Parse]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?><contact-info> </contact-info>");
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?> <contact-info> </contact-info>");
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
-    REQUIRE(xNodeRoot.elements.size()==1);
+    REQUIRE(xNodeRoot.elements.size() == 1);
+    REQUIRE(xNodeRoot.elements[0].name == "contact-info");
+  }
+  SECTION("Empty root element <address> ", "[XML][Parse][Root]")
+  {
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?> <address> </address>");
+    REQUIRE(xNodeRoot.version == "1.0");
+    REQUIRE(xNodeRoot.encoding == "UTF-8");
+    REQUIRE(xNodeRoot.standalone == "no");
+    REQUIRE(xNodeRoot.elements.size() == 1);
+    REQUIRE(xNodeRoot.elements[0].name == "address");
+  }
+  SECTION("Root element <address> and some contents ", "[XML][Parse][Root]")
+  {
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?> <address>    This is some contents    </address>");
+    REQUIRE(xNodeRoot.version == "1.0");
+    REQUIRE(xNodeRoot.encoding == "UTF-8");
+    REQUIRE(xNodeRoot.standalone == "no");
+    REQUIRE(xNodeRoot.elements.size() == 1);
+    REQUIRE(xNodeRoot.elements[0].name == "address");
+    REQUIRE(xNodeRoot.elements[0].contents == "    This is some contents    ");
   }
 }

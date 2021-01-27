@@ -68,7 +68,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        XNodeRoot parse(const XMLString &xmlToParse);
+        XNodeRoot parse(const XString &xmlToParse);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -82,6 +82,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        XNodeElement parseElement(ISource &source);
         void parseRootElement(ISource &source, XNodeRoot &xNodeRoot);
         XNodeRoot parseDelaration(ISource &source);
         XNodeRoot parseXML(ISource &source);

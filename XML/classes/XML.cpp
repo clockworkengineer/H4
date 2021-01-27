@@ -18,6 +18,7 @@
 // C++ STL
 //
 #include <vector>
+#include <set>
 // =========
 // NAMESPACE
 // =========
@@ -39,6 +40,22 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    inline std::string extractTagName(XML::ISource &source)
+    {
+        std::set<char> validCharacters{'-'};
+        std::string name;
+        while (source.bytesToParse() &&
+               (std::isalpha(source.currentByte()) || (validCharacters.contains(source.currentByte()))))
+        {
+            name += source.currentByte();
+            source.moveToNextByte();
+        }
+        if (!source.bytesToParse())
+        {
+            throw XML::SyntaxError();
+        }
+        return (name);
+    }
     inline std::string extractAttributeValue(XML::ISource &source)
     {
         if ((source.currentByte() == '\'') || ((source.currentByte() == '"')))
@@ -50,6 +67,10 @@ namespace H4
             {
                 value += source.currentByte();
                 source.moveToNextByte();
+            }
+            if (!source.bytesToParse())
+            {
+                throw XML::SyntaxError();
             }
             source.moveToNextByte();
             return (value);
@@ -63,6 +84,10 @@ namespace H4
         {
             name += source.currentByte();
             source.moveToNextByte();
+        }
+        if (!source.bytesToParse())
+        {
+            throw XML::SyntaxError();
         }
         source.moveToNextByte();
         return (name);
@@ -148,10 +173,40 @@ namespace H4
         }
         return (xNodeRoot);
     }
+    XNodeElement XML::parseElement(ISource &source)
+    {
+        XNodeElement xNodeElement;
+        source.moveToNextByte();
+        ignoreWhiteSpace(source);
+        xNodeElement.name = extractTagName(source);
+        ignoreWhiteSpace(source);
+        if (source.currentByte() != '>')
+        {
+            throw XML::SyntaxError();
+        }
+        source.moveToNextByte();
+        std::string endTag = "</" + xNodeElement.name + ">";
+        while (source.bytesToParse() && source.currentByte() != '<')
+        {
+            xNodeElement.contents += source.currentByte();
+            source.moveToNextByte();
+        }
+        if (!startsWith(source, endTag))
+        {
+            throw XML::SyntaxError();
+        }
+        return (xNodeElement);
+    }
     void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)
     {
         ignoreWhiteSpace(source);
-        xNodeRoot.elements.push_back(XNodeElement());
+        while (source.bytesToParse())
+        {
+            if (source.currentByte() == '<')
+            {
+                xNodeRoot.elements.push_back(parseElement(source));
+            }
+        }
     }
     XNodeRoot XML::parseXML(ISource &source)
     {

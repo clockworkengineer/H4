@@ -16,7 +16,7 @@ namespace H4
     //
     // Encoded string
     //
-    using XMLString = std::string;
+    using XString = std::string;
     //
     // X Attribute
     //
@@ -57,9 +57,9 @@ namespace H4
     {
     public:
         XNodeRoot(XNodeType nodeType = XNodeType::root) : XNode(nodeType) {}
-        XMLString version;
-        XMLString encoding;
-        XMLString standalone;
+        XString version;
+        XString encoding;
+        XString standalone;
         std::vector<XNodeElement> elements;
     };
     //
@@ -68,9 +68,15 @@ namespace H4
     struct XNodeElement : XNode
     {
     public:
-        XNodeElement(XNodeType nodeType = XNodeType::element) : XNode(nodeType) {}
-        XMLString name;
-        XMLString contents;
+        XNodeElement(XNodeType nodeType = XNodeType::element) : XNode(nodeType)
+        {
+        }
+        XNodeElement(const XString &name) : XNodeElement()
+        {
+            this->name = name;
+        }
+        XString name;
+        XString contents;
         std::vector<XAttribute> attributes;
         std::vector<XNodeElement> elements;
     };
