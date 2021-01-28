@@ -176,6 +176,10 @@ namespace H4
     XNodeElement XML::parseElement(ISource &source)
     {
         XNodeElement xNodeElement;
+        if (source.currentByte() != '<')
+        {
+            throw XML::SyntaxError();
+        }
         source.moveToNextByte();
         ignoreWhiteSpace(source);
         xNodeElement.name = extractTagName(source);
@@ -185,28 +189,37 @@ namespace H4
             throw XML::SyntaxError();
         }
         source.moveToNextByte();
-        std::string endTag = "</" + xNodeElement.name + ">";
-        while (source.bytesToParse() && source.currentByte() != '<')
+        while (source.bytesToParse())
         {
-            xNodeElement.contents += source.currentByte();
-            source.moveToNextByte();
+            if (source.currentByte() != '<')
+            {
+                xNodeElement.contents += source.currentByte();
+                source.moveToNextByte();
+            }
+            else if (startsWith(source, "</" + xNodeElement.name + ">"))
+            {
+                break;
+            }
+            else
+            {
+                xNodeElement.elements.emplace_back(parseElement(source));
+            }
         }
-        if (!startsWith(source, endTag))
-        {
-            throw XML::SyntaxError();
-        }
+        // if (!startsWith(source, "</" + xNodeElement.name + ">"))
+        // {
+        //     throw XML::SyntaxError();
+        // }
+        
         return (xNodeElement);
     }
     void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)
     {
         ignoreWhiteSpace(source);
-        while (source.bytesToParse())
-        {
-            if (source.currentByte() == '<')
-            {
-                xNodeRoot.elements.push_back(parseElement(source));
-            }
-        }
+        XNodeElement xNodeElement = parseElement(source);
+        xNodeRoot.name = xNodeElement.name;
+        xNodeRoot.attributes = xNodeElement.attributes;
+        xNodeRoot.contents = xNodeElement.contents;
+        xNodeRoot.elements = std::move(xNodeElement.elements);
     }
     XNodeRoot XML::parseXML(ISource &source)
     {

@@ -70,26 +70,44 @@ TEST_CASE("Use XML object to parse declaration and root element", "[XML][Parse][
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
-    REQUIRE(xNodeRoot.elements.size() == 1);
-    REQUIRE(xNodeRoot.elements[0].name == "contact-info");
+    REQUIRE(xNodeRoot.elements.size() == 0);
+    REQUIRE(xNodeRoot.name == "contact-info");
   }
-  SECTION("Empty root element <address> ", "[XML][Parse][Root]")
+  SECTION("Empty root element <AddressBook> ", "[XML][Parse][Root]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?> <address> </address>");
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?> <AddressBook> </AddressBook>");
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
-    REQUIRE(xNodeRoot.elements.size() == 1);
-    REQUIRE(xNodeRoot.elements[0].name == "address");
+    REQUIRE(xNodeRoot.elements.size() == 0);
+    REQUIRE(xNodeRoot.name == "AddressBook");
   }
-  SECTION("Root element <address> and some contents ", "[XML][Parse][Root]")
+  SECTION("Root element <Address> and some contents ", "[XML][Parse][Root]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?> <address>    This is some contents    </address>");
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?> <AddressBook><Address>    This is some contents    </Address></AddressBook>");
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
+    REQUIRE(xNodeRoot.name == "AddressBook");
     REQUIRE(xNodeRoot.elements.size() == 1);
-    REQUIRE(xNodeRoot.elements[0].name == "address");
+    REQUIRE(xNodeRoot.elements[0].name == "Address");
     REQUIRE(xNodeRoot.elements[0].contents == "    This is some contents    ");
+  }
+  SECTION("Root element multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
+  {
+    XNodeRoot xNodeRoot = xml.parse(XString("<?xml version = \"1.0\"?><AddressBook><Address>    This is some contents 1   </Address>") +
+                                    "<Address>    This is some contents 2   </Address>" +
+                                    "<Address>    This is some contents 3   </Address></AddressBook>");
+    REQUIRE(xNodeRoot.version == "1.0");
+    REQUIRE(xNodeRoot.encoding == "UTF-8");
+    REQUIRE(xNodeRoot.standalone == "no");
+    REQUIRE(xNodeRoot.name == "AddressBook");
+    REQUIRE(xNodeRoot.elements.size() == 3);
+    REQUIRE(xNodeRoot.elements[0].name == "Address");
+    REQUIRE(xNodeRoot.elements[0].contents == "    This is some contents 1   ");
+    REQUIRE(xNodeRoot.elements[1].name == "Address");
+    REQUIRE(xNodeRoot.elements[1].contents == "    This is some contents 2   ");
+    REQUIRE(xNodeRoot.elements[2].name == "Address");
+    REQUIRE(xNodeRoot.elements[2].contents == "    This is some contents 3   ");
   }
 }

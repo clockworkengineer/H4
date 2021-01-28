@@ -60,6 +60,9 @@ namespace H4
         XString version;
         XString encoding;
         XString standalone;
+        XString name;
+        XString contents;
+        std::vector<XAttribute> attributes;
         std::vector<XNodeElement> elements;
     };
     //
