@@ -189,27 +189,19 @@ namespace H4
             throw XML::SyntaxError();
         }
         source.moveToNextByte();
-        while (source.bytesToParse())
+        while (source.bytesToParse() && !startsWith(source, "</" + xNodeElement.name + ">"))
         {
             if (source.currentByte() != '<')
             {
                 xNodeElement.contents += source.currentByte();
                 source.moveToNextByte();
             }
-            else if (startsWith(source, "</" + xNodeElement.name + ">"))
-            {
-                break;
-            }
             else
             {
                 xNodeElement.elements.emplace_back(parseElement(source));
             }
         }
-        // if (!startsWith(source, "</" + xNodeElement.name + ">"))
-        // {
-        //     throw XML::SyntaxError();
-        // }
-        
+
         return (xNodeElement);
     }
     void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)

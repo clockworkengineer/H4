@@ -21,7 +21,7 @@ using namespace H4;
 /// </summary>
 /// <param name="jsonFileName">JSON file name</param>
 /// <returns></returns>
-std::string readJSONFromFile(const std::string &jsonFileName)
+std::string readXMLFromFile(const std::string &jsonFileName)
 {
   std::ifstream jsonFile;
   jsonFile.open(jsonFileName);
@@ -105,7 +105,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[JSON][Parse][ISourc
 }
 TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file testfile001.json).", "[JSON][Parse][ISource]")
 {
-  std::string buffer = readJSONFromFile(kSIngleJSONFile);
+  std::string buffer = readXMLFromFile(kSIngleJSONFile);
   SECTION("Create BufferSource.", "[JSON][Parse][ISource]")
   {
     REQUIRE_NOTHROW(BufferSource(buffer));
@@ -202,7 +202,7 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Parse][I
     file.addBytes("65767");
     std::filesystem::path filePath(kGeneratedTorrentFile);
     REQUIRE(std::filesystem::file_size(filePath) == 5);
-    std::string expected = readJSONFromFile(kGeneratedTorrentFile);
+    std::string expected = readXMLFromFile(kGeneratedTorrentFile);
     REQUIRE(expected == "65767");
   }
 }

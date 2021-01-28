@@ -8,6 +8,7 @@
 // Test definitions
 // =================
 #include "XML_tests.hpp"
+#include <fstream>
 // =======================
 // JSON class namespace
 // =======================
@@ -15,6 +16,20 @@ using namespace H4;
 // ==========================
 // Unit test helper functions
 // ==========================
+/// <summary>
+/// Open a XML file, read its contents into a string buffer and return
+/// the buffer.
+/// </summary>
+/// <param name="xmlFileName">XML file name</param>
+/// <returns></returns>
+std::string readXMLFromFile(const std::string &xmlFileName)
+{
+  std::ifstream xmlFile;
+  xmlFile.open(xmlFileName);
+  std::ostringstream jsonFileBuffer;
+  jsonFileBuffer << xmlFile.rdbuf();
+  return (jsonFileBuffer.str());
+}
 // ==========
 // Test cases
 // ==========
@@ -82,7 +97,7 @@ TEST_CASE("Use XML object to parse declaration and root element", "[XML][Parse][
     REQUIRE(xNodeRoot.elements.size() == 0);
     REQUIRE(xNodeRoot.name == "AddressBook");
   }
-  SECTION("Root element <Address> and some contents ", "[XML][Parse][Root]")
+  SECTION("Root element <AddressBook> and one child <Address> with contents ", "[XML][Parse][Root]")
   {
     XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?> <AddressBook><Address>    This is some contents    </Address></AddressBook>");
     REQUIRE(xNodeRoot.version == "1.0");
@@ -93,7 +108,7 @@ TEST_CASE("Use XML object to parse declaration and root element", "[XML][Parse][
     REQUIRE(xNodeRoot.elements[0].name == "Address");
     REQUIRE(xNodeRoot.elements[0].contents == "    This is some contents    ");
   }
-  SECTION("Root element multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
+  SECTION("Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
   {
     XNodeRoot xNodeRoot = xml.parse(XString("<?xml version = \"1.0\"?><AddressBook><Address>    This is some contents 1   </Address>") +
                                     "<Address>    This is some contents 2   </Address>" +
@@ -109,5 +124,33 @@ TEST_CASE("Use XML object to parse declaration and root element", "[XML][Parse][
     REQUIRE(xNodeRoot.elements[1].contents == "    This is some contents 2   ");
     REQUIRE(xNodeRoot.elements[2].name == "Address");
     REQUIRE(xNodeRoot.elements[2].contents == "    This is some contents 3   ");
+  }
+}
+TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
+{
+  XML xml;
+  SECTION("Sample XML test001.xml to read and parse.", "[XML][Parse]")
+  {
+    std::string jsonXMLBuffer = readXMLFromFile("./testData/testfile001.xml");
+    REQUIRE_NOTHROW(xml.parse(jsonXMLBuffer));
+    XNodeRoot xNodeRoot = xml.parse(jsonXMLBuffer);
+    REQUIRE(xNodeRoot.name == "CATALOG");
+    REQUIRE(xNodeRoot.elements.size() == 36);
+    REQUIRE(xNodeRoot.elements[35].name == "PLANT");
+    REQUIRE(xNodeRoot.elements[35].elements[0].name == "COMMON");
+    REQUIRE(xNodeRoot.elements[35].elements[0].contents == "Cardinal Flower");
+  }
+}
+TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attributes]")
+{
+  XML xml;
+  SECTION("Root attribute with one attached attribute number", "[XML][Parse][[Attributes]")
+  {
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15'> </AddressBook>");
+    REQUIRE(xNodeRoot.version == "1.0");
+    REQUIRE(xNodeRoot.encoding == "UTF-8");
+    REQUIRE(xNodeRoot.standalone == "no");
+    REQUIRE(xNodeRoot.elements.size() == 0);
+    REQUIRE(xNodeRoot.name == "AddressBook");
   }
 }
