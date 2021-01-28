@@ -89,7 +89,7 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
-        source.moveToNextByte();
+        //source.moveToNextByte();
         return (name);
     }
     inline bool startsWith(XML::ISource &source, const std::string &targetString)
@@ -184,11 +184,11 @@ namespace H4
         ignoreWhiteSpace(source);
         xNodeElement.name = extractTagName(source);
         ignoreWhiteSpace(source);
-        if (source.currentByte() != '>')
-        {
-            throw XML::SyntaxError();
-        }
-        source.moveToNextByte();
+        // if (source.currentByte() != '>')
+        // {
+            std::vector<XAttribute> attributes = parseAttributes(source, ">");
+        // }
+        // source.moveToNextByte();
         while (source.bytesToParse() && !startsWith(source, "</" + xNodeElement.name + ">"))
         {
             if (source.currentByte() != '<')
