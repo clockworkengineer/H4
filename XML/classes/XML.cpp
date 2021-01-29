@@ -45,7 +45,7 @@ namespace H4
     inline bool validTagName(std::string tagName)
     {
         std::transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
-        return (!(tagName[0] == '-' || tagName[0] == '.' || std::strncmp(tagName.c_str(), "xml", 3) == 0));
+        return (!(std::isdigit(tagName[0]) || tagName[0] == '-' || tagName[0] == '.' || std::strncmp(tagName.c_str(), "xml", 3) == 0));
     }
     inline bool validAtttributeName(std::string attributeName)
     {
@@ -53,28 +53,28 @@ namespace H4
     }
     inline std::string extractTagName(XML::ISource &source)
     {
-        std::string name;
+        std::string tagName;
         while (source.bytesToParse() && (std::strchr(validTagCharacters, source.currentByte()) != nullptr))
         {
-            name += source.currentByte();
+            tagName += source.currentByte();
             source.moveToNextByte();
         }
-        if (!source.bytesToParse() || !validTagName(name))
+        if (!source.bytesToParse() || !validTagName(tagName))
         {
             throw XML::SyntaxError();
         }
-        return (name);
+        return (tagName);
     }
     inline std::string extractAttributeValue(XML::ISource &source)
     {
         if ((source.currentByte() == '\'') || ((source.currentByte() == '"')))
         {
-            std::string value;
+            std::string attributeValue;
             char quote = source.currentByte();
             source.moveToNextByte();
             while (source.bytesToParse() && (source.currentByte() != quote))
             {
-                value += source.currentByte();
+                attributeValue += source.currentByte();
                 source.moveToNextByte();
             }
             if (!source.bytesToParse())
@@ -82,23 +82,23 @@ namespace H4
                 throw XML::SyntaxError();
             }
             source.moveToNextByte();
-            return (value);
+            return (attributeValue);
         }
         throw XML::SyntaxError();
     }
     inline std::string extractAttributeName(XML::ISource &source)
     {
-        std::string name;
+        std::string attributeName;
         while (source.bytesToParse() && std::strchr(validAttributeCharacters, source.currentByte()) != nullptr)
         {
-            name += source.currentByte();
+            attributeName += source.currentByte();
             source.moveToNextByte();
         }
-        if (!source.bytesToParse() || !validAtttributeName(name))
+        if (!source.bytesToParse() || !validAtttributeName(attributeName))
         {
             throw XML::SyntaxError();
         }
-        return (name);
+        return (attributeName);
     }
     inline bool findString(XML::ISource &source, const std::string &targetString)
     {
@@ -167,7 +167,7 @@ namespace H4
         }
         return (attributes);
     }
-    XNodeRoot XML::parseDelaration(ISource &source)
+    XNodeRoot XML::parseProlog(ISource &source)
     {
         XNodeRoot xNodeRoot;
         ignoreWhiteSpace(source);
@@ -221,7 +221,7 @@ namespace H4
     }
     XNodeRoot XML::parseXML(ISource &source)
     {
-        XNodeRoot xNodeRoot = parseDelaration(source);
+        XNodeRoot xNodeRoot = parseProlog(source);
         parseRootElement(source, xNodeRoot);
         return (xNodeRoot);
     }

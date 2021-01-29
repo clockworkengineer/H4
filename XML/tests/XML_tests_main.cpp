@@ -73,6 +73,11 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?> <root></root>"), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?> <root></root>"), "XML syntax error detected.");
   }
+  SECTION("Parse XML with declaration but no root element", "[XML][Parse][Declaration]")
+  {
+    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"), "XML syntax error detected.");
+  }
 }
 TEST_CASE("Check for invalid tag names", "[XML][Parse][Tags]")
 {
@@ -91,16 +96,18 @@ TEST_CASE("Check for invalid tag names", "[XML][Parse][Tags]")
     REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <AddressBook> </Address>"), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <AddressBook> </Address>"), "XML syntax error detected.");
   }
-    SECTION("Self closing tag ", "[XML][Parse][Tags]")
+  SECTION("Self closing tag ", "[XML][Parse][Tags]")
   {
     REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\"?> <AddressBook/>"));
   }
-  SECTION("Tag starts with a '.' or '-'", "[XML][Parse][Tags]")
+  SECTION("Tag starts with a '.', '-' or a numeric digit", "[XML][Parse][Tags]")
   {
     REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <.AddressBook> </.AddressBook>"), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <.AddressBook> </.AddressBook>"), "XML syntax error detected.");
     REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <-AddressBook> </-AddressBook>"), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <-AddressBook> </-AddressBook>"), "XML syntax error detected.");
+    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <0AddressBook> </0AddressBook>"), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <0AddressBook> </0AddressBook>"), "XML syntax error detected.");
   }
   SECTION("Tag starts with a xml/XML/Xml etc", "[XML][Parse][Tags]")
   {
@@ -165,16 +172,13 @@ TEST_CASE("Use XML object to parse declaration and root element", "[XML][Parse][
 TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
 {
   XML xml;
-  SECTION("Sample XML test001.xml to read and parse.", "[XML][Parse]")
+  auto testFile = GENERATE(values<std::string>({"./testData/testfile001.xml",
+                                                "./testData/testfile002.xml",
+                                                "./testData/testfile003.xml"}));
+  SECTION("Load file into buffer and parse.", "[XML][Parse]")
   {
-    std::string jsonXMLBuffer = readXMLFromFile("./testData/testfile001.xml");
+    std::string jsonXMLBuffer = readXMLFromFile(testFile);
     REQUIRE_NOTHROW(xml.parse(jsonXMLBuffer));
-    XNodeRoot xNodeRoot = xml.parse(jsonXMLBuffer);
-    REQUIRE(xNodeRoot.name == "CATALOG");
-    REQUIRE(xNodeRoot.elements.size() == 36);
-    REQUIRE(xNodeRoot.elements[35].name == "PLANT");
-    REQUIRE(xNodeRoot.elements[35].elements[0].name == "COMMON");
-    REQUIRE(xNodeRoot.elements[35].elements[0].contents == "Cardinal Flower");
   }
 }
 TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attributes]")
@@ -207,5 +211,10 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     REQUIRE(xNodeRoot.attributes[1].value == "yes");
     REQUIRE(xNodeRoot.attributes[2].name == "flat");
     REQUIRE(xNodeRoot.attributes[2].value == "no");
+  }
+  SECTION("Check self closing tags with attributes are not allowed.", "[XML][Parse][[Attributes]")
+  {
+    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15' />"), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15' />"), "XML syntax error detected.");
   }
 }

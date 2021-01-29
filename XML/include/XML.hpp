@@ -84,12 +84,11 @@ namespace H4
         // ===============
         XNodeElement parseElement(ISource &source);
         void parseRootElement(ISource &source, XNodeRoot &xNodeRoot);
-        XNodeRoot parseDelaration(ISource &source);
+        XNodeRoot parseProlog(ISource &source);
         XNodeRoot parseXML(ISource &source);
         // =================
         // PRIVATE VARIABLES
         // =================
-        std::string m_workBuffer;
     };
 } // namespace H4
 #endif /* XML_HPP */
