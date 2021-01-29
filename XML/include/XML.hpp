@@ -82,6 +82,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        void parseComment(ISource &source);
         XNodeElement parseElement(ISource &source);
         void parseRootElement(ISource &source, XNodeRoot &xNodeRoot);
         XNodeRoot parseProlog(ISource &source);

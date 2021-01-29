@@ -151,8 +151,9 @@ TEST_CASE("Use XML object to parse declaration and root element", "[XML][Parse][
   }
   SECTION("Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
   {
-    XNodeRoot xNodeRoot = xml.parse(XString("<?xml version = \"1.0\"?><AddressBook><Address>    This is some contents 1   </Address>") +
-                                    "<Address>    This is some contents 2   </Address>" +
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?><AddressBook><Address>"
+                                    "    This is some contents 1   </Address>"
+                                    "<Address>    This is some contents 2   </Address>"
                                     "<Address>    This is some contents 3   </Address></AddressBook>");
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
@@ -219,5 +220,37 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
   {
     REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15' colour='red' number='16'> </AddressBook>"), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15' colour='red' number='16'> </AddressBook>"), "XML syntax error detected.");
+  }
+}
+TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
+{
+  XML xml;
+  SECTION("A simple single line comment", "[XML][Parse][[Comments]")
+  {
+    REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                              "<!-- A single line comment --> <root></root>"));
+  }
+  SECTION("Multiple comments inside an root element", "[XML][Parse][[Comments]")
+  {
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?><AddressBook><!--Address one -->"
+                                    "<Address>    This is some contents 1   </Address><!--Address two -->"
+                                    "<Address>    This is some contents 2   </Address><!--Address three -->"
+                                    "<Address>    This is some contents 3   </Address></AddressBook>");
+    REQUIRE(xNodeRoot.version == "1.0");
+    REQUIRE(xNodeRoot.encoding == "UTF-8");
+    REQUIRE(xNodeRoot.standalone == "no");
+    REQUIRE(xNodeRoot.name == "AddressBook");
+    REQUIRE(xNodeRoot.elements.size() == 3);
+    REQUIRE(xNodeRoot.elements[0].name == "Address");
+    REQUIRE(xNodeRoot.elements[0].contents == "    This is some contents 1   ");
+    REQUIRE(xNodeRoot.elements[1].name == "Address");
+    REQUIRE(xNodeRoot.elements[1].contents == "    This is some contents 2   ");
+    REQUIRE(xNodeRoot.elements[2].name == "Address");
+    REQUIRE(xNodeRoot.elements[2].contents == "    This is some contents 3   ");
+  }
+  SECTION("A single comment after root node", "[XML][Parse][[Comments]")
+  {
+    REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                              "<root></root><!-- A single line comment --> "));
   }
 }

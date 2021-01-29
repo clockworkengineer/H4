@@ -154,6 +154,14 @@ namespace H4
         }
         return (validatedAttributes);
     }
+    void XML::parseComment(ISource &source)
+    {
+        while (source.bytesToParse() && !findString(source, "-->"))
+        {
+            source.moveToNextByte();
+        }
+        ignoreWhiteSpace(source);
+    }
     std::vector<XAttribute> parseAttributes(XML::ISource &source)
     {
         std::vector<XAttribute> attributes;
@@ -204,6 +212,7 @@ namespace H4
     }
     XNodeElement XML::parseElement(ISource &source)
     {
+
         XNodeElement xNodeElement;
         if (source.currentByte() != '<')
         {
@@ -223,6 +232,10 @@ namespace H4
                     xNodeElement.contents += source.currentByte();
                     source.moveToNextByte();
                 }
+                else if (findString(source, "<!--"))
+                {
+                    parseComment(source);
+                }
                 else
                 {
                     xNodeElement.elements.emplace_back(parseElement(source));
@@ -238,6 +251,10 @@ namespace H4
     void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)
     {
         ignoreWhiteSpace(source);
+        if (findString(source, "<!--"))
+        {
+            parseComment(source);
+        }
         XNodeElement xNodeElement = parseElement(source);
         xNodeRoot.name = xNodeElement.name;
         xNodeRoot.attributes = xNodeElement.attributes;
