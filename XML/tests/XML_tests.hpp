@@ -11,6 +11,7 @@
 // ============
 // STL includes
 // ============
+#include <fstream>
 // ===================
 // Unit test constants
 // ===================

@@ -18,7 +18,7 @@
 // C++ STL
 //
 #include <vector>
-#include <set>
+#include <cstring>
 // =========
 // NAMESPACE
 // =========
@@ -34,23 +34,32 @@ namespace H4
     // PRIVATE STATIC VARIABLES
     // ========================
     static XAttribute defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
+    static const char *validTagCharacters{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."};
+    static const char *validAttributeCharacters{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
     // ===============
     // PRIVATE METHODS
     // ===============
+    inline bool validTagName(std::string tagName)
+    {
+        std::transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
+        return (!(tagName[0] == '-' || tagName[0] == '.' || std::strncmp(tagName.c_str(), "xml", 3) == 0));
+    }
+    inline bool validAtttributeName(std::string attributeName)
+    {
+        return (!std::isdigit(attributeName[0]));
+    }
     inline std::string extractTagName(XML::ISource &source)
     {
-        std::set<char> validCharacters{'-'};
         std::string name;
-        while (source.bytesToParse() &&
-               (std::isalpha(source.currentByte()) || (validCharacters.contains(source.currentByte()))))
+        while (source.bytesToParse() && (std::strchr(validTagCharacters, source.currentByte()) != nullptr))
         {
             name += source.currentByte();
             source.moveToNextByte();
         }
-        if (!source.bytesToParse())
+        if (!source.bytesToParse() || !validTagName(name))
         {
             throw XML::SyntaxError();
         }
@@ -80,19 +89,18 @@ namespace H4
     inline std::string extractAttributeName(XML::ISource &source)
     {
         std::string name;
-        while (source.bytesToParse() && std::isalpha(source.currentByte()))
+        while (source.bytesToParse() && std::strchr(validAttributeCharacters, source.currentByte()) != nullptr)
         {
             name += source.currentByte();
             source.moveToNextByte();
         }
-        if (!source.bytesToParse())
+        if (!source.bytesToParse() || !validAtttributeName(name))
         {
             throw XML::SyntaxError();
         }
-        //source.moveToNextByte();
         return (name);
     }
-    inline bool startsWith(XML::ISource &source, const std::string &targetString)
+    inline bool findString(XML::ISource &source, const std::string &targetString)
     {
         long index = 0;
         while (source.bytesToParse() && source.currentByte() == targetString[index])
@@ -143,7 +151,7 @@ namespace H4
     std::vector<XAttribute> parseAttributes(XML::ISource &source, const std::string &endTag)
     {
         std::vector<XAttribute> attributes;
-        while (!startsWith(source, endTag))
+        while (!findString(source, endTag))
         {
             std::string name = extractAttributeName(source);
             ignoreWhiteSpace(source);
@@ -163,7 +171,7 @@ namespace H4
     {
         XNodeRoot xNodeRoot;
         ignoreWhiteSpace(source);
-        if (startsWith(source, "<?xml"))
+        if (findString(source, "<?xml"))
         {
             ignoreWhiteSpace(source);
             std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source, "?>"));
@@ -184,24 +192,22 @@ namespace H4
         ignoreWhiteSpace(source);
         xNodeElement.name = extractTagName(source);
         ignoreWhiteSpace(source);
-        // if (source.currentByte() != '>')
-        // {
-            std::vector<XAttribute> attributes = parseAttributes(source, ">");
-        // }
-        // source.moveToNextByte();
-        while (source.bytesToParse() && !startsWith(source, "</" + xNodeElement.name + ">"))
+        if (!findString(source, "/>"))
         {
-            if (source.currentByte() != '<')
+            xNodeElement.attributes = parseAttributes(source, ">");
+            while (source.bytesToParse() && !findString(source, "</" + xNodeElement.name + ">"))
             {
-                xNodeElement.contents += source.currentByte();
-                source.moveToNextByte();
-            }
-            else
-            {
-                xNodeElement.elements.emplace_back(parseElement(source));
+                if (source.currentByte() != '<')
+                {
+                    xNodeElement.contents += source.currentByte();
+                    source.moveToNextByte();
+                }
+                else
+                {
+                    xNodeElement.elements.emplace_back(parseElement(source));
+                }
             }
         }
-
         return (xNodeElement);
     }
     void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)

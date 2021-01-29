@@ -89,6 +89,7 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
+        std::string m_workBuffer;
     };
 } // namespace H4
 #endif /* XML_HPP */
