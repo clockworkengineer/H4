@@ -55,12 +55,10 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "yes");
   }
-  SECTION("Parse empty XML declaration. ", "[XML][Parse][Declaration]")
+  SECTION("Check declaration contains at least version attribute.", "[XML][Parse][Declaration]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml?> <root></root>");
-    REQUIRE(xNodeRoot.version == "1.0");
-    REQUIRE(xNodeRoot.encoding == "UTF-8");
-    REQUIRE(xNodeRoot.standalone == "no");
+    REQUIRE_THROWS_AS(xml.parse("<?xml?> <root></root>"), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse("<?xml?> <root></root>"), "XML syntax error detected.");
   }
   SECTION("Parse empty XML declaration no end tag ", "[XML][Parse][Declaration]")
   {
@@ -212,9 +210,14 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     REQUIRE(xNodeRoot.attributes[2].name == "flat");
     REQUIRE(xNodeRoot.attributes[2].value == "no");
   }
-  SECTION("Check self closing tags with attributes are not allowed.", "[XML][Parse][[Attributes]")
+  SECTION("Empty elements with attributes are allowed.", "[XML][Parse][[Attributes]")
   {
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15' />"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15' />"), "XML syntax error detected.");
+    REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15'><AddressBook/>"));
+    REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15'/>"));
+  }
+  SECTION("Root element with duplicate attributes.", "[XML][Parse][[Attributes]")
+  {
+    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15' colour='red' number='16'> </AddressBook>"), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <AddressBook number='15' colour='red' number='16'> </AddressBook>"), "XML syntax error detected.");
   }
 }

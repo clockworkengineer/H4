@@ -127,6 +127,12 @@ namespace H4
     }
     std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attributes)
     {
+        // Syntax error if no version present
+        if (std::find_if(attributes.begin(), attributes.end(),
+                         [](const XAttribute &attr) { return (attr.name == "version"); }) == attributes.end())
+        {
+            throw XML::SyntaxError();
+        }
         std::vector<XAttribute> validatedAttributes;
         long currentAttribute = 0;
         for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
@@ -148,10 +154,10 @@ namespace H4
         }
         return (validatedAttributes);
     }
-    std::vector<XAttribute> parseAttributes(XML::ISource &source, const std::string &endTag)
+    std::vector<XAttribute> parseAttributes(XML::ISource &source)
     {
         std::vector<XAttribute> attributes;
-        while (!findString(source, endTag))
+        while (source.currentByte() != '?' && source.currentByte() != '/' && source.currentByte() != '>')
         {
             std::string name = extractAttributeName(source);
             ignoreWhiteSpace(source);
@@ -163,7 +169,15 @@ namespace H4
             ignoreWhiteSpace(source);
             std::string value = extractAttributeValue(source);
             ignoreWhiteSpace(source);
-            attributes.emplace_back(name, value);
+            if (std::find_if(attributes.begin(), attributes.end(),
+                             [&name](const XAttribute &attr) { return (attr.name == name); }) == attributes.end())
+            {
+                attributes.emplace_back(name, value);
+            }
+            else
+            {
+                throw XML::SyntaxError();
+            }
         }
         return (attributes);
     }
@@ -174,10 +188,17 @@ namespace H4
         if (findString(source, "<?xml"))
         {
             ignoreWhiteSpace(source);
-            std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source, "?>"));
-            xNodeRoot.version = attributes[0].value;
-            xNodeRoot.encoding = attributes[1].value;
-            xNodeRoot.standalone = attributes[2].value;
+            std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source));
+            if (findString(source, "?>"))
+            {
+                xNodeRoot.version = attributes[0].value;
+                xNodeRoot.encoding = attributes[1].value;
+                xNodeRoot.standalone = attributes[2].value;
+            }
+            else
+            {
+                throw XML::SyntaxError();
+            }
         }
         return (xNodeRoot);
     }
@@ -192,9 +213,9 @@ namespace H4
         ignoreWhiteSpace(source);
         xNodeElement.name = extractTagName(source);
         ignoreWhiteSpace(source);
-        if (!findString(source, "/>"))
+        xNodeElement.attributes = parseAttributes(source);
+        if (findString(source, "/>") || findString(source, ">"))
         {
-            xNodeElement.attributes = parseAttributes(source, ">");
             while (source.bytesToParse() && !findString(source, "</" + xNodeElement.name + ">"))
             {
                 if (source.currentByte() != '<')
@@ -207,6 +228,10 @@ namespace H4
                     xNodeElement.elements.emplace_back(parseElement(source));
                 }
             }
+        }
+        else
+        {
+            throw XML::SyntaxError();
         }
         return (xNodeElement);
     }
