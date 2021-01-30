@@ -34,7 +34,7 @@ std::string readXMLFromFile(const std::string &xmlFileName)
 TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]")
 {
   XML xml;
-  SECTION("Parse basic XML declaration. ", "[XML]")
+  SECTION("Parse XML declaration. ", "[XML]")
   {
     XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?> <root></root>");
     REQUIRE(xNodeRoot.version == "1.0");
@@ -60,11 +60,11 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     REQUIRE_THROWS_AS(xml.parse("<?xml?> <root></root>"), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse("<?xml?> <root></root>"), "XML syntax error detected.");
   }
-  SECTION("Parse empty XML declaration no end tag ", "[XML][Parse][Declaration]")
+  SECTION("Parse empty XML declaration no root tag ", "[XML][Parse][Declaration]")
   {
     XNodeRoot xNodeRoot;
-    REQUIRE_THROWS_AS(xml.parse("<?xml >"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml >"), "XML syntax error detected.");
+    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\">"), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\">"), "XML syntax error detected.");
   }
   SECTION("Parse wrongly ordered attributes in XML declaration. ", "[XML][Parse][Declaration]")
   {
@@ -77,7 +77,7 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"), "XML syntax error detected.");
   }
 }
-TEST_CASE("Check for invalid tag names", "[XML][Parse][Tags]")
+TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
 {
   XML xml;
   SECTION("Allow tag names to with alpha numeric characters and '.','_', '-' ", "[XML][Parse][Tags]")
@@ -117,7 +117,7 @@ TEST_CASE("Check for invalid tag names", "[XML][Parse][Tags]")
     REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <XmlAddressBook> </XmlAddressBook>"), "XML syntax error detected.");
   }
 }
-TEST_CASE("Use XML object to parse declaration and root element", "[XML][Parse][Root]")
+TEST_CASE("Use XML object to parse declaration, root element and check parsed information ", "[XML][Parse][Root]")
 {
   XML xml;
   SECTION("Empty root element <contact-info> ", "[XML][Parse]")
@@ -231,7 +231,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
                               "<!-- A single line comment --> <root></root>"));
   }
-  SECTION("Multiple comments inside an root element", "[XML][Parse][[Comments]")
+  SECTION("Multiple comments inside root element and between its children ", "[XML][Parse][[Comments]")
   {
     XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\"?><AddressBook><!--Address one -->"
                                     "<Address>    This is some contents 1   </Address><!--Address two -->"
@@ -249,7 +249,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE(xNodeRoot.elements[2].name == "Address");
     REQUIRE(xNodeRoot.elements[2].contents == "    This is some contents 3   ");
   }
-  SECTION("A single comment after root node", "[XML][Parse][[Comments]")
+  SECTION("A single comment after root element", "[XML][Parse][[Comments]")
   {
     REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
                               "<root></root><!-- A single line comment --> "));
@@ -263,7 +263,6 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                               " and another line\n"
                               "--> <root></root>"));
   }
-
   SECTION("A simple comment within element content", "[XML][Parse][[Comments]")
   {
     REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test<!-- a simple comment -->Test</root>"));

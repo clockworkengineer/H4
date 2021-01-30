@@ -19,6 +19,7 @@
 //
 #include <vector>
 #include <cstring>
+#include <algorithm>
 // =========
 // NAMESPACE
 // =========
@@ -34,15 +35,21 @@ namespace H4
     // PRIVATE STATIC VARIABLES
     // ========================
     static XAttribute defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
-    static const char *validTagCharacters{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."};
-    static const char *validAttributeCharacters{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"};
+    static const char *validTag{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."};
+    static const char *validAttribute{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
     // ===============
     // PRIVATE METHODS
     // ===============
-    inline bool checkFor(const char *valid, const char c)
+    inline std::string toUpper(std::string str)
+    {
+        std::transform(str.begin(), str.end(), str.begin(),
+                  [](unsigned char c) { return std::toupper(c); });
+        return str;
+    }
+    inline bool checkValid(const char *valid, const char c)
     {
         return (std::strchr(valid, c) != nullptr);
     }
@@ -67,6 +74,7 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
+        // Fill in gaps with default if missing attributes
         std::vector<XAttribute> validatedAttributes;
         long currentAttribute = 0;
         for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
@@ -82,14 +90,15 @@ namespace H4
                 validatedAttributes.push_back(defaultAtributes[attrIndex]);
             }
         }
+        // Order not version, encoding, standalone == syntax error
         if (currentAttribute != (long)attributes.size())
         {
             throw XML::SyntaxError();
         }
         // Check valid declaration values
+        validatedAttributes[1].value = toUpper(validatedAttributes[1].value); // encoding to upper case
         if ((validatedAttributes[0].value != "1.0") ||
-            ((validatedAttributes[1].value != "UTF-8") && (validatedAttributes[1].value != "UTF-16") &&
-            (validatedAttributes[1].value != "utf-8") && (validatedAttributes[1].value != "utf-16")) ||
+            ((validatedAttributes[1].value != "UTF-8") && (validatedAttributes[1].value != "UTF-16")) ||
             ((validatedAttributes[2].value) != "yes" && (validatedAttributes[2].value != "no")))
         {
             throw XML::SyntaxError();
@@ -99,7 +108,7 @@ namespace H4
     std::string XML::extractTagName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.bytesToParse() && checkFor(validTagCharacters, source.currentByte()))
+        while (source.bytesToParse() && checkValid(validTag, source.currentByte()))
         {
             m_workBuffer += source.currentByte();
             source.moveToNextByte();
@@ -134,7 +143,7 @@ namespace H4
     std::string XML::extractAttributeName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.bytesToParse() && checkFor(validAttributeCharacters, source.currentByte()))
+        while (source.bytesToParse() && checkValid(validAttribute, source.currentByte()))
         {
             m_workBuffer += source.currentByte();
             source.moveToNextByte();
