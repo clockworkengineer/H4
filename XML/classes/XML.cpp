@@ -42,6 +42,9 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    inline bool checkFor(const char *valid, const char c) {
+        return (std::strchr(valid, c) != nullptr);
+    }
     inline bool attributePresent(std::vector<XAttribute> attributes, const std::string &name)
     {
         return (std::find_if(attributes.begin(), attributes.end(),
@@ -82,32 +85,39 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
+        // Check valid declaration values
+        if ((validatedAttributes[0].value != "1.0") ||
+            ((validatedAttributes[1].value != "UTF-8") && (validatedAttributes[1].value != "UTF-16")) ||
+            ((validatedAttributes[2].value) != "yes" && (validatedAttributes[2].value != "no")))
+        {
+            throw XML::SyntaxError();
+        }
         return (validatedAttributes);
     }
     std::string XML::extractTagName(ISource &source)
     {
-        std::string tagName;
-        while (source.bytesToParse() && (std::strchr(validTagCharacters, source.currentByte()) != nullptr))
+        m_workBuffer.clear();
+        while (source.bytesToParse() && checkFor(validTagCharacters, source.currentByte()))
         {
-            tagName += source.currentByte();
+            m_workBuffer += source.currentByte();
             source.moveToNextByte();
         }
-        if (!source.bytesToParse() || !validTagName(tagName))
+        if (!source.bytesToParse() || !validTagName(m_workBuffer))
         {
             throw XML::SyntaxError();
         }
-        return (tagName);
+        return (m_workBuffer);
     }
     std::string XML::extractAttributeValue(ISource &source)
     {
         if ((source.currentByte() == '\'') || ((source.currentByte() == '"')))
         {
-            std::string attributeValue;
+            m_workBuffer.clear();
             char quote = source.currentByte();
             source.moveToNextByte();
             while (source.bytesToParse() && (source.currentByte() != quote))
             {
-                attributeValue += source.currentByte();
+                m_workBuffer += source.currentByte();
                 source.moveToNextByte();
             }
             if (!source.bytesToParse())
@@ -115,23 +125,23 @@ namespace H4
                 throw XML::SyntaxError();
             }
             source.moveToNextByte();
-            return (attributeValue);
+            return (m_workBuffer);
         }
         throw XML::SyntaxError();
     }
     std::string XML::extractAttributeName(ISource &source)
     {
-        std::string attributeName;
-        while (source.bytesToParse() && std::strchr(validAttributeCharacters, source.currentByte()) != nullptr)
+        m_workBuffer.clear();
+        while (source.bytesToParse() && checkFor(validAttributeCharacters, source.currentByte()))
         {
-            attributeName += source.currentByte();
+            m_workBuffer += source.currentByte();
             source.moveToNextByte();
         }
-        if (!source.bytesToParse() || !validAtttributeName(attributeName))
+        if (!source.bytesToParse() || !validAtttributeName(m_workBuffer))
         {
             throw XML::SyntaxError();
         }
-        return (attributeName);
+        return (m_workBuffer);
     }
     bool XML::findString(ISource &source, const std::string &targetString)
     {
@@ -214,11 +224,11 @@ namespace H4
     }
     XNodeElement XML::parseElement(ISource &source)
     {
-        XNodeElement xNodeElement;
         if (source.currentByte() != '<')
         {
             throw XML::SyntaxError();
         }
+        XNodeElement xNodeElement;
         source.moveToNextByte();
         ignoreWhiteSpace(source);
         xNodeElement.name = extractTagName(source);

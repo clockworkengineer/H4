@@ -41,7 +41,7 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
   }
-  SECTION("Parse version 1.0 encoding == UTF-16 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
+  SECTION("Parse version 1.0 encoding == UTF-8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
     XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> <root></root>");
     REQUIRE(xNodeRoot.version == "1.0");
@@ -50,8 +50,8 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   }
   SECTION("Parse version 1.1 encoding == UTF8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.1\" standalone = \"yes\"?> <root></root>");
-    REQUIRE(xNodeRoot.version == "1.1");
+    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\" standalone = \"yes\"?> <root></root>");
+    REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "yes");
   }
@@ -173,7 +173,8 @@ TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
   XML xml;
   auto testFile = GENERATE(values<std::string>({"./testData/testfile001.xml",
                                                 "./testData/testfile002.xml",
-                                                "./testData/testfile003.xml"}));
+                                                "./testData/testfile003.xml",
+                                                "./testData/testfile005.xml"}));
   SECTION("Load file into buffer and parse.", "[XML][Parse]")
   {
     std::string jsonXMLBuffer = readXMLFromFile(testFile);

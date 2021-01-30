@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- In this collection, we will keep each title "as is" -->
+<!-- Each video is created using the following formula
+<video>
+  <title>This is the name that appears on the package</title>
+    <director>This is the name of the person(s) who directed the video</director>
+    <length>This is provided as a natural number for the minutes</length>
+    <format>The format can be VHS, DVD, BluRay, TV recording, etc</format>
+    <rating>This is the MPAA rating</rating>
+</video>
+-->
+<videos>
+  <video>
+	<title>The Distinguished Gentleman</title>
+	<director>Jonathan Lynn</director>
+	<length>112</length>
+	<format>DVD</format>
+	<rating>R</rating>
+  </video>
+  <video>
+	<title>Her Alibi</title>
+	<director>Bruce Beresford</director>
+	<length>94</length>
+	<format>DVD</format>
+	<rating>PG-13</rating>
+  </video>
+</videos>

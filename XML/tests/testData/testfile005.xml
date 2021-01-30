@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!-- This is code for a real estate business.--> 
+<Listing>
+  <!-- A property is created with the Property element.
+	For each property, a random number is created.
+	This number is made of two parts that each
+	ranges from 100 to 999.
+	Both parts are separated by a dash.
+  --> 
+  <!-- The sale status, named Status, indicates whether
+	the property is currently available or has already been sold.
+	The possible values are Available and Sold.
+  -->
+  <Property Code="889456" Status="Available">
+    	<!-- An element named DateListed specifies when the property was added 
+	     to the listing or when it entered in the market.
+    	--> 
+    	<!-- As its name suggests, the YearBuilt attribute
+	     indicates the year the property was built.
+    	--> 
+    <DateListed YearBuilt="2002">12/8/2008</DateListed> 
+      	<!-- The property type must be
+	 * Single Family: For a house that stands by itself
+	 * Townhouse: For a full house but that is attached to at least another house.
+	 * Condominium: For a type of apartment that belongs to a building.
+      	--> 
+    <PropertyType Style="Contemporary" Condition="Excellent">Townhouse</PropertyType> 
+      	<!-- The style of a property indicates a type of architecture.
+	     The possible styles are Contemporary, Colonial, Victorian, or Farmhouse.
+      	--> 
+      	<!-- The Condition attribute specifies whether the property can currently be 
+	     presented to a customer, or at least how it appears at the moment.
+	     The possible conditions are:
+		* Excellent: This suggests that the property has little to no flaw
+		* Good: This means that the property is mostly acceptable and can be 
+		  presented to a potential buyer. In this case, something such as a 
+		  refrigerator or a dishwasher may be missing; or something such as
+		  the garbage dispenser may need to be fixed, or a piece of carpet 
+		  that needs to be cleaned before the property is actually ready for sale
+		* Needs Repair: This means that the property is in a good selling condition.
+    	--> 
+    	<!-- A property can be located by its address which
+	     in most cases is made of an address, a city, a state (US, DE, AU, NG, etc) or
+  	     province (CA, CM, etc), a ZIP Code (US) or postal code (CA, GB, BE, etc).
+    	--> 
+    	<!-- To make it easy to locally find a property, the location may not be an actual
+	     city and usually people out of town may have a hard time finding it on a map. 
+	     Nevertheless, local people, the inhabitants, and those interested in real 
+	     estate properties would be familiar with the place.
+    	-->
+    <Location Address="1044 Larson Drive" City="Silver Spring" State="MD" ZIPCode="20904">White Oak</Location> 
+      	<!-- Stories is the number of levels (in other countries such as AU).
+	     This includes the basement (if any), the floor level, and the upper level(s), if any.
+	     Most new constructions of single families in US, CA, DE, GB, and AU have three 
+	     stories but you must check. Most condos have one story but it
+	     is not uncommon for a condo to have 2 stories.
+    	--> 
+    <Stories>2</Stories> 
+	<!-- A bedroom is a clearly designated area made for sleeping. It is easily 
+	     identifiable in any construction. Still, if the basement of a house
+	     is finished, unless it is clearly made as a bedroom, it should not be counted as such.
+  	--> 
+    <Bedrooms>4</Bedrooms> 
+	<!-- In our real estate listing, there are two types of bathrooms, full and half:
+		* A bathroom is counted as full if it is equipped with either a shower area, 
+		  a bath tub, or both. In addition, it should have toilet and a sink
+		* A bathroom is considered half if it (typically) has neither a shower area 
+		  nor a bath tub. In most single family and townhouses, a half bath
+		  is constructed on the floor level to conveniently serve the visitors who 
+		  enter the house. A typical half bathroom has a toilet (to do the business) 
+		  and a sink to wash the hands.
+	-->
+    <Bathrooms>2.50</Bathrooms> 
+	<!-- The value of the property, also referred to as the market value or the listing 
+	     value, can be the asking price for the property.
+	-->
+    <MarketValue>425860.00</MarketValue> 
+	<!-- The description of a property gives an overview of what the property offers. It 
+	     is usually written with positive words that can entice, we mean invite :), a 
+	     pontential buyer to feel comfortable with the idea of acquiring the property.
+	--> 
+    <Description>N/A</Description> 
+  </Property>
+</Listing>
