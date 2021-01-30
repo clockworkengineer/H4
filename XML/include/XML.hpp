@@ -35,7 +35,6 @@ namespace H4
             {
                 return ("XML syntax error detected.");
             }
-
         private:
             std::string errorMessage;
         };
@@ -64,7 +63,6 @@ namespace H4
         // ==========
         // DESTRUCTOR
         // ==========
-
         // ==============
         // PUBLIC METHODS
         // ==============
@@ -82,7 +80,16 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        bool validTagName(std::string tagName);
+        bool validAtttributeName(std::string attributeName);
+        std::string extractTagName(ISource &source);
+        std::string extractAttributeValue(ISource &source);
+        std::string extractAttributeName(ISource &source);
+        bool findString(ISource &source, const std::string &targetString);
+        void ignoreWhiteSpace(ISource &source);
+        std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attribute);
         void parseComment(ISource &source);
+        std::vector<XAttribute> parseAttributes(ISource &source);
         XNodeElement parseElement(ISource &source);
         void parseRootElement(ISource &source, XNodeRoot &xNodeRoot);
         XNodeRoot parseProlog(ISource &source);

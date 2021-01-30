@@ -42,16 +42,16 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    inline bool validTagName(std::string tagName)
+     bool XML::validTagName(std::string tagName)
     {
         std::transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
         return (!(std::isdigit(tagName[0]) || tagName[0] == '-' || tagName[0] == '.' || std::strncmp(tagName.c_str(), "xml", 3) == 0));
     }
-    inline bool validAtttributeName(std::string attributeName)
+     bool XML::validAtttributeName(std::string attributeName)
     {
         return (!std::isdigit(attributeName[0]));
     }
-    inline std::string extractTagName(XML::ISource &source)
+     std::string XML::extractTagName(ISource &source)
     {
         std::string tagName;
         while (source.bytesToParse() && (std::strchr(validTagCharacters, source.currentByte()) != nullptr))
@@ -65,7 +65,7 @@ namespace H4
         }
         return (tagName);
     }
-    inline std::string extractAttributeValue(XML::ISource &source)
+     std::string XML::extractAttributeValue(ISource &source)
     {
         if ((source.currentByte() == '\'') || ((source.currentByte() == '"')))
         {
@@ -86,7 +86,7 @@ namespace H4
         }
         throw XML::SyntaxError();
     }
-    inline std::string extractAttributeName(XML::ISource &source)
+     std::string XML::extractAttributeName(ISource &source)
     {
         std::string attributeName;
         while (source.bytesToParse() && std::strchr(validAttributeCharacters, source.currentByte()) != nullptr)
@@ -100,7 +100,7 @@ namespace H4
         }
         return (attributeName);
     }
-    inline bool findString(XML::ISource &source, const std::string &targetString)
+     bool XML::findString(ISource &source, const std::string &targetString)
     {
         long index = 0;
         while (source.bytesToParse() && source.currentByte() == targetString[index])
@@ -114,7 +114,7 @@ namespace H4
         source.backupBytes(index);
         return (false);
     }
-    inline void ignoreWhiteSpace(XML::ISource &source)
+     void XML::ignoreWhiteSpace(ISource &source)
     {
         while (source.bytesToParse() && std::iswspace(source.currentByte()))
         {
@@ -125,7 +125,7 @@ namespace H4
             throw XML::SyntaxError();
         }
     }
-    std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attributes)
+    std::vector<XAttribute> XML::validateDeclaration(const std::vector<XAttribute> &attributes)
     {
         // Syntax error if no version present
         if (std::find_if(attributes.begin(), attributes.end(),
@@ -162,7 +162,7 @@ namespace H4
         }
         ignoreWhiteSpace(source);
     }
-    std::vector<XAttribute> parseAttributes(XML::ISource &source)
+    std::vector<XAttribute> XML::parseAttributes(ISource &source)
     {
         std::vector<XAttribute> attributes;
         while (source.currentByte() != '?' && source.currentByte() != '/' && source.currentByte() != '>')
@@ -212,7 +212,6 @@ namespace H4
     }
     XNodeElement XML::parseElement(ISource &source)
     {
-
         XNodeElement xNodeElement;
         if (source.currentByte() != '<')
         {
