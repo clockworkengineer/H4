@@ -253,4 +253,24 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
                               "<root></root><!-- A single line comment --> "));
   }
+  SECTION("A simple multi line comment", "[XML][Parse][[Comments]")
+  {
+    REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                              "<!-- A single line comment\n"
+                              " another line\n"
+                              " another line\n"
+                              " and another line\n"
+                              "--> <root></root>"));
+  }
+
+  SECTION("A simple comment within element content", "[XML][Parse][[Comments]")
+  {
+    REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test<!-- a simple comment -->Test</root>"));
+    XNodeRoot XNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test<!-- a simple comment -->Test</root>");
+  }
+  SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][[Comments]")
+  {
+    XNodeRoot XNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test  <!-- a simple comment -->  Test</root>");
+    REQUIRE(XNodeRoot.contents == "Test    Test");
+  }
 }

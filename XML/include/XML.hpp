@@ -82,12 +82,12 @@ namespace H4
         // ===============
         bool validTagName(std::string tagName);
         bool validAtttributeName(std::string attributeName);
+        std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attribute);
         std::string extractTagName(ISource &source);
         std::string extractAttributeValue(ISource &source);
         std::string extractAttributeName(ISource &source);
         bool findString(ISource &source, const std::string &targetString);
         void ignoreWhiteSpace(ISource &source);
-        std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attribute);
         void parseComment(ISource &source);
         std::vector<XAttribute> parseAttributes(ISource &source);
         XNodeElement parseElement(ISource &source);
