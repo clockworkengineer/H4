@@ -42,7 +42,8 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    inline bool checkFor(const char *valid, const char c) {
+    inline bool checkFor(const char *valid, const char c)
+    {
         return (std::strchr(valid, c) != nullptr);
     }
     inline bool attributePresent(std::vector<XAttribute> attributes, const std::string &name)
@@ -87,7 +88,8 @@ namespace H4
         }
         // Check valid declaration values
         if ((validatedAttributes[0].value != "1.0") ||
-            ((validatedAttributes[1].value != "UTF-8") && (validatedAttributes[1].value != "UTF-16")) ||
+            ((validatedAttributes[1].value != "UTF-8") && (validatedAttributes[1].value != "UTF-16") &&
+            (validatedAttributes[1].value != "utf-8") && (validatedAttributes[1].value != "utf-16")) ||
             ((validatedAttributes[2].value) != "yes" && (validatedAttributes[2].value != "no")))
         {
             throw XML::SyntaxError();
