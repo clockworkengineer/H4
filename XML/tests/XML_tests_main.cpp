@@ -174,7 +174,8 @@ TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
   auto testFile = GENERATE(values<std::string>({"./testData/testfile001.xml",
                                                 "./testData/testfile002.xml",
                                                 "./testData/testfile003.xml",
-                                                "./testData/testfile005.xml"}));
+                                                "./testData/testfile005.xml",
+                                                "./testData/testfile007.xml"}));
   SECTION("Load file into buffer and parse.", "[XML][Parse]")
   {
     std::string jsonXMLBuffer = readXMLFromFile(testFile);
@@ -272,5 +273,18 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
   {
     XNodeRoot XNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test  <!-- a simple comment -->  Test</root>");
     REQUIRE(XNodeRoot.contents == "Test    Test");
+  }
+}
+
+TEST_CASE("Parse XML with Unicode character in element names, attributes, comments, character data, and processing instructions. ", "[XML][Parse][Unicode]")
+{
+  XML xml;
+  SECTION("Japanese characters", "[XML][Parse][[Unicode]")
+  {
+    REQUIRE_NOTHROW(xml.parse("<?xml version=\"1.0\" encoding=\"utf-8\"?><config><start_text>転送</start_text></config>"));
+  }
+    SECTION("Well-formed XML document including Chinese, Armenian and Cyrillic characters", "[XML][Parse][[Unicode]")
+  {
+    REQUIRE_NOTHROW(xml.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><俄语 լեզու=\"ռուսերեն\">данные</俄语>"));
   }
 }

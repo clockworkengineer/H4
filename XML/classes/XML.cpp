@@ -35,25 +35,33 @@ namespace H4
     // PRIVATE STATIC VARIABLES
     // ========================
     static XAttribute defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
-    static const char *validTag{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."};
-    static const char *validAttribute{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
     // ===============
     // PRIVATE METHODS
     // ===============
-    inline std::string toUpper(std::string str)
+    inline bool validTagNameChar(char c)
+    {
+        static const char *validTag{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."};
+        return (std::strchr(validTag, c) != nullptr);
+    }
+    inline bool validAttributeNameChar(char c)
+    {
+        static const char *validAttribute{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"};
+        return (std::strchr(validAttribute, c) != nullptr);
+    }
+    inline std::string XML::toUpper(std::string str)
     {
         std::transform(str.begin(), str.end(), str.begin(),
-                  [](unsigned char c) { return std::toupper(c); });
+                       [](unsigned char c) { return std::toupper(c); });
         return str;
     }
-    inline bool checkValid(const char *valid, const char c)
+    inline bool XML::checkValid(const char *valid, const char c)
     {
         return (std::strchr(valid, c) != nullptr);
     }
-    inline bool attributePresent(std::vector<XAttribute> attributes, const std::string &name)
+    inline bool XML::attributePresent(std::vector<XAttribute> attributes, const std::string &name)
     {
         return (std::find_if(attributes.begin(), attributes.end(),
                              [&name](const XAttribute &attr) { return (attr.name == name); }) != attributes.end());
@@ -108,7 +116,7 @@ namespace H4
     std::string XML::extractTagName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.bytesToParse() && checkValid(validTag, source.currentByte()))
+        while (source.bytesToParse() && validTagNameChar(source.currentByte()))
         {
             m_workBuffer += source.currentByte();
             source.moveToNextByte();
@@ -143,7 +151,7 @@ namespace H4
     std::string XML::extractAttributeName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.bytesToParse() && checkValid(validAttribute, source.currentByte()))
+        while (source.bytesToParse() && validAttributeNameChar(source.currentByte()))
         {
             m_workBuffer += source.currentByte();
             source.moveToNextByte();
@@ -156,7 +164,7 @@ namespace H4
     }
     void XML::parseComment(ISource &source)
     {
-        while (source.bytesToParse() && !source.findString( "-->"))
+        while (source.bytesToParse() && !source.findString("-->"))
         {
             source.moveToNextByte();
         }
@@ -191,11 +199,11 @@ namespace H4
     {
         XNodeRoot xNodeRoot;
         source.ignoreWhiteSpace();
-        if (source.findString( "<?xml"))
+        if (source.findString("<?xml"))
         {
             source.ignoreWhiteSpace();
             std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source));
-            if (source.findString( "?>"))
+            if (source.findString("?>"))
             {
                 xNodeRoot.version = attributes[0].value;
                 xNodeRoot.encoding = attributes[1].value;
@@ -220,16 +228,16 @@ namespace H4
         xNodeElement.name = extractTagName(source);
         source.ignoreWhiteSpace();
         xNodeElement.attributes = parseAttributes(source);
-        if (source.findString( "/>") || source.findString( ">"))
+        if (source.findString("/>") || source.findString(">"))
         {
-            while (source.bytesToParse() && !source.findString( "</" + xNodeElement.name + ">"))
+            while (source.bytesToParse() && !source.findString("</" + xNodeElement.name + ">"))
             {
                 if (source.currentByte() != '<')
                 {
                     xNodeElement.contents += source.currentByte();
                     source.moveToNextByte();
                 }
-                else if (source.findString( "<!--"))
+                else if (source.findString("<!--"))
                 {
                     parseComment(source);
                 }
@@ -248,7 +256,7 @@ namespace H4
     void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)
     {
         source.ignoreWhiteSpace();
-        if (source.findString( "<!--"))
+        if (source.findString("<!--"))
         {
             parseComment(source);
             source.ignoreWhiteSpace();
