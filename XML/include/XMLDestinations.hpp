@@ -13,24 +13,24 @@ namespace H4
         BufferDestination()
         {
         }
-        void addBytes(std::string bytes)
+        void addBytes(const std::string &bytes)
         {
             for (auto b : bytes)
             {
                 m_stringifyBuffer.push_back(b);
             }
         }
-        std::string getBuffer()
+        XString getBuffer()
         {
             return (m_stringifyBuffer);
         }
     private:
-        std::string m_stringifyBuffer;
+        XString m_stringifyBuffer;
     };
     class FileDestination : public XML::IDestination
     { 
     public:
-        FileDestination(std::string desinationFileName)
+        FileDestination(const std::string &desinationFileName)
         {
             m_destination.open(desinationFileName.c_str(), std::ios_base::binary);
             if (!m_destination.is_open())
@@ -38,7 +38,7 @@ namespace H4
                 throw std::runtime_error("XML file output stream failed to open or could not be created.");
             }
         }
-        void addBytes(std::string bytes)
+        void addBytes(const std::string &bytes)
         {
             m_destination.write(bytes.c_str(), bytes.length());
             m_destination.flush();

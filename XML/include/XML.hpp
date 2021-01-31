@@ -44,10 +44,10 @@ namespace H4
         class ISource
         {
         public:
-            virtual char currentByte() = 0;
+            virtual XChar currentByte() = 0;
             virtual void moveToNextByte() = 0;
             virtual bool bytesToParse() = 0;
-            virtual bool findString(const std::string &targetString) = 0;
+            virtual bool findString(const XString &targetString) = 0;
             void ignoreWhiteSpace()
             {
                 while (bytesToParse() && std::iswspace(currentByte()))
@@ -66,7 +66,7 @@ namespace H4
         class IDestination
         {
         public:
-            virtual void addBytes(std::string bytes) = 0;
+            virtual void addBytes(const std::string &bytes) = 0;
         };
         // ============
         // CONSTRUCTORS
@@ -91,15 +91,14 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        std::string toUpper(std::string str);
-        bool checkValid(const char *valid, const char c);
-        bool attributePresent(std::vector<XAttribute> attributes, const std::string &name);
-        bool validTagName(std::string tagName);
-        bool validAtttributeName(std::string attributeName);
+        XString toUpper(XString str);
+        bool attributePresent(std::vector<XAttribute> attributes, const XString &name);
+        bool validTagName(XString tagName);
+        bool validAtttributeName(XString attributeName);
         std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attribute);
-        std::string extractTagName(ISource &source);
-        std::string extractAttributeValue(ISource &source);
-        std::string extractAttributeName(ISource &source);
+        XString extractTagName(ISource &source);
+        XString extractAttributeValue(ISource &source);
+        XString extractAttributeName(ISource &source);
         void parseComment(ISource &source);
         std::vector<XAttribute> parseAttributes(ISource &source);
         XNodeElement parseElement(ISource &source);
@@ -109,7 +108,7 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        std::string m_workBuffer;
+        XString m_workBuffer;
     };
 } // namespace H4
 #endif /* XML_HPP */

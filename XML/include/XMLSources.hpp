@@ -10,7 +10,7 @@ namespace H4
     class BufferSource : public XML::ISource
     {
     public:
-        BufferSource(std::string sourceBuffer)
+        BufferSource(XString sourceBuffer)
         {
             if (sourceBuffer.empty())
             {
@@ -18,7 +18,7 @@ namespace H4
             }
             m_parseBuffer = sourceBuffer;
         }
-        char currentByte()
+        XChar currentByte()
         {
             if (bytesToParse())
             {
@@ -41,7 +41,7 @@ namespace H4
         {
             return (m_bufferPosition < m_parseBuffer.size());
         }
-        bool findString(const std::string &targetString)
+        bool findString(const XString &targetString)
         {
             long index = 0;
             while (bytesToParse() && currentByte() == targetString[index])
@@ -61,12 +61,12 @@ namespace H4
         }
     private:
         std::size_t m_bufferPosition = 0;
-        std::string m_parseBuffer;
+        XString m_parseBuffer;
     };
     class FileSource : public XML::ISource
     {
     public:
-        FileSource(std::string sourceFileName)
+        FileSource(const std::string &sourceFileName)
         {
             m_source.open(sourceFileName.c_str(), std::ios_base::binary);
             if (!m_source.is_open())
@@ -74,7 +74,7 @@ namespace H4
                 throw std::runtime_error("XML file input stream failed to open or does not exist.");
             }
         }
-        char currentByte()
+        XChar currentByte()
         {
             return (m_source.peek());
         }
@@ -87,7 +87,7 @@ namespace H4
         {
             return (m_source.peek() != EOF);
         }
-        bool findString(const std::string &targetString)
+        bool findString(const XString &targetString)
         {
             long index = 0;
             while (bytesToParse() && currentByte() == targetString[index])

@@ -16,18 +16,19 @@ namespace H4
     //
     // Encoded string
     //
-    using XString = std::string;
+    using XString = std::u16string;
+    using XChar = XString::value_type;
     //
     // X Attribute
     //
     struct XAttribute
     {
     public:
-        XAttribute(const std::string &name, const std::string value) : name(name), value(value)
+        XAttribute(const XString &name, const XString value) : name(name), value(value)
         {
         }
-        std::string name;
-        std::string value;
+        XString name;
+        XString value;
     };
     //
     // XNode structure.
