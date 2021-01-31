@@ -77,7 +77,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        XNodeRoot parse(const XString &xmlToParse);
+        XNodeRoot parse(const std::string &xmlToParse);
         // ================
         // PUBLIC VARIABLES
         // ================

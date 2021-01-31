@@ -20,6 +20,8 @@
 #include <vector>
 #include <cstring>
 #include <algorithm>
+#include <codecvt>
+#include <locale>
 // =========
 // NAMESPACE
 // =========
@@ -47,7 +49,6 @@ namespace H4
     }
     inline bool validAttributeNameChar(XChar c)
     {
-
         return (std::isalpha(c) || std::isdigit(c) || c == '_');
     }
     inline XString XML::toUpper(XString str)
@@ -271,9 +272,10 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-    XNodeRoot XML::parse(const XString &xmlToParse)
+    XNodeRoot XML::parse(const std::string &xmlToParse)
     {
-        BufferSource xml(xmlToParse);
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_utf8Toutf16;
+        BufferSource xml(m_utf8Toutf16.from_bytes(xmlToParse));
         return (parseXML(xml));
     }
 } // namespace H4
