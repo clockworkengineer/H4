@@ -154,17 +154,6 @@ namespace H4
         }
         return (m_workBuffer);
     }
-    void XML::ignoreWhiteSpace(ISource &source)
-    {
-        while (source.bytesToParse() && std::iswspace(source.currentByte()))
-        {
-            source.moveToNextByte();
-        }
-        if (!source.bytesToParse())
-        {
-            throw XML::SyntaxError();
-        }
-    }
     void XML::parseComment(ISource &source)
     {
         while (source.bytesToParse() && !source.findString( "-->"))

@@ -73,8 +73,8 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   }
   SECTION("Parse XML with declaration but no root element", "[XML][Parse][Declaration]")
   {
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"), "XML syntax error detected.");
+    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"), std::runtime_error);
+    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"), "Parse buffer empty before parse complete.");
   }
 }
 TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")

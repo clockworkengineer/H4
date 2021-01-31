@@ -57,22 +57,8 @@ namespace H4
             {
                 m_bufferPosition = 0;
             }
-
             return (false);
         }
-
-        void ignoreWhiteSpace()
-        {
-            while (bytesToParse() && std::iswspace(currentByte()))
-            {
-                moveToNextByte();
-            }
-            if (!bytesToParse())
-            {
-                throw std::runtime_error("Parse buffer empty before parse complete.");
-            }
-        }
-
     private:
         std::size_t m_bufferPosition = 0;
         std::string m_parseBuffer;
@@ -113,21 +99,8 @@ namespace H4
                 }
             }
             m_source.seekg(-index, std::ios_base::cur);
-
             return (false);
         }
-        void ignoreWhiteSpace()
-        {
-            while (bytesToParse() && std::iswspace(currentByte()))
-            {
-                moveToNextByte();
-            }
-            if (!bytesToParse())
-            {
-                throw std::runtime_error("Parse buffer empty before parse complete.");
-            }
-        }
-
     private:
         std::ifstream m_source;
     };

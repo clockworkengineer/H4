@@ -49,7 +49,17 @@ namespace H4
             virtual void moveToNextByte() = 0;
             virtual bool bytesToParse() = 0;
             virtual bool findString(const std::string &targetString) = 0;
-            virtual void ignoreWhiteSpace() = 0;
+            void ignoreWhiteSpace()
+            {
+                while (bytesToParse() && std::iswspace(currentByte()))
+                {
+                    moveToNextByte();
+                }
+                if (!bytesToParse())
+                {
+                    throw std::runtime_error("Parse buffer empty before parse complete.");
+                }
+            }
         };
         //
         // Destination interface
@@ -88,8 +98,6 @@ namespace H4
         std::string extractTagName(ISource &source);
         std::string extractAttributeValue(ISource &source);
         std::string extractAttributeName(ISource &source);
-        bool findString(ISource &source, const std::string &targetString);
-        void ignoreWhiteSpace(ISource &source);
         void parseComment(ISource &source);
         std::vector<XAttribute> parseAttributes(ISource &source);
         XNodeElement parseElement(ISource &source);
