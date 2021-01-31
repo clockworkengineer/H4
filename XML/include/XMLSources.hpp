@@ -41,14 +41,38 @@ namespace H4
         {
             return (m_bufferPosition < m_parseBuffer.size());
         }
-        void backupBytes(long length)
+        bool findString(const std::string &targetString)
         {
-            m_bufferPosition -= length;
+            long index = 0;
+            while (bytesToParse() && currentByte() == targetString[index])
+            {
+                moveToNextByte();
+                if (++index == (long)targetString.length())
+                {
+                    return (true);
+                }
+            }
+            m_bufferPosition -= index;
             if (m_bufferPosition < 0)
             {
                 m_bufferPosition = 0;
             }
+
+            return (false);
         }
+
+        void ignoreWhiteSpace()
+        {
+            while (bytesToParse() && std::iswspace(currentByte()))
+            {
+                moveToNextByte();
+            }
+            if (!bytesToParse())
+            {
+                throw std::runtime_error("Parse buffer empty before parse complete.");
+            }
+        }
+
     private:
         std::size_t m_bufferPosition = 0;
         std::string m_parseBuffer;
@@ -77,10 +101,33 @@ namespace H4
         {
             return (m_source.peek() != EOF);
         }
-        void backupBytes(long length)
+        bool findString(const std::string &targetString)
         {
-            m_source.seekg(-length, std::ios_base::cur);
+            long index = 0;
+            while (bytesToParse() && currentByte() == targetString[index])
+            {
+                moveToNextByte();
+                if (++index == (long)targetString.length())
+                {
+                    return (true);
+                }
+            }
+            m_source.seekg(-index, std::ios_base::cur);
+
+            return (false);
         }
+        void ignoreWhiteSpace()
+        {
+            while (bytesToParse() && std::iswspace(currentByte()))
+            {
+                moveToNextByte();
+            }
+            if (!bytesToParse())
+            {
+                throw std::runtime_error("Parse buffer empty before parse complete.");
+            }
+        }
+
     private:
         std::ifstream m_source;
     };

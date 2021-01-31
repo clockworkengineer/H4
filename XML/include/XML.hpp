@@ -35,6 +35,7 @@ namespace H4
             {
                 return ("XML syntax error detected.");
             }
+
         private:
             std::string errorMessage;
         };
@@ -47,7 +48,8 @@ namespace H4
             virtual char currentByte() = 0;
             virtual void moveToNextByte() = 0;
             virtual bool bytesToParse() = 0;
-            virtual void backupBytes(long length) = 0;
+            virtual bool findString(const std::string &targetString) = 0;
+            virtual void ignoreWhiteSpace() = 0;
         };
         //
         // Destination interface

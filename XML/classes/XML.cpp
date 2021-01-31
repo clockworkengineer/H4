@@ -154,20 +154,6 @@ namespace H4
         }
         return (m_workBuffer);
     }
-    bool XML::findString(ISource &source, const std::string &targetString)
-    {
-        long index = 0;
-        while (source.bytesToParse() && source.currentByte() == targetString[index])
-        {
-            source.moveToNextByte();
-            if (++index == (long)targetString.length())
-            {
-                return (true);
-            }
-        }
-        source.backupBytes(index);
-        return (false);
-    }
     void XML::ignoreWhiteSpace(ISource &source)
     {
         while (source.bytesToParse() && std::iswspace(source.currentByte()))
@@ -181,7 +167,7 @@ namespace H4
     }
     void XML::parseComment(ISource &source)
     {
-        while (source.bytesToParse() && !findString(source, "-->"))
+        while (source.bytesToParse() && !source.findString( "-->"))
         {
             source.moveToNextByte();
         }
@@ -192,15 +178,15 @@ namespace H4
         while (source.currentByte() != '?' && source.currentByte() != '/' && source.currentByte() != '>')
         {
             std::string name = extractAttributeName(source);
-            ignoreWhiteSpace(source);
+            source.ignoreWhiteSpace();
             if (source.currentByte() != '=')
             {
                 throw XML::SyntaxError();
             }
             source.moveToNextByte();
-            ignoreWhiteSpace(source);
+            source.ignoreWhiteSpace();
             std::string value = extractAttributeValue(source);
-            ignoreWhiteSpace(source);
+            source.ignoreWhiteSpace();
             if (!attributePresent(attributes, name))
             {
                 attributes.emplace_back(name, value);
@@ -215,12 +201,12 @@ namespace H4
     XNodeRoot XML::parseProlog(ISource &source)
     {
         XNodeRoot xNodeRoot;
-        ignoreWhiteSpace(source);
-        if (findString(source, "<?xml"))
+        source.ignoreWhiteSpace();
+        if (source.findString( "<?xml"))
         {
-            ignoreWhiteSpace(source);
+            source.ignoreWhiteSpace();
             std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source));
-            if (findString(source, "?>"))
+            if (source.findString( "?>"))
             {
                 xNodeRoot.version = attributes[0].value;
                 xNodeRoot.encoding = attributes[1].value;
@@ -241,20 +227,20 @@ namespace H4
         }
         XNodeElement xNodeElement;
         source.moveToNextByte();
-        ignoreWhiteSpace(source);
+        source.ignoreWhiteSpace();
         xNodeElement.name = extractTagName(source);
-        ignoreWhiteSpace(source);
+        source.ignoreWhiteSpace();
         xNodeElement.attributes = parseAttributes(source);
-        if (findString(source, "/>") || findString(source, ">"))
+        if (source.findString( "/>") || source.findString( ">"))
         {
-            while (source.bytesToParse() && !findString(source, "</" + xNodeElement.name + ">"))
+            while (source.bytesToParse() && !source.findString( "</" + xNodeElement.name + ">"))
             {
                 if (source.currentByte() != '<')
                 {
                     xNodeElement.contents += source.currentByte();
                     source.moveToNextByte();
                 }
-                else if (findString(source, "<!--"))
+                else if (source.findString( "<!--"))
                 {
                     parseComment(source);
                 }
@@ -272,11 +258,11 @@ namespace H4
     }
     void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)
     {
-        ignoreWhiteSpace(source);
-        if (findString(source, "<!--"))
+        source.ignoreWhiteSpace();
+        if (source.findString( "<!--"))
         {
             parseComment(source);
-            ignoreWhiteSpace(source);
+            source.ignoreWhiteSpace();
         }
         XNodeElement xNodeElement = parseElement(source);
         xNodeRoot.name = xNodeElement.name;
