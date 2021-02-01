@@ -47,17 +47,17 @@ namespace H4
         class ISource
         {
         public:
-            virtual XChar currentByte() = 0;
-            virtual void moveToNextByte() = 0;
-            virtual bool bytesToParse() = 0;
+            virtual XChar currentCharacter() = 0;
+            virtual void moveToNextCharacter() = 0;
+            virtual bool charactersToParse() = 0;
             virtual bool findString(const XString &targetString) = 0;
             void ignoreWhiteSpace()
             {
-                while (bytesToParse() && std::iswspace(currentByte()))
+                while (charactersToParse() && std::iswspace(currentCharacter()))
                 {
-                    moveToNextByte();
+                    moveToNextCharacter();
                 }
-                if (!bytesToParse())
+                if (!charactersToParse())
                 {
                     throw std::runtime_error("Parse buffer empty before parse complete.");
                 }
@@ -94,11 +94,11 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        std::string toUpper(std::string str);
+        bool validNameStartChar(XChar c);
+        bool validNameChar(XChar c);
         bool attributePresent(std::vector<XAttribute> attributes, const XString &name);
-        bool validName(XString);
-        bool validTagName(XString tagName);
-        bool validAttributeName(XString attributeName);
+        bool validateTagName(XString tagName);
+        bool validateAttributeName(XString attributeName);
         std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attribute);
         XString extractTagName(ISource &source);
         XString extractAttributeValue(ISource &source);

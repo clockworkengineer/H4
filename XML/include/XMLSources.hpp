@@ -18,9 +18,9 @@ namespace H4
             }
             m_parseBuffer = sourceBuffer;
         }
-        XChar currentByte()
+        XChar currentCharacter()
         {
-            if (bytesToParse())
+            if (charactersToParse())
             {
                 return (m_parseBuffer[m_bufferPosition]);
             }
@@ -29,24 +29,24 @@ namespace H4
                 return (EOF);
             }
         }
-        void moveToNextByte()
+        void moveToNextCharacter()
         {
-            if (!bytesToParse())
+            if (!charactersToParse())
             {
                 throw std::runtime_error("Parse buffer empty before parse complete.");
             }
             m_bufferPosition++;
         }
-        bool bytesToParse()
+        bool charactersToParse()
         {
             return (m_bufferPosition < m_parseBuffer.size());
         }
         bool findString(const XString &targetString)
         {
             long index = 0;
-            while (bytesToParse() && currentByte() == targetString[index])
+            while (charactersToParse() && currentCharacter() == targetString[index])
             {
-                moveToNextByte();
+                moveToNextCharacter();
                 if (++index == (long)targetString.length())
                 {
                     return (true);
@@ -74,25 +74,25 @@ namespace H4
                 throw std::runtime_error("XML file input stream failed to open or does not exist.");
             }
         }
-        XChar currentByte()
+        XChar currentCharacter()
         {
             return (m_source.peek());
         }
-        void moveToNextByte()
+        void moveToNextCharacter()
         {
             char c;
             m_source.get(c);
         }
-        bool bytesToParse()
+        bool charactersToParse()
         {
             return (m_source.peek() != EOF);
         }
         bool findString(const XString &targetString)
         {
             long index = 0;
-            while (bytesToParse() && currentByte() == targetString[index])
+            while (charactersToParse() && currentCharacter() == targetString[index])
             {
-                moveToNextByte();
+                moveToNextCharacter();
                 if (++index == (long)targetString.length())
                 {
                     return (true);

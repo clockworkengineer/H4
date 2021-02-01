@@ -20,7 +20,6 @@
 #include <vector>
 #include <cstring>
 #include <algorithm>
-
 // =========
 // NAMESPACE
 // =========
@@ -42,7 +41,7 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    inline bool validNameStartChar(XChar c)
+    inline bool XML::validNameStartChar(XChar c)
     {
         return ((c == ':') ||
                 (c == '_') ||
@@ -61,7 +60,7 @@ namespace H4
                 (c >= 0xFDF0 && c <= 0xFFFD) ||
                 (c >= 0x10000 && c <= 0xEFFFF));
     }
-    inline bool validNameChar(XChar c)
+    inline bool XML::validNameChar(XChar c)
     {
         return (validNameStartChar(c) ||
                 (c == '-') ||
@@ -69,20 +68,14 @@ namespace H4
                 (c >= '0' && c <= '9') ||
                 (c == 0xB7) ||
                 (c >= 0x0300 && c <= 0x036F) ||
-                (c >= 0x203F && c <= 0x02040));
-    }
-    inline std::string XML::toUpper(std::string str)
-    {
-        std::transform(str.begin(), str.end(), str.begin(),
-                       [](unsigned int c) { return std::toupper(c); });
-        return str;
+                (c >= 0x203F && c <= 0x2040));
     }
     inline bool XML::attributePresent(std::vector<XAttribute> attributes, const XString &name)
     {
         return (std::find_if(attributes.begin(), attributes.end(),
-                             [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.end());
+        [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.end());
     }
-    inline bool XML::validAttributeName(XString name)
+    inline bool XML::validateAttributeName(XString name)
     {
         if (!validNameStartChar(name[0]))
         {
@@ -95,17 +88,16 @@ namespace H4
                 return (false);
             }
         }
-
         return (true);
     }
-    inline bool XML::validTagName(XString name)
+    inline bool XML::validateTagName(XString name)
     {
         std::transform(name.begin(), name.end(), name.begin(), ::tolower);
         if (name.substr(0, 3) == U"xml")
         {
             return (false);
         }
-        return (validAttributeName(name));
+        return (validateAttributeName(name));
     }
     std::vector<XAttribute> XML::validateDeclaration(const std::vector<XAttribute> &attributes)
     {
@@ -135,8 +127,10 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
+        // Encoding all upper case
+        std::transform(validatedAttributes[1].value.begin(), validatedAttributes[1].value.end(),
+                       validatedAttributes[1].value.begin(), [](unsigned int c) { return std::toupper(c); });
         // Check valid declaration values
-        validatedAttributes[1].value = toUpper(validatedAttributes[1].value); // encoding to upper case
         if ((validatedAttributes[0].value != "1.0") ||
             ((validatedAttributes[1].value != "UTF-8") && (validatedAttributes[1].value != "UTF-16")) ||
             ((validatedAttributes[2].value) != "yes" && (validatedAttributes[2].value != "no")))
@@ -148,12 +142,12 @@ namespace H4
     XString XML::extractTagName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.bytesToParse() && validNameChar(source.currentByte()))
+        while (source.charactersToParse() && validNameChar(source.currentCharacter()))
         {
-            m_workBuffer += source.currentByte();
-            source.moveToNextByte();
+            m_workBuffer += source.currentCharacter();
+            source.moveToNextCharacter();
         }
-        if (!source.bytesToParse() || !validTagName(m_workBuffer))
+        if (!source.charactersToParse() || !validateTagName(m_workBuffer))
         {
             throw XML::SyntaxError();
         }
@@ -161,21 +155,21 @@ namespace H4
     }
     XString XML::extractAttributeValue(ISource &source)
     {
-        if ((source.currentByte() == '\'') || ((source.currentByte() == '"')))
+        if ((source.currentCharacter() == '\'') || ((source.currentCharacter() == '"')))
         {
             m_workBuffer.clear();
-            XChar quote = source.currentByte();
-            source.moveToNextByte();
-            while (source.bytesToParse() && (source.currentByte() != quote))
+            XChar quote = source.currentCharacter();
+            source.moveToNextCharacter();
+            while (source.charactersToParse() && (source.currentCharacter() != quote))
             {
-                m_workBuffer += source.currentByte();
-                source.moveToNextByte();
+                m_workBuffer += source.currentCharacter();
+                source.moveToNextCharacter();
             }
-            if (!source.bytesToParse())
+            if (!source.charactersToParse())
             {
                 throw XML::SyntaxError();
             }
-            source.moveToNextByte();
+            source.moveToNextCharacter();
             return (m_workBuffer);
         }
         throw XML::SyntaxError();
@@ -183,12 +177,12 @@ namespace H4
     XString XML::extractAttributeName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.bytesToParse() && validNameChar(source.currentByte()))
+        while (source.charactersToParse() && validNameChar(source.currentCharacter()))
         {
-            m_workBuffer += source.currentByte();
-            source.moveToNextByte();
+            m_workBuffer += source.currentCharacter();
+            source.moveToNextCharacter();
         }
-        if (!source.bytesToParse() || !validAttributeName(m_workBuffer))
+        if (!source.charactersToParse() || !validateAttributeName(m_workBuffer))
         {
             throw XML::SyntaxError();
         }
@@ -196,23 +190,23 @@ namespace H4
     }
     void XML::parseComment(ISource &source)
     {
-        while (source.bytesToParse() && !source.findString(U"-->"))
+        while (source.charactersToParse() && !source.findString(U"-->"))
         {
-            source.moveToNextByte();
+            source.moveToNextCharacter();
         }
     }
     std::vector<XAttribute> XML::parseAttributes(ISource &source)
     {
         std::vector<XAttribute> attributes;
-        while (source.currentByte() != '?' && source.currentByte() != '/' && source.currentByte() != '>')
+        while (source.currentCharacter() != '?' && source.currentCharacter() != '/' && source.currentCharacter() != '>')
         {
             XString name = extractAttributeName(source);
             source.ignoreWhiteSpace();
-            if (source.currentByte() != '=')
+            if (source.currentCharacter() != '=')
             {
                 throw XML::SyntaxError();
             }
-            source.moveToNextByte();
+            source.moveToNextCharacter();
             source.ignoreWhiteSpace();
             XString value = extractAttributeValue(source);
             source.ignoreWhiteSpace();
@@ -250,24 +244,24 @@ namespace H4
     }
     XNodeElement XML::parseElement(ISource &source)
     {
-        if (source.currentByte() != '<')
+        if (source.currentCharacter() != '<')
         {
             throw XML::SyntaxError();
         }
         XNodeElement xNodeElement;
-        source.moveToNextByte();
+        source.moveToNextCharacter();
         source.ignoreWhiteSpace();
         xNodeElement.name = m_toFromUTF8.to_bytes(extractTagName(source));
         source.ignoreWhiteSpace();
         xNodeElement.attributes = parseAttributes(source);
         if (source.findString(U"/>") || source.findString(U">"))
         {
-            while (source.bytesToParse() && !source.findString(U"</" + m_toFromUTF8.from_bytes(xNodeElement.name) + U">"))
+            while (source.charactersToParse() && !source.findString(U"</" + m_toFromUTF8.from_bytes(xNodeElement.name) + U">"))
             {
-                if (source.currentByte() != '<')
+                if (source.currentCharacter() != '<')
                 {
-                    xNodeElement.contents += m_toFromUTF8.to_bytes(source.currentByte());
-                    source.moveToNextByte();
+                    xNodeElement.contents += m_toFromUTF8.to_bytes(source.currentCharacter());
+                    source.moveToNextCharacter();
                 }
                 else if (source.findString(U"<!--"))
                 {

@@ -14,7 +14,7 @@
 namespace H4
 {
     //
-    // Encoded string
+    // 32 bit characters internally
     //
     using XString = std::u32string;
     using XChar = XString::value_type;
