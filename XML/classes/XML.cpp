@@ -36,13 +36,41 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
-    static XAttribute defaultAtributes[3] = {{u"version", u"1.0"}, {u"encoding", u"UTF-8"}, {u"standalone", u"no"}};
+    static XAttribute defaultAtributes[3] = {{U"version", U"1.0"}, {U"encoding", U"UTF-8"}, {U"standalone", U"no"}};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
     // ===============
     // PRIVATE METHODS
     // ===============
+     inline bool validNameStartChar(XChar c)
+    {
+        return((c==':')||
+               (c=='_')||
+               (c>='A'&&c<='Z') ||
+               (c>='a'&&c<='z') ||
+               (c>=0xC0&&c<=0xD6) ||
+               (c>=0xD8&&c<=0xF6) ||
+               (c>=0xF8&&c<=0x2FF) ||
+               (c>=0x370&&c<=0x37D) ||
+               (c>=0x37F&&c<=0x1FFF) ||
+               (c>=0x200C&&c<=0x200D) ||
+               (c>=0x2070&&c<=0x218F) ||
+               (c>=0x2C00&&c<=0x2FEF) ||
+               (c>=0x3001&&c<=0xD7FF) ||
+               (c>=0xF900&&c<=0xFDCF) ||
+               (c>=0xFDF0&&c<=0xFFFD) ||
+               (c>=0x10000&&c<=0xEFFFF));
+    }
+    inline bool validNameChar(XChar c)
+    {
+         return(validNameStartChar(c)||
+                (c=='-')||
+                (c=='.')||
+                (c==0xB7) ||
+                (c>=0x0300&&c<=0x036F) ||
+                (c>=0x203F&&c<=0x02040));
+    }
     inline bool validTagNameChar(XChar c)
     {
         return (std::isalpha(c) || std::isdigit(c) || c == '-' || c == '_' || c == '.');
@@ -65,7 +93,7 @@ namespace H4
     inline bool XML::validTagName(XString tagName)
     {
         std::transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
-        return (!(std::isdigit(tagName[0]) || tagName[0] == '-' || tagName[0] == '.' || tagName.substr(0, 3) == u"xml"));
+        return (!(std::isdigit(tagName[0]) || tagName[0] == '-' || tagName[0] == '.' || tagName.substr(0, 3) == U"xml"));
     }
     inline bool XML::validAtttributeName(XString attributeName)
     {
@@ -74,7 +102,7 @@ namespace H4
     std::vector<XAttribute> XML::validateDeclaration(const std::vector<XAttribute> &attributes)
     {
         // Syntax error if no version present
-        if (!attributePresent(attributes, u"version"))
+        if (!attributePresent(attributes, U"version"))
         {
             throw XML::SyntaxError();
         }
@@ -101,9 +129,9 @@ namespace H4
         }
         // Check valid declaration values
         validatedAttributes[1].value = toUpper(validatedAttributes[1].value); // encoding to upper case
-        if ((validatedAttributes[0].value != u"1.0") ||
-            ((validatedAttributes[1].value != u"UTF-8") && (validatedAttributes[1].value != u"UTF-16")) ||
-            ((validatedAttributes[2].value) != u"yes" && (validatedAttributes[2].value != u"no")))
+        if ((validatedAttributes[0].value != U"1.0") ||
+            ((validatedAttributes[1].value != U"UTF-8") && (validatedAttributes[1].value != U"UTF-16")) ||
+            ((validatedAttributes[2].value) != U"yes" && (validatedAttributes[2].value != U"no")))
         {
             throw XML::SyntaxError();
         }
@@ -160,7 +188,7 @@ namespace H4
     }
     void XML::parseComment(ISource &source)
     {
-        while (source.bytesToParse() && !source.findString(u"-->"))
+        while (source.bytesToParse() && !source.findString(U"-->"))
         {
             source.moveToNextByte();
         }
@@ -195,11 +223,11 @@ namespace H4
     {
         XNodeRoot xNodeRoot;
         source.ignoreWhiteSpace();
-        if (source.findString(u"<?xml"))
+        if (source.findString(U"<?xml"))
         {
             source.ignoreWhiteSpace();
             std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source));
-            if (source.findString(u"?>"))
+            if (source.findString(U"?>"))
             {
                 xNodeRoot.version = attributes[0].value;
                 xNodeRoot.encoding = attributes[1].value;
@@ -224,16 +252,16 @@ namespace H4
         xNodeElement.name = extractTagName(source);
         source.ignoreWhiteSpace();
         xNodeElement.attributes = parseAttributes(source);
-        if (source.findString(u"/>") || source.findString(u">"))
+        if (source.findString(U"/>") || source.findString(U">"))
         {
-            while (source.bytesToParse() && !source.findString(u"</" + xNodeElement.name + u">"))
+            while (source.bytesToParse() && !source.findString(U"</" + xNodeElement.name + U">"))
             {
                 if (source.currentByte() != '<')
                 {
                     xNodeElement.contents += source.currentByte();
                     source.moveToNextByte();
                 }
-                else if (source.findString(u"<!--"))
+                else if (source.findString(U"<!--"))
                 {
                     parseComment(source);
                 }
@@ -252,7 +280,7 @@ namespace H4
     void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)
     {
         source.ignoreWhiteSpace();
-        if (source.findString(u"<!--"))
+        if (source.findString(U"<!--"))
         {
             parseComment(source);
             source.ignoreWhiteSpace();
@@ -274,8 +302,8 @@ namespace H4
     // ==============
     XNodeRoot XML::parse(const std::string &xmlToParse)
     {
-        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_utf8Toutf16;
-        BufferSource xml(m_utf8Toutf16.from_bytes(xmlToParse));
+        std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> toFromUTF8;
+        BufferSource xml(toFromUTF8.from_bytes(xmlToParse));
         return (parseXML(xml));
     }
 } // namespace H4

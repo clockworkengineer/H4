@@ -16,7 +16,7 @@ namespace H4
     //
     // Encoded string
     //
-    using XString = std::u16string;
+    using XString = std::u32string;
     using XChar = XString::value_type;
     //
     // X Attribute
