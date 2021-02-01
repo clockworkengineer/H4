@@ -6,6 +6,8 @@
 #include <string>
 #include <stdexcept>
 #include <memory>
+#include <codecvt>
+#include <locale>
 //
 // XML XNodes
 //
@@ -92,7 +94,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        XString toUpper(XString str);
+        std::string toUpper(std::string str);
         bool attributePresent(std::vector<XAttribute> attributes, const XString &name);
         bool validName(XString);
         bool validTagName(XString tagName);
@@ -111,6 +113,7 @@ namespace H4
         // PRIVATE VARIABLES
         // =================
         XString m_workBuffer;
+        std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_toFromUTF8;
     };
 } // namespace H4
 #endif /* XML_HPP */

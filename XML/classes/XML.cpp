@@ -20,8 +20,7 @@
 #include <vector>
 #include <cstring>
 #include <algorithm>
-#include <codecvt>
-#include <locale>
+
 // =========
 // NAMESPACE
 // =========
@@ -36,7 +35,7 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
-    static XAttribute defaultAtributes[3] = {{U"version", U"1.0"}, {U"encoding", U"UTF-8"}, {U"standalone", U"no"}};
+    static XAttribute defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -72,7 +71,7 @@ namespace H4
                 (c >= 0x0300 && c <= 0x036F) ||
                 (c >= 0x203F && c <= 0x02040));
     }
-    inline XString XML::toUpper(XString str)
+    inline std::string XML::toUpper(std::string str)
     {
         std::transform(str.begin(), str.end(), str.begin(),
                        [](unsigned int c) { return std::toupper(c); });
@@ -81,7 +80,7 @@ namespace H4
     inline bool XML::attributePresent(std::vector<XAttribute> attributes, const XString &name)
     {
         return (std::find_if(attributes.begin(), attributes.end(),
-                             [&name](const XAttribute &attr) { return (attr.name == name); }) != attributes.end());
+                             [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.end());
     }
     inline bool XML::validAttributeName(XString name)
     {
@@ -138,9 +137,9 @@ namespace H4
         }
         // Check valid declaration values
         validatedAttributes[1].value = toUpper(validatedAttributes[1].value); // encoding to upper case
-        if ((validatedAttributes[0].value != U"1.0") ||
-            ((validatedAttributes[1].value != U"UTF-8") && (validatedAttributes[1].value != U"UTF-16")) ||
-            ((validatedAttributes[2].value) != U"yes" && (validatedAttributes[2].value != U"no")))
+        if ((validatedAttributes[0].value != "1.0") ||
+            ((validatedAttributes[1].value != "UTF-8") && (validatedAttributes[1].value != "UTF-16")) ||
+            ((validatedAttributes[2].value) != "yes" && (validatedAttributes[2].value != "no")))
         {
             throw XML::SyntaxError();
         }
@@ -219,7 +218,7 @@ namespace H4
             source.ignoreWhiteSpace();
             if (!attributePresent(attributes, name))
             {
-                attributes.emplace_back(name, value);
+                attributes.emplace_back(m_toFromUTF8.to_bytes(name), m_toFromUTF8.to_bytes(value));
             }
             else
             {
@@ -258,16 +257,16 @@ namespace H4
         XNodeElement xNodeElement;
         source.moveToNextByte();
         source.ignoreWhiteSpace();
-        xNodeElement.name = extractTagName(source);
+        xNodeElement.name = m_toFromUTF8.to_bytes(extractTagName(source));
         source.ignoreWhiteSpace();
         xNodeElement.attributes = parseAttributes(source);
         if (source.findString(U"/>") || source.findString(U">"))
         {
-            while (source.bytesToParse() && !source.findString(U"</" + xNodeElement.name + U">"))
+            while (source.bytesToParse() && !source.findString(U"</" + m_toFromUTF8.from_bytes(xNodeElement.name) + U">"))
             {
                 if (source.currentByte() != '<')
                 {
-                    xNodeElement.contents += source.currentByte();
+                    xNodeElement.contents += m_toFromUTF8.to_bytes(source.currentByte());
                     source.moveToNextByte();
                 }
                 else if (source.findString(U"<!--"))
@@ -311,8 +310,7 @@ namespace H4
     // ==============
     XNodeRoot XML::parse(const std::string &xmlToParse)
     {
-        std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> toFromUTF8;
-        BufferSource xml(toFromUTF8.from_bytes(xmlToParse));
+        BufferSource xml(m_toFromUTF8.from_bytes(xmlToParse));
         return (parseXML(xml));
     }
 } // namespace H4

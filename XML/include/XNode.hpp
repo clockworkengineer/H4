@@ -24,11 +24,11 @@ namespace H4
     struct XAttribute
     {
     public:
-        XAttribute(const XString &name, const XString value) : name(name), value(value)
+        XAttribute(const std::string &name, const std::string value) : name(name), value(value)
         {
         }
-        XString name;
-        XString value;
+        std::string name;
+        std::string value;
     };
     //
     // XNode structure.
@@ -58,11 +58,11 @@ namespace H4
     {
     public:
         XNodeRoot(XNodeType nodeType = XNodeType::root) : XNode(nodeType) {}
-        XString version;
-        XString encoding;
-        XString standalone;
-        XString name;
-        XString contents;
+        std::string version;
+        std::string encoding;
+        std::string standalone;
+        std::string name;
+        std::string contents;
         std::vector<XAttribute> attributes;
         std::vector<XNodeElement> elements;
     };
@@ -75,12 +75,12 @@ namespace H4
         XNodeElement(XNodeType nodeType = XNodeType::element) : XNode(nodeType)
         {
         }
-        XNodeElement(const XString &name) : XNodeElement()
+        XNodeElement(const std::string &name) : XNodeElement()
         {
             this->name = name;
         }
-        XString name;
-        XString contents;
+        std::string name;
+        std::string contents;
         std::vector<XAttribute> attributes;
         std::vector<XNodeElement> elements;
     };
