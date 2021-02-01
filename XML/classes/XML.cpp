@@ -43,41 +43,34 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-     inline bool validNameStartChar(XChar c)
+    inline bool validNameStartChar(XChar c)
     {
-        return((c==':')||
-               (c=='_')||
-               (c>='A'&&c<='Z') ||
-               (c>='a'&&c<='z') ||
-               (c>=0xC0&&c<=0xD6) ||
-               (c>=0xD8&&c<=0xF6) ||
-               (c>=0xF8&&c<=0x2FF) ||
-               (c>=0x370&&c<=0x37D) ||
-               (c>=0x37F&&c<=0x1FFF) ||
-               (c>=0x200C&&c<=0x200D) ||
-               (c>=0x2070&&c<=0x218F) ||
-               (c>=0x2C00&&c<=0x2FEF) ||
-               (c>=0x3001&&c<=0xD7FF) ||
-               (c>=0xF900&&c<=0xFDCF) ||
-               (c>=0xFDF0&&c<=0xFFFD) ||
-               (c>=0x10000&&c<=0xEFFFF));
+        return ((c == ':') ||
+                (c == '_') ||
+                (c >= 'A' && c <= 'Z') ||
+                (c >= 'a' && c <= 'z') ||
+                (c >= 0xC0 && c <= 0xD6) ||
+                (c >= 0xD8 && c <= 0xF6) ||
+                (c >= 0xF8 && c <= 0x2FF) ||
+                (c >= 0x370 && c <= 0x37D) ||
+                (c >= 0x37F && c <= 0x1FFF) ||
+                (c >= 0x200C && c <= 0x200D) ||
+                (c >= 0x2070 && c <= 0x218F) ||
+                (c >= 0x2C00 && c <= 0x2FEF) ||
+                (c >= 0x3001 && c <= 0xD7FF) ||
+                (c >= 0xF900 && c <= 0xFDCF) ||
+                (c >= 0xFDF0 && c <= 0xFFFD) ||
+                (c >= 0x10000 && c <= 0xEFFFF));
     }
     inline bool validNameChar(XChar c)
     {
-         return(validNameStartChar(c)||
-                (c=='-')||
-                (c=='.')||
-                (c==0xB7) ||
-                (c>=0x0300&&c<=0x036F) ||
-                (c>=0x203F&&c<=0x02040));
-    }
-    inline bool validTagNameChar(XChar c)
-    {
-        return (std::isalpha(c) || std::isdigit(c) || c == '-' || c == '_' || c == '.');
-    }
-    inline bool validAttributeNameChar(XChar c)
-    {
-        return (std::isalpha(c) || std::isdigit(c) || c == '_');
+        return (validNameStartChar(c) ||
+                (c == '-') ||
+                (c == '.') ||
+                (c >= '0' && c <= '9') ||
+                (c == 0xB7) ||
+                (c >= 0x0300 && c <= 0x036F) ||
+                (c >= 0x203F && c <= 0x02040));
     }
     inline XString XML::toUpper(XString str)
     {
@@ -93,11 +86,11 @@ namespace H4
     inline bool XML::validTagName(XString tagName)
     {
         std::transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
-        return (!(std::isdigit(tagName[0]) || tagName[0] == '-' || tagName[0] == '.' || tagName.substr(0, 3) == U"xml"));
+        return (validNameStartChar(tagName[0]) && tagName.substr(0, 3) != U"xml");
     }
     inline bool XML::validAtttributeName(XString attributeName)
     {
-        return (!std::isdigit(attributeName[0]));
+        return (validNameStartChar(attributeName[0]));
     }
     std::vector<XAttribute> XML::validateDeclaration(const std::vector<XAttribute> &attributes)
     {
@@ -140,7 +133,7 @@ namespace H4
     XString XML::extractTagName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.bytesToParse() && validTagNameChar(source.currentByte()))
+        while (source.bytesToParse() && validNameChar(source.currentByte()))
         {
             m_workBuffer += source.currentByte();
             source.moveToNextByte();
@@ -175,7 +168,7 @@ namespace H4
     XString XML::extractAttributeName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.bytesToParse() && validAttributeNameChar(source.currentByte()))
+        while (source.bytesToParse() && validNameChar(source.currentByte()))
         {
             m_workBuffer += source.currentByte();
             source.moveToNextByte();
