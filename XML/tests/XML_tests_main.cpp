@@ -34,47 +34,54 @@ std::string readXMLFromFile(const std::string &xmlFileName)
 TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]")
 {
   XML xml;
+  std::string xmlString;
   SECTION("Parse XML declaration. ", "[XML]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?> <root></root>");
+    xmlString  = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?> <root></root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
   }
   SECTION("Parse version 1.0 encoding == UTF-8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> <root></root>");
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> <root></root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-16");
     REQUIRE(xNodeRoot.standalone == "yes");
   }
   SECTION("Parse version 1.1 encoding == UTF8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
-    XNodeRoot xNodeRoot = xml.parse("<?xml version = \"1.0\" standalone = \"yes\"?> <root></root>");
+    xmlString = "<?xml version = \"1.0\" standalone = \"yes\"?> <root></root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "yes");
   }
   SECTION("Check declaration contains at least version attribute.", "[XML][Parse][Declaration]")
   {
-    REQUIRE_THROWS_AS(xml.parse("<?xml?> <root></root>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml?> <root></root>"), "XML syntax error detected.");
+    xmlString = "<?xml?> <root></root>";    
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Parse empty XML declaration no root tag ", "[XML][Parse][Declaration]")
   {
-    XNodeRoot xNodeRoot;
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\">"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\">"), "XML syntax error detected.");
+    xmlString = "<?xml version = \"1.0\">";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Parse wrongly ordered attributes in XML declaration. ", "[XML][Parse][Declaration]")
   {
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?> <root></root>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?> <root></root>"), "XML syntax error detected.");
+    xmlString = "<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?> <root></root>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Parse XML with declaration but no root element", "[XML][Parse][Declaration]")
   {
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"), std::runtime_error);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"), "Parse buffer empty before parse complete.");
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), std::runtime_error);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "Parse buffer empty before parse complete.");
   }
 }
 TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")

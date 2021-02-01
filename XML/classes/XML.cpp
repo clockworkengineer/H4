@@ -73,7 +73,7 @@ namespace H4
     inline bool XML::attributePresent(std::vector<XAttribute> attributes, const XString &name)
     {
         return (std::find_if(attributes.begin(), attributes.end(),
-        [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.end());
+                             [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.end());
     }
     inline bool XML::validateAttributeName(XString name)
     {
@@ -244,19 +244,16 @@ namespace H4
     }
     XNodeElement XML::parseElement(ISource &source)
     {
-        if (source.currentCharacter() != '<')
-        {
-            throw XML::SyntaxError();
-        }
         XNodeElement xNodeElement;
         source.moveToNextCharacter();
         source.ignoreWhiteSpace();
         xNodeElement.name = m_toFromUTF8.to_bytes(extractTagName(source));
         source.ignoreWhiteSpace();
         xNodeElement.attributes = parseAttributes(source);
+        XString closingTag = U"</" + m_toFromUTF8.from_bytes(xNodeElement.name) + U">";
         if (source.findString(U"/>") || source.findString(U">"))
         {
-            while (source.charactersToParse() && !source.findString(U"</" + m_toFromUTF8.from_bytes(xNodeElement.name) + U">"))
+            while (source.charactersToParse() && !source.findString(closingTag))
             {
                 if (source.currentCharacter() != '<')
                 {
@@ -286,6 +283,10 @@ namespace H4
         {
             parseComment(source);
             source.ignoreWhiteSpace();
+        }
+        if (source.currentCharacter() != '<')
+        {
+            throw XML::SyntaxError();
         }
         XNodeElement xNodeElement = parseElement(source);
         xNodeRoot.name = xNodeElement.name;
