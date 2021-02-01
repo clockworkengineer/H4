@@ -83,14 +83,30 @@ namespace H4
         return (std::find_if(attributes.begin(), attributes.end(),
                              [&name](const XAttribute &attr) { return (attr.name == name); }) != attributes.end());
     }
-    inline bool XML::validTagName(XString tagName)
+    inline bool XML::validAttributeName(XString name)
     {
-        std::transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
-        return (validNameStartChar(tagName[0]) && tagName.substr(0, 3) != U"xml");
+        if (!validNameStartChar(name[0]))
+        {
+            return (false);
+        }
+        for (auto it = name.begin() + 1; it != name.end(); it++)
+        {
+            if (!validNameChar(*it))
+            {
+                return (false);
+            }
+        }
+
+        return (true);
     }
-    inline bool XML::validAtttributeName(XString attributeName)
+    inline bool XML::validTagName(XString name)
     {
-        return (validNameStartChar(attributeName[0]));
+        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+        if (name.substr(0, 3) == U"xml")
+        {
+            return (false);
+        }
+        return (validAttributeName(name));
     }
     std::vector<XAttribute> XML::validateDeclaration(const std::vector<XAttribute> &attributes)
     {
@@ -173,7 +189,7 @@ namespace H4
             m_workBuffer += source.currentByte();
             source.moveToNextByte();
         }
-        if (!source.bytesToParse() || !validAtttributeName(m_workBuffer))
+        if (!source.bytesToParse() || !validAttributeName(m_workBuffer))
         {
             throw XML::SyntaxError();
         }

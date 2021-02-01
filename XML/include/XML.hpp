@@ -35,6 +35,7 @@ namespace H4
             {
                 return ("XML syntax error detected.");
             }
+
         private:
             std::string errorMessage;
         };
@@ -93,8 +94,9 @@ namespace H4
         // ===============
         XString toUpper(XString str);
         bool attributePresent(std::vector<XAttribute> attributes, const XString &name);
+        bool validName(XString);
         bool validTagName(XString tagName);
-        bool validAtttributeName(XString attributeName);
+        bool validAttributeName(XString attributeName);
         std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attribute);
         XString extractTagName(ISource &source);
         XString extractAttributeValue(ISource &source);
