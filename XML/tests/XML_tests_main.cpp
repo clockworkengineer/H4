@@ -87,41 +87,53 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
 TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
 {
   XML xml;
+  std::string xmlString;
   SECTION("Allow tag names to with alpha numeric characters and '.','_', '-' ", "[XML][Parse][Tags]")
   {
-    REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\"?> <abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.></abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>"));
+    xmlString = "<?xml version = \"1.0\"?> <abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>"
+                 "</abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Tag names are case sensitive", "[XML][Parse][Tags]")
   {
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <AddressBook> </addressbook>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <AddressBook> </addressbook>"), "XML syntax error detected.");
+    xmlString = "<?xml version = \"1.0\"?> <AddressBook> </addressbook>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Incorrect closing tag ", "[XML][Parse][Tags]")
   {
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <AddressBook> </Address>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <AddressBook> </Address>"), "XML syntax error detected.");
+    xmlString = "<?xml version = \"1.0\"?> <AddressBook> </Address>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Self closing tag ", "[XML][Parse][Tags]")
   {
-    REQUIRE_NOTHROW(xml.parse("<?xml version = \"1.0\"?> <AddressBook/>"));
+    xmlString = "<?xml version = \"1.0\"?> <AddressBook/>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Tag starts with a '.', '-' or a numeric digit", "[XML][Parse][Tags]")
   {
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <.AddressBook> </.AddressBook>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <.AddressBook> </.AddressBook>"), "XML syntax error detected.");
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <-AddressBook> </-AddressBook>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <-AddressBook> </-AddressBook>"), "XML syntax error detected.");
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <0AddressBook> </0AddressBook>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <0AddressBook> </0AddressBook>"), "XML syntax error detected.");
+    xmlString = "<?xml version = \"1.0\"?> <.AddressBook> </.AddressBook>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
+    xmlString = "<?xml version = \"1.0\"?> <-AddressBook> </-AddressBook>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
+    xmlString = "<?xml version = \"1.0\"?> <0AddressBook> </0AddressBook>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Tag starts with a xml/XML/Xml etc", "[XML][Parse][Tags]")
   {
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <xmlAddressBook> </xmlAddressBook>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <xmlAddressBook> </xmlAddressBook>"), "XML syntax error detected.");
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <XMLAddressBook> </XMLAddressBook>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <XMLAddressBook> </XMLAddressBook>"), "XML syntax error detected.");
-    REQUIRE_THROWS_AS(xml.parse("<?xml version = \"1.0\"?> <XmlAddressBook> </XmlAddressBook>"), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse("<?xml version = \"1.0\"?> <XmlAddressBook> </XmlAddressBook>"), "XML syntax error detected.");
+    xmlString ="<?xml version = \"1.0\"?> <xmlAddressBook> </xmlAddressBook>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
+    xmlString = "<?xml version = \"1.0\"?> <XMLAddressBook> </XMLAddressBook>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
+    xmlString ="<?xml version = \"1.0\"?> <XmlAddressBook> </XmlAddressBook>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
 }
 TEST_CASE("Use XML object to parse declaration, root element and check parsed information ", "[XML][Parse][Root]")
