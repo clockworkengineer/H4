@@ -150,7 +150,7 @@ namespace H4
             m_workBuffer += source.currentCharacter();
             source.moveToNextCharacter();
         }
-        if (!source.charactersToParse() || !validateTagName(m_workBuffer))
+        if (!validateTagName(m_workBuffer))
         {
             throw XML::SyntaxError();
         }
@@ -166,12 +166,17 @@ namespace H4
             while (source.charactersToParse() &&
                    source.currentCharacter() != quote)
             {
-                m_workBuffer += source.currentCharacter();
-                source.moveToNextCharacter();
-            }
-            if (!source.charactersToParse())
-            {
-                throw XML::SyntaxError();
+                XChar c;
+                if (source.currentCharacter() == '&')
+                {
+                    c = parseCharacterEntities(source);
+                }
+                else
+                {
+                    c = source.currentCharacter();
+                    source.moveToNextCharacter();
+                }
+                m_workBuffer += c;
             }
             source.moveToNextCharacter();
             return (m_workBuffer);
@@ -188,15 +193,15 @@ namespace H4
             m_workBuffer += source.currentCharacter();
             source.moveToNextCharacter();
         }
-        if (!source.charactersToParse() || !validateAttributeName(m_workBuffer))
+        if (!validateAttributeName(m_workBuffer))
         {
             throw XML::SyntaxError();
         }
         return (m_workBuffer);
     }
-    XChar XML::parseCharacterRefenece(ISource &source)
+    XChar XML::parseCharacterEntities(ISource &source)
     {
-        std::string name;
+        XString name;
         source.moveToNextCharacter();
         while (source.currentCharacter() && source.currentCharacter() != ';')
         {
@@ -204,27 +209,46 @@ namespace H4
             source.moveToNextCharacter();
         }
         source.moveToNextCharacter();
-        if (name == "amp")
+        if (name == U"amp")
         {
             return ('&');
         }
-        else if (name == "quot")
+        else if (name == U"quot")
         {
             return ('"');
         }
-        else if (name == "apos")
+        else if (name == U"apos")
         {
             return ('\'');
         }
-        else if (name == "lt")
+        else if (name == U"lt")
         {
             return ('<');
         }
-        else if (name == "gt")
+        else if (name == U"gt")
         {
             return ('>');
         }
-
+        else if (name[0] == 'x')
+        {
+            char *end;
+            std::string value = m_toFromUTF8.to_bytes(name.substr(1));
+            int ref = std::strtol(value.c_str(), &end, 16);
+            if (*end == '\0')
+            {
+                return (ref);
+            }
+        }
+        else if (name[0] >= '0' && name[0] <= '9')
+        {
+            char *end;
+            std::string value = m_toFromUTF8.to_bytes(name);
+            int ref = std::strtol(value.c_str(), &end, 10);
+            if (*end == '\0')
+            {
+                return (ref);
+            }
+        }
         throw XML::SyntaxError();
     }
     void XML::parseComment(ISource &source)
@@ -301,7 +325,7 @@ namespace H4
                     XChar c;
                     if (source.currentCharacter() == '&')
                     {
-                        c = parseCharacterRefenece(source);
+                        c = parseCharacterEntities(source);
                     }
                     else
                     {

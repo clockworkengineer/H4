@@ -332,26 +332,71 @@ TEST_CASE("Parse XML with Unicode character in element names, attributes, commen
     REQUIRE(xNodeRoot.contents == "данные");
   }
 }
-TEST_CASE("Check the pasring of character entities.", "[XML][Parse][Entities]")
+TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][Entities]")
 {
   XML xml;
   std::string xmlString;
   SECTION("Parse entity &amp; in contents area", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> <root> &amp; </root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &amp; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.contents == " & ");
   }
   SECTION("Parse entity &quot; in contents area", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> <root> &quot; </root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &quot; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.contents == " \" ");
   }
   SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> <root> &apos; &lt; &gt; </root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &apos; &lt; &gt; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.contents == " ' < > ");
   }
+  SECTION("Parse reference &x00A5; in contents area", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &x00A5; </root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
+    REQUIRE(xNodeRoot.contents == " ¥ ");
+  }
+  SECTION("Parse reference &163; in contents area", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &163; </root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
+    REQUIRE(xNodeRoot.contents == " £ ");
+  }
+
+  SECTION("Parse entity &amp; in attribute value", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &amp; \"></root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
+    REQUIRE(xNodeRoot.attributes.size() == 1);
+    REQUIRE(xNodeRoot.attributes[0].name == "attr1");
+    REQUIRE(xNodeRoot.attributes[0].value == " & ");
+  }
+  // SECTION("Parse entity &quot; in contents area", "[XML][Parse][Declaration]")
+  // {
+  //   xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &quot; </root>";
+  //   XNodeRoot xNodeRoot = xml.parse(xmlString);
+  //   REQUIRE(xNodeRoot.contents == " \" ");
+  // }
+  // SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Declaration]")
+  // {
+  //   xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &apos; &lt; &gt; </root>";
+  //   XNodeRoot xNodeRoot = xml.parse(xmlString);
+  //   REQUIRE(xNodeRoot.contents == " ' < > ");
+  // }
+  // SECTION("Parse reference &x00A5; in contents area", "[XML][Parse][Declaration]")
+  // {
+  //   xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &x00A5; </root>";
+  //   XNodeRoot xNodeRoot = xml.parse(xmlString);
+  //   REQUIRE(xNodeRoot.contents == " ¥ ");
+  // }
+  // SECTION("Parse reference &163; in contents area", "[XML][Parse][Declaration]")
+  // {
+  //   xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &163; </root>";
+  //   XNodeRoot xNodeRoot = xml.parse(xmlString);
+  //   REQUIRE(xNodeRoot.contents == " £ ");
+  // }
 }
