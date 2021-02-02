@@ -41,6 +41,15 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    inline bool XML::validChar(XChar ch)
+    {
+        return ((ch == 0x09) ||
+                (ch == 0x0A) ||
+                (ch == 0x0D) ||
+                (ch >= 0x20 && ch <= 0xD7FF) ||
+                (ch >= 0xE000 && ch <= 0xFFFD) ||
+                (ch >= 0x10000 && ch <= 0x10FFFF));
+    }
     inline bool XML::validNameStartChar(XChar ch)
     {
         return ((ch == ':') ||
@@ -374,12 +383,22 @@ namespace H4
         parseRootElement(source, xNodeRoot);
         return (xNodeRoot);
     }
+    std::string XML::transformXML(const std::string &xmlToParse)
+    {
+        std::string transformedXML;
+        for (auto ch : xmlToParse) {
+            if (ch != 0x0D) {
+                transformedXML += ch;
+            }
+        }
+        return (transformedXML);
+    }
     // ==============
     // PUBLIC METHODS
     // ==============
     XNodeRoot XML::parse(const std::string &xmlToParse)
     {
-        BufferSource xml(m_toFromUTF8.from_bytes(xmlToParse));
+        BufferSource xml(m_toFromUTF8.from_bytes(transformXML(xmlToParse)));
         return (parseXML(xml));
     }
 } // namespace H4

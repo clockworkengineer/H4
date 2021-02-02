@@ -94,6 +94,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        inline bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
         bool validNameChar(XChar c);
         bool attributePresent(std::vector<XAttribute> attributes, const XString &name);
@@ -110,6 +111,7 @@ namespace H4
         void parseRootElement(ISource &source, XNodeRoot &xNodeRoot);
         XNodeRoot parseProlog(ISource &source);
         XNodeRoot parseXML(ISource &source);
+        std::string transformXML(const std::string &xmlToParse);
         // =================
         // PRIVATE VARIABLES
         // =================
