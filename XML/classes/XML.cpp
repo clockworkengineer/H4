@@ -142,7 +142,10 @@ namespace H4
     XString XML::extractTagName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.charactersToParse() && validNameChar(source.currentCharacter()))
+        while (source.charactersToParse() &&
+               source.currentCharacter() != '/' &&
+               source.currentCharacter() != '>' &&
+               !std::iswspace(source.currentCharacter()))
         {
             m_workBuffer += source.currentCharacter();
             source.moveToNextCharacter();
@@ -160,7 +163,8 @@ namespace H4
             m_workBuffer.clear();
             XChar quote = source.currentCharacter();
             source.moveToNextCharacter();
-            while (source.charactersToParse() && (source.currentCharacter() != quote))
+            while (source.charactersToParse() &&
+                   source.currentCharacter() != quote)
             {
                 m_workBuffer += source.currentCharacter();
                 source.moveToNextCharacter();
@@ -177,7 +181,9 @@ namespace H4
     XString XML::extractAttributeName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.charactersToParse() && validNameChar(source.currentCharacter()))
+        while (source.charactersToParse() &&
+               source.currentCharacter() != '=' &&
+               !std::iswspace(source.currentCharacter()))
         {
             m_workBuffer += source.currentCharacter();
             source.moveToNextCharacter();
@@ -198,7 +204,9 @@ namespace H4
     std::vector<XAttribute> XML::parseAttributes(ISource &source)
     {
         std::vector<XAttribute> attributes;
-        while (source.currentCharacter() != '?' && source.currentCharacter() != '/' && source.currentCharacter() != '>')
+        while (source.currentCharacter() != '?' &&
+               source.currentCharacter() != '/' &&
+               source.currentCharacter() != '>')
         {
             XString name = extractAttributeName(source);
             source.ignoreWhiteSpace();
