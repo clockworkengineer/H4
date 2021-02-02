@@ -103,6 +103,7 @@ namespace H4
         XString extractTagName(ISource &source);
         XString extractAttributeValue(ISource &source);
         XString extractAttributeName(ISource &source);
+        XChar parseCharacterRefenece(ISource &source);
         void parseComment(ISource &source);
         std::vector<XAttribute> parseAttributes(ISource &source);
         XNodeElement parseElement(ISource &source);

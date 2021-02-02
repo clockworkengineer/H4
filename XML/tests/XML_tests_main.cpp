@@ -11,7 +11,7 @@
 // JSON class namespace
 // =======================
 using namespace H4;
-// ========================== 
+// ==========================
 // Unit test helper functions
 // ==========================
 /// <summary>
@@ -37,7 +37,7 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   std::string xmlString;
   SECTION("Parse XML declaration. ", "[XML]")
   {
-    xmlString  = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?> <root></root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?> <root></root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
@@ -61,7 +61,7 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   }
   SECTION("Check declaration contains at least version attribute.", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml?> <root></root>";    
+    xmlString = "<?xml?> <root></root>";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
@@ -91,7 +91,7 @@ TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
   SECTION("Allow tag names to with alpha numeric characters and '.','_', '-' ", "[XML][Parse][Tags]")
   {
     xmlString = "<?xml version = \"1.0\"?> <abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>"
-                 "</abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>";
+                "</abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Tag names are case sensitive", "[XML][Parse][Tags]")
@@ -125,13 +125,13 @@ TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
   }
   SECTION("Tag starts with a xml/XML/Xml etc", "[XML][Parse][Tags]")
   {
-    xmlString ="<?xml version = \"1.0\"?> <xmlAddressBook> </xmlAddressBook>";
+    xmlString = "<?xml version = \"1.0\"?> <xmlAddressBook> </xmlAddressBook>";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
     xmlString = "<?xml version = \"1.0\"?> <XMLAddressBook> </XMLAddressBook>";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
-    xmlString ="<?xml version = \"1.0\"?> <XmlAddressBook> </XmlAddressBook>";
+    xmlString = "<?xml version = \"1.0\"?> <XmlAddressBook> </XmlAddressBook>";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
@@ -152,7 +152,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
   }
   SECTION("Empty root element <AddressBook> ", "[XML][Parse][Root]")
   {
-    xmlString ="<?xml version = \"1.0\"?> <AddressBook> </AddressBook>";
+    xmlString = "<?xml version = \"1.0\"?> <AddressBook> </AddressBook>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
@@ -260,7 +260,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
   SECTION("A simple single line comment", "[XML][Parse][[Comments]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                              "<!-- A single line comment --> <root></root>";
+                "<!-- A single line comment --> <root></root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Multiple comments inside root element and between its children ", "[XML][Parse][[Comments]")
@@ -285,7 +285,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
   SECTION("A single comment after root element", "[XML][Parse][[Comments]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                              "<root></root><!-- A single line comment --> ";
+                "<root></root><!-- A single line comment --> ";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("A simple multi line comment", "[XML][Parse][[Comments]")
@@ -306,7 +306,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
   }
   SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][[Comments]")
   {
-    xmlString ="<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test  <!-- a simple comment -->  Test</root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test  <!-- a simple comment -->  Test</root>";
     XNodeRoot XNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRoot.contents == "Test    Test");
   }
@@ -329,6 +329,29 @@ TEST_CASE("Parse XML with Unicode character in element names, attributes, commen
     REQUIRE(xNodeRoot.attributes.size() == 1);
     REQUIRE(xNodeRoot.attributes[0].name == "լեզու");
     REQUIRE(xNodeRoot.attributes[0].value == "ռուսերեն");
-    REQUIRE(xNodeRoot.contents=="данные");
+    REQUIRE(xNodeRoot.contents == "данные");
+  }
+}
+TEST_CASE("Check the pasring of character entities.", "[XML][Parse][Entities]")
+{
+  XML xml;
+  std::string xmlString;
+  SECTION("Parse entity &amp; in contents area", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> <root> &amp; </root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
+    REQUIRE(xNodeRoot.contents == " & ");
+  }
+  SECTION("Parse entity &quot; in contents area", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> <root> &quot; </root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
+    REQUIRE(xNodeRoot.contents == " \" ");
+  }
+  SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> <root> &apos; &lt; &gt; </root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
+    REQUIRE(xNodeRoot.contents == " ' < > ");
   }
 }

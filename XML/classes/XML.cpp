@@ -194,6 +194,39 @@ namespace H4
         }
         return (m_workBuffer);
     }
+    XChar XML::parseCharacterRefenece(ISource &source)
+    {
+        std::string name;
+        source.moveToNextCharacter();
+        while (source.currentCharacter() && source.currentCharacter() != ';')
+        {
+            name += source.currentCharacter();
+            source.moveToNextCharacter();
+        }
+        source.moveToNextCharacter();
+        if (name == "amp")
+        {
+            return ('&');
+        }
+        else if (name == "quot")
+        {
+            return ('"');
+        }
+        else if (name == "apos")
+        {
+            return ('\'');
+        }
+        else if (name == "lt")
+        {
+            return ('<');
+        }
+        else if (name == "gt")
+        {
+            return ('>');
+        }
+
+        throw XML::SyntaxError();
+    }
     void XML::parseComment(ISource &source)
     {
         while (source.charactersToParse() && !source.foundString(U"-->"))
@@ -265,8 +298,17 @@ namespace H4
             {
                 if (source.currentCharacter() != '<')
                 {
-                    xNodeElement.contents += m_toFromUTF8.to_bytes(source.currentCharacter());
-                    source.moveToNextCharacter();
+                    XChar c;
+                    if (source.currentCharacter() == '&')
+                    {
+                        c = parseCharacterRefenece(source);
+                    }
+                    else
+                    {
+                        c = source.currentCharacter();
+                        source.moveToNextCharacter();
+                    }
+                    xNodeElement.contents += m_toFromUTF8.to_bytes(c);
                 }
                 else if (source.foundString(U"<!--"))
                 {
