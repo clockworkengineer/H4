@@ -366,37 +366,20 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.contents == " £ ");
   }
-
-  SECTION("Parse entity &amp; in attribute value", "[XML][Parse][Declaration]")
+  SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &amp; \"></root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &amp;&quot;&apos;&gt;&lt; \"></root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.attributes.size() == 1);
     REQUIRE(xNodeRoot.attributes[0].name == "attr1");
-    REQUIRE(xNodeRoot.attributes[0].value == " & ");
+    REQUIRE(xNodeRoot.attributes[0].value == " &\"'>< ");
   }
-  // SECTION("Parse entity &quot; in contents area", "[XML][Parse][Declaration]")
-  // {
-  //   xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &quot; </root>";
-  //   XNodeRoot xNodeRoot = xml.parse(xmlString);
-  //   REQUIRE(xNodeRoot.contents == " \" ");
-  // }
-  // SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Declaration]")
-  // {
-  //   xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &apos; &lt; &gt; </root>";
-  //   XNodeRoot xNodeRoot = xml.parse(xmlString);
-  //   REQUIRE(xNodeRoot.contents == " ' < > ");
-  // }
-  // SECTION("Parse reference &x00A5; in contents area", "[XML][Parse][Declaration]")
-  // {
-  //   xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &x00A5; </root>";
-  //   XNodeRoot xNodeRoot = xml.parse(xmlString);
-  //   REQUIRE(xNodeRoot.contents == " ¥ ");
-  // }
-  // SECTION("Parse reference &163; in contents area", "[XML][Parse][Declaration]")
-  // {
-  //   xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &163; </root>";
-  //   XNodeRoot xNodeRoot = xml.parse(xmlString);
-  //   REQUIRE(xNodeRoot.contents == " £ ");
-  // }
+    SECTION("Parse entity &x00A5;&163 in attribute value", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &x00A5;&163; \"></root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
+    REQUIRE(xNodeRoot.attributes.size() == 1);
+    REQUIRE(xNodeRoot.attributes[0].name == "attr1");
+    REQUIRE(xNodeRoot.attributes[0].value == " ¥£ ");
+  }
 }
