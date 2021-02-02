@@ -50,7 +50,7 @@ namespace H4
             virtual XChar currentCharacter() = 0;
             virtual void moveToNextCharacter() = 0;
             virtual bool charactersToParse() = 0;
-            virtual bool findString(const XString &targetString) = 0;
+            virtual bool foundString(const XString &targetString) = 0;
             void ignoreWhiteSpace()
             {
                 while (charactersToParse() && std::iswspace(currentCharacter()))

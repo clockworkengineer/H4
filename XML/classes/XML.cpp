@@ -196,7 +196,7 @@ namespace H4
     }
     void XML::parseComment(ISource &source)
     {
-        while (source.charactersToParse() && !source.findString(U"-->"))
+        while (source.charactersToParse() && !source.foundString(U"-->"))
         {
             source.moveToNextCharacter();
         }
@@ -233,11 +233,11 @@ namespace H4
     {
         XNodeRoot xNodeRoot;
         source.ignoreWhiteSpace();
-        if (source.findString(U"<?xml"))
+        if (source.foundString(U"<?xml"))
         {
             source.ignoreWhiteSpace();
             std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source));
-            if (source.findString(U"?>"))
+            if (source.foundString(U"?>"))
             {
                 xNodeRoot.version = attributes[0].value;
                 xNodeRoot.encoding = attributes[1].value;
@@ -259,16 +259,16 @@ namespace H4
         source.ignoreWhiteSpace();
         xNodeElement.attributes = parseAttributes(source);
         XString closingTag = U"</" + m_toFromUTF8.from_bytes(xNodeElement.name) + U">";
-        if (source.findString(U"/>") || source.findString(U">"))
+        if (source.foundString(U"/>") || source.foundString(U">"))
         {
-            while (source.charactersToParse() && !source.findString(closingTag))
+            while (source.charactersToParse() && !source.foundString(closingTag))
             {
                 if (source.currentCharacter() != '<')
                 {
                     xNodeElement.contents += m_toFromUTF8.to_bytes(source.currentCharacter());
                     source.moveToNextCharacter();
                 }
-                else if (source.findString(U"<!--"))
+                else if (source.foundString(U"<!--"))
                 {
                     parseComment(source);
                 }
@@ -287,7 +287,7 @@ namespace H4
     void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)
     {
         source.ignoreWhiteSpace();
-        if (source.findString(U"<!--"))
+        if (source.foundString(U"<!--"))
         {
             parseComment(source);
             source.ignoreWhiteSpace();

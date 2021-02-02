@@ -41,7 +41,7 @@ namespace H4
         {
             return (m_bufferPosition < m_parseBuffer.size());
         }
-        bool findString(const XString &targetString)
+        bool foundString(const XString &targetString)
         {
             long index = 0;
             while (charactersToParse() && currentCharacter() == targetString[index])
@@ -87,7 +87,7 @@ namespace H4
         {
             return (m_source.peek() != EOF);
         }
-        bool findString(const XString &targetString)
+        bool foundString(const XString &targetString)
         {
             long index = 0;
             while (charactersToParse() && currentCharacter() == targetString[index])
