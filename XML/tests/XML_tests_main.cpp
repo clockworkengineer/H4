@@ -374,7 +374,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     REQUIRE(xNodeRoot.attributes[0].name == "attr1");
     REQUIRE(xNodeRoot.attributes[0].value == " &\"'>< ");
   }
-    SECTION("Parse entity &x00A5;&163 in attribute value", "[XML][Parse][Declaration]")
+    SECTION("Parse references &x00A5;&163 in attribute value", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &x00A5;&163; \"></root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);

@@ -41,47 +41,47 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    inline bool XML::validNameStartChar(XChar c)
+    inline bool XML::validNameStartChar(XChar ch)
     {
-        return ((c == ':') ||
-                (c == '_') ||
-                (c >= 'A' && c <= 'Z') ||
-                (c >= 'a' && c <= 'z') ||
-                (c >= 0xC0 && c <= 0xD6) ||
-                (c >= 0xD8 && c <= 0xF6) ||
-                (c >= 0xF8 && c <= 0x2FF) ||
-                (c >= 0x370 && c <= 0x37D) ||
-                (c >= 0x37F && c <= 0x1FFF) ||
-                (c >= 0x200C && c <= 0x200D) ||
-                (c >= 0x2070 && c <= 0x218F) ||
-                (c >= 0x2C00 && c <= 0x2FEF) ||
-                (c >= 0x3001 && c <= 0xD7FF) ||
-                (c >= 0xF900 && c <= 0xFDCF) ||
-                (c >= 0xFDF0 && c <= 0xFFFD) ||
-                (c >= 0x10000 && c <= 0xEFFFF));
+        return ((ch == ':') ||
+                (ch == '_') ||
+                (ch >= 'A' && ch <= 'Z') ||
+                (ch >= 'a' && ch <= 'z') ||
+                (ch >= 0xC0 && ch <= 0xD6) ||
+                (ch >= 0xD8 && ch <= 0xF6) ||
+                (ch >= 0xF8 && ch <= 0x2FF) ||
+                (ch >= 0x370 && ch <= 0x37D) ||
+                (ch >= 0x37F && ch <= 0x1FFF) ||
+                (ch >= 0x200C && ch <= 0x200D) ||
+                (ch >= 0x2070 && ch <= 0x218F) ||
+                (ch >= 0x2C00 && ch <= 0x2FEF) ||
+                (ch >= 0x3001 && ch <= 0xD7FF) ||
+                (ch >= 0xF900 && ch <= 0xFDCF) ||
+                (ch >= 0xFDF0 && ch <= 0xFFFD) ||
+                (ch >= 0x10000 && ch <= 0xEFFFF));
     }
-    inline bool XML::validNameChar(XChar c)
+    inline bool XML::validNameChar(XChar ch)
     {
-        return (validNameStartChar(c) ||
-                (c == '-') ||
-                (c == '.') ||
-                (c >= '0' && c <= '9') ||
-                (c == 0xB7) ||
-                (c >= 0x0300 && c <= 0x036F) ||
-                (c >= 0x203F && c <= 0x2040));
+        return (validNameStartChar(ch) ||
+                (ch == '-') ||
+                (ch == '.') ||
+                (ch >= '0' && ch <= '9') ||
+                (ch == 0xB7) ||
+                (ch >= 0x0300 && ch <= 0x036F) ||
+                (ch >= 0x203F && ch <= 0x2040));
     }
     inline bool XML::attributePresent(std::vector<XAttribute> attributes, const XString &name)
     {
         return (std::find_if(attributes.begin(), attributes.end(),
                              [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.end());
     }
-    inline bool XML::validateAttributeName(XString name)
+    inline bool XML::validateAttributeName(XString attributeName)
     {
-        if (!validNameStartChar(name[0]))
+        if (!validNameStartChar(attributeName[0]))
         {
             return (false);
         }
-        for (auto it = name.begin() + 1; it != name.end(); it++)
+        for (auto it = attributeName.begin() + 1; it != attributeName.end(); it++)
         {
             if (!validNameChar(*it))
             {
@@ -90,14 +90,14 @@ namespace H4
         }
         return (true);
     }
-    inline bool XML::validateTagName(XString name)
+    inline bool XML::validateTagName(XString tagName)
     {
-        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-        if (name.substr(0, 3) == U"xml")
+        std::transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
+        if (tagName.substr(0, 3) == U"xml")
         {
             return (false);
         }
-        return (validateAttributeName(name));
+        return (validateAttributeName(tagName));
     }
     std::vector<XAttribute> XML::validateDeclaration(const std::vector<XAttribute> &attributes)
     {
@@ -166,17 +166,17 @@ namespace H4
             while (source.charactersToParse() &&
                    source.currentCharacter() != quote)
             {
-                XChar c;
+                XChar ch;
                 if (source.currentCharacter() == '&')
                 {
-                    c = parseCharacterEntities(source);
+                    ch = parseCharacterEntities(source);
                 }
                 else
                 {
-                    c = source.currentCharacter();
+                    ch = source.currentCharacter();
                     source.moveToNextCharacter();
                 }
-                m_workBuffer += c;
+                m_workBuffer += ch;
             }
             source.moveToNextCharacter();
             return (m_workBuffer);
@@ -201,48 +201,48 @@ namespace H4
     }
     XChar XML::parseCharacterEntities(ISource &source)
     {
-        XString name;
+        XString entityName;
         source.moveToNextCharacter();
         while (source.currentCharacter() && source.currentCharacter() != ';')
         {
-            name += source.currentCharacter();
+            entityName += source.currentCharacter();
             source.moveToNextCharacter();
         }
         source.moveToNextCharacter();
-        if (name == U"amp")
+        if (entityName == U"amp")
         {
             return ('&');
         }
-        else if (name == U"quot")
+        else if (entityName == U"quot")
         {
             return ('"');
         }
-        else if (name == U"apos")
+        else if (entityName == U"apos")
         {
             return ('\'');
         }
-        else if (name == U"lt")
+        else if (entityName == U"lt")
         {
             return ('<');
         }
-        else if (name == U"gt")
+        else if (entityName == U"gt")
         {
             return ('>');
         }
-        else if (name[0] == 'x')
+        else if (entityName[0] == 'x')
         {
             char *end;
-            std::string value = m_toFromUTF8.to_bytes(name.substr(1));
+            std::string value = m_toFromUTF8.to_bytes(entityName.substr(1));
             int ref = std::strtol(value.c_str(), &end, 16);
             if (*end == '\0')
             {
                 return (ref);
             }
         }
-        else if (name[0] >= '0' && name[0] <= '9')
+        else if (entityName[0] >= '0' && entityName[0] <= '9')
         {
             char *end;
-            std::string value = m_toFromUTF8.to_bytes(name);
+            std::string value = m_toFromUTF8.to_bytes(entityName);
             int ref = std::strtol(value.c_str(), &end, 10);
             if (*end == '\0')
             {
@@ -265,7 +265,7 @@ namespace H4
                source.currentCharacter() != '/' &&
                source.currentCharacter() != '>')
         {
-            XString name = extractAttributeName(source);
+            XString attributeName = extractAttributeName(source);
             source.ignoreWhiteSpace();
             if (source.currentCharacter() != '=')
             {
@@ -273,11 +273,11 @@ namespace H4
             }
             source.moveToNextCharacter();
             source.ignoreWhiteSpace();
-            XString value = extractAttributeValue(source);
+            XString attributeValue = extractAttributeValue(source);
             source.ignoreWhiteSpace();
-            if (!attributePresent(attributes, name))
+            if (!attributePresent(attributes, attributeName))
             {
-                attributes.emplace_back(m_toFromUTF8.to_bytes(name), m_toFromUTF8.to_bytes(value));
+                attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
             }
             else
             {
@@ -322,17 +322,17 @@ namespace H4
             {
                 if (source.currentCharacter() != '<')
                 {
-                    XChar c;
+                    XChar ch;
                     if (source.currentCharacter() == '&')
                     {
-                        c = parseCharacterEntities(source);
+                        ch = parseCharacterEntities(source);
                     }
                     else
                     {
-                        c = source.currentCharacter();
+                        ch = source.currentCharacter();
                         source.moveToNextCharacter();
                     }
-                    xNodeElement.contents += m_toFromUTF8.to_bytes(c);
+                    xNodeElement.contents += m_toFromUTF8.to_bytes(ch);
                 }
                 else if (source.foundString(U"<!--"))
                 {
