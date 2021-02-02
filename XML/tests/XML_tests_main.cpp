@@ -310,6 +310,17 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     XNodeRoot XNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRoot.contents == "Test    Test");
   }
+  SECTION("A simple single line comment containing -- is illegal", "[XML][Parse][[Comments]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                "<!-- A single line comment-- --> <root></root>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                "<!-- A single line comment ---> <root></root>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
+  }
 }
 TEST_CASE("Parse XML with Unicode character in element names, attributes, comments, character data, and processing instructions. ", "[XML][Parse][Unicode]")
 {
@@ -374,7 +385,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     REQUIRE(xNodeRoot.attributes[0].name == "attr1");
     REQUIRE(xNodeRoot.attributes[0].value == " &\"'>< ");
   }
-    SECTION("Parse references &x00A5;&163 in attribute value", "[XML][Parse][Declaration]")
+  SECTION("Parse references &x00A5;&163 in attribute value", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &x00A5;&163; \"></root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);

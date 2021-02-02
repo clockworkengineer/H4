@@ -262,10 +262,14 @@ namespace H4
     }
     void XML::parseComment(ISource &source)
     {
-        while (source.charactersToParse() && !source.foundString(U"-->"))
+        while (source.charactersToParse() && !source.foundString(U"--"))
         {
             source.moveToNextCharacter();
         }
+        if (source.currentCharacter()!='>') {
+            throw SyntaxError();
+        }
+        source.moveToNextCharacter();
     }
     std::vector<XAttribute> XML::parseAttributes(ISource &source)
     {
