@@ -263,7 +263,6 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "<!-- A single line comment --> <root></root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
-
   SECTION("Multiple single line comments beifre root tag", "[XML][Parse][[Comments]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
@@ -402,7 +401,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     REQUIRE(xNodeRoot.root.attributes[0].value == " ¥£ ");
   }
 }
-TEST_CASE("Check the parsing of XML containig program instructions", "[XML][Parse][PI]")
+TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Parse][PI]")
 {
   XML xml;
   std::string xmlString;
@@ -424,5 +423,37 @@ TEST_CASE("Check the parsing of XML containig program instructions", "[XML][Pars
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
                 "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?></root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
+}
+TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
+{
+  XML xml;
+  std::string xmlString;
+  SECTION("Parse XML root containing CDDATA containing a XML tags", "[XML][Parse][CDATA]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                " <root>   <![CDATA[<message> Welcome to TutorialsPoint </message>   ]]>   </root>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
+  SECTION("Parse XML root containing CDDATA containing a XML tags and check contents", "[XML][Parse][CDATA]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                " <root>   <![CDATA[<message> Welcome to TutorialsPoint </message>]]>   </root>";
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
+    REQUIRE(xNodeRoot.root.contents == "   <message> Welcome to TutorialsPoint </message>   ");
+  }
+  SECTION("Parse XML root containing CDDATA containing nested CDATA ", "[XML][Parse][CDATA]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                " <root>   <![CDATA[< Test test <![CDATA[ Test text ]]> ]]>   </root>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
+  }
+  SECTION("Parse XML root containing CDDATA containing ]]> ", "[XML][Parse][CDATA]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                " <root>   <![CDATA[< Test Test text ]]>  ]]>   </root>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
 }

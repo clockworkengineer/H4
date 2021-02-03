@@ -297,6 +297,20 @@ namespace H4
             source.next();
         }
     }
+    XString XML::parseCDATA(ISource &source)
+    {
+        m_workBuffer.clear();
+        while (source.more() && !source.find(U"]]>"))
+        {
+            if (source.find(U"<![CDATA["))
+            {
+                throw XML::SyntaxError();
+            }
+            m_workBuffer += source.current();
+            source.next();
+        }
+        return (m_workBuffer);
+    }
     std::vector<XAttribute> XML::parseAttributes(ISource &source)
     {
         std::vector<XAttribute> attributes;
@@ -358,7 +372,11 @@ namespace H4
     }
     void XML::parseContents(ISource &source, XNodeElement &xNodeElement)
     {
-        if (source.current() != '<')
+        if (source.find(U"]]>"))
+        {
+            throw XML::SyntaxError();
+        }
+        else if (source.current() != '<')
         {
             XChar ch;
             if (source.current() == '&')
@@ -379,6 +397,10 @@ namespace H4
         else if (source.find(U"<?"))
         {
             parsePI(source);
+        }
+        else if (source.find(U"<![CDATA["))
+        {
+            xNodeElement.contents += m_toFromUTF8.to_bytes(parseCDATA(source));
         }
         else
         {
