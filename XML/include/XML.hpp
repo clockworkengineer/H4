@@ -111,8 +111,8 @@ namespace H4
         void parseCDATA(ISource &source, XNodeElement &xNodeElement);
         void parsePI(ISource &source, XNodeElement &xNodeElement);
         void parseContents(ISource &source, XNodeElement &XNodeElement);
-        XNodeElement parseElement(ISource &source, XNodeElement &xNodeParent);
-        XNodeRoot parseProlog(ISource &source);
+        void parseElement(ISource &source, XNodeElement &XNodeElement);
+        void parseProlog(ISource &source, XNodeRoot &xNodeRoot);
         XNodeRoot parseXML(ISource &source);
         // =================
         // PRIVATE VARIABLES
