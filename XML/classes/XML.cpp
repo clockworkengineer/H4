@@ -181,6 +181,8 @@ namespace H4
     }
     XString XML::extractAttributeValue(ISource &source)
     {
+        source.moveToNextCharacter();
+        source.ignoreWhiteSpace();
         if ((source.currentCharacter() == '\'') || ((source.currentCharacter() == '"')))
         {
             m_workBuffer.clear();
@@ -202,6 +204,7 @@ namespace H4
                 m_workBuffer += ch;
             }
             source.moveToNextCharacter();
+            source.ignoreWhiteSpace();
             return (m_workBuffer);
         }
         throw XML::SyntaxError();
@@ -220,6 +223,7 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
+        source.ignoreWhiteSpace();
         return (m_workBuffer);
     }
     XChar XML::parseCharacterEntities(ISource &source)
@@ -301,15 +305,11 @@ namespace H4
                source.currentCharacter() != '>')
         {
             XString attributeName = extractAttributeName(source);
-            source.ignoreWhiteSpace();
             if (source.currentCharacter() != '=')
             {
                 throw XML::SyntaxError();
             }
-            source.moveToNextCharacter();
-            source.ignoreWhiteSpace();
             XString attributeValue = extractAttributeValue(source);
-            source.ignoreWhiteSpace();
             if (!attributePresent(attributes, attributeName))
             {
                 attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
