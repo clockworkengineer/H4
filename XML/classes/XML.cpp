@@ -41,6 +41,17 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    std::string XML::convertCRLF(const std::string &xmlString)
+    {
+        std::string converted = xmlString;
+        size_t pos = converted.find("\x0D\x0A");
+        while (pos != std::string::npos)
+        {
+            converted.replace(pos, 2, "\x0A");
+            pos = converted.find("\x0D\x0A", pos + 1);
+        }
+        return (converted);
+    }
     inline bool XML::validChar(XChar ch)
     {
         return ((ch == 0x09) ||
@@ -266,7 +277,8 @@ namespace H4
         {
             source.moveToNextCharacter();
         }
-        if (source.currentCharacter()!='>') {
+        if (source.currentCharacter() != '>')
+        {
             throw SyntaxError();
         }
         source.moveToNextCharacter();
@@ -387,22 +399,12 @@ namespace H4
         parseRootElement(source, xNodeRoot);
         return (xNodeRoot);
     }
-    std::string XML::transformXML(const std::string &xmlToParse)
-    {
-        std::string transformedXML;
-        for (auto ch : xmlToParse) {
-            if (ch != 0x0D) {
-                transformedXML += ch;
-            }
-        }
-        return (transformedXML);
-    }
     // ==============
     // PUBLIC METHODS
     // ==============
     XNodeRoot XML::parse(const std::string &xmlToParse)
     {
-        BufferSource xml(m_toFromUTF8.from_bytes(transformXML(xmlToParse)));
+        BufferSource xml(m_toFromUTF8.from_bytes(convertCRLF(xmlToParse)));
         return (parseXML(xml));
     }
 } // namespace H4

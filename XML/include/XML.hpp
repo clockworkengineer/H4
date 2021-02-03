@@ -94,6 +94,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        std::string convertCRLF(const std::string &xmlToParse);
         inline bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
         bool validNameChar(XChar c);
@@ -111,7 +112,6 @@ namespace H4
         void parseRootElement(ISource &source, XNodeRoot &xNodeRoot);
         XNodeRoot parseProlog(ISource &source);
         XNodeRoot parseXML(ISource &source);
-        std::string transformXML(const std::string &xmlToParse);
         // =================
         // PRIVATE VARIABLES
         // =================
