@@ -109,8 +109,8 @@ namespace H4
         void parseComment(ISource &source);
         void parsePI(ISource &source);
         std::vector<XAttribute> parseAttributes(ISource &source);
+        void parseContents(ISource &source, XNodeElement &XNodeElement);
         XNodeElement parseElement(ISource &source);
-        XNodeRoot parseRootElement(ISource &source, XNodeRoot xNodeRoot);
         XNodeRoot parseProlog(ISource &source);
         XNodeRoot parseXML(ISource &source);
         // =================

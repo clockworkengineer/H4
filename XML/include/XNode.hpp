@@ -24,7 +24,7 @@ namespace H4
     struct XAttribute
     {
     public:
-        XAttribute(const std::string &name, const std::string value) : name(name), value(value)
+        XAttribute(const std::string &name, const std::string &value) : name(name), value(value)
         {
         }
         std::string name;
@@ -48,23 +48,13 @@ namespace H4
         XNode(XNodeType nodeType = XNodeType::base) : nodeType(nodeType)
         {
         }
-        const XNodeType nodeType;
-    };
-    //
-    // Root XNode
-    //
-    struct XNodeElement;
-    struct XNodeRoot : XNode
-    {
-    public:
-        XNodeRoot(XNodeType nodeType = XNodeType::root) : XNode(nodeType) {}
-        std::string version;
-        std::string encoding;
-        std::string standalone;
-        std::string name;
-        std::string contents;
-        std::vector<XAttribute> attributes;
-        std::vector<XNodeElement> elements;
+        XNodeType getNodeType()
+        {
+            return (nodeType);
+        }
+
+    private:
+        XNodeType nodeType;
     };
     //
     // Element XNode
@@ -84,5 +74,19 @@ namespace H4
         std::vector<XAttribute> attributes;
         std::vector<XNodeElement> elements;
     };
+    //
+    // Root XNode
+    //
+    struct XNodeElement;
+    struct XNodeRoot : XNode
+    {
+    public:
+        XNodeRoot(XNodeType nodeType = XNodeType::root) : XNode(nodeType) {}
+        std::string version;
+        std::string encoding;
+        std::string standalone;
+        XNodeElement root;
+    };
+
 } // namespace H4
 #endif /* XNODE_HPP */

@@ -147,8 +147,8 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
-    REQUIRE(xNodeRoot.elements.size() == 0);
-    REQUIRE(xNodeRoot.name == "contact-info");
+    REQUIRE(xNodeRoot.root.elements.size() == 0);
+    REQUIRE(xNodeRoot.root.name == "contact-info");
   }
   SECTION("Empty root element <AddressBook> ", "[XML][Parse][Root]")
   {
@@ -157,8 +157,8 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
-    REQUIRE(xNodeRoot.elements.size() == 0);
-    REQUIRE(xNodeRoot.name == "AddressBook");
+    REQUIRE(xNodeRoot.root.elements.size() == 0);
+    REQUIRE(xNodeRoot.root.name == "AddressBook");
   }
   SECTION("Root element <AddressBook> and one child <Address> with contents ", "[XML][Parse][Root]")
   {
@@ -167,10 +167,10 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
-    REQUIRE(xNodeRoot.name == "AddressBook");
-    REQUIRE(xNodeRoot.elements.size() == 1);
-    REQUIRE(xNodeRoot.elements[0].name == "Address");
-    REQUIRE(xNodeRoot.elements[0].contents == "    This is some contents    ");
+    REQUIRE(xNodeRoot.root.name == "AddressBook");
+    REQUIRE(xNodeRoot.root.elements.size() == 1);
+    REQUIRE(xNodeRoot.root.elements[0].name == "Address");
+    REQUIRE(xNodeRoot.root.elements[0].contents == "    This is some contents    ");
   }
   SECTION("Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
   {
@@ -182,14 +182,14 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
-    REQUIRE(xNodeRoot.name == "AddressBook");
-    REQUIRE(xNodeRoot.elements.size() == 3);
-    REQUIRE(xNodeRoot.elements[0].name == "Address");
-    REQUIRE(xNodeRoot.elements[0].contents == "    This is some contents 1   ");
-    REQUIRE(xNodeRoot.elements[1].name == "Address");
-    REQUIRE(xNodeRoot.elements[1].contents == "    This is some contents 2   ");
-    REQUIRE(xNodeRoot.elements[2].name == "Address");
-    REQUIRE(xNodeRoot.elements[2].contents == "    This is some contents 3   ");
+    REQUIRE(xNodeRoot.root.name == "AddressBook");
+    REQUIRE(xNodeRoot.root.elements.size() == 3);
+    REQUIRE(xNodeRoot.root.elements[0].name == "Address");
+    REQUIRE(xNodeRoot.root.elements[0].contents == "    This is some contents 1   ");
+    REQUIRE(xNodeRoot.root.elements[1].name == "Address");
+    REQUIRE(xNodeRoot.root.elements[1].contents == "    This is some contents 2   ");
+    REQUIRE(xNodeRoot.root.elements[2].name == "Address");
+    REQUIRE(xNodeRoot.root.elements[2].contents == "    This is some contents 3   ");
   }
 }
 TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
@@ -217,11 +217,11 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
-    REQUIRE(xNodeRoot.elements.size() == 0);
-    REQUIRE(xNodeRoot.name == "AddressBook");
-    REQUIRE(xNodeRoot.attributes.size() == 1);
-    REQUIRE(xNodeRoot.attributes[0].name == "number");
-    REQUIRE(xNodeRoot.attributes[0].value == "15");
+    REQUIRE(xNodeRoot.root.elements.size() == 0);
+    REQUIRE(xNodeRoot.root.name == "AddressBook");
+    REQUIRE(xNodeRoot.root.attributes.size() == 1);
+    REQUIRE(xNodeRoot.root.attributes[0].name == "number");
+    REQUIRE(xNodeRoot.root.attributes[0].value == "15");
   }
   SECTION("Root attribute with 3 attached attributes number, away, flat", "[XML][Parse][[Attributes]")
   {
@@ -230,15 +230,15 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
-    REQUIRE(xNodeRoot.elements.size() == 0);
-    REQUIRE(xNodeRoot.name == "AddressBook");
-    REQUIRE(xNodeRoot.attributes.size() == 3);
-    REQUIRE(xNodeRoot.attributes[0].name == "number");
-    REQUIRE(xNodeRoot.attributes[0].value == "15");
-    REQUIRE(xNodeRoot.attributes[1].name == "away");
-    REQUIRE(xNodeRoot.attributes[1].value == "yes");
-    REQUIRE(xNodeRoot.attributes[2].name == "flat");
-    REQUIRE(xNodeRoot.attributes[2].value == "no");
+    REQUIRE(xNodeRoot.root.elements.size() == 0);
+    REQUIRE(xNodeRoot.root.name == "AddressBook");
+    REQUIRE(xNodeRoot.root.attributes.size() == 3);
+    REQUIRE(xNodeRoot.root.attributes[0].name == "number");
+    REQUIRE(xNodeRoot.root.attributes[0].value == "15");
+    REQUIRE(xNodeRoot.root.attributes[1].name == "away");
+    REQUIRE(xNodeRoot.root.attributes[1].value == "yes");
+    REQUIRE(xNodeRoot.root.attributes[2].name == "flat");
+    REQUIRE(xNodeRoot.root.attributes[2].value == "no");
   }
   SECTION("Empty elements with attributes are allowed.", "[XML][Parse][[Attributes]")
   {
@@ -263,7 +263,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "<!-- A single line comment --> <root></root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
-  
+
   SECTION("Multiple single line comments beifre root tag", "[XML][Parse][[Comments]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
@@ -280,14 +280,14 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE(xNodeRoot.version == "1.0");
     REQUIRE(xNodeRoot.encoding == "UTF-8");
     REQUIRE(xNodeRoot.standalone == "no");
-    REQUIRE(xNodeRoot.name == "AddressBook");
-    REQUIRE(xNodeRoot.elements.size() == 3);
-    REQUIRE(xNodeRoot.elements[0].name == "Address");
-    REQUIRE(xNodeRoot.elements[0].contents == "    This is some contents 1   ");
-    REQUIRE(xNodeRoot.elements[1].name == "Address");
-    REQUIRE(xNodeRoot.elements[1].contents == "    This is some contents 2   ");
-    REQUIRE(xNodeRoot.elements[2].name == "Address");
-    REQUIRE(xNodeRoot.elements[2].contents == "    This is some contents 3   ");
+    REQUIRE(xNodeRoot.root.name == "AddressBook");
+    REQUIRE(xNodeRoot.root.elements.size() == 3);
+    REQUIRE(xNodeRoot.root.elements[0].name == "Address");
+    REQUIRE(xNodeRoot.root.elements[0].contents == "    This is some contents 1   ");
+    REQUIRE(xNodeRoot.root.elements[1].name == "Address");
+    REQUIRE(xNodeRoot.root.elements[1].contents == "    This is some contents 2   ");
+    REQUIRE(xNodeRoot.root.elements[2].name == "Address");
+    REQUIRE(xNodeRoot.root.elements[2].contents == "    This is some contents 3   ");
   }
   SECTION("A single comment after root element", "[XML][Parse][[Comments]")
   {
@@ -309,13 +309,14 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test<!-- a simple comment -->Test</root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
-    XNodeRoot XNodeRoot = xml.parse(xmlString);
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
+    REQUIRE(xNodeRoot.root.contents == "TestTest");
   }
   SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][[Comments]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test  <!-- a simple comment -->  Test</root>";
-    XNodeRoot XNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRoot.contents == "Test    Test");
+    XNodeRoot xNodeRoot = xml.parse(xmlString);
+    REQUIRE(xNodeRoot.root.contents == "Test    Test");
   }
   SECTION("A simple single line comment containing -- is illegal", "[XML][Parse][[Comments]")
   {
@@ -343,11 +344,11 @@ TEST_CASE("Parse XML with Unicode character in element names, attributes, commen
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><俄语 լեզու=\"ռուսերեն\">данные</俄语>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
     XNodeRoot xNodeRoot = xml.parse(xmlString);
-    REQUIRE(xNodeRoot.name == "俄语");
-    REQUIRE(xNodeRoot.attributes.size() == 1);
-    REQUIRE(xNodeRoot.attributes[0].name == "լեզու");
-    REQUIRE(xNodeRoot.attributes[0].value == "ռուսերեն");
-    REQUIRE(xNodeRoot.contents == "данные");
+    REQUIRE(xNodeRoot.root.name == "俄语");
+    REQUIRE(xNodeRoot.root.attributes.size() == 1);
+    REQUIRE(xNodeRoot.root.attributes[0].name == "լեզու");
+    REQUIRE(xNodeRoot.root.attributes[0].value == "ռուսերեն");
+    REQUIRE(xNodeRoot.root.contents == "данные");
   }
 }
 TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][Entities]")
@@ -358,47 +359,47 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &amp; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
-    REQUIRE(xNodeRoot.contents == " & ");
+    REQUIRE(xNodeRoot.root.contents == " & ");
   }
   SECTION("Parse entity &quot; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &quot; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
-    REQUIRE(xNodeRoot.contents == " \" ");
+    REQUIRE(xNodeRoot.root.contents == " \" ");
   }
   SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &apos; &lt; &gt; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
-    REQUIRE(xNodeRoot.contents == " ' < > ");
+    REQUIRE(xNodeRoot.root.contents == " ' < > ");
   }
   SECTION("Parse reference &x00A5; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &x00A5; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
-    REQUIRE(xNodeRoot.contents == " ¥ ");
+    REQUIRE(xNodeRoot.root.contents == " ¥ ");
   }
   SECTION("Parse reference &163; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &163; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
-    REQUIRE(xNodeRoot.contents == " £ ");
+    REQUIRE(xNodeRoot.root.contents == " £ ");
   }
   SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &amp;&quot;&apos;&gt;&lt; \"></root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
-    REQUIRE(xNodeRoot.attributes.size() == 1);
-    REQUIRE(xNodeRoot.attributes[0].name == "attr1");
-    REQUIRE(xNodeRoot.attributes[0].value == " &\"'>< ");
+    REQUIRE(xNodeRoot.root.attributes.size() == 1);
+    REQUIRE(xNodeRoot.root.attributes[0].name == "attr1");
+    REQUIRE(xNodeRoot.root.attributes[0].value == " &\"'>< ");
   }
   SECTION("Parse references &x00A5;&163 in attribute value", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &x00A5;&163; \"></root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
-    REQUIRE(xNodeRoot.attributes.size() == 1);
-    REQUIRE(xNodeRoot.attributes[0].name == "attr1");
-    REQUIRE(xNodeRoot.attributes[0].value == " ¥£ ");
+    REQUIRE(xNodeRoot.root.attributes.size() == 1);
+    REQUIRE(xNodeRoot.root.attributes[0].name == "attr1");
+    REQUIRE(xNodeRoot.root.attributes[0].value == " ¥£ ");
   }
 }
 TEST_CASE("Check the parsing of XML containig program instructions", "[XML][Parse][PI]")
@@ -411,14 +412,14 @@ TEST_CASE("Check the parsing of XML containig program instructions", "[XML][Pars
                 "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?><root></root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
-    SECTION("Parse XML containing multiple PI after declaration", "[XML][Parse][PI]")
+  SECTION("Parse XML containing multiple PI after declaration", "[XML][Parse][PI]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
                 "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?> "
                 "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>  <root></root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
-    SECTION("Parse XML containing PI in root section", "[XML][Parse][PI]")
+  SECTION("Parse XML containing PI in root section", "[XML][Parse][PI]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
                 "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?></root>";

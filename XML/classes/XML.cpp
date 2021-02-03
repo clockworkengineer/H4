@@ -162,6 +162,8 @@ namespace H4
     XString XML::extractTagName(ISource &source)
     {
         m_workBuffer.clear();
+        source.moveToNextCharacter();
+        source.ignoreWhiteSpace();
         while (source.charactersToParse() &&
                source.currentCharacter() != '/' &&
                source.currentCharacter() != '>' &&
@@ -174,6 +176,7 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
+        source.ignoreWhiteSpace();
         return (m_workBuffer);
     }
     XString XML::extractAttributeValue(ISource &source)
@@ -353,45 +356,46 @@ namespace H4
         }
         return (xNodeRoot);
     }
+    void XML::parseContents(ISource &source, XNodeElement &xNodeElement)
+    {
+        if (source.currentCharacter() != '<')
+        {
+            XChar ch;
+            if (source.currentCharacter() == '&')
+            {
+                ch = parseCharacterEntities(source);
+            }
+            else
+            {
+                ch = source.currentCharacter();
+                source.moveToNextCharacter();
+            }
+            xNodeElement.contents += m_toFromUTF8.to_bytes(ch);
+        }
+        else if (source.foundString(U"<!--"))
+        {
+            parseComment(source);
+        }
+        else if (source.foundString(U"<?"))
+        {
+            parsePI(source);
+        }
+        else
+        {
+            xNodeElement.elements.emplace_back(parseElement(source));
+        }
+    }
     XNodeElement XML::parseElement(ISource &source)
     {
         XNodeElement xNodeElement;
-        source.moveToNextCharacter();
-        source.ignoreWhiteSpace();
         xNodeElement.name = m_toFromUTF8.to_bytes(extractTagName(source));
-        source.ignoreWhiteSpace();
         xNodeElement.attributes = parseAttributes(source);
         XString closingTag = U"</" + m_toFromUTF8.from_bytes(xNodeElement.name) + U">";
         if (source.foundString(U"/>") || source.foundString(U">"))
         {
             while (source.charactersToParse() && !source.foundString(closingTag))
             {
-                if (source.currentCharacter() != '<')
-                {
-                    XChar ch;
-                    if (source.currentCharacter() == '&')
-                    {
-                        ch = parseCharacterEntities(source);
-                    }
-                    else
-                    {
-                        ch = source.currentCharacter();
-                        source.moveToNextCharacter();
-                    }
-                    xNodeElement.contents += m_toFromUTF8.to_bytes(ch);
-                }
-                else if (source.foundString(U"<!--"))
-                {
-                    parseComment(source);
-                }
-                else if (source.foundString(U"<?"))
-                {
-                    parsePI(source);
-                }
-                else
-                {
-                    xNodeElement.elements.emplace_back(parseElement(source));
-                }
+                parseContents(source, xNodeElement);
             }
         }
         else
@@ -400,18 +404,11 @@ namespace H4
         }
         return (xNodeElement);
     }
-    XNodeRoot XML::parseRootElement(ISource &source, XNodeRoot xNodeRoot)
-    {
-        XNodeElement xNodeElement = parseElement(source);
-        xNodeRoot.name = xNodeElement.name;
-        xNodeRoot.attributes = xNodeElement.attributes;
-        xNodeRoot.contents = xNodeElement.contents;
-        xNodeRoot.elements = std::move(xNodeElement.elements);
-        return (xNodeRoot);
-    }
     XNodeRoot XML::parseXML(ISource &source)
     {
-        return (parseRootElement(source, parseProlog(source)));
+        XNodeRoot xNodeRoot = parseProlog(source);
+        xNodeRoot.root = parseElement(source);
+        return (xNodeRoot);
     }
     // ==============
     // PUBLIC METHODS
