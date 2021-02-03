@@ -13,7 +13,7 @@ namespace H4
         BufferDestination()
         {
         }
-        void addBytes(const std::string &bytes)
+        void add(const std::string &bytes)
         {
             for (auto b : bytes)
             {
@@ -38,7 +38,7 @@ namespace H4
                 throw std::runtime_error("XML file output stream failed to open or could not be created.");
             }
         }
-        void addBytes(const std::string &bytes)
+        void add(const std::string &bytes)
         {
             m_destination.write(bytes.c_str(), bytes.length());
             m_destination.flush();

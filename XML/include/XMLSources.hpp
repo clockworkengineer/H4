@@ -18,9 +18,9 @@ namespace H4
             }
             m_parseBuffer = sourceBuffer;
         }
-        XChar currentCharacter()
+        XChar current()
         {
-            if (charactersToParse())
+            if (more())
             {
                 return (m_parseBuffer[m_bufferPosition]);
             }
@@ -29,24 +29,24 @@ namespace H4
                 return (EOF);
             }
         }
-        void moveToNextCharacter()
+        void next()
         {
-            if (!charactersToParse())
+            if (!more())
             {
                 throw std::runtime_error("Parse buffer empty before parse complete.");
             }
             m_bufferPosition++;
         }
-        bool charactersToParse()
+        bool more()
         {
             return (m_bufferPosition < m_parseBuffer.size());
         }
-        bool foundString(const XString &targetString)
+        bool find(const XString &targetString)
         {
             long index = 0;
-            while (charactersToParse() && currentCharacter() == targetString[index])
+            while (more() && current() == targetString[index])
             {
-                moveToNextCharacter();
+                next();
                 if (++index == (long)targetString.length())
                 {
                     return (true);
@@ -74,25 +74,25 @@ namespace H4
                 throw std::runtime_error("XML file input stream failed to open or does not exist.");
             }
         }
-        XChar currentCharacter()
+        XChar current()
         {
             return (m_source.peek());
         }
-        void moveToNextCharacter()
+        void next()
         {
             char c;
             m_source.get(c);
         }
-        bool charactersToParse()
+        bool more()
         {
             return (m_source.peek() != EOF);
         }
-        bool foundString(const XString &targetString)
+        bool find(const XString &targetString)
         {
             long index = 0;
-            while (charactersToParse() && currentCharacter() == targetString[index])
+            while (more() && current() == targetString[index])
             {
-                moveToNextCharacter();
+                next();
                 if (++index == (long)targetString.length())
                 {
                     return (true);

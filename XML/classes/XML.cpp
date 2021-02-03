@@ -162,49 +162,49 @@ namespace H4
     XString XML::extractTagName(ISource &source)
     {
         m_workBuffer.clear();
-        source.moveToNextCharacter();
-        source.ignoreWhiteSpace();
-        while (source.charactersToParse() &&
-               source.currentCharacter() != '/' &&
-               source.currentCharacter() != '>' &&
-               !std::iswspace(source.currentCharacter()))
+        source.next();
+        source.ignoreWS();
+        while (source.more() &&
+               source.current() != '/' &&
+               source.current() != '>' &&
+               !std::iswspace(source.current()))
         {
-            m_workBuffer += source.currentCharacter();
-            source.moveToNextCharacter();
+            m_workBuffer += source.current();
+            source.next();
         }
         if (!validateTagName(m_workBuffer))
         {
             throw XML::SyntaxError();
         }
-        source.ignoreWhiteSpace();
+        source.ignoreWS();
         return (m_workBuffer);
     }
     XString XML::extractAttributeValue(ISource &source)
     {
-        source.moveToNextCharacter();
-        source.ignoreWhiteSpace();
-        if ((source.currentCharacter() == '\'') || ((source.currentCharacter() == '"')))
+        source.next();
+        source.ignoreWS();
+        if ((source.current() == '\'') || ((source.current() == '"')))
         {
             m_workBuffer.clear();
-            XChar quote = source.currentCharacter();
-            source.moveToNextCharacter();
-            while (source.charactersToParse() &&
-                   source.currentCharacter() != quote)
+            XChar quote = source.current();
+            source.next();
+            while (source.more() &&
+                   source.current() != quote)
             {
                 XChar ch;
-                if (source.currentCharacter() == '&')
+                if (source.current() == '&')
                 {
                     ch = parseCharacterEntities(source);
                 }
                 else
                 {
-                    ch = source.currentCharacter();
-                    source.moveToNextCharacter();
+                    ch = source.current();
+                    source.next();
                 }
                 m_workBuffer += ch;
             }
-            source.moveToNextCharacter();
-            source.ignoreWhiteSpace();
+            source.next();
+            source.ignoreWS();
             return (m_workBuffer);
         }
         throw XML::SyntaxError();
@@ -212,30 +212,30 @@ namespace H4
     XString XML::extractAttributeName(ISource &source)
     {
         m_workBuffer.clear();
-        while (source.charactersToParse() &&
-               source.currentCharacter() != '=' &&
-               !std::iswspace(source.currentCharacter()))
+        while (source.more() &&
+               source.current() != '=' &&
+               !std::iswspace(source.current()))
         {
-            m_workBuffer += source.currentCharacter();
-            source.moveToNextCharacter();
+            m_workBuffer += source.current();
+            source.next();
         }
         if (!validateAttributeName(m_workBuffer))
         {
             throw XML::SyntaxError();
         }
-        source.ignoreWhiteSpace();
+        source.ignoreWS();
         return (m_workBuffer);
     }
     XChar XML::parseCharacterEntities(ISource &source)
     {
         XString entityName;
-        source.moveToNextCharacter();
-        while (source.currentCharacter() && source.currentCharacter() != ';')
+        source.next();
+        while (source.current() && source.current() != ';')
         {
-            entityName += source.currentCharacter();
-            source.moveToNextCharacter();
+            entityName += source.current();
+            source.next();
         }
-        source.moveToNextCharacter();
+        source.next();
         if (entityName == U"amp")
         {
             return ('&');
@@ -280,32 +280,32 @@ namespace H4
     }
     void XML::parseComment(ISource &source)
     {
-        while (source.charactersToParse() && !source.foundString(U"--"))
+        while (source.more() && !source.find(U"--"))
         {
-            source.moveToNextCharacter();
+            source.next();
         }
-        if (source.currentCharacter() != '>')
+        if (source.current() != '>')
         {
             throw SyntaxError();
         }
-        source.moveToNextCharacter();
+        source.next();
     }
     void XML::parsePI(ISource &source)
     {
-        while (source.charactersToParse() && !source.foundString(U"?>"))
+        while (source.more() && !source.find(U"?>"))
         {
-            source.moveToNextCharacter();
+            source.next();
         }
     }
     std::vector<XAttribute> XML::parseAttributes(ISource &source)
     {
         std::vector<XAttribute> attributes;
-        while (source.currentCharacter() != '?' &&
-               source.currentCharacter() != '/' &&
-               source.currentCharacter() != '>')
+        while (source.current() != '?' &&
+               source.current() != '/' &&
+               source.current() != '>')
         {
             XString attributeName = extractAttributeName(source);
-            if (source.currentCharacter() != '=')
+            if (source.current() != '=')
             {
                 throw XML::SyntaxError();
             }
@@ -324,12 +324,12 @@ namespace H4
     XNodeRoot XML::parseProlog(ISource &source)
     {
         XNodeRoot xNodeRoot;
-        source.ignoreWhiteSpace();
-        if (source.foundString(U"<?xml"))
+        source.ignoreWS();
+        if (source.find(U"<?xml"))
         {
-            source.ignoreWhiteSpace();
+            source.ignoreWS();
             std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source));
-            if (!source.foundString(U"?>"))
+            if (!source.find(U"?>"))
             {
                 throw XML::SyntaxError();
             }
@@ -337,14 +337,14 @@ namespace H4
             xNodeRoot.encoding = attributes[1].value;
             xNodeRoot.standalone = attributes[2].value;
         }
-        source.ignoreWhiteSpace();
-        while (source.charactersToParse())
+        source.ignoreWS();
+        while (source.more())
         {
-            if (source.foundString(U"<!--"))
+            if (source.find(U"<!--"))
             {
                 parseComment(source);
             }
-            else if (source.foundString(U"<?"))
+            else if (source.find(U"<?"))
             {
                 parsePI(source);
             }
@@ -352,31 +352,31 @@ namespace H4
             {
                 break;
             }
-            source.ignoreWhiteSpace();
+            source.ignoreWS();
         }
         return (xNodeRoot);
     }
     void XML::parseContents(ISource &source, XNodeElement &xNodeElement)
     {
-        if (source.currentCharacter() != '<')
+        if (source.current() != '<')
         {
             XChar ch;
-            if (source.currentCharacter() == '&')
+            if (source.current() == '&')
             {
                 ch = parseCharacterEntities(source);
             }
             else
             {
-                ch = source.currentCharacter();
-                source.moveToNextCharacter();
+                ch = source.current();
+                source.next();
             }
             xNodeElement.contents += m_toFromUTF8.to_bytes(ch);
         }
-        else if (source.foundString(U"<!--"))
+        else if (source.find(U"<!--"))
         {
             parseComment(source);
         }
-        else if (source.foundString(U"<?"))
+        else if (source.find(U"<?"))
         {
             parsePI(source);
         }
@@ -391,9 +391,9 @@ namespace H4
         xNodeElement.name = m_toFromUTF8.to_bytes(extractTagName(source));
         xNodeElement.attributes = parseAttributes(source);
         XString closingTag = U"</" + m_toFromUTF8.from_bytes(xNodeElement.name) + U">";
-        if (source.foundString(U"/>") || source.foundString(U">"))
+        if (source.find(U"/>") || source.find(U">"))
         {
-            while (source.charactersToParse() && !source.foundString(closingTag))
+            while (source.more() && !source.find(closingTag))
             {
                 parseContents(source, xNodeElement);
             }

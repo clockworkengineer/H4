@@ -47,17 +47,17 @@ namespace H4
         class ISource
         {
         public:
-            virtual XChar currentCharacter() = 0;
-            virtual void moveToNextCharacter() = 0;
-            virtual bool charactersToParse() = 0;
-            virtual bool foundString(const XString &targetString) = 0;
-            void ignoreWhiteSpace()
+            virtual XChar current() = 0;
+            virtual void next() = 0;
+            virtual bool more() = 0;
+            virtual bool find(const XString &targetString) = 0;
+            void ignoreWS()
             {
-                while (charactersToParse() && std::iswspace(currentCharacter()))
+                while (more() && std::iswspace(current()))
                 {
-                    moveToNextCharacter();
+                    next();
                 }
-                if (!charactersToParse())
+                if (!more())
                 {
                     throw std::runtime_error("Parse buffer empty before parse complete.");
                 }
@@ -69,7 +69,7 @@ namespace H4
         class IDestination
         {
         public:
-            virtual void addBytes(const std::string &bytes) = 0;
+            virtual void add(const std::string &bytes) = 0;
         };
         // ============
         // CONSTRUCTORS
