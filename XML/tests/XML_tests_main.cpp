@@ -263,6 +263,13 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "<!-- A single line comment --> <root></root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
+  
+  SECTION("Multiple single line comments beifre root tag", "[XML][Parse][[Comments]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                "<!-- A single line comment --> <!-- A single line comment --> <!-- A single line comment --> <root></root>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
   SECTION("Multiple comments inside root element and between its children ", "[XML][Parse][[Comments]")
   {
     xmlString = "<?xml version = \"1.0\"?><AddressBook><!--Address one -->"
@@ -347,37 +354,37 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
 {
   XML xml;
   std::string xmlString;
-  SECTION("Parse entity &amp; in contents area", "[XML][Parse][Declaration]")
+  SECTION("Parse entity &amp; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &amp; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.contents == " & ");
   }
-  SECTION("Parse entity &quot; in contents area", "[XML][Parse][Declaration]")
+  SECTION("Parse entity &quot; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &quot; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.contents == " \" ");
   }
-  SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Declaration]")
+  SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &apos; &lt; &gt; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.contents == " ' < > ");
   }
-  SECTION("Parse reference &x00A5; in contents area", "[XML][Parse][Declaration]")
+  SECTION("Parse reference &x00A5; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &x00A5; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.contents == " ¥ ");
   }
-  SECTION("Parse reference &163; in contents area", "[XML][Parse][Declaration]")
+  SECTION("Parse reference &163; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &163; </root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.contents == " £ ");
   }
-  SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Declaration]")
+  SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &amp;&quot;&apos;&gt;&lt; \"></root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
@@ -385,12 +392,36 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     REQUIRE(xNodeRoot.attributes[0].name == "attr1");
     REQUIRE(xNodeRoot.attributes[0].value == " &\"'>< ");
   }
-  SECTION("Parse references &x00A5;&163 in attribute value", "[XML][Parse][Declaration]")
+  SECTION("Parse references &x00A5;&163 in attribute value", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &x00A5;&163; \"></root>";
     XNodeRoot xNodeRoot = xml.parse(xmlString);
     REQUIRE(xNodeRoot.attributes.size() == 1);
     REQUIRE(xNodeRoot.attributes[0].name == "attr1");
     REQUIRE(xNodeRoot.attributes[0].value == " ¥£ ");
+  }
+}
+TEST_CASE("Check the parsing of XML containig program instructions", "[XML][Parse][PI]")
+{
+  XML xml;
+  std::string xmlString;
+  SECTION("Parse XML containing PI after declaration", "[XML][Parse][PI]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
+                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?><root></root>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
+    SECTION("Parse XML containing multiple PI after declaration", "[XML][Parse][PI]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
+                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?> "
+                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>  <root></root>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
+    SECTION("Parse XML containing PI in root section", "[XML][Parse][PI]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
+                "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?></root>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
   }
 }

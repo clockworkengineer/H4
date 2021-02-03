@@ -283,6 +283,13 @@ namespace H4
         }
         source.moveToNextCharacter();
     }
+    void XML::parsePI(ISource &source)
+    {
+        while (source.charactersToParse() && !source.foundString(U"?>"))
+        {
+            source.moveToNextCharacter();
+        }
+    }
     std::vector<XAttribute> XML::parseAttributes(ISource &source)
     {
         std::vector<XAttribute> attributes;
@@ -319,16 +326,30 @@ namespace H4
         {
             source.ignoreWhiteSpace();
             std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source));
-            if (source.foundString(U"?>"))
-            {
-                xNodeRoot.version = attributes[0].value;
-                xNodeRoot.encoding = attributes[1].value;
-                xNodeRoot.standalone = attributes[2].value;
-            }
-            else
+            if (!source.foundString(U"?>"))
             {
                 throw XML::SyntaxError();
             }
+            xNodeRoot.version = attributes[0].value;
+            xNodeRoot.encoding = attributes[1].value;
+            xNodeRoot.standalone = attributes[2].value;
+        }
+        source.ignoreWhiteSpace();
+        while (source.charactersToParse())
+        {
+            if (source.foundString(U"<!--"))
+            {
+                parseComment(source);
+            }
+            else if (source.foundString(U"<?"))
+            {
+                parsePI(source);
+            }
+            else
+            {
+                break;
+            }
+            source.ignoreWhiteSpace();
         }
         return (xNodeRoot);
     }
@@ -363,6 +384,10 @@ namespace H4
                 {
                     parseComment(source);
                 }
+                else if (source.foundString(U"<?"))
+                {
+                    parsePI(source);
+                }
                 else
                 {
                     xNodeElement.elements.emplace_back(parseElement(source));
@@ -375,29 +400,18 @@ namespace H4
         }
         return (xNodeElement);
     }
-    void XML::parseRootElement(ISource &source, XNodeRoot &xNodeRoot)
+    XNodeRoot XML::parseRootElement(ISource &source, XNodeRoot xNodeRoot)
     {
-        source.ignoreWhiteSpace();
-        if (source.foundString(U"<!--"))
-        {
-            parseComment(source);
-            source.ignoreWhiteSpace();
-        }
-        if (source.currentCharacter() != '<')
-        {
-            throw XML::SyntaxError();
-        }
         XNodeElement xNodeElement = parseElement(source);
         xNodeRoot.name = xNodeElement.name;
         xNodeRoot.attributes = xNodeElement.attributes;
         xNodeRoot.contents = xNodeElement.contents;
         xNodeRoot.elements = std::move(xNodeElement.elements);
+        return (xNodeRoot);
     }
     XNodeRoot XML::parseXML(ISource &source)
     {
-        XNodeRoot xNodeRoot = parseProlog(source);
-        parseRootElement(source, xNodeRoot);
-        return (xNodeRoot);
+        return (parseRootElement(source, parseProlog(source)));
     }
     // ==============
     // PUBLIC METHODS
