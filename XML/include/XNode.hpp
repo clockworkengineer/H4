@@ -52,7 +52,7 @@ namespace H4
         {
             return (nodeType);
         }
-
+        XNode &operator[](int index);
     private:
         XNodeType nodeType;
     };
@@ -72,7 +72,7 @@ namespace H4
         std::string name;
         std::string contents;
         std::vector<XAttribute> attributes;
-        std::vector<XNodeElement> elements;
+        std::vector<std::unique_ptr<XNode>> elements;
     };
     //
     // Root XNode
@@ -85,8 +85,26 @@ namespace H4
         std::string version;
         std::string encoding;
         std::string standalone;
-        XNodeElement root;
+        std::unique_ptr<XNode> root;
     };
-
+    //
+    // Convert base XNode reference
+    //
+    template <typename T>
+    T &XNodeRef(XNode &xNode)
+    {
+        return (static_cast<T &>(xNode));
+    }
+    inline XNode &XNode::operator[](int index) // Array
+    {
+        if (nodeType == XNodeType::element)
+        {
+            if ((index >= 0) && (index < ((int)XNodeRef<XNodeElement>(*this).elements.size())))
+            {
+                return (*((XNodeRef<XNodeElement>(*this).elements[index].get())));
+            }
+        }
+        throw std::runtime_error("Invalid index used to access array.");
+    }
 } // namespace H4
 #endif /* XNODE_HPP */

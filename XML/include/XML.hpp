@@ -80,7 +80,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        XNodeRoot parse(const std::string &xmlToParse);
+        std::unique_ptr<XNodeRoot> parse(const std::string &xmlToParse);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -102,19 +102,19 @@ namespace H4
         bool validateTagName(XString tagName);
         bool validateAttributeName(XString attributeName);
         std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attribute);
-        void parseTagName(ISource &source, XNodeElement &xNodeElement);
+        void parseTagName(ISource &source, XNodeElement *xNodeElement);
         XString extractAttributeValue(ISource &source);
         XString extractAttributeName(ISource &source);
         XChar parseCharacterEntities(ISource &source);
-        void parseChildElement(ISource &source, XNodeElement &xNodeElement);
-        void parseAttributes(ISource &source, XNodeElement &xNodeElement);
-        void parseComment(ISource &source, XNodeElement &xNodeElement);
-        void parseCDATA(ISource &source, XNodeElement &xNodeElement);
-        void parsePI(ISource &source, XNodeElement &xNodeElement);
-        void parseContents(ISource &source, XNodeElement &XNodeElement);
-        void parseElement(ISource &source, XNodeElement &XNodeElement);
-        void parseProlog(ISource &source, XNodeRoot &xNodeRoot);
-        XNodeRoot parseXML(ISource &source);
+        void parseChildElement(ISource &source, XNodeElement *xNodeElement);
+        void parseAttributes(ISource &source, XNodeElement *xNodeElement);
+        void parseComment(ISource &source, XNodeElement *xNodeElement);
+        void parseCDATA(ISource &source, XNodeElement *xNodeElement);
+        void parsePI(ISource &source, XNodeElement *xNodeElement);
+        void parseContents(ISource &source, XNodeElement *XNodeElement);
+        void parseElement(ISource &source, XNodeElement *XNodeElement);
+        void parseProlog(ISource &source, XNodeRoot *xNodeRoot);
+        std::unique_ptr<XNodeRoot> parseXML(ISource &source);
         // =================
         // PRIVATE VARIABLES
         // =================
