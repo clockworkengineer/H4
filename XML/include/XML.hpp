@@ -100,7 +100,7 @@ namespace H4
         bool attributePresent(std::vector<XAttribute> attributes, const XString &name);
         bool validateTagName(XString tagName);
         bool validateAttributeName(XString attributeName);
-        std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attribute);
+        bool validateDeclaration(XNodeElement *xNodeElement);
         XChar parseCharacter(ISource &source);
         XString parseAttributeValue(ISource &source);
         XString parseAttributeName(ISource &source);

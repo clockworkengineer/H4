@@ -37,7 +37,10 @@ namespace H4
     {
         base = 0,
         root = 1,
-        element = 2
+        element = 2,
+        comment = 3,
+        cdata = 4,
+        pi = 5
     };
     //
     // Base XNode
@@ -73,6 +76,17 @@ namespace H4
         std::string contents;
         std::vector<XAttribute> attributes;
         std::vector<std::unique_ptr<XNode>> elements;
+    };
+    //
+    // Comment XNode
+    //
+    struct XNodeComment : XNode
+    {
+    public:
+        XNodeComment(XNodeType nodeType = XNodeType::comment) : XNode(nodeType)
+        {
+        }
+        std::string comment;
     };
     //
     // Convert base XNode reference

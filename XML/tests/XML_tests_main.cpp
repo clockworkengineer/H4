@@ -252,7 +252,7 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
- }
+}
 TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
 {
   XML xml;
@@ -280,13 +280,16 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).contents == "    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 6);
+    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][0]).comment == "Address one ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).contents == "    This is some contents 2   ");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).contents == "    This is some contents 3   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).contents == "    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][2]).comment == "Address two ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).contents == "    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][4]).comment == "Address three ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).contents == "    This is some contents 3   ");
   }
   SECTION("A single comment after root element", "[XML][Parse][[Comments]")
   {
