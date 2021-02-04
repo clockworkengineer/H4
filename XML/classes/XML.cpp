@@ -311,9 +311,8 @@ namespace H4
         }
         xNodeElement.contents += m_toFromUTF8.to_bytes(m_workBuffer);
     }
-    std::vector<XAttribute> XML::parseAttributes(ISource &source)
+    void XML::parseAttributes(ISource &source, XNodeElement &xNodeElement)
     {
-        std::vector<XAttribute> attributes;
         while (source.current() != '?' &&
                source.current() != '/' &&
                source.current() != '>')
@@ -324,24 +323,25 @@ namespace H4
                 throw XML::SyntaxError();
             }
             XString attributeValue = extractAttributeValue(source);
-            if (!attributePresent(attributes, attributeName))
+            if (!attributePresent(xNodeElement.attributes, attributeName))
             {
-                attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
+                xNodeElement.attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
             }
             else
             {
                 throw XML::SyntaxError();
             }
         }
-        return (attributes);
     }
     void XML::parseProlog(ISource &source, XNodeRoot &xNodeRoot)
     {
         source.ignoreWS();
         if (source.match(U"<?xml"))
         {
+            XNodeElement xNodeElement;
             source.ignoreWS();
-            std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source));
+            parseAttributes(source, xNodeElement);
+            std::vector<XAttribute> attributes = validateDeclaration(xNodeElement.attributes);
             if (!source.match(U"?>"))
             {
                 throw XML::SyntaxError();
@@ -368,6 +368,12 @@ namespace H4
             source.ignoreWS();
         }
     }
+    void XML::parseChildElement(ISource &source, XNodeElement &xNodeElement)
+    {
+        XNodeElement xNodeChildElement;
+        parseElement(source, xNodeChildElement);
+        xNodeElement.elements.emplace_back(xNodeChildElement);
+    }
     void XML::parseContents(ISource &source, XNodeElement &xNodeElement)
     {
         if (source.match(U"]]>"))
@@ -388,9 +394,7 @@ namespace H4
         }
         else if (source.current() == '<')
         {
-            XNodeElement xNodeChildElement;
-            parseElement(source, xNodeChildElement);
-            xNodeElement.elements.emplace_back(xNodeChildElement);
+            parseChildElement(source, xNodeElement);
         }
         else
         {
@@ -410,7 +414,7 @@ namespace H4
     void XML::parseElement(ISource &source, XNodeElement &xNodeElement)
     {
         parseTagName(source, xNodeElement);
-        xNodeElement.attributes = parseAttributes(source);
+        parseAttributes(source, xNodeElement);
         XString closingTag = U"</" + m_toFromUTF8.from_bytes(xNodeElement.name) + U">";
         if (source.match(U"/>") || source.match(U">"))
         {
