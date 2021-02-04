@@ -286,7 +286,6 @@ namespace H4
     void XML::parseComment(ISource &source, XNodeElement *xNodeElement)
     {
         XNodeComment xNodeComment;
-
         while (source.more() && !source.match(U"--"))
         {
             xNodeComment.comment += m_toFromUTF8.to_bytes(source.current());
@@ -297,7 +296,6 @@ namespace H4
             throw SyntaxError();
         }
         source.next();
-
         xNodeElement->elements.emplace_back(std::make_unique<XNodeComment>(xNodeComment));
     }
     void XML::parsePI(ISource &source, XNodeElement * /*xNodeElement*/)
@@ -309,17 +307,15 @@ namespace H4
     }
     void XML::parseCDATA(ISource &source, XNodeElement *xNodeElement)
     {
-        XString contents;
         while (source.more() && !source.match(U"]]>"))
         {
             if (source.match(U"<![CDATA["))
             {
                 throw XML::SyntaxError();
             }
-            contents += source.current();
+             xNodeElement->contents += m_toFromUTF8.to_bytes(source.current());
             source.next();
         }
-        xNodeElement->contents += m_toFromUTF8.to_bytes(contents);
     }
     void XML::parseAttributes(ISource &source, XNodeElement *xNodeElement)
     {
