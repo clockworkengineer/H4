@@ -41,7 +41,7 @@ namespace H4
         {
             return (m_bufferPosition < m_parseBuffer.size());
         }
-        bool find(const XString &targetString)
+        bool match(const XString &targetString)
         {
             long index = 0;
             while (more() && current() == targetString[index])
@@ -87,7 +87,7 @@ namespace H4
         {
             return (m_source.peek() != EOF);
         }
-        bool find(const XString &targetString)
+        bool match(const XString &targetString)
         {
             long index = 0;
             while (more() && current() == targetString[index])

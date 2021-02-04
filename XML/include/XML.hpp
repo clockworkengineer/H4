@@ -50,7 +50,7 @@ namespace H4
             virtual XChar current() = 0;
             virtual void next() = 0;
             virtual bool more() = 0;
-            virtual bool find(const XString &targetString) = 0;
+            virtual bool match(const XString &targetString) = 0;
             void ignoreWS()
             {
                 while (more() && std::iswspace(current()))
@@ -102,7 +102,7 @@ namespace H4
         bool validateTagName(XString tagName);
         bool validateAttributeName(XString attributeName);
         std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attribute);
-        XString extractTagName(ISource &source);
+        void parseTagName(ISource &source, XNodeElement &xNodeElement);
         XString extractAttributeValue(ISource &source);
         XString extractAttributeName(ISource &source);
         XChar parseCharacterEntities(ISource &source);

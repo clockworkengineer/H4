@@ -159,7 +159,7 @@ namespace H4
         }
         return (validatedAttributes);
     }
-    XString XML::extractTagName(ISource &source)
+    void XML::parseTagName(ISource &source, XNodeElement &xNodeElement)
     {
         m_workBuffer.clear();
         source.next();
@@ -177,7 +177,7 @@ namespace H4
             throw XML::SyntaxError();
         }
         source.ignoreWS();
-        return (m_workBuffer);
+        xNodeElement.name = m_toFromUTF8.to_bytes(m_workBuffer);
     }
     XString XML::extractAttributeValue(ISource &source)
     {
@@ -280,7 +280,7 @@ namespace H4
     }
     void XML::parseComment(ISource &source, XNodeElement & /*xNodeElement*/)
     {
-        while (source.more() && !source.find(U"--"))
+        while (source.more() && !source.match(U"--"))
         {
             source.next();
         }
@@ -292,7 +292,7 @@ namespace H4
     }
     void XML::parsePI(ISource &source, XNodeElement & /*xNodeElement*/)
     {
-        while (source.more() && !source.find(U"?>"))
+        while (source.more() && !source.match(U"?>"))
         {
             source.next();
         }
@@ -300,9 +300,9 @@ namespace H4
     void XML::parseCDATA(ISource &source, XNodeElement &xNodeElement)
     {
         m_workBuffer.clear();
-        while (source.more() && !source.find(U"]]>"))
+        while (source.more() && !source.match(U"]]>"))
         {
-            if (source.find(U"<![CDATA["))
+            if (source.match(U"<![CDATA["))
             {
                 throw XML::SyntaxError();
             }
@@ -337,13 +337,12 @@ namespace H4
     }
     void XML::parseProlog(ISource &source, XNodeRoot &xNodeRoot)
     {
-        //   XNodeRoot xNodeRoot;
         source.ignoreWS();
-        if (source.find(U"<?xml"))
+        if (source.match(U"<?xml"))
         {
             source.ignoreWS();
             std::vector<XAttribute> attributes = validateDeclaration(parseAttributes(source));
-            if (!source.find(U"?>"))
+            if (!source.match(U"?>"))
             {
                 throw XML::SyntaxError();
             }
@@ -354,11 +353,11 @@ namespace H4
         source.ignoreWS();
         while (source.more())
         {
-            if (source.find(U"<!--"))
+            if (source.match(U"<!--"))
             {
                 parseComment(source, xNodeRoot.root);
             }
-            else if (source.find(U"<?"))
+            else if (source.match(U"<?"))
             {
                 parsePI(source, xNodeRoot.root);
             }
@@ -371,19 +370,19 @@ namespace H4
     }
     void XML::parseContents(ISource &source, XNodeElement &xNodeElement)
     {
-        if (source.find(U"]]>"))
+        if (source.match(U"]]>"))
         {
             throw XML::SyntaxError();
         }
-        else if (source.find(U"<!--"))
+        else if (source.match(U"<!--"))
         {
             parseComment(source, xNodeElement);
         }
-        else if (source.find(U"<?"))
+        else if (source.match(U"<?"))
         {
             parsePI(source, xNodeElement);
         }
-        else if (source.find(U"<![CDATA["))
+        else if (source.match(U"<![CDATA["))
         {
             parseCDATA(source, xNodeElement);
         }
@@ -410,12 +409,12 @@ namespace H4
     }
     void XML::parseElement(ISource &source, XNodeElement &xNodeElement)
     {
-        xNodeElement.name = m_toFromUTF8.to_bytes(extractTagName(source));
+        parseTagName(source, xNodeElement);
         xNodeElement.attributes = parseAttributes(source);
         XString closingTag = U"</" + m_toFromUTF8.from_bytes(xNodeElement.name) + U">";
-        if (source.find(U"/>") || source.find(U">"))
+        if (source.match(U"/>") || source.match(U">"))
         {
-            while (source.more() && !source.find(closingTag))
+            while (source.more() && !source.match(closingTag))
             {
                 parseContents(source, xNodeElement);
             }
