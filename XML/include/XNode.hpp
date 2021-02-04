@@ -75,19 +75,6 @@ namespace H4
         std::vector<std::unique_ptr<XNode>> elements;
     };
     //
-    // Root XNode
-    //
-    struct XNodeElement;
-    struct XNodeRoot : XNode
-    {
-    public:
-        XNodeRoot(XNodeType nodeType = XNodeType::root) : XNode(nodeType) {}
-        std::string version;
-        std::string encoding;
-        std::string standalone;
-        std::unique_ptr<XNode> root;
-    };
-    //
     // Convert base XNode reference
     //
     template <typename T>

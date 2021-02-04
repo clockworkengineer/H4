@@ -337,33 +337,34 @@ namespace H4
             }
         }
     }
-    void XML::parseProlog(ISource &source, XNodeRoot *xNodeRoot)
+    void XML::parseProlog(ISource &source, XNodeElement *xNodeElement)
     {
         source.ignoreWS();
         if (source.match(U"<?xml"))
         {
-            XNodeElement xNodeElement;
+           // XNodeElement xNodeElement;
             source.ignoreWS();
-            parseAttributes(source, &xNodeElement);
-            std::vector<XAttribute> attributes = validateDeclaration(xNodeElement.attributes);
+            parseAttributes(source, xNodeElement);
+            std::vector<XAttribute> attributes = validateDeclaration(xNodeElement->attributes);
             if (!source.match(U"?>"))
             {
                 throw XML::SyntaxError();
             }
-            xNodeRoot->version = attributes[0].value;
-            xNodeRoot->encoding = attributes[1].value;
-            xNodeRoot->standalone = attributes[2].value;
+            xNodeElement->attributes = attributes;
+            // xNodeRoot->version = attributes[0].value;
+            // xNodeRoot->encoding = attributes[1].value;
+            // xNodeRoot->standalone = attributes[2].value;
         }
         source.ignoreWS();
         while (source.more())
         {
             if (source.match(U"<!--"))
             {
-                parseComment(source, static_cast<XNodeElement *>(xNodeRoot->root.get()));
+                parseComment(source, xNodeElement);
             }
             else if (source.match(U"<?"))
             {
-                parsePI(source, static_cast<XNodeElement *>(xNodeRoot->root.get()));
+                parsePI(source, xNodeElement);
             }
             else
             {
@@ -422,18 +423,18 @@ namespace H4
             throw XML::SyntaxError();
         }
     }
-    std::unique_ptr<XNodeRoot> XML::parseXML(ISource &source)
+    std::unique_ptr<XNode> XML::parseXML(ISource &source)
     {
-        XNodeRoot xNodeRoot;
+        XNodeElement xNodeRoot;
         parseProlog(source, &xNodeRoot);
-        xNodeRoot.root = std::make_unique<XNodeElement>();
-        parseElement(source, static_cast<XNodeElement *>(xNodeRoot.root.get()));
-        return (std::make_unique<XNodeRoot>(std::move(xNodeRoot)));
+         xNodeRoot.elements.emplace_back(std::make_unique<XNodeElement>());
+        parseElement(source, static_cast<XNodeElement *>(xNodeRoot.elements[0].get()));
+        return (std::make_unique<XNodeElement>(std::move(xNodeRoot)));
     }
     // ==============
     // PUBLIC METHODS
     // ==============
-    std::unique_ptr<XNodeRoot> XML::parse(const std::string &xmlToParse)
+    std::unique_ptr<XNode> XML::parse(const std::string &xmlToParse)
     {
         BufferSource xml(m_toFromUTF8.from_bytes(convertCRLF(xmlToParse)));
         return (parseXML(xml));
