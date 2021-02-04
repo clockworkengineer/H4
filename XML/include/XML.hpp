@@ -37,7 +37,6 @@ namespace H4
             {
                 return ("XML syntax error detected.");
             }
-
         private:
             std::string errorMessage;
         };
@@ -102,10 +101,11 @@ namespace H4
         bool validateTagName(XString tagName);
         bool validateAttributeName(XString attributeName);
         std::vector<XAttribute> validateDeclaration(const std::vector<XAttribute> &attribute);
-        void parseTagName(ISource &source, XNodeElement *xNodeElement);
-        XString extractAttributeValue(ISource &source);
-        XString extractAttributeName(ISource &source);
+        XChar parseCharacter(ISource &source);
+        XString parseAttributeValue(ISource &source);
+        XString parseAttributeName(ISource &source);
         XChar parseCharacterEntities(ISource &source);
+        void parseTagName(ISource &source, XNodeElement *xNodeElement);
         void parseChildElement(ISource &source, XNodeElement *xNodeElement);
         void parseAttributes(ISource &source, XNodeElement *xNodeElement);
         void parseComment(ISource &source, XNodeElement *xNodeElement);
@@ -118,7 +118,6 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        XString m_workBuffer;
         std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_toFromUTF8;
     };
 } // namespace H4

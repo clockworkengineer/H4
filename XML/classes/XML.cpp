@@ -161,7 +161,7 @@ namespace H4
     }
     void XML::parseTagName(ISource &source, XNodeElement *xNodeElement)
     {
-        m_workBuffer.clear();
+        XString tagName;
         source.next();
         source.ignoreWS();
         while (source.more() &&
@@ -169,62 +169,66 @@ namespace H4
                source.current() != '>' &&
                !std::iswspace(source.current()))
         {
-            m_workBuffer += source.current();
+            tagName += source.current();
             source.next();
         }
-        if (!validateTagName(m_workBuffer))
+        if (!validateTagName(tagName))
         {
             throw XML::SyntaxError();
         }
         source.ignoreWS();
-        xNodeElement->name = m_toFromUTF8.to_bytes(m_workBuffer);
+        xNodeElement->name = m_toFromUTF8.to_bytes(tagName);
     }
-    XString XML::extractAttributeValue(ISource &source)
+    XChar XML::parseCharacter(ISource &source)
+    {
+        XChar ch;
+        if (source.current() == '&')
+        {
+            ch = parseCharacterEntities(source);
+        }
+        else
+        {
+            ch = source.current();
+            source.next();
+        }
+        return(ch);
+    }
+    XString XML::parseAttributeValue(ISource &source)
     {
         source.next();
         source.ignoreWS();
         if ((source.current() == '\'') || ((source.current() == '"')))
         {
-            m_workBuffer.clear();
+            XString attributeValue;
             XChar quote = source.current();
             source.next();
             while (source.more() &&
                    source.current() != quote)
             {
-                XChar ch;
-                if (source.current() == '&')
-                {
-                    ch = parseCharacterEntities(source);
-                }
-                else
-                {
-                    ch = source.current();
-                    source.next();
-                }
-                m_workBuffer += ch;
+                attributeValue += parseCharacter(source);
             }
             source.next();
             source.ignoreWS();
-            return (m_workBuffer);
+            return (attributeValue);
         }
         throw XML::SyntaxError();
     }
-    XString XML::extractAttributeName(ISource &source)
+    XString XML::parseAttributeName(ISource &source)
     {
-        m_workBuffer.clear();
+        XString attributeName;
         while (source.more() &&
                source.current() != '=' &&
                !std::iswspace(source.current()))
         {
-            m_workBuffer += source.current();
+            attributeName += source.current();
             source.next();
         }
-        if (!validateAttributeName(m_workBuffer))
+        if (!validateAttributeName(attributeName))
         {
             throw XML::SyntaxError();
         }
         source.ignoreWS();
-        return (m_workBuffer);
+        return (attributeName);
     }
     XChar XML::parseCharacterEntities(ISource &source)
     {
@@ -299,17 +303,17 @@ namespace H4
     }
     void XML::parseCDATA(ISource &source, XNodeElement *xNodeElement)
     {
-        m_workBuffer.clear();
+        XString contents;
         while (source.more() && !source.match(U"]]>"))
         {
             if (source.match(U"<![CDATA["))
             {
                 throw XML::SyntaxError();
             }
-            m_workBuffer += source.current();
+            contents += source.current();
             source.next();
         }
-        xNodeElement->contents += m_toFromUTF8.to_bytes(m_workBuffer);
+        xNodeElement->contents += m_toFromUTF8.to_bytes(contents);
     }
     void XML::parseAttributes(ISource &source, XNodeElement *xNodeElement)
     {
@@ -317,12 +321,12 @@ namespace H4
                source.current() != '/' &&
                source.current() != '>')
         {
-            XString attributeName = extractAttributeName(source);
+            XString attributeName = parseAttributeName(source);
             if (source.current() != '=')
             {
                 throw XML::SyntaxError();
             }
-            XString attributeValue = extractAttributeValue(source);
+            XString attributeValue = parseAttributeValue(source);
             if (!attributePresent(xNodeElement->attributes, attributeName))
             {
                 xNodeElement->attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
@@ -355,11 +359,11 @@ namespace H4
         {
             if (source.match(U"<!--"))
             {
-                parseComment(source, static_cast<XNodeElement*>(xNodeRoot->root.get()));
+                parseComment(source, static_cast<XNodeElement *>(xNodeRoot->root.get()));
             }
             else if (source.match(U"<?"))
             {
-                parsePI(source, static_cast<XNodeElement*>(xNodeRoot->root.get()));
+                parsePI(source, static_cast<XNodeElement *>(xNodeRoot->root.get()));
             }
             else
             {
@@ -371,7 +375,7 @@ namespace H4
     void XML::parseChildElement(ISource &source, XNodeElement *xNodeElement)
     {
         std::unique_ptr<XNode> xNodeChildElement = std::make_unique<XNodeElement>();
-        parseElement(source, static_cast<XNodeElement*>(xNodeChildElement.get()));
+        parseElement(source, static_cast<XNodeElement *>(xNodeChildElement.get()));
         xNodeElement->elements.push_back(std::move(xNodeChildElement));
     }
     void XML::parseContents(ISource &source, XNodeElement *xNodeElement)
@@ -398,17 +402,7 @@ namespace H4
         }
         else
         {
-            XChar ch;
-            if (source.current() == '&')
-            {
-                ch = parseCharacterEntities(source);
-            }
-            else
-            {
-                ch = source.current();
-                source.next();
-            }
-            xNodeElement->contents += m_toFromUTF8.to_bytes(ch);
+            xNodeElement->contents += m_toFromUTF8.to_bytes(parseCharacter(source));
         }
     }
     void XML::parseElement(ISource &source, XNodeElement *xNodeElement)
@@ -433,7 +427,7 @@ namespace H4
         XNodeRoot xNodeRoot;
         parseProlog(source, &xNodeRoot);
         xNodeRoot.root = std::make_unique<XNodeElement>();
-        parseElement(source, static_cast<XNodeElement*>(xNodeRoot.root.get()));
+        parseElement(source, static_cast<XNodeElement *>(xNodeRoot.root.get()));
         return (std::make_unique<XNodeRoot>(std::move(xNodeRoot)));
     }
     // ==============
