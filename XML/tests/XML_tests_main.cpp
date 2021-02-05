@@ -20,13 +20,28 @@ using namespace H4;
 /// </summary>
 /// <param name="xmlFileName">XML file name</param>
 /// <returns></returns>
-std::string readXMLFromFile(const std::string &xmlFileName)
+std::string readXMLFromFileUTF8(const std::string &xmlFileName)
 {
   std::ifstream xmlFile;
   xmlFile.open(xmlFileName);
   std::ostringstream xmlFileBuffer;
   xmlFileBuffer << xmlFile.rdbuf();
   return (xmlFileBuffer.str());
+}
+std::u16string readXMLFromFileUTF16(const std::string &xmlFileName)
+{
+  std::ifstream fin(xmlFileName, std::ios::binary);
+  fin.seekg(0, std::ios::end);
+  size_t size = (size_t)fin.tellg();
+  fin.seekg(0, std::ios::beg);
+  std::u16string u16;
+  char ch[2];
+  for (int index = 0; index < (int)size / 2; index++)
+  {
+    fin.read(ch, 2);
+    u16 += ((char16_t)(ch[1]) << 8) | ch[0];
+  }
+  return (u16);
 }
 // ==========
 // Test cases
@@ -202,7 +217,7 @@ TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
                                                 "./testData/testfile007.xml"}));
   SECTION("Load file into buffer and parse.", "[XML][Parse]")
   {
-    std::string jsonXMLBuffer = readXMLFromFile(testFile);
+    std::string jsonXMLBuffer = readXMLFromFileUTF8(testFile);
     REQUIRE_NOTHROW(xml.parse(jsonXMLBuffer));
   }
 }
@@ -479,13 +494,18 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
 }
-TEST_CASE("Parse UTF-16 encoded files.", "[XML][Parse][CDATA]")
+TEST_CASE("Parse UTF-16 encoded files.", "[XML][Parse][UTF16]")
 {
   XML xml;
   std::string xmlString;
-  SECTION("Parse XML root containing CDDATA containing a XML tags", "[XML][Parse][Encoding]")
+  SECTION("Parse UTF16 encoded file LE ", "[XML][Parse][UTF16]")
   {
-    std::string jsonXMLBuffer = readXMLFromFile("./testData/testfile008.xml");
+    std::u16string jsonXMLBuffer = readXMLFromFileUTF16("./testData/testfile008.xml");
+    REQUIRE_NOTHROW(xml.parse(jsonXMLBuffer));
+  }
+    SECTION("Parse UTF16 encoded file BE ", "[XML][Parse][UTF16]")
+  {
+    std::u16string jsonXMLBuffer = readXMLFromFileUTF16("./testData/testfile009.xml");
     REQUIRE_NOTHROW(xml.parse(jsonXMLBuffer));
   }
 }

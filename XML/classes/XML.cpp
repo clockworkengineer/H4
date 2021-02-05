@@ -455,4 +455,16 @@ namespace H4
         BufferSource xml(m_toFromUTF8.from_bytes(convertCRLF(xmlToParse)));
         return (parseXML(xml));
     }
+    std::unique_ptr<XNode> XML::parse(const std::u16string &xmlToParse)
+    {
+        std::u16string utf16xml{xmlToParse};
+        if (!xmlToParse.starts_with(u"<?xml"))
+        {
+            for (char16_t &ch : utf16xml)
+            {
+                ch = ((ch & 0xFF00) >> 8) | ((ch & 0x00FF) << 8);
+            }
+        }
+        return (parse(m_toFromUTF16.to_bytes(utf16xml)));
+    }
 } // namespace H4
