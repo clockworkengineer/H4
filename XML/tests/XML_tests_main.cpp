@@ -479,3 +479,13 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
 }
+TEST_CASE("Parse UTF-16 encoded files.", "[XML][Parse][CDATA]")
+{
+  XML xml;
+  std::string xmlString;
+  SECTION("Parse XML root containing CDDATA containing a XML tags", "[XML][Parse][Encoding]")
+  {
+    std::string jsonXMLBuffer = readXMLFromFile("./testData/testfile008.xml");
+    REQUIRE_NOTHROW(xml.parse(jsonXMLBuffer));
+  }
+}

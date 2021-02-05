@@ -180,17 +180,21 @@ namespace H4
         source.ignoreWS();
         xNodeElement->name = m_toFromUTF8.to_bytes(tagName);
     }
-    XChar XML::parseCharacter(ISource &source)
+    XChar XML::parseEncodedCharacter(ISource &source)
     {
         XChar ch;
         if (source.current() == '&')
         {
-            ch = parseCharacterEntities(source);
+            ch = parseReferenceOrEntity(source);
         }
         else
         {
             ch = source.current();
             source.next();
+        }
+        if (!validChar(ch))
+        {
+            throw XML::SyntaxError();
         }
         return (ch);
     }
@@ -206,7 +210,7 @@ namespace H4
             while (source.more() &&
                    source.current() != quote)
             {
-                attributeValue += parseCharacter(source);
+                attributeValue += parseEncodedCharacter(source);
             }
             source.next();
             source.ignoreWS();
@@ -231,7 +235,7 @@ namespace H4
         source.ignoreWS();
         return (attributeName);
     }
-    XChar XML::parseCharacterEntities(ISource &source)
+    XChar XML::parseReferenceOrEntity(ISource &source)
     {
         XString entityName;
         source.next();
@@ -312,7 +316,7 @@ namespace H4
             xNodePI.parameters += m_toFromUTF8.to_bytes(source.current());
             source.next();
         }
-           xNodeElement->elements.emplace_back(std::make_unique<XNodePI>(xNodePI));
+        xNodeElement->elements.emplace_back(std::make_unique<XNodePI>(xNodePI));
     }
     void XML::parseCDATA(ISource &source, XNodeElement *xNodeElement)
     {
@@ -387,6 +391,10 @@ namespace H4
         parseElement(source, static_cast<XNodeElement *>(xNodeChildElement.get()));
         xNodeElement->elements.push_back(std::move(xNodeChildElement));
     }
+    void XML::parseCharacter(ISource &source, XNodeElement *xNodeElement)
+    {
+        xNodeElement->contents += m_toFromUTF8.to_bytes(parseEncodedCharacter(source));
+    }
     void XML::parseContents(ISource &source, XNodeElement *xNodeElement)
     {
         if (source.match(U"]]>"))
@@ -411,7 +419,7 @@ namespace H4
         }
         else
         {
-            xNodeElement->contents += m_toFromUTF8.to_bytes(parseCharacter(source));
+            parseCharacter(source, xNodeElement);
         }
     }
     void XML::parseElement(ISource &source, XNodeElement *xNodeElement)

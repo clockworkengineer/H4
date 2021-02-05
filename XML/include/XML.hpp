@@ -37,6 +37,7 @@ namespace H4
             {
                 return ("XML syntax error detected.");
             }
+
         private:
             std::string errorMessage;
         };
@@ -101,10 +102,11 @@ namespace H4
         bool validateTagName(XString tagName);
         bool validateAttributeName(XString attributeName);
         bool validateDeclaration(XNodeElement *xNodeElement);
-        XChar parseCharacter(ISource &source);
+        XChar parseEncodedCharacter(ISource &source);
         XString parseAttributeValue(ISource &source);
         XString parseAttributeName(ISource &source);
-        XChar parseCharacterEntities(ISource &source);
+        XChar parseReferenceOrEntity(ISource &source);
+        void parseCharacter(ISource &source, XNodeElement *xNodeElement);
         void parseTagName(ISource &source, XNodeElement *xNodeElement);
         void parseChildElement(ISource &source, XNodeElement *xNodeElement);
         void parseAttributes(ISource &source, XNodeElement *xNodeElement);
