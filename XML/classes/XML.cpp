@@ -298,12 +298,21 @@ namespace H4
         source.next();
         xNodeElement->elements.emplace_back(std::make_unique<XNodeComment>(xNodeComment));
     }
-    void XML::parsePI(ISource &source, XNodeElement * /*xNodeElement*/)
+    void XML::parsePI(ISource &source, XNodeElement *xNodeElement)
     {
-        while (source.more() && !source.match(U"?>"))
+        XNodePI xNodePI;
+        while (source.more() && !std::iswspace(source.current()))
         {
+            xNodePI.name += m_toFromUTF8.to_bytes(source.current());
             source.next();
         }
+        source.ignoreWS();
+        while (source.more() && !source.match(U"?>"))
+        {
+            xNodePI.parameters += m_toFromUTF8.to_bytes(source.current());
+            source.next();
+        }
+           xNodeElement->elements.emplace_back(std::make_unique<XNodePI>(xNodePI));
     }
     void XML::parseCDATA(ISource &source, XNodeElement *xNodeElement)
     {

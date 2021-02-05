@@ -427,6 +427,24 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
                 "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?></root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
+  SECTION("Parse XML containing PI after declaration and check values", "[XML][Parse][PI]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
+                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?><root></root>";
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::pi);
+    REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0]).name == "xml-stylesheet");
+    REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0]).parameters == "href = \"tutorialspointstyle.css\" type = \"text/css\"");
+  }
+  SECTION("Parse XML containing PI in root section and check values", "[XML][Parse][PI]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
+                "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?></root>";
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0][0]).getNodeType() == XNodeType::pi);
+    REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0][0]).name == "xml-stylesheet");
+    REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0][0]).parameters == "href = \"tutorialspointstyle.css\" type = \"text/css\"");
+  }
 }
 TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
 {

@@ -106,11 +106,11 @@ namespace H4
     struct XNodePI : XNode
     {
     public:
-        XNodePI(XNodeType nodeType = XNodeType::cdata) : XNode(nodeType)
+        XNodePI(XNodeType nodeType = XNodeType::pi) : XNode(nodeType)
         {
         }
         std::string name;
-        std::vector<XAttribute> attributes;
+        std::string parameters;
     };
     //
     // Convert base XNode reference
