@@ -56,6 +56,7 @@ namespace H4
             return (nodeType);
         }
         XNode &operator[](int index);
+
     private:
         XNodeType nodeType;
     };
@@ -87,6 +88,29 @@ namespace H4
         {
         }
         std::string comment;
+    };
+    //
+    // CDATA XNode
+    //
+    struct XNodeCDATA : XNode
+    {
+    public:
+        XNodeCDATA(XNodeType nodeType = XNodeType::cdata) : XNode(nodeType)
+        {
+        }
+        std::string cdata;
+    };
+    //
+    // PI XNode
+    //
+    struct XNodePI : XNode
+    {
+    public:
+        XNodePI(XNodeType nodeType = XNodeType::cdata) : XNode(nodeType)
+        {
+        }
+        std::string name;
+        std::vector<XAttribute> attributes;
     };
     //
     // Convert base XNode reference

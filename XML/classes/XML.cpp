@@ -307,15 +307,18 @@ namespace H4
     }
     void XML::parseCDATA(ISource &source, XNodeElement *xNodeElement)
     {
+        XNodeCDATA xNodeCDATA;
         while (source.more() && !source.match(U"]]>"))
         {
             if (source.match(U"<![CDATA["))
             {
                 throw XML::SyntaxError();
             }
-             xNodeElement->contents += m_toFromUTF8.to_bytes(source.current());
+            xNodeElement->contents += m_toFromUTF8.to_bytes(source.current());
+            xNodeCDATA.cdata += m_toFromUTF8.to_bytes(source.current());
             source.next();
         }
+        xNodeElement->elements.emplace_back(std::make_unique<XNodeCDATA>(xNodeCDATA));
     }
     void XML::parseAttributes(ISource &source, XNodeElement *xNodeElement)
     {
