@@ -462,7 +462,7 @@ namespace H4
         {
             for (char16_t &ch : utf16xml)
             {
-                ch = ((ch & 0xFF00) >> 8) | ((ch & 0x00FF) << 8);
+                ch = (static_cast<u_int16_t>(ch) >> 8) | (static_cast<u_int16_t>(ch) << 8);
             }
         }
         return (parse(m_toFromUTF16.to_bytes(utf16xml)));
