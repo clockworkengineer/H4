@@ -39,7 +39,7 @@ std::u16string readXMLFromFileUTF16(const std::string &xmlFileName)
   for (int index = 0; index < (int)size / 2; index++)
   {
     fin.read(ch, 2);
-    u16 += ((char16_t)(ch[1]) << 8) | ch[0];
+    u16 += ((char16_t)(ch[0]) << 8) | ch[1];
   }
   return (u16);
 }
@@ -552,5 +552,24 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].value == "http://www.w3.org/TR/html4/");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[1].name == "f");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[1].value == "https://www.w3schools.com/furniture");
+  }
+  SECTION("A root document and two namespaces defined in the root element and non-existant namespace g for one of tables.", "[XML][Parse][Namespace]")
+  {
+    xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">"
+                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table><g:table>"
+                "<g:name>African Coffee Table</g:name><g:width>80</g:width>"
+                "<g:length>120</g:length></g:table></root>";
+    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
+  }
+  SECTION("A root documement with a default namespace", "[XML][Parse][Namespace]")
+  {
+    xmlString = "<table xmlns=\"http://www.w3.org/TR/html4/\"><tr><td>Apples</td><td>Bananas</td></tr></table>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "tr");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].name == ":");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].value == "http://www.w3.org/TR/html4/");
   }
 }

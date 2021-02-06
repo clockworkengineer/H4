@@ -90,7 +90,7 @@ namespace H4
                 (ch >= 0x0300 && ch <= 0x036F) ||
                 (ch >= 0x203F && ch <= 0x2040));
     }
-    inline bool XML::attributePresent(std::vector<XAttribute> attributes, const XString &name)
+    inline bool XML::namePresent(std::vector<XAttribute> attributes, const XString &name)
     {
         return (std::find_if(attributes.begin(), attributes.end(),
                              [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.end());
@@ -122,7 +122,7 @@ namespace H4
     bool XML::validateDeclaration(XNodeElement *xNodeElement)
     {
         // Syntax error if no version present
-        if (!attributePresent(xNodeElement->attributes, U"version"))
+        if (!namePresent(xNodeElement->attributes, U"version"))
         {
             return (false);
         }
@@ -345,11 +345,12 @@ namespace H4
                 throw XML::SyntaxError();
             }
             XString attributeValue = parseAttributeValue(source);
-            if (attributeName.starts_with(U"xmlns:"))
+            if (attributeName.starts_with(U"xmlns"))
             {
-                xNodeElement->namespaces.emplace_back(m_toFromUTF8.to_bytes(attributeName.substr(6)), m_toFromUTF8.to_bytes(attributeValue));
+                attributeName = (attributeName.size() > 5) ? attributeName.substr(6) : U":";
+                xNodeElement->namespaces.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
             }
-            else if (!attributePresent(xNodeElement->attributes, attributeName))
+            else if (!namePresent(xNodeElement->attributes, attributeName))
             {
                 xNodeElement->attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
             }
@@ -394,6 +395,15 @@ namespace H4
         std::unique_ptr<XNode> xNodeChildElement = std::make_unique<XNodeElement>();
         XNodeRef<XNodeElement>(*xNodeChildElement).namespaces = xNodeElement->namespaces;
         parseElement(source, static_cast<XNodeElement *>(xNodeChildElement.get()));
+        std::string tagName = XNodeRef<XNodeElement>(*xNodeChildElement).name;
+        if (tagName.find(':') != std::string::npos)
+        {
+            tagName = tagName.substr(0, tagName.find(':'));
+            if (!namePresent(XNodeRef<XNodeElement>(*xNodeChildElement).namespaces, m_toFromUTF8.from_bytes(tagName)))
+            {
+                throw XML::SyntaxError();
+            }
+        }
         xNodeElement->elements.push_back(std::move(xNodeChildElement));
     }
     void XML::parseCharacter(ISource &source, XNodeElement *xNodeElement)
