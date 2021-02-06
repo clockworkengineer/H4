@@ -95,8 +95,13 @@ namespace H4
         return (std::find_if(attributes.begin(), attributes.end(),
                              [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.end());
     }
-    inline bool XML::validateAttributeName(XString attributeName)
+    inline bool XML::validateName(XString attributeName)
     {
+        std::transform(attributeName.begin(), attributeName.end(), attributeName.begin(), ::tolower);
+        if (attributeName.substr(0, 3) == U"xml")
+        {
+            return (false);
+        }
         if (!validNameStartChar(attributeName[0]))
         {
             return (false);
@@ -109,15 +114,6 @@ namespace H4
             }
         }
         return (true);
-    }
-    inline bool XML::validateTagName(XString tagName)
-    {
-        std::transform(tagName.begin(), tagName.end(), tagName.begin(), ::tolower);
-        if (tagName.substr(0, 3) == U"xml")
-        {
-            return (false);
-        }
-        return (validateAttributeName(tagName));
     }
     bool XML::validateDeclaration(XNodeElement *xNodeElement)
     {
@@ -173,7 +169,7 @@ namespace H4
             tagName += source.current();
             source.next();
         }
-        if (!validateTagName(tagName))
+        if (!validateName(tagName))
         {
             throw XML::SyntaxError();
         }
@@ -228,10 +224,10 @@ namespace H4
             attributeName += source.current();
             source.next();
         }
-        if (!validateAttributeName(attributeName))
-        {
-            throw XML::SyntaxError();
-        }
+        // if (!validateAttributeName(attributeName))
+        // {
+        //     throw XML::SyntaxError();
+        // }
         source.ignoreWS();
         return (attributeName);
     }
@@ -357,7 +353,7 @@ namespace H4
                     throw XML::SyntaxError();
                 }
             }
-            else if (!namePresent(xNodeElement->attributes, attributeName))
+            else if (validateName(attributeName)&&!namePresent(xNodeElement->attributes, attributeName))
             {
                 xNodeElement->attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
             }
