@@ -76,6 +76,7 @@ namespace H4
         std::string name;
         std::string contents;
         std::vector<XAttribute> attributes;
+        std::vector<XAttribute> namespaces;
         std::vector<std::unique_ptr<XNode>> elements;
     };
     //

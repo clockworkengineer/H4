@@ -345,7 +345,11 @@ namespace H4
                 throw XML::SyntaxError();
             }
             XString attributeValue = parseAttributeValue(source);
-            if (!attributePresent(xNodeElement->attributes, attributeName))
+            if (attributeName.starts_with(U"xmlns:"))
+            {
+                xNodeElement->namespaces.emplace_back(m_toFromUTF8.to_bytes(attributeName.substr(6)), m_toFromUTF8.to_bytes(attributeValue));
+            }
+            else if (!attributePresent(xNodeElement->attributes, attributeName))
             {
                 xNodeElement->attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
             }
@@ -388,6 +392,7 @@ namespace H4
     void XML::parseChildElement(ISource &source, XNodeElement *xNodeElement)
     {
         std::unique_ptr<XNode> xNodeChildElement = std::make_unique<XNodeElement>();
+        XNodeRef<XNodeElement>(*xNodeChildElement).namespaces = xNodeElement->namespaces;
         parseElement(source, static_cast<XNodeElement *>(xNodeChildElement.get()));
         xNodeElement->elements.push_back(std::move(xNodeChildElement));
     }

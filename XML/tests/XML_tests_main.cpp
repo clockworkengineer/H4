@@ -503,9 +503,54 @@ TEST_CASE("Parse UTF-16 encoded files.", "[XML][Parse][UTF16]")
     std::u16string jsonXMLBuffer = readXMLFromFileUTF16("./testData/testfile008.xml");
     REQUIRE_NOTHROW(xml.parse(jsonXMLBuffer));
   }
-    SECTION("Parse UTF16 encoded file BE ", "[XML][Parse][UTF16]")
+  SECTION("Parse UTF16 encoded file BE ", "[XML][Parse][UTF16]")
   {
     std::u16string jsonXMLBuffer = readXMLFromFileUTF16("./testData/testfile009.xml");
     REQUIRE_NOTHROW(xml.parse(jsonXMLBuffer));
+  }
+}
+TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
+{
+  XML xml;
+  std::string xmlString;
+  SECTION("A root document and two namespaces defined in the child two table elements.", "[XML][Parse][Namespace]")
+  {
+    xmlString = "<root><h:table xmlns:h=\"http://www.w3.org/TR/html4/\">"
+                "<h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table>"
+                "<f:table xmlns:f=\"https://www.w3schools.com/furniture\">"
+                "<f:name>African Coffee Table</f:name><f:width>80</f:width>"
+                "<f:length>120</f:length></f:table></root>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "h:table");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].value == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "f:table");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].value == "https://www.w3schools.com/furniture");
+  }
+
+  SECTION("A root document and two namespaces defined in the root element.", "[XML][Parse][Namespace]")
+  {
+    xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">"
+                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table><f:table>"
+                "<f:name>African Coffee Table</f:name><f:width>80</f:width>"
+                "<f:length>120</f:length></f:table></root>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "h:table");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].value == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[1].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[1].value == "https://www.w3schools.com/furniture");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "f:table");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].value == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[1].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[1].value == "https://www.w3schools.com/furniture");
   }
 }
