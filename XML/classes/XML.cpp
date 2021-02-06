@@ -348,7 +348,14 @@ namespace H4
             if (attributeName.starts_with(U"xmlns"))
             {
                 attributeName = (attributeName.size() > 5) ? attributeName.substr(6) : U":";
-                xNodeElement->namespaces.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
+                if (!namePresent(xNodeElement->namespaces, attributeName))
+                {
+                    xNodeElement->namespaces.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
+                }
+                else
+                {
+                    throw XML::SyntaxError();
+                }
             }
             else if (!namePresent(xNodeElement->attributes, attributeName))
             {
