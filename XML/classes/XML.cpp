@@ -41,6 +41,30 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    void XML::initialiseTables()
+    {
+        m_entityToCharacter[U"amp"] = '&';
+        m_entityToCharacter[U"quot"] = '"'; 
+        m_entityToCharacter[U"apos"] = '\'';
+        m_entityToCharacter[U"lt"] = '<';
+        m_entityToCharacter[U"gt"] = '>';
+    }
+    long XML::characterReference(XString reference)
+    {
+        char *end;
+        long temp = 10;
+        if (reference[0] == 'x')
+        {
+            reference = reference.substr(1);
+            temp = 16;
+        }
+        temp = std::strtol(m_toFromUTF8.to_bytes(reference).c_str(), &end, temp);
+        if (*end == '\0')
+        {
+            return (temp);
+        }
+        throw XML::SyntaxError();
+    }
     std::string XML::convertCRLF(const std::string &xmlString)
     {
         std::string converted = xmlString;
@@ -224,10 +248,6 @@ namespace H4
             attributeName += source.current();
             source.next();
         }
-        // if (!validateAttributeName(attributeName))
-        // {
-        //     throw XML::SyntaxError();
-        // }
         source.ignoreWS();
         return (attributeName);
     }
@@ -241,47 +261,14 @@ namespace H4
             source.next();
         }
         source.next();
-        if (entityName == U"amp")
+        if (m_entityToCharacter.count(entityName) > 0)
         {
-            return ('&');
+            return (m_entityToCharacter[entityName]);
         }
-        else if (entityName == U"quot")
+        else
         {
-            return ('"');
+            return (characterReference(entityName));
         }
-        else if (entityName == U"apos")
-        {
-            return ('\'');
-        }
-        else if (entityName == U"lt")
-        {
-            return ('<');
-        }
-        else if (entityName == U"gt")
-        {
-            return ('>');
-        }
-        else if (entityName[0] == 'x')
-        {
-            char *end;
-            std::string value = m_toFromUTF8.to_bytes(entityName.substr(1));
-            int ref = std::strtol(value.c_str(), &end, 16);
-            if (*end == '\0')
-            {
-                return (ref);
-            }
-        }
-        else if (entityName[0] >= '0' && entityName[0] <= '9')
-        {
-            char *end;
-            std::string value = m_toFromUTF8.to_bytes(entityName);
-            int ref = std::strtol(value.c_str(), &end, 10);
-            if (*end == '\0')
-            {
-                return (ref);
-            }
-        }
-        throw XML::SyntaxError();
     }
     void XML::parseComment(ISource &source, XNodeElement *xNodeElement)
     {
@@ -353,7 +340,7 @@ namespace H4
                     throw XML::SyntaxError();
                 }
             }
-            else if (validateName(attributeName)&&!namePresent(xNodeElement->attributes, attributeName))
+            else if (validateName(attributeName) && !namePresent(xNodeElement->attributes, attributeName))
             {
                 xNodeElement->attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
             }

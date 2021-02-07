@@ -8,6 +8,7 @@
 #include <memory>
 #include <codecvt>
 #include <locale>
+#include <unordered_map>
 //
 // XML XNodes
 //
@@ -74,6 +75,10 @@ namespace H4
         // ============
         // CONSTRUCTORS
         // ============
+        XML()
+        {
+            initialiseTables();
+        }
         // ==========
         // DESTRUCTOR
         // ==========
@@ -95,6 +100,8 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        void initialiseTables();
+        long characterReference(XString reference);
         std::string convertCRLF(const std::string &xmlToParse);
         inline bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
@@ -122,6 +129,7 @@ namespace H4
         // =================
         std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_toFromUTF8;
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_toFromUTF16;
+        std::unordered_map<XString, XChar> m_entityToCharacter;
     };
 } // namespace H4
 #endif /* XML_HPP */
