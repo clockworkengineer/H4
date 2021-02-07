@@ -572,13 +572,34 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].name == ":");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].value == "http://www.w3.org/TR/html4/");
   }
-   SECTION("A root document and two namespaces (the same name) defined in the root element.", "[XML][Parse][Namespace]")
+  //  SECTION("A root document and two namespaces (the same name) defined in the root element.", "[XML][Parse][Namespace]")
+  // {
+  //   xmlString = "<root xmlns:f=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">"
+  //               "<f:table><f:tr><f:td>Apples</f:td><f:td>Bananas</f:td></f:tr></f:table><f:table>"
+  //               "<f:name>African Coffee Table</f:name><f:width>80</f:width>"
+  //               "<f:length>120</f:length></f:table></root>";
+  //   REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
+  //   REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
+  // }
+}
+TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
+{
+  XML xml;
+  std::string xmlString;
+  SECTION("XML with internal DTD", "[XML][Parse][DTD]")
   {
-    xmlString = "<root xmlns:f=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">"
-                "<f:table><f:tr><f:td>Apples</f:td><f:td>Bananas</f:td></f:tr></f:table><f:table>"
-                "<f:name>African Coffee Table</f:name><f:width>80</f:width>"
-                "<f:length>120</f:length></f:table></root>";
-    REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
+    xmlString = "<?xml version=\"1.0\"?><!DOCTYPE note [<!ELEMENT note (to,from,heading,body)>"
+                "<!ELEMENT to (#PCDATA)><!ELEMENT from (#PCDATA)>"
+                "<!ELEMENT heading (#PCDATA)><!ELEMENT body (#PCDATA)>"
+                "]><note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
+                "<body>Don't forget me this weekend</body></note>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
+  SECTION("XML with external DTD", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note SYSTEM \"Note.dtd\">"
+                "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
+                "<body>Don't forget me this weekend!</body></note>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
   }
 }

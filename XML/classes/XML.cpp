@@ -44,7 +44,7 @@ namespace H4
     void XML::initialiseTables()
     {
         m_entityToCharacter[U"amp"] = '&';
-        m_entityToCharacter[U"quot"] = '"'; 
+        m_entityToCharacter[U"quot"] = '"';
         m_entityToCharacter[U"apos"] = '\'';
         m_entityToCharacter[U"lt"] = '<';
         m_entityToCharacter[U"gt"] = '>';
@@ -220,8 +220,6 @@ namespace H4
     }
     XString XML::parseAttributeValue(ISource &source)
     {
-        source.next();
-        source.ignoreWS();
         if ((source.current() == '\'') || ((source.current() == '"')))
         {
             XString attributeValue;
@@ -285,6 +283,34 @@ namespace H4
         source.next();
         xNodeElement->elements.emplace_back(std::make_unique<XNodeComment>(xNodeComment));
     }
+    void XML::parseDTD(ISource &source, XNodeElement * /*xNodeElement*/)
+    {
+        source.ignoreWS();
+        while (source.more() && !std::iswspace(source.current()))
+        {
+            source.next();
+        }
+        source.ignoreWS();
+        if (!source.match(U"SYSTEM"))
+        {
+            while (source.more() && !source.match(U"]>"))
+            {
+                source.next();
+            }
+        }
+        else
+        {
+            source.ignoreWS();
+            parseAttributeValue(source);
+            source.ignoreWS();
+            if (source.current() != '>')
+            {
+                throw XML::SyntaxError();
+            }
+            source.next();
+        }
+        source.ignoreWS();
+    }
     void XML::parsePI(ISource &source, XNodeElement *xNodeElement)
     {
         XNodePI xNodePI;
@@ -327,6 +353,8 @@ namespace H4
             {
                 throw XML::SyntaxError();
             }
+            source.next();
+            source.ignoreWS();
             XString attributeValue = parseAttributeValue(source);
             if (attributeName.starts_with(U"xmlns"))
             {
@@ -372,6 +400,10 @@ namespace H4
             else if (source.match(U"<?"))
             {
                 parsePI(source, xNodeElement);
+            }
+            else if (source.match(U"<!DOCTYPE"))
+            {
+                parseDTD(source, xNodeElement);
             }
             else
             {

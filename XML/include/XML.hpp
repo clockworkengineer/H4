@@ -119,6 +119,7 @@ namespace H4
         void parseAttributes(ISource &source, XNodeElement *xNodeElement);
         void parseComment(ISource &source, XNodeElement *xNodeElement);
         void parseCDATA(ISource &source, XNodeElement *xNodeElement);
+        void parseDTD(ISource &source, XNodeElement *xNodeElement);
         void parsePI(ISource &source, XNodeElement *xNodeElement);
         void parseContents(ISource &source, XNodeElement *XNodeElement);
         void parseElement(ISource &source, XNodeElement *XNodeElement);
