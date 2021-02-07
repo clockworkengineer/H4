@@ -116,8 +116,8 @@ namespace H4
     }
     inline bool XML::namePresent(std::vector<XAttribute> attributes, const XString &name)
     {
-        return (std::find_if(attributes.begin(), attributes.end(),
-                             [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.end());
+        return (std::find_if(attributes.rbegin(), attributes.rend(),
+                             [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.rend());
     }
     inline bool XML::validateName(XString attributeName)
     {
@@ -344,6 +344,7 @@ namespace H4
     }
     void XML::parseAttributes(ISource &source, XNodeElement *xNodeElement)
     {
+        std::vector<XAttribute> namespaces;
         while (source.current() != '?' &&
                source.current() != '/' &&
                source.current() != '>')
@@ -359,9 +360,10 @@ namespace H4
             if (attributeName.starts_with(U"xmlns"))
             {
                 attributeName = (attributeName.size() > 5) ? attributeName.substr(6) : U":";
-                if (!namePresent(xNodeElement->namespaces, attributeName))
+                if (!namePresent(namespaces, attributeName))
                 {
                     xNodeElement->namespaces.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
+                    namespaces.emplace_back(xNodeElement->namespaces.back());
                 }
                 else
                 {
