@@ -618,6 +618,6 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ENTITY copyright \"Copyright: W3Schools.\">]>"
                 "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
                 "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer></note>";
-    REQUIRE_NOTHROW(xml.parse(xmlString));
+                REQUIRE_NOTHROW(xml.parse(xmlString));
   }
 }

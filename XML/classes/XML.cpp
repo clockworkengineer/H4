@@ -286,27 +286,63 @@ namespace H4
     }
     void XML::parseDTD(ISource &source, XNodeElement * /*xNodeElement*/)
     {
+        XString rootElementName;
         source.ignoreWS();
         while (source.more() && !std::iswspace(source.current()))
         {
+            rootElementName += source.current();
             source.next();
         }
         source.ignoreWS();
-        if (!source.match(U"SYSTEM"))
+        if (source.current() == '[')
         {
+            source.next();
+            source.ignoreWS();
             while (source.more() && !source.match(U"]>"))
             {
-                source.next();
+                if (source.match(U"<!ENTITY"))
+                {
+                    source.ignoreWS();
+                    XString entityName = parseAttributeName(source);
+                    XString entityValue = parseAttributeValue(source);
+                    m_entityToCharacter[entityName] = ' ';
+                    if (source.current() == '>')
+                    {
+                        source.next();
+                        source.ignoreWS();
+                    }
+                    else
+                    {
+                        throw XML::SyntaxError();
+                    }
+                }
+                else if (source.match(U"<!ELEMENT"))
+                {
+                    while (source.more() &&  source.current() != '>')
+                    {
+                        rootElementName += source.current();
+                        source.next();
+                    }
+                    source.next();
+                }
+                else
+                {
+                    throw XML::SyntaxError();
+                }
             }
         }
         else
         {
             source.ignoreWS();
-            parseAttributeValue(source);
-            source.ignoreWS();
-            if (source.current() != '>')
+            if (source.match(U"SYSTEM"))
             {
-                throw XML::SyntaxError();
+                source.ignoreWS();
+                parseAttributeValue(source);
+                source.ignoreWS();
+                if (source.current() != '>')
+                {
+                    throw XML::SyntaxError();
+                }
             }
             source.next();
         }
