@@ -157,7 +157,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
   std::string xmlString;
   SECTION("Empty root element <contact-info> ", "[XML][Parse]")
   {
-    xmlString = "<?xml version = \"1.0\"?> <contact-info> </contact-info>";
+    xmlString = "<?xml version = \"1.0\"?> <contact-info></contact-info>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");

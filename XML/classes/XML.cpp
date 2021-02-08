@@ -418,6 +418,7 @@ namespace H4
                 throw XML::SyntaxError();
             }
         }
+        
     }
     void XML::parseProlog(ISource &source, XNodeElement *xNodeElement)
     {
@@ -473,7 +474,7 @@ namespace H4
     {
         xNodeElement->contents += m_toFromUTF8.to_bytes(parseEncodedCharacter(source));
     }
-    void XML::parseContents(ISource &source, XNodeElement *xNodeElement)
+    void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
     {
         if (source.match(U"]]>"))
         {
@@ -509,7 +510,7 @@ namespace H4
         {
             while (source.more() && !source.match(closingTag))
             {
-                parseContents(source, xNodeElement);
+                parseElementContents(source, xNodeElement);
             }
         }
         else
@@ -521,8 +522,15 @@ namespace H4
     {
         XNodeElement xNodeRoot;
         parseProlog(source, &xNodeRoot);
-        xNodeRoot.elements.emplace_back(std::make_unique<XNodeElement>());
-        parseElement(source, static_cast<XNodeElement *>(xNodeRoot.elements.back().get()));
+        if (source.current() == '<')
+        {
+            xNodeRoot.elements.emplace_back(std::make_unique<XNodeElement>());
+            parseElement(source, static_cast<XNodeElement *>(xNodeRoot.elements.back().get()));
+        }
+        else
+        {
+            throw XML::SyntaxError();
+        }
         return (std::make_unique<XNodeElement>(std::move(xNodeRoot)));
     }
     // ==============

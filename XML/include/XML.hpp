@@ -121,7 +121,7 @@ namespace H4
         void parseCDATA(ISource &source, XNodeElement *xNodeElement);
         void parseDTD(ISource &source, XNodeElement *xNodeElement);
         void parsePI(ISource &source, XNodeElement *xNodeElement);
-        void parseContents(ISource &source, XNodeElement *XNodeElement);
+        void parseElementContents(ISource &source, XNodeElement *XNodeElement);
         void parseElement(ISource &source, XNodeElement *XNodeElement);
         void parseProlog(ISource &source, XNodeElement *xNodeRoot);
         std::unique_ptr<XNode> parseXML(ISource &source);
