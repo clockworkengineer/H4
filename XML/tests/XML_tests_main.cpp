@@ -390,15 +390,15 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == " ' < > ");
   }
-  SECTION("Parse reference &x00A5; in contents area", "[XML][Parse][Entities]")
+  SECTION("Parse reference &#x00A5; in contents area", "[XML][Parse][Entities]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &x00A5; </root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &#x00A5; </root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == " ¥ ");
   }
-  SECTION("Parse reference &163; in contents area", "[XML][Parse][Entities]")
+  SECTION("Parse reference &#163; in contents area", "[XML][Parse][Entities]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &163; </root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &#163; </root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == " £ ");
   }
@@ -410,9 +410,9 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].name == "attr1");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].value == " &\"'>< ");
   }
-  SECTION("Parse references &x00A5;&163 in attribute value", "[XML][Parse][Entities]")
+  SECTION("Parse references &#x00A5;&#163 in attribute value", "[XML][Parse][Entities]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &x00A5;&163; \"></root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root attr1=\" &#x00A5;&#163; \"></root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].name == "attr1");

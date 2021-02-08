@@ -259,14 +259,15 @@ namespace H4
             source.next();
         }
         source.next();
-        if (m_entityToCharacter.count(entityName) > 0)
+        if (entityName[0] == '#')
+        {
+            return (characterReference(entityName.substr(1)));
+        }
+        else if (m_entityToCharacter.count(entityName) > 0)
         {
             return (m_entityToCharacter[entityName]);
         }
-        else
-        {
-            return (characterReference(entityName));
-        }
+        throw XML::SyntaxError();
     }
     void XML::parseComment(ISource &source, XNodeElement *xNodeElement)
     {
