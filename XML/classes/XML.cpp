@@ -338,7 +338,6 @@ namespace H4
             {
                 source.ignoreWS();
                 parseAttributeValue(source);
-                source.ignoreWS();
                 if (source.current() != '>')
                 {
                     throw XML::SyntaxError();

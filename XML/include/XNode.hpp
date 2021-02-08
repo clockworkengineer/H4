@@ -40,7 +40,8 @@ namespace H4
         element = 2,
         comment = 3,
         cdata = 4,
-        pi = 5
+        pi = 5,
+        dtd = 6
     };
     //
     // Base XNode
@@ -112,6 +113,17 @@ namespace H4
         }
         std::string name;
         std::string parameters;
+    };
+    //
+    // DTD XNode
+    //
+    struct XNodeDTD : XNode
+    {
+    public:
+        XNodeDTD(XNodeType nodeType = XNodeType::dtd) : XNode(nodeType)
+        {
+        }
+        std::string name;
     };
     //
     // Convert base XNode reference
