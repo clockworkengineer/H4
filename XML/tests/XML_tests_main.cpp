@@ -618,6 +618,18 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ENTITY copyright \"Copyright: W3Schools.\">]>"
                 "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
                 "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer></note>";
-                REQUIRE_NOTHROW(xml.parse(xmlString));
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
+
+  SECTION("XML with DTD with !ENTITY definitions and uses. Check translationof entity values", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note "
+                "[<!ENTITY nbsp \"&#xA0;\"><!ENTITY writer \"Writer: Donald Duck.\">"
+                "<!ENTITY copyright \"Copyright: W3Schools.\">]>"
+                "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
+                "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer></note>";
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][4]).name == "footer");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][4]).contents == "Writer: Donald Duck.\x0ACopyright: W3Schools.");
   }
 }
