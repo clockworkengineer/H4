@@ -43,11 +43,11 @@ namespace H4
     // ===============
     void XML::initialiseTables()
     {
-        m_entityToCharacter[U"amp"] = '&';
-        m_entityToCharacter[U"quot"] = '"';
-        m_entityToCharacter[U"apos"] = '\'';
-        m_entityToCharacter[U"lt"] = '<';
-        m_entityToCharacter[U"gt"] = '>';
+        m_entityToCharacter[U"amp"] = U"&";
+        m_entityToCharacter[U"quot"] = U"\"";
+        m_entityToCharacter[U"apos"] = U"\'";
+        m_entityToCharacter[U"lt"] = U"<";
+        m_entityToCharacter[U"gt"] = U">";
     }
     long XML::characterReference(XString reference)
     {
@@ -200,23 +200,26 @@ namespace H4
         source.ignoreWS();
         xNodeElement->name = m_toFromUTF8.to_bytes(tagName);
     }
-    XChar XML::parseEncodedCharacter(ISource &source)
+    XString XML::parseEncodedCharacter(ISource &source)
     {
-        XChar ch;
+        XString characters;
         if (source.current() == '&')
         {
-            ch = parseReferenceOrEntity(source);
+            characters = parseReferenceOrEntity(source);
         }
         else
         {
-            ch = source.current();
+            characters = source.current();
             source.next();
         }
-        if (!validChar(ch))
+        for (auto ch : characters)
         {
-            throw XML::SyntaxError();
+            if (!validChar(ch))
+            {
+                throw XML::SyntaxError();
+            }
         }
-        return (ch);
+        return (characters);
     }
     XString XML::parseAttributeValue(ISource &source)
     {
@@ -249,7 +252,7 @@ namespace H4
         source.ignoreWS();
         return (attributeName);
     }
-    XChar XML::parseReferenceOrEntity(ISource &source)
+    XString XML::parseReferenceOrEntity(ISource &source)
     {
         XString entityName;
         source.next();
@@ -261,7 +264,7 @@ namespace H4
         source.next();
         if (entityName[0] == '#')
         {
-            return (characterReference(entityName.substr(1)));
+            return (XString(1, characterReference(entityName.substr(1))));
         }
         else if (m_entityToCharacter.count(entityName) > 0)
         {
@@ -305,7 +308,7 @@ namespace H4
                     source.ignoreWS();
                     XString entityName = parseAttributeName(source);
                     XString entityValue = parseAttributeValue(source);
-                    m_entityToCharacter[entityName] = ' ';
+                    m_entityToCharacter[entityName] = entityValue;
                     if (source.current() == '>')
                     {
                         source.next();
@@ -318,7 +321,7 @@ namespace H4
                 }
                 else if (source.match(U"<!ELEMENT"))
                 {
-                    while (source.more() &&  source.current() != '>')
+                    while (source.more() && source.current() != '>')
                     {
                         rootElementName += source.current();
                         source.next();
