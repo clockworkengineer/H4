@@ -611,4 +611,13 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<body>Don't forget me this weekend!</body></note>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
+  SECTION("XML with DTD with !ENTITY definitions and uses", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note "
+                "[<!ENTITY nbsp \"&#xA0;\"><!ENTITY writer \"Writer: Donald Duck.\">"
+                "<!ENTITY copyright \"Copyright: W3Schools.\">]>"
+                "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
+                "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer></note>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
 }
