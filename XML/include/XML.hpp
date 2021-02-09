@@ -109,7 +109,7 @@ namespace H4
         bool namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name);
         bool validateName(XString attributeName);
         bool validateXMLDeclaration(XNodeElement *xNodeElement);
-        void validateAttribute(std::vector<XAttribute> &attributes, const XString  &attributeName, const XString &attributeValue);
+        void addNameValuePairToList(std::vector<XAttribute> &attributes, const XString &attributeName, const XString &attributeValue);
         XString parseDTDValue(ISource &source);
         XString parseDTDName(ISource &source);
         XString parseEncodedCharacter(ISource &source);
@@ -122,7 +122,10 @@ namespace H4
         void parseAttributes(ISource &source, XNodeElement *xNodeElement);
         void parseComment(ISource &source, XNodeElement *xNodeElement);
         void parseCDATA(ISource &source, XNodeElement *xNodeElement);
-        void parseDTD(ISource &source, XNodeElement *xNodeElement);
+        void parseDTDEntity(ISource &source, XNodeDTD *xNodeDTD);
+        void parseDTDElement(ISource &source, XNodeDTD *xNodeElement);
+        void parseDTDExternal(ISource &source, XNodeDTD *xNodeDTD);
+        void parseDTD(ISource &source, XNodeElement *XNodeElement);
         void parsePI(ISource &source, XNodeElement *xNodeElement);
         void parseElementContents(ISource &source, XNodeElement *XNodeElement);
         void parseElement(ISource &source, XNodeElement *XNodeElement);
