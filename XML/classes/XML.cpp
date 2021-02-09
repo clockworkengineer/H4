@@ -49,7 +49,12 @@ namespace H4
         m_entityToCharacter[U"lt"] = U"<";
         m_entityToCharacter[U"gt"] = U">";
     }
-    long XML::characterReference(XString reference)
+    bool XML::namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name)
+    {
+        return (std::find_if(attributes.rbegin(), attributes.rend(),
+                             [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.rend());
+    }
+    long XML::calculatecharacterReference(XString reference)
     {
         char *end;
         long temp = 10;
@@ -65,7 +70,7 @@ namespace H4
         }
         throw XML::SyntaxError();
     }
-    std::string XML::convertCRLF(const std::string &xmlString)
+    std::string XML::convertCRLFToLF(const std::string &xmlString)
     {
         std::string converted = xmlString;
         size_t pos = converted.find("\x0D\x0A");
@@ -104,7 +109,7 @@ namespace H4
                 (ch >= 0xFDF0 && ch <= 0xFFFD) ||
                 (ch >= 0x10000 && ch <= 0xEFFFF));
     }
-    inline bool XML::validNameChar(XChar ch)
+    bool XML::validNameChar(XChar ch)
     {
         return (validNameStartChar(ch) ||
                 (ch == '-') ||
@@ -114,12 +119,7 @@ namespace H4
                 (ch >= 0x0300 && ch <= 0x036F) ||
                 (ch >= 0x203F && ch <= 0x2040));
     }
-    inline bool XML::namePresent(std::vector<XAttribute> attributes, const XString &name)
-    {
-        return (std::find_if(attributes.rbegin(), attributes.rend(),
-                             [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.rend());
-    }
-    inline bool XML::validateName(XString attributeName)
+    bool XML::validateName(XString attributeName)
     {
         std::transform(attributeName.begin(), attributeName.end(), attributeName.begin(), ::tolower);
         if (attributeName.substr(0, 3) == U"xml")
@@ -139,10 +139,10 @@ namespace H4
         }
         return (true);
     }
-    bool XML::validateDeclaration(XNodeElement *xNodeElement)
+    bool XML::validateXMLDeclaration(XNodeElement *xNodeElement)
     {
         // Syntax error if no version present
-        if (!namePresent(xNodeElement->attributes, U"version"))
+        if (!namePresentInAttributeList(xNodeElement->attributes, U"version"))
         {
             return (false);
         }
@@ -182,7 +182,7 @@ namespace H4
     }
     void XML::validateAttribute(std::vector<XAttribute> &attributes, const XString &attributeName, const XString &attributeValue)
     {
-        if (validateName(attributeName) && !namePresent(attributes, attributeName))
+        if (validateName(attributeName) && !namePresentInAttributeList(attributes, attributeName))
         {
             attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
         }
@@ -190,6 +190,40 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
+    }
+    XString XML::parseDTDValue(ISource &source)
+    {
+        if ((source.current() == '\'') || ((source.current() == '"')))
+        {
+            XString attributeValue;
+            XChar quote = source.current();
+            source.next();
+            while (source.more() &&
+                   source.current() != quote)
+            {
+                attributeValue += parseEncodedCharacter(source);
+            }
+            source.next();
+            source.ignoreWS();
+            return (attributeValue);
+        }
+        throw XML::SyntaxError();
+    }
+    XString XML::parseDTDName(ISource &source)
+    {
+        XString dtdName;
+        while (source.more() &&
+               !std::iswspace(source.current()))
+        {
+            dtdName += source.current();
+            source.next();
+        }
+        source.ignoreWS();
+        if (!validateName(dtdName))
+        {
+            throw XML::SyntaxError();
+        }
+        return (dtdName);
     }
     void XML::parseTagName(ISource &source, XNodeElement *xNodeElement)
     {
@@ -275,7 +309,7 @@ namespace H4
         source.next();
         if (entityName[0] == '#')
         {
-            return (XString(1, characterReference(entityName.substr(1))));
+            return (XString(1, calculatecharacterReference(entityName.substr(1))));
         }
         else if (m_entityToCharacter.count(entityName) > 0)
         {
@@ -317,9 +351,9 @@ namespace H4
                 if (source.match(U"<!ENTITY"))
                 {
                     source.ignoreWS();
-                    XString entityName = parseAttributeName(source);
-                    XString entityValue = parseAttributeValue(source);
-                    if (source.current() == '>' && validateName(entityName))
+                    XString entityName = parseDTDName(source);
+                    XString entityValue = parseDTDValue(source);
+                    if (source.current() == '>')
                     {
                         m_entityToCharacter[entityName] = entityValue;
                         source.next();
@@ -333,7 +367,7 @@ namespace H4
                 else if (source.match(U"<!ELEMENT"))
                 {
                     source.ignoreWS();
-                    XString elementName = parseAttributeName(source);
+                    XString elementName = parseDTDName(source);
                     XString elementValue;
                     if (source.current() == '(')
                     {
@@ -344,19 +378,27 @@ namespace H4
                             source.next();
                         }
                         source.next();
-                        source.ignoreWS();
-                        if (source.current() != '>')
-                        {
-                            throw XML::SyntaxError();
-                        }
-                        source.next();
-                        source.ignoreWS();
-                        xNodeDTD.elements.emplace_back(m_toFromUTF8.to_bytes(elementName), m_toFromUTF8.to_bytes(elementValue));
+                    }
+                    else if (source.match(U"EMPTY"))
+                    {
+                        elementValue = U"EMPTY";
+                    }
+                    else if (source.match(U"ANY"))
+                    {
+                        elementValue = U"ANY";
                     }
                     else
                     {
                         throw XML::SyntaxError();
                     }
+                    source.ignoreWS();
+                    if (source.current() != '>')
+                    {
+                        throw XML::SyntaxError();
+                    }
+                    source.next();
+                    source.ignoreWS();
+                    xNodeDTD.elements.emplace_back(m_toFromUTF8.to_bytes(elementName), m_toFromUTF8.to_bytes(elementValue));
                 }
                 else
                 {
@@ -367,7 +409,7 @@ namespace H4
         else if (source.match(U"SYSTEM"))
         {
             source.ignoreWS();
-            parseAttributeValue(source);
+            XString file = parseDTDValue(source);
             if (source.current() != '>')
             {
                 throw XML::SyntaxError();
@@ -377,14 +419,14 @@ namespace H4
         else if (source.match(U"PUBLIC"))
         {
             source.ignoreWS();
-            parseAttributeValue(source);
+            XString fpi = parseDTDValue(source);
+            XString url = parseDTDValue(source);
             if (source.current() != '>')
             {
                 throw XML::SyntaxError();
             }
             source.next();
         }
-
         source.ignoreWS();
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
     }
@@ -453,7 +495,7 @@ namespace H4
         {
             source.ignoreWS();
             parseAttributes(source, xNodeElement);
-            if (!source.match(U"?>") || !validateDeclaration(xNodeElement))
+            if (!source.match(U"?>") || !validateXMLDeclaration(xNodeElement))
             {
                 throw XML::SyntaxError();
             }
@@ -487,7 +529,7 @@ namespace H4
         parseElement(source, &xNodeChildElement);
         if (auto pos = xNodeChildElement.name.find(':') != std::string::npos)
         {
-            if (!namePresent(xNodeChildElement.namespaces, m_toFromUTF8.from_bytes(xNodeChildElement.name.substr(0, pos))))
+            if (!namePresentInAttributeList(xNodeChildElement.namespaces, m_toFromUTF8.from_bytes(xNodeChildElement.name.substr(0, pos))))
             {
                 throw XML::SyntaxError();
             }
@@ -562,7 +604,7 @@ namespace H4
     // ==============
     std::unique_ptr<XNode> XML::parse(const std::string &xmlToParse)
     {
-        BufferSource xml(m_toFromUTF8.from_bytes(convertCRLF(xmlToParse)));
+        BufferSource xml(m_toFromUTF8.from_bytes(convertCRLFToLF(xmlToParse)));
         return (parseXML(xml));
     }
     std::unique_ptr<XNode> XML::parse(const std::u16string &xmlToParse)

@@ -101,15 +101,17 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void initialiseTables();
-        long characterReference(XString reference);
-        std::string convertCRLF(const std::string &xmlToParse);
+        long calculatecharacterReference(XString reference);
+        std::string convertCRLFToLF(const std::string &xmlToParse);
         inline bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
         bool validNameChar(XChar c);
-        bool namePresent(std::vector<XAttribute> attributes, const XString &name);
+        bool namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name);
         bool validateName(XString attributeName);
-        bool validateDeclaration(XNodeElement *xNodeElement);
+        bool validateXMLDeclaration(XNodeElement *xNodeElement);
         void validateAttribute(std::vector<XAttribute> &attributes, const XString  &attributeName, const XString &attributeValue);
+        XString parseDTDValue(ISource &source);
+        XString parseDTDName(ISource &source);
         XString parseEncodedCharacter(ISource &source);
         XString parseAttributeValue(ISource &source);
         XString parseAttributeName(ISource &source);

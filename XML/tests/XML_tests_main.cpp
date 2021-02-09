@@ -604,9 +604,17 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<body>Don't forget me this weekend</body></note>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
-  SECTION("XML with external DTD", "[XML][Parse][DTD]")
+  SECTION("XML with external (SYSTEM) DTD", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note SYSTEM \"Note.dtd\">"
+                "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
+                "<body>Don't forget me this weekend!</body></note>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
+  SECTION("XML with external (PUBLIC) DTD", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note PUBLIC "
+                "\"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
                 "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
                 "<body>Don't forget me this weekend!</body></note>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
@@ -640,7 +648,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\" ?>"
                 "<!DOCTYPE address [   <!ELEMENT address (name,company,phone)>"
                 "<!ELEMENT name (#PCDATA)><!ELEMENT company (#PCDATA)>"
-                "<!ELEMENT phone (#PCDATA)>]><address><name>Tanmay Patil</name>"
+                "<!ELEMENT phone (#PCDATA)><!ELEMENT br EMPTY><!ELEMENT footer ANY>]><address><name>Tanmay Patil</name>"
                 "<company>TutorialsPoint</company><phone>(011) 123-4567</phone></address>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
@@ -653,5 +661,9 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[2].value == "#PCDATA");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[3].name == "phone");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[3].value == "#PCDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[4].name == "br");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[4].value == "EMPTY");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[5].name == "footer");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[5].value == "ANY");
   }
 }
