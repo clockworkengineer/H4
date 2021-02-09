@@ -113,7 +113,7 @@ namespace H4
         XString parseAttributeValue(ISource &source);
         XString parseAttributeName(ISource &source);
         XString parseReferenceOrEntity(ISource &source);
-        void parseCharacter(ISource &source, XNodeElement *xNodeElement);
+        void parseDefault(ISource &source, XNodeElement *xNodeElement);
         void parseTagName(ISource &source, XNodeElement *xNodeElement);
         void parseChildElement(ISource &source, XNodeElement *xNodeElement);
         void parseAttributes(ISource &source, XNodeElement *xNodeElement);

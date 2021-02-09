@@ -418,7 +418,6 @@ namespace H4
                 throw XML::SyntaxError();
             }
         }
-        
     }
     void XML::parseProlog(ISource &source, XNodeElement *xNodeElement)
     {
@@ -456,31 +455,31 @@ namespace H4
     }
     void XML::parseChildElement(ISource &source, XNodeElement *xNodeElement)
     {
-        std::unique_ptr<XNode> xNodeChildElement = std::make_unique<XNodeElement>();
-        XNodeRef<XNodeElement>(*xNodeChildElement).namespaces = xNodeElement->namespaces;
-        parseElement(source, static_cast<XNodeElement *>(xNodeChildElement.get()));
-        std::string tagName = XNodeRef<XNodeElement>(*xNodeChildElement).name;
+        XNodeElement xNodeChildElement;
+        xNodeChildElement.namespaces = xNodeElement->namespaces;
+        parseElement(source, &xNodeChildElement);
+        std::string tagName = xNodeChildElement.name;
         if (tagName.find(':') != std::string::npos)
         {
             tagName = tagName.substr(0, tagName.find(':'));
-            if (!namePresent(XNodeRef<XNodeElement>(*xNodeChildElement).namespaces, m_toFromUTF8.from_bytes(tagName)))
+            if (!namePresent(xNodeChildElement.namespaces, m_toFromUTF8.from_bytes(tagName)))
             {
                 throw XML::SyntaxError();
             }
         }
-        xNodeElement->elements.push_back(std::move(xNodeChildElement));
+        xNodeElement->elements.push_back(std::make_unique<XNodeElement>(std::move(xNodeChildElement)));
     }
-    void XML::parseCharacter(ISource &source, XNodeElement *xNodeElement)
-    {
-        xNodeElement->contents += m_toFromUTF8.to_bytes(parseEncodedCharacter(source));
-    }
-    void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
+    void XML::parseDefault(ISource &source, XNodeElement *xNodeElement)
     {
         if (source.match(U"]]>"))
         {
             throw XML::SyntaxError();
         }
-        else if (source.match(U"<!--"))
+        xNodeElement->contents += m_toFromUTF8.to_bytes(parseEncodedCharacter(source));
+    }
+    void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
+    {
+        if (source.match(U"<!--"))
         {
             parseComment(source, xNodeElement);
         }
@@ -498,7 +497,7 @@ namespace H4
         }
         else
         {
-            parseCharacter(source, xNodeElement);
+            parseDefault(source, xNodeElement);
         }
     }
     void XML::parseElement(ISource &source, XNodeElement *xNodeElement)
