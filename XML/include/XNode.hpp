@@ -125,6 +125,7 @@ namespace H4
         {
         }
         std::string name;
+        std::vector<XAttribute> elements;
     };
     //
     // Convert base XNode reference

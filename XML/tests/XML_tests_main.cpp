@@ -634,4 +634,24 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).name == "footer");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).contents == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
+
+  SECTION("XML with internal DTD and check values", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\" ?>"
+                "<!DOCTYPE address [   <!ELEMENT address (name,company,phone)>"
+                "<!ELEMENT name (#PCDATA)><!ELEMENT company (#PCDATA)>"
+                "<!ELEMENT phone (#PCDATA)>]><address><name>Tanmay Patil</name>"
+                "<company>TutorialsPoint</company><phone>(011) 123-4567</phone></address>";
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].name == "address");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].value == "name,company,phone");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].name == "name");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].value == "#PCDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[2].name == "company");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[2].value == "#PCDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[3].name == "phone");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[3].value == "#PCDATA");
+  }
 }

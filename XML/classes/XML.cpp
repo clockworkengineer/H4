@@ -325,18 +325,38 @@ namespace H4
                         source.next();
                         source.ignoreWS();
                     }
-                    else 
+                    else
                     {
                         throw XML::SyntaxError();
                     }
                 }
                 else if (source.match(U"<!ELEMENT"))
                 {
-                    while (source.more() && source.current() != '>')
+                    source.ignoreWS();
+                    XString elementName = parseAttributeName(source);
+                    XString elementValue;
+                    if (source.current() == '(')
                     {
                         source.next();
+                        while (source.more() && source.current() != ')')
+                        {
+                            elementValue += source.current();
+                            source.next();
+                        }
+                        source.next();
+                        source.ignoreWS();
+                        if (source.current() != '>')
+                        {
+                            throw XML::SyntaxError();
+                        }
+                        source.next();
+                        source.ignoreWS();
+                        xNodeDTD.elements.emplace_back(m_toFromUTF8.to_bytes(elementName), m_toFromUTF8.to_bytes(elementValue));
                     }
-                    source.next();
+                    else
+                    {
+                        throw XML::SyntaxError();
+                    }
                 }
                 else
                 {
@@ -344,20 +364,27 @@ namespace H4
                 }
             }
         }
-        else
+        else if (source.match(U"SYSTEM"))
         {
             source.ignoreWS();
-            if (source.match(U"SYSTEM"))
+            parseAttributeValue(source);
+            if (source.current() != '>')
             {
-                source.ignoreWS();
-                parseAttributeValue(source);
-                if (source.current() != '>')
-                {
-                    throw XML::SyntaxError();
-                }
+                throw XML::SyntaxError();
             }
             source.next();
         }
+        else if (source.match(U"PUBLIC"))
+        {
+            source.ignoreWS();
+            parseAttributeValue(source);
+            if (source.current() != '>')
+            {
+                throw XML::SyntaxError();
+            }
+            source.next();
+        }
+
         source.ignoreWS();
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
     }
