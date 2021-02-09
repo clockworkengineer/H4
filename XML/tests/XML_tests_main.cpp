@@ -183,7 +183,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "Address");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).contents == "    This is some contents    ");
   }
@@ -621,7 +621,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
 
-  SECTION("XML with DTD with !ENTITY definitions and uses. Check translationof entity values", "[XML][Parse][DTD]")
+  SECTION("XML with DTD with !ENTITY definitions and uses. Check translation of entity values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note "
                 "[<!ENTITY nbsp \"&#xA0;\"><!ENTITY writer \"Writer: Donald Duck.\">"
@@ -629,7 +629,9 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
                 "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer></note>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][4]).name == "footer");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][4]).contents == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::element);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).name == "footer");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).contents == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
 }

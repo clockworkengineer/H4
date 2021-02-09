@@ -30,6 +30,7 @@ namespace H4
         std::string name;
         std::string value;
     };
+    using XNamespace = XAttribute;
     //
     // XNode structure.
     //
