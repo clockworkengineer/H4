@@ -654,13 +654,13 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].name == "address");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].value == "name,company,phone");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].value == "(name,company,phone)");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].name == "name");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].value == "#PCDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].value == "(#PCDATA)");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[2].name == "company");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[2].value == "#PCDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[2].value == "(#PCDATA)");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[3].name == "phone");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[3].value == "#PCDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[3].value == "(#PCDATA)");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[4].name == "br");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[4].value == "EMPTY");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[5].name == "footer");
@@ -688,5 +688,33 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].value == "-//W3C//DTD XHTML 1.0 Transitional//EN");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].name == "PUBLIC_URL");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].value == "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+  }
+  SECTION("XML with internal DTD with attributes", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                "<!DOCTYPE TVSCHEDULE [<!ELEMENT TVSCHEDULE (CHANNEL+)><!ELEMENT CHANNEL (BANNER,DAY+)>"
+                "<!ELEMENT BANNER (#PCDATA)><!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>"
+                "<!ELEMENT HOLIDAY (#PCDATA)><!ELEMENT DATE (#PCDATA)>"
+                "<!ELEMENT PROGRAMSLOT (TIME,TITLE,DESCRIPTION?)><!ELEMENT TIME (#PCDATA)>"
+                "<!ELEMENT TITLE (#PCDATA)><!ELEMENT DESCRIPTION (#PCDATA)>"
+                "<!ATTLIST TVSCHEDULE NAME CDATA #REQUIRED>"
+                "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED><!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>"
+                "<!ATTLIST TITLE RATING CDATA #IMPLIED><!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>"
+                "<TVSCHEDULE></TVSCHEDULE>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
+  SECTION("XML with internal DTD with attributes and check values", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                "<!DOCTYPE TVSCHEDULE [<!ELEMENT TVSCHEDULE (CHANNEL+)><!ELEMENT CHANNEL (BANNER,DAY+)>"
+                "<!ELEMENT BANNER (#PCDATA)><!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>"
+                "<!ELEMENT HOLIDAY (#PCDATA)><!ELEMENT DATE (#PCDATA)>"
+                "<!ELEMENT PROGRAMSLOT (TIME,TITLE,DESCRIPTION?)><!ELEMENT TIME (#PCDATA)>"
+                "<!ELEMENT TITLE (#PCDATA)><!ELEMENT DESCRIPTION (#PCDATA)>"
+                "<!ATTLIST TVSCHEDULE NAME CDATA #REQUIRED>"
+                "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED><!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>"
+                "<!ATTLIST TITLE RATING CDATA #IMPLIED><!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>"
+                "<TVSCHEDULE></TVSCHEDULE>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
   }
 }

@@ -66,6 +66,16 @@ namespace H4
         }
         return (dtdName);
     }
+    void XML::parseDTDAttributeList(ISource &source, XNodeDTD * /*xNodeDTD*/)
+    {
+        source.ignoreWS();
+        while (source.more() && source.current() != '>')
+        {
+            source.next();
+        }
+        source.next();
+        source.ignoreWS();
+    }
     void XML::parseDTDEntity(ISource &source, XNodeDTD * /*xNodeDTD*/)
     {
         source.ignoreWS();
@@ -89,12 +99,20 @@ namespace H4
         XString elementValue;
         if (source.current() == '(')
         {
+            int bracketCount=1;
+            elementValue += source.current();
             source.next();
-            while (source.more() && source.current() != ')')
+            while (source.more() && bracketCount!=0)
             {
                 elementValue += source.current();
                 source.next();
+                if (source.current()=='(') {
+                    bracketCount++;
+                } else if (source.current()==')') {
+                    bracketCount--;
+                }
             }
+            elementValue += source.current();
             source.next();
         }
         else if (source.match(U"EMPTY"))
@@ -154,6 +172,10 @@ namespace H4
             else if (source.match(U"<!ELEMENT"))
             {
                 parseDTDElement(source, xNodeDTD);
+            }
+            else if (source.match(U"<!ATTLIST"))
+            {
+                parseDTDAttributeList(source, xNodeDTD);
             }
             else
             {
