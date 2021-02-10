@@ -419,6 +419,26 @@ namespace H4
         }
         source.next();
     }
+    void XML::parseDTDInternal(ISource &source, XNodeDTD *xNodeDTD)
+    {
+        source.next();
+        source.ignoreWS();
+        while (source.more() && !source.match(U"]>"))
+        {
+            if (source.match(U"<!ENTITY"))
+            {
+                parseDTDEntity(source, xNodeDTD);
+            }
+            else if (source.match(U"<!ELEMENT"))
+            {
+                parseDTDElement(source, xNodeDTD);
+            }
+            else
+            {
+                throw XML::SyntaxError();
+            }
+        }
+    }
     void XML::parseDTD(ISource &source, XNodeElement *xNodeElement)
     {
         XNodeDTD xNodeDTD;
@@ -431,23 +451,7 @@ namespace H4
         source.ignoreWS();
         if (source.current() == '[')
         {
-            source.next();
-            source.ignoreWS();
-            while (source.more() && !source.match(U"]>"))
-            {
-                if (source.match(U"<!ENTITY"))
-                {
-                    parseDTDEntity(source, &xNodeDTD);
-                }
-                else if (source.match(U"<!ELEMENT"))
-                {
-                    parseDTDElement(source, &xNodeDTD);
-                }
-                else
-                {
-                    throw XML::SyntaxError();
-                }
-            }
+            parseDTDInternal(source, &xNodeDTD);
         }
         else
         {

@@ -125,6 +125,7 @@ namespace H4
         void parseDTDEntity(ISource &source, XNodeDTD *xNodeDTD);
         void parseDTDElement(ISource &source, XNodeDTD *xNodeElement);
         void parseDTDExternal(ISource &source, XNodeDTD *xNodeDTD);
+        void parseDTDInternal(ISource &source, XNodeDTD * xNodeDTD);
         void parseDTD(ISource &source, XNodeElement *XNodeElement);
         void parsePI(ISource &source, XNodeElement *xNodeElement);
         void parseElementContents(ISource &source, XNodeElement *XNodeElement);
