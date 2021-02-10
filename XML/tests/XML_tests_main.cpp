@@ -666,4 +666,27 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[5].name == "footer");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[5].value == "ANY");
   }
+  SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note SYSTEM \"Note.dtd\"><note><to>Tove"
+                "</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>";
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].name == "SYSTEM_FILE");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].value == "Note.dtd");
+  }
+  SECTION("XML with external URL DTD and check values", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+                "<html></html>";
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].name == "PUBLIC_PFI");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].value == "-//W3C//DTD XHTML 1.0 Transitional//EN");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].name == "PUBLIC_URL");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].value == "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+  }
 }

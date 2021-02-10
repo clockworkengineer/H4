@@ -19,6 +19,7 @@ enable_testing()
 
 set (XML_SOURCES
     ./classes/XML.cpp
+    ./classes/XML_DTD.cpp
 )
 
 set (XML_INCLUDES
