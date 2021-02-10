@@ -130,6 +130,10 @@ namespace H4
                 (ch >= 0x0300 && ch <= 0x036F) ||
                 (ch >= 0x203F && ch <= 0x2040));
     }
+    bool XML::validReservedName(const XString &name)
+    {
+        return (name.starts_with(U"xmlns"));
+    }
     bool XML::validateName(XString name)
     {
         if (name.empty())
@@ -137,7 +141,7 @@ namespace H4
             return (false);
         }
         std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-        if (name.substr(0, 3) == U"xml")
+        if (name.starts_with(U"xml") && !(validReservedName(name)))
         {
             return (false);
         }
@@ -195,24 +199,24 @@ namespace H4
         xNodeElement->attributes = validatedAttributes;
         return (true);
     }
-    void XML::parseTagName(ISource &source, XNodeElement *xNodeElement)
+    XString XML::parseName(XML::ISource &source)
     {
-        XString tagName;
-        source.next();
-        source.ignoreWS();
-        while (source.more() &&
-               source.current() != '/' &&
-               source.current() != '>' &&
-               !std::iswspace(source.current()))
+        XString name;
+        while (source.more() && validNameChar(source.current()))
         {
-            tagName += source.current();
+            name += source.current();
             source.next();
         }
+        source.ignoreWS();
+        return (name);
+    }
+    void XML::parseTagName(ISource &source, XNodeElement *xNodeElement)
+    {
+        XString tagName = parseName(source);
         if (!validateName(tagName))
         {
             throw XML::SyntaxError();
         }
-        source.ignoreWS();
         xNodeElement->name = m_toFromUTF8.to_bytes(tagName);
     }
     XString XML::parseEncodedCharacter(ISource &source)
@@ -220,6 +224,7 @@ namespace H4
         XString characters;
         if (source.current() == '&')
         {
+            source.next();
             characters = parseReferenceOrEntity(source);
         }
         else
@@ -243,8 +248,7 @@ namespace H4
             XString attributeValue;
             XChar quote = source.current();
             source.next();
-            while (source.more() &&
-                   source.current() != quote)
+            while (source.more() && source.current() != quote)
             {
                 attributeValue += parseEncodedCharacter(source);
             }
@@ -256,21 +260,8 @@ namespace H4
     }
     XString XML::parseAttributeName(ISource &source)
     {
-        XString attributeName;
-        while (source.more() &&
-               source.current() != '=' &&
-               !std::iswspace(source.current()))
-        {
-            attributeName += source.current();
-            source.next();
-        }
-        source.ignoreWS();
-        XString name = attributeName;
-        if (attributeName.starts_with(U"xmlns"))
-        {
-            name = (name.size() > 5) ? name.substr(6) : U"";
-        }
-        if (!name.empty() && !validateName(name))
+        XString attributeName = parseName(source);
+        if (!validateName(attributeName))
         {
             throw XML::SyntaxError();
         }
@@ -279,7 +270,6 @@ namespace H4
     XString XML::parseReferenceOrEntity(ISource &source)
     {
         XString entityName;
-        source.next();
         while (source.current() && source.current() != ';')
         {
             entityName += source.current();
@@ -314,12 +304,7 @@ namespace H4
     void XML::parsePI(ISource &source, XNodeElement *xNodeElement)
     {
         XNodePI xNodePI;
-        while (source.more() && !std::iswspace(source.current()))
-        {
-            xNodePI.name += m_toFromUTF8.to_bytes(source.current());
-            source.next();
-        }
-        source.ignoreWS();
+        xNodePI.name = m_toFromUTF8.to_bytes(parseName(source));
         while (source.more() && !source.match(U"?>"))
         {
             xNodePI.parameters += m_toFromUTF8.to_bytes(source.current());
@@ -439,7 +424,7 @@ namespace H4
         {
             parseCDATA(source, xNodeElement);
         }
-        else if (source.current() == '<')
+        else if (source.match(U"<"))
         {
             parseChildElement(source, xNodeElement);
         }
@@ -471,6 +456,7 @@ namespace H4
         parseProlog(source, &xNodeRoot);
         if (source.current() == '<')
         {
+            source.next();
             xNodeRoot.elements.emplace_back(std::make_unique<XNodeElement>());
             parseElement(source, static_cast<XNodeElement *>(xNodeRoot.elements.back().get()));
         }

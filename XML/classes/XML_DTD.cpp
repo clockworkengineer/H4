@@ -47,8 +47,7 @@ namespace H4
             XString attributeValue;
             XChar quote = source.current();
             source.next();
-            while (source.more() &&
-                   source.current() != quote)
+            while (source.more() && source.current() != quote)
             {
                 attributeValue += parseEncodedCharacter(source);
             }
@@ -60,13 +59,7 @@ namespace H4
     }
     XString XML::parseDTDName(ISource &source)
     {
-        XString dtdName;
-        while (source.more() && !std::iswspace(source.current()))
-        {
-            dtdName += source.current();
-            source.next();
-        }
-        source.ignoreWS();
+        XString dtdName = parseName(source);
         if (!validateName(dtdName))
         {
             throw XML::SyntaxError();

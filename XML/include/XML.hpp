@@ -109,7 +109,9 @@ namespace H4
         bool namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name);
         bool validateName(XString attributeName);
         bool validateXMLDeclaration(XNodeElement *xNodeElement);
+        bool validReservedName(const XString &name);
         void addNameValuePairToList(std::vector<XAttribute> &attributes, const XString &attributeName, const XString &attributeValue);
+        XString parseName(XML::ISource &source);
         XString parseDTDValue(ISource &source);
         XString parseDTDName(ISource &source);
         XString parseEncodedCharacter(ISource &source);
