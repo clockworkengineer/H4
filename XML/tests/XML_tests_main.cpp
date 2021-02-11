@@ -747,14 +747,36 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   SECTION("XML with internal DTD with elements with multiple attributes and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE CATALOG [<!ENTITY AUTHOR \"John Doe\"><!ENTITY COMPANY \"JD Power Tools, Inc.\">"
-    "<!ENTITY EMAIL \"jd@jd-tools.com\"><!ELEMENT CATALOG (PRODUCT+)><!ELEMENT PRODUCT(SPECIFICATIONS+,OPTIONS?,PRICE+,NOTES?)>"
-    "<!ATTLIST PRODUCT NAME CDATA #IMPLIED CATEGORY (HandTool|Table|Shop-Professional) \"HandTool\""
-    "PARTNUM CDATA #IMPLIED PLANT (Pittsburgh|Milwaukee|Chicago) \"Chicago\" INVENTORY (InStock|Backordered|Discontinued)"
-    " \"InStock\"><!ELEMENT SPECIFICATIONS (#PCDATA)><!ATTLIST SPECIFICATIONS WEIGHT CDATA #IMPLIED POWER CDATA #IMPLIED>"
-    "<!ELEMENT OPTIONS (#PCDATA)><!ATTLIST OPTIONS FINISH (Metal|Polished|Matte) \"Matte\" ADAPTER (Included|Optional|NotApplicable)"
-    " \"Included\" CASE (HardShell|Soft|NotApplicable) \"HardShell\"><!ELEMENT PRICE (#PCDATA)><!ATTLIST PRICE MSRP CDATA #IMPLIED"
-    "WHOLESALE CDATA #IMPLIED STREET CDATA #IMPLIED SHIPPING CDATA #IMPLIED><!ELEMENT NOTES (#PCDATA)> ]>"
-    "<CATALOGUE> </CATALOGUE>";
+                "<!ENTITY EMAIL \"jd@jd-tools.com\"><!ELEMENT CATALOG (PRODUCT+)><!ELEMENT PRODUCT(SPECIFICATIONS+,OPTIONS?,PRICE+,NOTES?)>"
+                "<!ATTLIST PRODUCT NAME CDATA #IMPLIED CATEGORY (HandTool|Table|Shop-Professional) \"HandTool\""
+                "PARTNUM CDATA #IMPLIED PLANT (Pittsburgh|Milwaukee|Chicago) \"Chicago\" INVENTORY (InStock|Backordered|Discontinued)"
+                " \"InStock\"><!ELEMENT SPECIFICATIONS (#PCDATA)><!ATTLIST SPECIFICATIONS WEIGHT CDATA #IMPLIED POWER CDATA #IMPLIED>"
+                "<!ELEMENT OPTIONS (#PCDATA)><!ATTLIST OPTIONS FINISH (Metal|Polished|Matte) \"Matte\" ADAPTER (Included|Optional|NotApplicable)"
+                " \"Included\" CASE (HardShell|Soft|NotApplicable) \"HardShell\"><!ELEMENT PRICE (#PCDATA)><!ATTLIST PRICE MSRP CDATA #IMPLIED"
+                "WHOLESALE CDATA #IMPLIED STREET CDATA #IMPLIED SHIPPING CDATA #IMPLIED><!ELEMENT NOTES (#PCDATA)> ]>"
+                "<CATALOG> </CATALOG>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == "CATALOG");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].name == "PRODUCT");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes.size() == 5);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[0].name == "NAME");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[0].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[0].value == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[1].name == "CATEGORY");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[1].type == "(HandTool|Table|Shop-Professional)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[1].value == "HandTool");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[2].name == "PARTNUM");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[2].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[2].value == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[3].name == "PLANT");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[3].type == "(Pittsburgh|Milwaukee|Chicago)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[3].value == "Chicago");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[4].name == "INVENTORY");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[4].type == "(InStock|Backordered|Discontinued)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PRODUCT"].attributes[4].value == "InStock");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["NOTES"].name == "NOTES");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["NOTES"].content == "(#PCDATA)");
   }
 }

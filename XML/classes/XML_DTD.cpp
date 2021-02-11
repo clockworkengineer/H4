@@ -118,6 +118,7 @@ namespace H4
                     xDTDAttribute.type += source.current();
                     source.next();
                 }
+                    xDTDAttribute.type += source.current();
                 source.next();
             }
             else
