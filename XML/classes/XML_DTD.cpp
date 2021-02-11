@@ -68,84 +68,88 @@ namespace H4
     }
     void XML::parseDTDAttributeList(ISource &source, XNodeDTD *xNodeDTD)
     {
-        XDTDAttribute xDTDAttribute;
+
         source.ignoreWS();
         std::string elementName = m_toFromUTF8.to_bytes(parseDTDName(source));
-        xDTDAttribute.name = m_toFromUTF8.to_bytes(parseDTDName(source));
-        if (source.match(U"CDATA"))
+        while (source.current() != '>')
         {
-            xDTDAttribute.type = "CDATA";
-        }
-        else if (source.match(U"IDREF"))
-        {
-            xDTDAttribute.type = "IDREF";
-        }
-        else if (source.match(U"IDREFS"))
-        {
-            xDTDAttribute.type = "IDREFS";
-        }
-        else if (source.match(U"NMTOKEN"))
-        {
-            xDTDAttribute.type = "NMTOKEN";
-        }
-        else if (source.match(U"NMTOKENS"))
-        {
-            xDTDAttribute.type = "NMTOKENS";
-        }
-        else if (source.match(U"ENTITY"))
-        {
-            xDTDAttribute.type = "ENTITY";
-        }
-        else if (source.match(U"ENTITIES"))
-        {
-            xDTDAttribute.type = "ENTITIES";
-        }
-        else if (source.match(U"NOTATION"))
-        {
-            xDTDAttribute.type = "NOTATION";
-        }
-        else if (source.match(U"ID"))
-        {
-            xDTDAttribute.type = "ID";
-        }
-        else if (source.current() == '(')
-        {
-            while (source.more() && source.current() != ')')
+            XDTDAttribute xDTDAttribute;
+            xDTDAttribute.name = m_toFromUTF8.to_bytes(parseDTDName(source));
+            if (source.match(U"CDATA"))
             {
-                xDTDAttribute.type += source.current();
+                xDTDAttribute.type = "CDATA";
+            }
+            else if (source.match(U"IDREF"))
+            {
+                xDTDAttribute.type = "IDREF";
+            }
+            else if (source.match(U"IDREFS"))
+            {
+                xDTDAttribute.type = "IDREFS";
+            }
+            else if (source.match(U"NMTOKEN"))
+            {
+                xDTDAttribute.type = "NMTOKEN";
+            }
+            else if (source.match(U"NMTOKENS"))
+            {
+                xDTDAttribute.type = "NMTOKENS";
+            }
+            else if (source.match(U"ENTITY"))
+            {
+                xDTDAttribute.type = "ENTITY";
+            }
+            else if (source.match(U"ENTITIES"))
+            {
+                xDTDAttribute.type = "ENTITIES";
+            }
+            else if (source.match(U"NOTATION"))
+            {
+                xDTDAttribute.type = "NOTATION";
+            }
+            else if (source.match(U"ID"))
+            {
+                xDTDAttribute.type = "ID";
+            }
+            else if (source.current() == '(')
+            {
+                while (source.more() && source.current() != ')')
+                {
+                    xDTDAttribute.type += source.current();
+                    source.next();
+                }
                 source.next();
             }
-            source.next();
+            else
+            {
+                throw XML::SyntaxError();
+            }
+            source.ignoreWS();
+            if (source.match(U"#REQUIRED"))
+            {
+                xDTDAttribute.value = "#REQUIRED";
+            }
+            else if (source.match(U"#IMPLIED"))
+            {
+                xDTDAttribute.value = "#IMPLIED";
+            }
+            else if (source.match(U"#FIXED"))
+            {
+                xDTDAttribute.value = "#FIXED ";
+                xDTDAttribute.value += m_toFromUTF8.to_bytes(parseDTDValue(source));
+            }
+            else
+            {
+                xDTDAttribute.value = m_toFromUTF8.to_bytes(parseDTDValue(source));
+            }
+            source.ignoreWS();
+            xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
         }
-        else
-        {
-            throw XML::SyntaxError();
-        }
-        source.ignoreWS();
-        if (source.match(U"#REQUIRED"))
-        {
-            xDTDAttribute.value = "#REQUIRED";
-        }
-        else if (source.match(U"#IMPLIED"))
-        {
-            xDTDAttribute.value = "#IMPLIED";
-        }
-        else if (source.match(U"#FIXED"))
-        {
-            xDTDAttribute.value = "#FIXED ";
-            xDTDAttribute.value += m_toFromUTF8.to_bytes(parseDTDValue(source));
-        }
-        else
-        {
-            xDTDAttribute.value = m_toFromUTF8.to_bytes(parseDTDValue(source));
-        }
-        source.ignoreWS();
-        if (source.current()!='>') {
-            throw XML::SyntaxError();
-        }
+        // if (source.current()!='>') {
+        //     throw XML::SyntaxError();
+        // }
         source.next();
         source.ignoreWS();
-        xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
     }
     void XML::parseDTDEntity(ISource &source, XNodeDTD * /*xNodeDTD*/)
     {
@@ -260,6 +264,7 @@ namespace H4
             {
                 throw XML::SyntaxError();
             }
+            
         }
     }
     void XML::parseDTD(ISource &source, XNodeElement *xNodeElement)

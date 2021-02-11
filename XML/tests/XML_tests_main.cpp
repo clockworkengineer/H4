@@ -531,7 +531,6 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].name == "f");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].value == "https://www.w3schools.com/furniture");
   }
-
   SECTION("A root document and two namespaces defined in the root element.", "[XML][Parse][Namespace]")
   {
     xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">"
@@ -628,7 +627,6 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer></note>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
-
   SECTION("XML with DTD with !ENTITY definitions and uses. Check translation of entity values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note "
@@ -642,7 +640,6 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).name == "footer");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).content == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
-
   SECTION("XML with internal DTD and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\" ?>"
@@ -746,5 +743,18 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PROGRAMSLOT"].attributes[0].value == "#IMPLIED");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes[0].value == "#IMPLIED");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes[1].value == "#IMPLIED");
+  }
+  SECTION("XML with internal DTD with elements with multiple attributes and check values", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE CATALOG [<!ENTITY AUTHOR \"John Doe\"><!ENTITY COMPANY \"JD Power Tools, Inc.\">"
+    "<!ENTITY EMAIL \"jd@jd-tools.com\"><!ELEMENT CATALOG (PRODUCT+)><!ELEMENT PRODUCT(SPECIFICATIONS+,OPTIONS?,PRICE+,NOTES?)>"
+    "<!ATTLIST PRODUCT NAME CDATA #IMPLIED CATEGORY (HandTool|Table|Shop-Professional) \"HandTool\""
+    "PARTNUM CDATA #IMPLIED PLANT (Pittsburgh|Milwaukee|Chicago) \"Chicago\" INVENTORY (InStock|Backordered|Discontinued)"
+    " \"InStock\"><!ELEMENT SPECIFICATIONS (#PCDATA)><!ATTLIST SPECIFICATIONS WEIGHT CDATA #IMPLIED POWER CDATA #IMPLIED>"
+    "<!ELEMENT OPTIONS (#PCDATA)><!ATTLIST OPTIONS FINISH (Metal|Polished|Matte) \"Matte\" ADAPTER (Included|Optional|NotApplicable)"
+    " \"Included\" CASE (HardShell|Soft|NotApplicable) \"HardShell\"><!ELEMENT PRICE (#PCDATA)><!ATTLIST PRICE MSRP CDATA #IMPLIED"
+    "WHOLESALE CDATA #IMPLIED STREET CDATA #IMPLIED SHIPPING CDATA #IMPLIED><!ELEMENT NOTES (#PCDATA)> ]>"
+    "<CATALOGUE> </CATALOGUE>";
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
   }
 }
