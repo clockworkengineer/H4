@@ -653,18 +653,18 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].name == "address");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].value == "(name,company,phone)");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].name == "name");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].value == "(#PCDATA)");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[2].name == "company");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[2].value == "(#PCDATA)");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[3].name == "phone");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[3].value == "(#PCDATA)");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[4].name == "br");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[4].value == "EMPTY");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[5].name == "footer");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[5].value == "ANY");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["address"].name == "address");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["address"].value == "(name,company,phone)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["name"].name == "name");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["name"].value  == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["company"].name == "company");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["company"].value == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["phone"].name == "phone");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["phone"].value == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["br"].name == "br");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["br"].value == "EMPTY");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["footer"].name == "footer");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["footer"].value == "ANY");
   }
   SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
   {
@@ -673,8 +673,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].name == "SYSTEM_FILE");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].value == "Note.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).external.name == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).external.value == "Note.dtd");
   }
   SECTION("XML with external URL DTD and check values", "[XML][Parse][DTD]")
   {
@@ -684,10 +684,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].name == "PUBLIC_PFI");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[0].value == "-//W3C//DTD XHTML 1.0 Transitional//EN");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].name == "PUBLIC_URL");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements[1].value == "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).external.name == "PUBLIC");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).external.value == "-//W3C//DTD XHTML 1.0 Transitional//EN, http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
   }
   SECTION("XML with internal DTD with attributes", "[XML][Parse][DTD]")
   {

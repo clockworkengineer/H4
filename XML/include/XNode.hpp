@@ -19,18 +19,33 @@ namespace H4
     using XString = std::u32string;
     using XChar = XString::value_type;
     //
+    // DTD element definition
+    //
+    struct XDTDAttribute
+    {
+        std::string name;
+        std::string type;
+        std::string value;
+    };
+    struct XDTDElement
+    {
+        std::string name;
+        std::string content;
+        std::vector<XDTDAttribute> attributes;
+    };
+    //
     // X Attribute
     //
     struct XAttribute
     {
     public:
+        XAttribute() {}
         XAttribute(const std::string &name, const std::string &value) : name(name), value(value)
         {
         }
         std::string name;
         std::string value;
     };
-    using XNamespace = XAttribute;
     //
     // XNode structure.
     //
@@ -58,7 +73,6 @@ namespace H4
             return (nodeType);
         }
         XNode &operator[](int index);
-
     private:
         XNodeType nodeType;
     };
@@ -125,7 +139,8 @@ namespace H4
         {
         }
         std::string name;
-        std::vector<XAttribute> elements;
+        XAttribute external;
+        std::unordered_map<std::string, XDTDAttribute> elements;
     };
     //
     // Convert base XNode reference
