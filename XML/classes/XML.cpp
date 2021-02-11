@@ -321,7 +321,7 @@ namespace H4
             {
                 throw XML::SyntaxError();
             }
-            xNodeElement->contents += m_toFromUTF8.to_bytes(source.current());
+            xNodeElement->content += m_toFromUTF8.to_bytes(source.current());
             xNodeCDATA.cdata += m_toFromUTF8.to_bytes(source.current());
             source.next();
         }
@@ -408,7 +408,7 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
-        xNodeElement->contents += m_toFromUTF8.to_bytes(parseEncodedCharacter(source));
+        xNodeElement->content += m_toFromUTF8.to_bytes(parseEncodedCharacter(source));
     }
     void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
     {

@@ -66,15 +66,86 @@ namespace H4
         }
         return (dtdName);
     }
-    void XML::parseDTDAttributeList(ISource &source, XNodeDTD * /*xNodeDTD*/)
+    void XML::parseDTDAttributeList(ISource &source, XNodeDTD *xNodeDTD)
     {
+        XDTDAttribute xDTDAttribute;
         source.ignoreWS();
-        while (source.more() && source.current() != '>')
+        std::string elementName = m_toFromUTF8.to_bytes(parseDTDName(source));
+        xDTDAttribute.name = m_toFromUTF8.to_bytes(parseDTDName(source));
+        if (source.match(U"CDATA"))
         {
+            xDTDAttribute.type = "CDATA";
+        }
+        else if (source.match(U"IDREF"))
+        {
+            xDTDAttribute.type = "IDREF";
+        }
+        else if (source.match(U"IDREFS"))
+        {
+            xDTDAttribute.type = "IDREFS";
+        }
+        else if (source.match(U"NMTOKEN"))
+        {
+            xDTDAttribute.type = "NMTOKEN";
+        }
+        else if (source.match(U"NMTOKENS"))
+        {
+            xDTDAttribute.type = "NMTOKENS";
+        }
+        else if (source.match(U"ENTITY"))
+        {
+            xDTDAttribute.type = "ENTITY";
+        }
+        else if (source.match(U"ENTITIES"))
+        {
+            xDTDAttribute.type = "ENTITIES";
+        }
+        else if (source.match(U"NOTATION"))
+        {
+            xDTDAttribute.type = "NOTATION";
+        }
+        else if (source.match(U"ID"))
+        {
+            xDTDAttribute.type = "ID";
+        }
+        else if (source.current() == '(')
+        {
+            while (source.more() && source.current() != ')')
+            {
+                xDTDAttribute.type += source.current();
+                source.next();
+            }
             source.next();
+        }
+        else
+        {
+            throw XML::SyntaxError();
+        }
+        source.ignoreWS();
+        if (source.match(U"#REQUIRED"))
+        {
+            xDTDAttribute.value = "#REQUIRED";
+        }
+        else if (source.match(U"#IMPLIED"))
+        {
+            xDTDAttribute.value = "#IMPLIED";
+        }
+        else if (source.match(U"#FIXED"))
+        {
+            xDTDAttribute.value = "#FIXED ";
+            xDTDAttribute.value += m_toFromUTF8.to_bytes(parseDTDValue(source));
+        }
+        else
+        {
+            xDTDAttribute.value = m_toFromUTF8.to_bytes(parseDTDValue(source));
+        }
+        source.ignoreWS();
+        if (source.current()!='>') {
+            throw XML::SyntaxError();
         }
         source.next();
         source.ignoreWS();
+        xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
     }
     void XML::parseDTDEntity(ISource &source, XNodeDTD * /*xNodeDTD*/)
     {
@@ -96,15 +167,15 @@ namespace H4
     {
         source.ignoreWS();
         XString elementName = parseDTDName(source);
-        XString elementValue;
+        XString elementContent;
         if (source.current() == '(')
         {
             int bracketCount = 1;
-            elementValue += source.current();
+            elementContent += source.current();
             source.next();
             while (source.more() && bracketCount != 0)
             {
-                elementValue += source.current();
+                elementContent += source.current();
                 source.next();
                 if (source.current() == '(')
                 {
@@ -115,16 +186,16 @@ namespace H4
                     bracketCount--;
                 }
             }
-            elementValue += source.current();
+            elementContent += source.current();
             source.next();
         }
         else if (source.match(U"EMPTY"))
         {
-            elementValue = U"EMPTY";
+            elementContent = U"EMPTY";
         }
         else if (source.match(U"ANY"))
         {
-            elementValue = U"ANY";
+            elementContent = U"ANY";
         }
         else
         {
@@ -137,10 +208,11 @@ namespace H4
         }
         source.next();
         source.ignoreWS();
-        XDTDAttribute element;
+        XDTDElement element;
         element.name = m_toFromUTF8.to_bytes(elementName);
-        element.value = m_toFromUTF8.to_bytes(elementValue);
-        xNodeDTD->elements[element.name] = element;
+        element.content = m_toFromUTF8.to_bytes(elementContent);
+        xNodeDTD->elements[element.name].name = element.name;
+        xNodeDTD->elements[element.name].content = element.content;
     }
     void XML::parseDTDExternal(ISource &source, XNodeDTD *xNodeDTD)
     {

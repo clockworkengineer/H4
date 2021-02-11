@@ -90,7 +90,7 @@ namespace H4
             this->name = name;
         }
         std::string name;
-        std::string contents;
+        std::string content;
         std::vector<XAttribute> attributes;
         std::vector<XAttribute> namespaces;
         std::vector<std::unique_ptr<XNode>> elements;
@@ -140,7 +140,7 @@ namespace H4
         }
         std::string name;
         XAttribute external;
-        std::unordered_map<std::string, XDTDAttribute> elements;
+        std::unordered_map<std::string, XDTDElement> elements;
     };
     //
     // Convert base XNode reference

@@ -185,7 +185,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).contents == "    This is some contents    ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).content == "    This is some contents    ");
   }
   SECTION("Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
   {
@@ -200,11 +200,11 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).contents == "    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).content == "    This is some contents 1   ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).contents == "    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).content == "    This is some contents 2   ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).contents == "    This is some contents 3   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).content == "    This is some contents 3   ");
   }
 }
 TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
@@ -298,13 +298,13 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 6);
     REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][0]).comment == "Address one ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).contents == "    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).content == "    This is some contents 1   ");
     REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][2]).comment == "Address two ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).contents == "    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).content == "    This is some contents 2   ");
     REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][4]).comment == "Address three ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).contents == "    This is some contents 3   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).content == "    This is some contents 3   ");
   }
   SECTION("A single comment after root element", "[XML][Parse][[Comments]")
   {
@@ -327,13 +327,13 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test<!-- a simple comment -->Test</root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == "TestTest");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "TestTest");
   }
   SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][[Comments]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><root>Test  <!-- a simple comment -->  Test</root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == "Test    Test");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "Test    Test");
   }
   SECTION("A simple single line comment containing -- is illegal", "[XML][Parse][[Comments]")
   {
@@ -365,7 +365,7 @@ TEST_CASE("Parse XML with Unicode character in element names, attributes, commen
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].name == "լեզու");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].value == "ռուսերեն");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == "данные");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "данные");
   }
 }
 TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][Entities]")
@@ -376,31 +376,31 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &amp; </root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == " & ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " & ");
   }
   SECTION("Parse entity &quot; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &quot; </root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == " \" ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " \" ");
   }
   SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &apos; &lt; &gt; </root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == " ' < > ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " ' < > ");
   }
   SECTION("Parse reference &#x00A5; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &#x00A5; </root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == " ¥ ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " ¥ ");
   }
   SECTION("Parse reference &#163; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> <root> &#163; </root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == " £ ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " £ ");
   }
   SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Entities]")
   {
@@ -476,7 +476,7 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
                 " <root>   <![CDATA[<message> Welcome to TutorialsPoint </message>]]>   </root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).contents == "   <message> Welcome to TutorialsPoint </message>   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "   <message> Welcome to TutorialsPoint </message>   ");
     REQUIRE(XNodeRef<XNodeCDATA>((*xNodeRoot)[0][0]).cdata == "<message> Welcome to TutorialsPoint </message>");
   }
   SECTION("Parse XML root containing CDDATA containing nested CDATA ", "[XML][Parse][CDATA]")
@@ -640,7 +640,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::element);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).name == "footer");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).contents == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).content == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
 
   SECTION("XML with internal DTD and check values", "[XML][Parse][DTD]")
@@ -654,17 +654,17 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["address"].name == "address");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["address"].value == "(name,company,phone)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["address"].content == "(name,company,phone)");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["name"].name == "name");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["name"].value  == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["name"].content == "(#PCDATA)");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["company"].name == "company");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["company"].value == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["company"].content == "(#PCDATA)");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["phone"].name == "phone");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["phone"].value == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["phone"].content == "(#PCDATA)");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["br"].name == "br");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["br"].value == "EMPTY");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["br"].content == "EMPTY");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["footer"].name == "footer");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["footer"].value == "ANY");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["footer"].content == "ANY");
   }
   SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
   {
@@ -713,6 +713,38 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED><!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>"
                 "<!ATTLIST TITLE RATING CDATA #IMPLIED><!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>"
                 "<TVSCHEDULE></TVSCHEDULE>";
-    REQUIRE_NOTHROW(xml.parse(xmlString));
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == "TVSCHEDULE");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TVSCHEDULE"].name == "TVSCHEDULE");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["CHANNEL"].name == "CHANNEL");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["BANNER"].name == "BANNER");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["DAY"].name == "DAY");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["HOLIDAY"].name == "HOLIDAY");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["DATE"].name == "DATE");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PROGRAMSLOT"].name == "PROGRAMSLOT");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TIME"].name == "TIME");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].name == "TITLE");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["DESCRIPTION"].name == "DESCRIPTION");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TVSCHEDULE"].attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["CHANNEL"].attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PROGRAMSLOT"].attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes.size() == 2);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TVSCHEDULE"].attributes[0].name == "NAME");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["CHANNEL"].attributes[0].name == "CHAN");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PROGRAMSLOT"].attributes[0].name == "VTR");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes[0].name == "RATING");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes[1].name == "LANGUAGE");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TVSCHEDULE"].attributes[0].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["CHANNEL"].attributes[0].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PROGRAMSLOT"].attributes[0].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes[0].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes[1].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TVSCHEDULE"].attributes[0].value == "#REQUIRED");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["CHANNEL"].attributes[0].value == "#REQUIRED");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["PROGRAMSLOT"].attributes[0].value == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes[0].value == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes[1].value == "#IMPLIED");
   }
 }
