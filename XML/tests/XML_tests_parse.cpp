@@ -472,7 +472,8 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
   SECTION("Parse XML containing PI after declaration and check values", "[XML][Parse][PI]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
-                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?><root></root>";
+                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>"
+                "<root></root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::pi);
     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0]).name == "xml-stylesheet");
@@ -481,7 +482,8 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
   SECTION("Parse XML containing PI in root section and check values", "[XML][Parse][PI]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
-                "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?></root>";
+                "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>"
+                "</root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0][0]).getNodeType() == XNodeType::pi);
     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0][0]).name == "xml-stylesheet");
@@ -495,13 +497,17 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
   SECTION("Parse XML root containing CDDATA containing a XML tags", "[XML][Parse][CDATA]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                " <root>   <![CDATA[<message> Welcome to TutorialsPoint </message>   ]]>   </root>";
+                " <root>"
+                "   <![CDATA[<message> Welcome to TutorialsPoint </message>   ]]>   "
+                "</root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Parse XML root containing CDDATA containing a XML tags and check contents", "[XML][Parse][CDATA]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                " <root>   <![CDATA[<message> Welcome to TutorialsPoint </message>]]>   </root>";
+                " <root>"
+                "   <![CDATA[<message> Welcome to TutorialsPoint </message>]]>   "
+                "</root>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "   <message> Welcome to TutorialsPoint </message>   ");
     REQUIRE(XNodeRef<XNodeCDATA>((*xNodeRoot)[0][0]).cdata == "<message> Welcome to TutorialsPoint </message>");
@@ -509,14 +515,18 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
   SECTION("Parse XML root containing CDDATA containing nested CDATA ", "[XML][Parse][CDATA]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                " <root>   <![CDATA[< Test test <![CDATA[ Test text ]]> ]]>   </root>";
+                " <root>"
+                "   <![CDATA[< Test test <![CDATA[ Test text ]]> ]]>"
+                "   </root>";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Parse XML root containing CDDATA containing ]]> ", "[XML][Parse][CDATA]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                " <root>   <![CDATA[< Test Test text ]]>  ]]>   </root>";
+                " <root>"
+                "   <![CDATA[< Test Test text ]]>  ]]>"
+                "   </root>";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
@@ -542,11 +552,16 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
   std::string xmlString;
   SECTION("A root document and two namespaces defined in the child two table elements.", "[XML][Parse][Namespace]")
   {
-    xmlString = "<root><h:table xmlns:h=\"http://www.w3.org/TR/html4/\">"
-                "<h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table>"
+    xmlString = "<root>"
+                "<h:table xmlns:h=\"http://www.w3.org/TR/html4/\">"
+                "<h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr>"
+                "</h:table>"
                 "<f:table xmlns:f=\"https://www.w3schools.com/furniture\">"
-                "<f:name>African Coffee Table</f:name><f:width>80</f:width>"
-                "<f:length>120</f:length></f:table></root>";
+                "<f:name>African Coffee Table</f:name>"
+                "<f:width>80</f:width>"
+                "<f:length>120</f:length>"
+                "</f:table>"
+                "</root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "h:table");
@@ -561,9 +576,8 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
   SECTION("A root document and two namespaces defined in the root element.", "[XML][Parse][Namespace]")
   {
     xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">"
-                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table><f:table>"
-                "<f:name>African Coffee Table</f:name><f:width>80</f:width>"
-                "<f:length>120</f:length></f:table></root>";
+                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table>"
+                "<f:table><f:name>African Coffee Table</f:name><f:width>80</f:width><f:length>120</f:length></f:table></root>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "h:table");
