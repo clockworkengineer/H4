@@ -9,6 +9,7 @@
 #include <codecvt>
 #include <locale>
 #include <unordered_map>
+#include <set>
 //
 // XML XNodes
 //
@@ -115,6 +116,8 @@ namespace H4
         XString parseValue(ISource &source);
         XString parseEncodedCharacter(ISource &source);
         XString parseReferenceOrEntity(ISource &source);
+        XString parseDTDAttributeType(ISource &source);
+        XString parseDTDAttributeValue(ISource &source);
         void parseDefault(ISource &source, XNodeElement *xNodeElement);
         void parseTagName(ISource &source, XNodeElement *xNodeElement);
         void parseChildElement(ISource &source, XNodeElement *xNodeElement);
@@ -137,8 +140,9 @@ namespace H4
         // =================
         static std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
-        static XAttribute defaultAtributes[3];
-        std::unordered_map<XString, XString> m_entityToCharacter;
+        static XAttribute m_defaultAtributes[3];
+        static std::set<XString> m_dtdAttrListTypes;
+        std::unordered_map<XString, XString> m_entityMapping;
     };
 } // namespace H4
 #endif /* XML_HPP */

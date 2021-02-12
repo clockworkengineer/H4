@@ -143,6 +143,7 @@ namespace H4
         std::string name;
         XAttribute external;
         std::unordered_map<std::string, XDTDElement> elements;
+        std::unordered_map<XString, XString> entityMapping;
     };
     //
     // Convert base XNode reference

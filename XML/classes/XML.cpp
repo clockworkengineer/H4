@@ -34,9 +34,10 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
-    XAttribute XML::defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
+    XAttribute XML::m_defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
     std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> XML::m_UTF8;
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> XML::m_UTF16;
+    std::set<XString> XML::m_dtdAttrListTypes;
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -45,11 +46,21 @@ namespace H4
     // ===============
     void XML::initialiseTables()
     {
-        m_entityToCharacter[U"amp"] = U"&";
-        m_entityToCharacter[U"quot"] = U"\"";
-        m_entityToCharacter[U"apos"] = U"\'";
-        m_entityToCharacter[U"lt"] = U"<";
-        m_entityToCharacter[U"gt"] = U">";
+        m_entityMapping[U"amp"] = U"&";
+        m_entityMapping[U"quot"] = U"\"";
+        m_entityMapping[U"apos"] = U"\'";
+        m_entityMapping[U"lt"] = U"<";
+        m_entityMapping[U"gt"] = U">";
+        XML::m_dtdAttrListTypes.insert(
+            {U"CDATA",
+             U"IDREF",
+             U"IDREFS",
+             U"NMTOKEN",
+             U"NMTOKENS",
+             U"ENTITY",
+             U"ENTITIES",
+             U"NOTATION",
+             U"ID"});
     }
     bool XML::namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name)
     {
@@ -173,14 +184,14 @@ namespace H4
         for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
         {
             if ((currentAttribute < (int)xNodeElement->attributes.size()) &&
-                (xNodeElement->attributes[currentAttribute].name == XML::defaultAtributes[attrIndex].name))
+                (xNodeElement->attributes[currentAttribute].name == XML::m_defaultAtributes[attrIndex].name))
             {
                 validatedAttributes.push_back(xNodeElement->attributes[currentAttribute]);
                 currentAttribute++;
             }
             else
             {
-                validatedAttributes.push_back(XML::defaultAtributes[attrIndex]);
+                validatedAttributes.push_back(XML::m_defaultAtributes[attrIndex]);
             }
         }
         // Order not version, encoding, standalone == syntax error
@@ -272,9 +283,9 @@ namespace H4
         {
             return (XString(1, calculatecharacterReference(entityName.substr(1))));
         }
-        else if (m_entityToCharacter.count(entityName) > 0)
+        else if (m_entityMapping.count(entityName) > 0)
         {
-            return (m_entityToCharacter[entityName]);
+            return (m_entityMapping[entityName]);
         }
         throw XML::SyntaxError();
     }

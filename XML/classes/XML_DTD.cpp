@@ -40,6 +40,58 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    XString XML::parseDTDAttributeType(ISource &source)
+    {
+        XString type;
+        for (auto attrType : XML::m_dtdAttrListTypes)
+        {
+            if (source.match(attrType))
+            {
+                type = attrType;
+            }
+        }
+        if (type.empty())
+        {
+            if (source.current() == '(')
+            {
+                while (source.more() && source.current() != ')')
+                {
+                    type += source.current();
+                    source.next();
+                }
+                type += source.current();
+                source.next();
+            }
+            else
+            {
+                throw XML::SyntaxError();
+            }
+        }
+        source.ignoreWS();
+        return (type);
+    }
+    XString XML::parseDTDAttributeValue(ISource &source)
+    {
+        XString value;
+        if (source.match(U"#REQUIRED"))
+        {
+            value = U"#REQUIRED";
+        }
+        else if (source.match(U"#IMPLIED"))
+        {
+            value = U"#IMPLIED";
+        }
+        else if (source.match(U"#FIXED"))
+        {
+            value = U"#FIXED ";
+            value += parseValue(source);
+        }
+        else
+        {
+            value = parseValue(source);
+        }
+        return (value);
+    }
     void XML::parseDTDAttributeList(ISource &source, XNodeDTD *xNodeDTD)
     {
         source.ignoreWS();
@@ -48,86 +100,20 @@ namespace H4
         {
             XDTDAttribute xDTDAttribute;
             xDTDAttribute.name = m_UTF8.to_bytes(parseName(source));
-            if (source.match(U"CDATA"))
-            {
-                xDTDAttribute.type = "CDATA";
-            }
-            else if (source.match(U"IDREF"))
-            {
-                xDTDAttribute.type = "IDREF";
-            }
-            else if (source.match(U"IDREFS"))
-            {
-                xDTDAttribute.type = "IDREFS";
-            }
-            else if (source.match(U"NMTOKEN"))
-            {
-                xDTDAttribute.type = "NMTOKEN";
-            }
-            else if (source.match(U"NMTOKENS"))
-            {
-                xDTDAttribute.type = "NMTOKENS";
-            }
-            else if (source.match(U"ENTITY"))
-            {
-                xDTDAttribute.type = "ENTITY";
-            }
-            else if (source.match(U"ENTITIES"))
-            {
-                xDTDAttribute.type = "ENTITIES";
-            }
-            else if (source.match(U"NOTATION"))
-            {
-                xDTDAttribute.type = "NOTATION";
-            }
-            else if (source.match(U"ID"))
-            {
-                xDTDAttribute.type = "ID";
-            }
-            else if (source.current() == '(')
-            {
-                while (source.more() && source.current() != ')')
-                {
-                    xDTDAttribute.type += source.current();
-                    source.next();
-                }
-                xDTDAttribute.type += source.current();
-                source.next();
-            }
-            else
-            {
-                throw XML::SyntaxError();
-            }
-            source.ignoreWS();
-            if (source.match(U"#REQUIRED"))
-            {
-                xDTDAttribute.value = "#REQUIRED";
-            }
-            else if (source.match(U"#IMPLIED"))
-            {
-                xDTDAttribute.value = "#IMPLIED";
-            }
-            else if (source.match(U"#FIXED"))
-            {
-                xDTDAttribute.value = "#FIXED ";
-                xDTDAttribute.value += m_UTF8.to_bytes(parseValue(source));
-            }
-            else
-            {
-                xDTDAttribute.value = m_UTF8.to_bytes(parseValue(source));
-            }
+            xDTDAttribute.type = m_UTF8.to_bytes(parseDTDAttributeType(source));
+            xDTDAttribute.value = m_UTF8.to_bytes(parseDTDAttributeValue(source));
             source.ignoreWS();
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
         }
-               source.ignoreWS();
+        source.ignoreWS();
     }
-    void XML::parseDTDEntity(ISource &source, XNodeDTD * /*xNodeDTD*/)
+    void XML::parseDTDEntity(ISource &source, XNodeDTD *xNodeDTD)
     {
         source.ignoreWS();
         XString entityName = parseName(source);
         XString entityValue = parseValue(source);
-        m_entityToCharacter[entityName] = entityValue;
-
+        m_entityMapping[entityName] = entityValue;
+        xNodeDTD->entityMapping[entityName] = entityValue;
     }
     void XML::parseDTDElement(ISource &source, XNodeDTD *xNodeDTD)
     {
