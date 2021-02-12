@@ -218,8 +218,7 @@ namespace H4
     }
     void XML::parseTagName(ISource &source, XNodeElement *xNodeElement)
     {
-        XString tagName = parseName(source);
-        xNodeElement->name = XML::m_UTF8.to_bytes(tagName);
+        xNodeElement->name = XML::m_UTF8.to_bytes(parseName(source));
     }
     XString XML::parseEncodedCharacter(ISource &source)
     {
@@ -259,11 +258,6 @@ namespace H4
             return (value);
         }
         throw XML::SyntaxError();
-    }
-    XString XML::parseAttributeName(ISource &source)
-    {
-        XString attributeName = parseName(source);
-        return (attributeName);
     }
     XString XML::parseReferenceOrEntity(ISource &source)
     {
@@ -333,11 +327,7 @@ namespace H4
                source.current() != '/' &&
                source.current() != '>')
         {
-            XString attributeName = parseAttributeName(source);
-            if (source.current() != '=')
-            {
-                throw XML::SyntaxError();
-            }
+            XString attributeName = parseName(source);
             source.next();
             source.ignoreWS();
             XString attributeValue = parseValue(source);

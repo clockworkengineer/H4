@@ -91,7 +91,7 @@ namespace H4
                     xDTDAttribute.type += source.current();
                     source.next();
                 }
-                    xDTDAttribute.type += source.current();
+                xDTDAttribute.type += source.current();
                 source.next();
             }
             else
@@ -183,11 +183,8 @@ namespace H4
         }
         source.next();
         source.ignoreWS();
-        XDTDElement element;
-        element.name = m_UTF8.to_bytes(elementName);
-        element.content = m_UTF8.to_bytes(elementContent);
-        xNodeDTD->elements[element.name].name = element.name;
-        xNodeDTD->elements[element.name].content = element.content;
+        XDTDElement element(m_UTF8.to_bytes(elementName), m_UTF8.to_bytes(elementContent));
+        xNodeDTD->elements.emplace(std::pair(element.name, element));
     }
     void XML::parseDTDExternal(ISource &source, XNodeDTD *xNodeDTD)
     {

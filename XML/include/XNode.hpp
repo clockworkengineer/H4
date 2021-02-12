@@ -29,6 +29,8 @@ namespace H4
     };
     struct XDTDElement
     {
+        XDTDElement() {}
+        XDTDElement(const std::string &name, const std::string &content) : name(name), content(content) {}
         std::string name;
         std::string content;
         std::vector<XDTDAttribute> attributes;
