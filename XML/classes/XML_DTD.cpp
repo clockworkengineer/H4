@@ -119,24 +119,15 @@ namespace H4
             source.ignoreWS();
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
         }
-        source.next();
-        source.ignoreWS();
+       
     }
     void XML::parseDTDEntity(ISource &source, XNodeDTD * /*xNodeDTD*/)
     {
         source.ignoreWS();
         XString entityName = parseName(source);
         XString entityValue = parseValue(source);
-        if (source.current() == '>')
-        {
-            m_entityToCharacter[entityName] = entityValue;
-            source.next();
-            source.ignoreWS();
-        }
-        else
-        {
-            throw XML::SyntaxError();
-        }
+        m_entityToCharacter[entityName] = entityValue;
+
     }
     void XML::parseDTDElement(ISource &source, XNodeDTD *xNodeDTD)
     {
@@ -176,13 +167,6 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
-        source.ignoreWS();
-        if (source.current() != '>')
-        {
-            throw XML::SyntaxError();
-        }
-        source.next();
-        source.ignoreWS();
         XDTDElement element(m_UTF8.to_bytes(elementName), m_UTF8.to_bytes(elementContent));
         xNodeDTD->elements.emplace(std::pair(element.name, element));
     }
@@ -232,6 +216,13 @@ namespace H4
             {
                 throw XML::SyntaxError();
             }
+            source.ignoreWS();
+            if (source.current() != '>')
+            {
+                throw XML::SyntaxError();
+            }
+            source.next();
+            source.ignoreWS();
         }
     }
     void XML::parseDTD(ISource &source, XNodeElement *xNodeElement)
