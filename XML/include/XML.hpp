@@ -111,11 +111,9 @@ namespace H4
         bool validateXMLDeclaration(XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);
         void addNameValuePairToList(std::vector<XAttribute> &attributes, const XString &attributeName, const XString &attributeValue);
-        XString parseName(XML::ISource &source);
-        XString parseDTDValue(ISource &source);
-        XString parseDTDName(ISource &source);
+        XString parseName(ISource &source);
+        XString parseValue(ISource &source);
         XString parseEncodedCharacter(ISource &source);
-        XString parseAttributeValue(ISource &source);
         XString parseAttributeName(ISource &source);
         XString parseReferenceOrEntity(ISource &source);
         void parseDefault(ISource &source, XNodeElement *xNodeElement);
@@ -124,11 +122,11 @@ namespace H4
         void parseAttributes(ISource &source, XNodeElement *xNodeElement);
         void parseComment(ISource &source, XNodeElement *xNodeElement);
         void parseCDATA(ISource &source, XNodeElement *xNodeElement);
-        void parseDTDAttributeList(ISource &source, XNodeDTD * xNodeDTD);
+        void parseDTDAttributeList(ISource &source, XNodeDTD *xNodeDTD);
         void parseDTDEntity(ISource &source, XNodeDTD *xNodeDTD);
         void parseDTDElement(ISource &source, XNodeDTD *xNodeElement);
         void parseDTDExternal(ISource &source, XNodeDTD *xNodeDTD);
-        void parseDTDInternal(ISource &source, XNodeDTD * xNodeDTD);
+        void parseDTDInternal(ISource &source, XNodeDTD *xNodeDTD);
         void parseDTD(ISource &source, XNodeElement *XNodeElement);
         void parsePI(ISource &source, XNodeElement *xNodeElement);
         void parseElementContents(ISource &source, XNodeElement *XNodeElement);
@@ -138,8 +136,8 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        static std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_toFromUTF8;
-        static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_toFromUTF16;
+        static std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
+        static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
         static XAttribute defaultAtributes[3];
         std::unordered_map<XString, XString> m_entityToCharacter;
     };
