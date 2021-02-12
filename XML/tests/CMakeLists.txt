@@ -13,6 +13,7 @@ set(TEST_EXECUTABLE ${XML_LIBRARY_NAME}_Unit_Tests)
 
 set(TEST_SOURCES
     XML_tests_main.cpp
+    XML_tests_parse.cpp
 )
 
 add_executable(${TEST_EXECUTABLE} ${TEST_SOURCES})

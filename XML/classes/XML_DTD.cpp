@@ -146,9 +146,6 @@ namespace H4
             source.ignoreWS();
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
         }
-        // if (source.current()!='>') {
-        //     throw XML::SyntaxError();
-        // }
         source.next();
         source.ignoreWS();
     }

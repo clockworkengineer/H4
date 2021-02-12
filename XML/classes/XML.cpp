@@ -34,7 +34,9 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
-    static XAttribute defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
+    XAttribute XML::defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
+    std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> XML::m_toFromUTF8;
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> XML::m_toFromUTF16;
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -52,7 +54,7 @@ namespace H4
     bool XML::namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name)
     {
         return (std::find_if(attributes.rbegin(), attributes.rend(),
-                             [&name, this](const XAttribute &attr) { return (attr.name == m_toFromUTF8.to_bytes(name)); }) != attributes.rend());
+                             [&name](const XAttribute &attr) { return (attr.name == XML::m_toFromUTF8.to_bytes(name)); }) != attributes.rend());
     }
     long XML::calculatecharacterReference(XString reference)
     {
@@ -63,7 +65,7 @@ namespace H4
             reference = reference.substr(1);
             temp = 16;
         }
-        temp = std::strtol(m_toFromUTF8.to_bytes(reference).c_str(), &end, temp);
+        temp = std::strtol(XML::m_toFromUTF8.to_bytes(reference).c_str(), &end, temp);
         if (*end == '\0')
         {
             return (temp);
@@ -85,7 +87,7 @@ namespace H4
     {
         if (!namePresentInAttributeList(attributes, attributeName))
         {
-            attributes.emplace_back(m_toFromUTF8.to_bytes(attributeName), m_toFromUTF8.to_bytes(attributeValue));
+            attributes.emplace_back(XML::m_toFromUTF8.to_bytes(attributeName), XML::m_toFromUTF8.to_bytes(attributeValue));
         }
         else
         {
@@ -171,14 +173,14 @@ namespace H4
         for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
         {
             if ((currentAttribute < (int)xNodeElement->attributes.size()) &&
-                (xNodeElement->attributes[currentAttribute].name == defaultAtributes[attrIndex].name))
+                (xNodeElement->attributes[currentAttribute].name == XML::defaultAtributes[attrIndex].name))
             {
                 validatedAttributes.push_back(xNodeElement->attributes[currentAttribute]);
                 currentAttribute++;
             }
             else
             {
-                validatedAttributes.push_back(defaultAtributes[attrIndex]);
+                validatedAttributes.push_back(XML::defaultAtributes[attrIndex]);
             }
         }
         // Order not version, encoding, standalone == syntax error
@@ -217,7 +219,7 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
-        xNodeElement->name = m_toFromUTF8.to_bytes(tagName);
+        xNodeElement->name = XML::m_toFromUTF8.to_bytes(tagName);
     }
     XString XML::parseEncodedCharacter(ISource &source)
     {
@@ -291,7 +293,7 @@ namespace H4
         XNodeComment xNodeComment;
         while (source.more() && !source.match(U"--"))
         {
-            xNodeComment.comment += m_toFromUTF8.to_bytes(source.current());
+            xNodeComment.comment += XML::m_toFromUTF8.to_bytes(source.current());
             source.next();
         }
         if (source.current() != '>')
@@ -304,10 +306,10 @@ namespace H4
     void XML::parsePI(ISource &source, XNodeElement *xNodeElement)
     {
         XNodePI xNodePI;
-        xNodePI.name = m_toFromUTF8.to_bytes(parseName(source));
+        xNodePI.name = XML::m_toFromUTF8.to_bytes(parseName(source));
         while (source.more() && !source.match(U"?>"))
         {
-            xNodePI.parameters += m_toFromUTF8.to_bytes(source.current());
+            xNodePI.parameters += XML::m_toFromUTF8.to_bytes(source.current());
             source.next();
         }
         xNodeElement->elements.emplace_back(std::make_unique<XNodePI>(xNodePI));
@@ -321,8 +323,8 @@ namespace H4
             {
                 throw XML::SyntaxError();
             }
-            xNodeElement->content += m_toFromUTF8.to_bytes(source.current());
-            xNodeCDATA.cdata += m_toFromUTF8.to_bytes(source.current());
+            xNodeElement->content += XML::m_toFromUTF8.to_bytes(source.current());
+            xNodeCDATA.cdata += XML::m_toFromUTF8.to_bytes(source.current());
             source.next();
         }
         xNodeElement->elements.emplace_back(std::make_unique<XNodeCDATA>(xNodeCDATA));
@@ -395,7 +397,7 @@ namespace H4
         parseElement(source, &xNodeChildElement);
         if (auto pos = xNodeChildElement.name.find(':') != std::string::npos)
         {
-            if (!namePresentInAttributeList(xNodeChildElement.namespaces, m_toFromUTF8.from_bytes(xNodeChildElement.name.substr(0, pos))))
+            if (!namePresentInAttributeList(xNodeChildElement.namespaces, XML::m_toFromUTF8.from_bytes(xNodeChildElement.name.substr(0, pos))))
             {
                 throw XML::SyntaxError();
             }
@@ -408,7 +410,7 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
-        xNodeElement->content += m_toFromUTF8.to_bytes(parseEncodedCharacter(source));
+        xNodeElement->content += XML::m_toFromUTF8.to_bytes(parseEncodedCharacter(source));
     }
     void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
     {
@@ -439,7 +441,7 @@ namespace H4
         parseAttributes(source, xNodeElement);
         if (source.match(U"/>") || source.match(U">"))
         {
-            XString closingTag = U"</" + m_toFromUTF8.from_bytes(xNodeElement->name) + U">";
+            XString closingTag = U"</" + XML::m_toFromUTF8.from_bytes(xNodeElement->name) + U">";
             while (source.more() && !source.match(closingTag))
             {
                 parseElementContents(source, xNodeElement);
@@ -471,7 +473,7 @@ namespace H4
     // ==============
     std::unique_ptr<XNode> XML::parse(const std::string &xmlToParse)
     {
-        BufferSource xml(m_toFromUTF8.from_bytes(convertCRLFToLF(xmlToParse)));
+        BufferSource xml(XML::m_toFromUTF8.from_bytes(convertCRLFToLF(xmlToParse)));
         return (parseXML(xml));
     }
     std::unique_ptr<XNode> XML::parse(const std::u16string &xmlToParse)
@@ -484,6 +486,6 @@ namespace H4
                 ch = (static_cast<u_int16_t>(ch) >> 8) | (static_cast<u_int16_t>(ch) << 8);
             }
         }
-        return (parse(m_toFromUTF16.to_bytes(utf16xml)));
+        return (parse(XML::m_toFromUTF16.to_bytes(utf16xml)));
     }
 } // namespace H4

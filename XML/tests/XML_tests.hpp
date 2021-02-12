@@ -18,4 +18,6 @@
 // ==========================
 // Unit test helper functions
 // ==========================
+std::string readXMLFromFileUTF8(const std::string &xmlFileName);
+std::u16string readXMLFromFileUTF16(const std::string &xmlFileName);
 #endif /* XML_TESTS_HPP */

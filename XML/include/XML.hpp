@@ -138,8 +138,9 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_toFromUTF8;
-        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_toFromUTF16;
+        static std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_toFromUTF8;
+        static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_toFromUTF16;
+        static XAttribute defaultAtributes[3];
         std::unordered_map<XString, XString> m_entityToCharacter;
     };
 } // namespace H4
