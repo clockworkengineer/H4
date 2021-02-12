@@ -119,7 +119,7 @@ namespace H4
             source.ignoreWS();
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
         }
-       
+               source.ignoreWS();
     }
     void XML::parseDTDEntity(ISource &source, XNodeDTD * /*xNodeDTD*/)
     {
@@ -167,6 +167,7 @@ namespace H4
         {
             throw XML::SyntaxError();
         }
+        source.ignoreWS();
         XDTDElement element(m_UTF8.to_bytes(elementName), m_UTF8.to_bytes(elementContent));
         xNodeDTD->elements.emplace(std::pair(element.name, element));
     }
@@ -183,10 +184,6 @@ namespace H4
             source.ignoreWS();
             xNodeDTD->external.name = m_UTF8.to_bytes(U"PUBLIC");
             xNodeDTD->external.value = m_UTF8.to_bytes(parseValue(source)) + ", " + m_UTF8.to_bytes(parseValue(source));
-        }
-        else
-        {
-            throw XML::SyntaxError();
         }
         if (source.current() != '>')
         {
@@ -212,11 +209,6 @@ namespace H4
             {
                 parseDTDAttributeList(source, xNodeDTD);
             }
-            else
-            {
-                throw XML::SyntaxError();
-            }
-            source.ignoreWS();
             if (source.current() != '>')
             {
                 throw XML::SyntaxError();
