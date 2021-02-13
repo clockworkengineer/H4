@@ -109,11 +109,17 @@ namespace H4
     }
     void XML::parseDTDEntity(ISource &source, XNodeDTD *xNodeDTD)
     {
+        XString entity=U"&";
         source.ignoreWS();
-        XString entityName = parseName(source);
+        if (source.current()=='%') {
+            entity = U"%";
+            source.next();
+            source.ignoreWS();
+        }
+        entity += parseName(source)+U";";
         XString entityValue = parseValue(source);
-        m_entityMapping[U"&"+entityName+U";"] = entityValue;
-        xNodeDTD->entityMapping[U"&"+entityName+U";"] = entityValue;
+        m_entityMapping[entity] = entityValue;
+        xNodeDTD->entityMapping[entity] = entityValue;
     }
     void XML::parseDTDElement(ISource &source, XNodeDTD *xNodeDTD)
     {

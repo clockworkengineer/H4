@@ -829,7 +829,20 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ELEMENT office (%area;, %contact;)>"
                 "<!ELEMENT shop (%area;, %contact;)>"
                 "<!ENTITY % area \"name, street, pincode, city\">"
-                "<!ENTITY % contact \"phone\">"
+                "<!ENTITY % contact \"phone\"> ]>"
+                "<area></area>";
+    REQUIRE(xml.parse(xmlString));
+  }
+    SECTION("XML with internal DTD with both types of entities an check values", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT ["
+                "<!ELEMENT residence (%area;, %contact;)>"
+                "<!ELEMENT apartment (%area;, %contact;)>"
+                "<!ELEMENT office (%area;, %contact;)>"
+                "<!ELEMENT shop (%area;, %contact;)>"
+                "<!ENTITY asg \"dummy test\">"
+                "<!ENTITY % area \"name, street, pincode, city\">"
+                "<!ENTITY % contact \"phone\"> ]>"
                 "<area></area>";
     REQUIRE(xml.parse(xmlString));
   }
