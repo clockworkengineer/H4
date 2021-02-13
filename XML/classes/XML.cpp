@@ -395,7 +395,7 @@ namespace H4
         XNodeElement xNodeChildElement;
         xNodeChildElement.namespaces = xNodeElement->namespaces;
         parseElement(source, &xNodeChildElement);
-        if (auto pos = xNodeChildElement.name.find(':') != std::string::npos)
+        if (auto pos = xNodeChildElement.name.find(':'); pos  != std::string::npos)
         {
             if (!namePresentInAttributeList(xNodeChildElement.namespaces,
                                             XML::m_UTF8.from_bytes(xNodeChildElement.name.substr(0, pos))))
@@ -440,15 +440,15 @@ namespace H4
     {
         parseTagName(source, xNodeElement);
         parseAttributes(source, xNodeElement);
-        if (source.match(U"/>") || source.match(U">"))
+        if (source.match(U">"))
         {
             XString closingTag = U"</" + XML::m_UTF8.from_bytes(xNodeElement->name) + U">";
             while (source.more() && !source.match(closingTag))
             {
                 parseElementContents(source, xNodeElement);
-            }
+            } 
         }
-        else
+        else if (!source.match(U"/>"))
         {
             throw XML::SyntaxError();
         }
