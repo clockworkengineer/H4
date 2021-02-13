@@ -112,8 +112,8 @@ namespace H4
         source.ignoreWS();
         XString entityName = parseName(source);
         XString entityValue = parseValue(source);
-        m_entityMapping[entityName] = entityValue;
-        xNodeDTD->entityMapping[entityName] = entityValue;
+        m_entityMapping[U"&"+entityName+U";"] = entityValue;
+        xNodeDTD->entityMapping[U"&"+entityName+U";"] = entityValue;
     }
     void XML::parseDTDElement(ISource &source, XNodeDTD *xNodeDTD)
     {

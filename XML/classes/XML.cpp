@@ -46,11 +46,11 @@ namespace H4
     // ===============
     void XML::initialiseTables()
     {
-        m_entityMapping[U"amp"] = U"&";
-        m_entityMapping[U"quot"] = U"\"";
-        m_entityMapping[U"apos"] = U"\'";
-        m_entityMapping[U"lt"] = U"<";
-        m_entityMapping[U"gt"] = U">";
+        m_entityMapping[U"&amp;"] = U"&";
+        m_entityMapping[U"&quot;"] = U"\"";
+        m_entityMapping[U"&apos;"] = U"\'";
+        m_entityMapping[U"&lt;"] = U"<";
+        m_entityMapping[U"&gt;"] = U">";
         XML::m_dtdAttrListTypes.insert(
             {U"CDATA",
              U"IDREF",
@@ -283,9 +283,9 @@ namespace H4
         {
             return (XString(1, calculatecharacterReference(entityName.substr(1))));
         }
-        else if (m_entityMapping.count(entityName) > 0)
+        else if (m_entityMapping.count(U"&"+entityName+U";") > 0)
         {
-            return (m_entityMapping[entityName]);
+            return (m_entityMapping[U"&"+entityName+U";"]);
         }
         throw XML::SyntaxError();
     }

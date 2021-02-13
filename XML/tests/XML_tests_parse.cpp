@@ -821,4 +821,43 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["NOTES"].name == "NOTES");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["NOTES"].content == "(#PCDATA)");
   }
+  SECTION("XML with internal DTD with parameter entities.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT ["
+                "<!ELEMENT residence (%area;, %contact;)>"
+                "<!ELEMENT apartment (%area;, %contact;)>"
+                "<!ELEMENT office (%area;, %contact;)>"
+                "<!ELEMENT shop (%area;, %contact;)>"
+                "<!ENTITY % area \"name, street, pincode, city\">"
+                "<!ENTITY % contact \"phone\">"
+                "<area></area>";
+    REQUIRE(xml.parse(xmlString));
+  }
+  // xmlString = "<!DOCTYPE REPORT ["
+  //             "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>"
+  //             "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>"
+  //             "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>"
+  //             "<!ELEMENT SHORTSECT (TITLE,%BODY;)>"
+  //             "<!ELEMENT TITLE %TEXT;>"
+  //             "<!ELEMENT PARA %TEXT;>"
+  //             "<!ELEMENT LIST (ITEM)+>"
+  //             "<!ELEMENT ITEM (%BLOCK;)>"
+  //             "<!ELEMENT CODE (#PCDATA)>"
+  //             "<!ELEMENT KEYWORD (#PCDATA)>"
+  //             "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>"
+  //             "<!ELEMENT GRAPHIC EMPTY>"
+  //             "<!ATTLIST REPORT security (high | medium | low ) \"low\">"
+  //             "<!ATTLIST CODE type CDATA #IMPLIED>"
+  //             "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>"
+  //             "<!ENTITY xml \"Extensible Markup Language\">"
+  //             "<!ENTITY sgml \"Standard Generalized Markup Language\">"
+  //             "<!ENTITY pxa \"Professional XML Authoring\">"
+  //             "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">"
+  //             "<!ENTITY % BLOCK \"(PARA|LIST)+\">"
+  //             "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">"
+  //             "<!NOTATION GIF SYSTEM \"\">"
+  //             "<!NOTATION JPG SYSTEM \"\">"
+  //             "<!NOTATION BMP SYSTEM \"\">"
+  //             "]>"
+  //             "<REPORT> </REPORT>";
 }
