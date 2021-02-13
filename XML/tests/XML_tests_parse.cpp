@@ -201,11 +201,11 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
 TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
 {
   XML xml;
-  auto testFile = GENERATE(values<std::string>({//"./testData/testfile001.xml",
-                                                //"./testData/testfile002.xml",
-                                                //"./testData/testfile003.xml",
-                                                //"./testData/testfile005.xml",
-                                                //"./testData/testfile007.xml",
+  auto testFile = GENERATE(values<std::string>({"./testData/testfile001.xml",
+                                                "./testData/testfile002.xml",
+                                                "./testData/testfile003.xml",
+                                                "./testData/testfile005.xml",
+                                                "./testData/testfile007.xml",
                                                 "./testData/testfile010.xml"}));
   SECTION("Load file into buffer and parse.", "[XML][Parse]")
   {
