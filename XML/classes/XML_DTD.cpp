@@ -110,13 +110,14 @@ namespace H4
     {
         source.ignoreWS();
         XAttribute notation;
-        notation.name = m_UTF8.to_bytes(parseName(source));
+        std::string name = m_UTF8.to_bytes(parseName(source));
+        notation.name =  m_UTF8.to_bytes(parseName(source));
         while (source.more() && source.current() != '>')
         {
             notation.value += m_UTF8.to_bytes(source.current());
             source.next();
         }
-        xNodeDTD->notations.emplace_back(notation);
+        xNodeDTD->notations[name] = notation;
         source.ignoreWS();
     }
     void XML::parseDTDEntity(ISource &source, XNodeDTD *xNodeDTD)

@@ -142,7 +142,7 @@ namespace H4
         }
         std::string name;
         XAttribute external;
-        std::vector<XAttribute> notations;
+        std::unordered_map<std::string, XAttribute> notations;
         std::unordered_map<std::string, XDTDElement> elements;
         std::unordered_map<std::string, std::string> entityMapping;
     };

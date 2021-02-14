@@ -663,26 +663,31 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   SECTION("XML with DTD with !ENTITY definitions and uses", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note "
-                "[<!ENTITY nbsp \"&#xA0;\"><!ENTITY writer \"Writer: Donald Duck.\">"
+                "[<!ENTITY nbsp \"&#xA0;\">"
+                "<!ENTITY writer \"Writer: Donald Duck.\">"
                 "<!ENTITY copyright \"Copyright: W3Schools.\">]>"
                 "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
-                "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer></note>";
+                "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer>"
+                "</note>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("XML with DTD with !ENTITY definitions and uses. Check translation of entity values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note "
-                "[<!ENTITY nbsp \"&#xA0;\"><!ENTITY writer \"Writer: Donald Duck.\">"
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                "<!DOCTYPE note "
+                "[<!ENTITY nbsp \"&#xA0;\">"
+                "<!ENTITY writer \"Writer: Donald Duck.\">"
                 "<!ENTITY copyright \"Copyright: W3Schools.\">]>"
                 "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading>"
-                "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer></note>";
+                "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer>"
+                "</note>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::element);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).name == "footer");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).content == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
-  SECTION("XML with internal DTD and check values", "[XML][Parse][DTD]")
+  SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\" ?>"
                 "<!DOCTYPE address [   <!ELEMENT address (name,company,phone)>"
@@ -715,7 +720,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).external.name == "SYSTEM");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).external.value == "Note.dtd");
   }
-  SECTION("XML with external URL DTD and check values", "[XML][Parse][DTD]")
+  SECTION("XML with external URL DTD to parse and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
@@ -726,7 +731,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).external.name == "PUBLIC");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).external.value == "-//W3C//DTD XHTML 1.0 Transitional//EN, http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
   }
-  SECTION("XML with internal DTD with attributes", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with attributes to parse ", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 "<!DOCTYPE TVSCHEDULE [<!ELEMENT TVSCHEDULE (CHANNEL+)><!ELEMENT CHANNEL (BANNER,DAY+)>"
@@ -740,7 +745,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<TVSCHEDULE></TVSCHEDULE>";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
-  SECTION("XML with internal DTD with attributes and check values", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with attributes to parse and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 "<!DOCTYPE TVSCHEDULE [<!ELEMENT TVSCHEDULE (CHANNEL+)><!ELEMENT CHANNEL (BANNER,DAY+)>"
@@ -786,7 +791,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes[0].value == "#IMPLIED");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["TITLE"].attributes[1].value == "#IMPLIED");
   }
-  SECTION("XML with internal DTD with elements with multiple attributes and check values", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with elements with multiple attributes to parse and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE CATALOG ["
                 "<!ENTITY AUTHOR \"John Doe\">"
@@ -829,7 +834,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["NOTES"].name == "NOTES");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["NOTES"].content == "(#PCDATA)");
   }
-  SECTION("XML with internal DTD with parameter entities.", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with parameter entities to parse.", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE REPORT ["
                 "<!ELEMENT residence (%area;, %contact;)>"
@@ -841,7 +846,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<area></area>";
     REQUIRE(xml.parse(xmlString));
   }
-  SECTION("XML with internal DTD with both types of entities an check values", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with both types of entities to parse an check values", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE REPORT ["
                 "<!ELEMENT residence (%area;, %contact;)>"
@@ -863,7 +868,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["residence"].name == "residence");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["residence"].content == "(%area;, %contact;)");
   }
-  SECTION("XML with internal DTD with !NOTIFCATION to parse.", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE REPORT ["
                 "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>"
@@ -892,6 +897,13 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!NOTATION BMP SYSTEM \"\">"
                 "]>"
                 "<REPORT> </REPORT>";
-    REQUIRE_NOTHROW(xml.parse(xmlString));
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["GIF"].name == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["GIF"].value == "\"\"");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["JPG"].name == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["JPG"].value == "\"\"");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["BMP"].name == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["BMP"].value == "\"\"");
   }
 }
