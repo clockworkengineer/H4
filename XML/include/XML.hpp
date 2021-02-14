@@ -39,7 +39,6 @@ namespace H4
             {
                 return ("XML syntax error detected.");
             }
-
         private:
             std::string errorMessage;
         };
@@ -104,10 +103,10 @@ namespace H4
         void initialiseTables();
         long calculatecharacterReference(XString reference);
         std::string convertCRLFToLF(const std::string &xmlToParse);
-        inline bool validChar(XChar ch);
+        bool namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name);
+        bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
         bool validNameChar(XChar c);
-        bool namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name);
         bool validateName(XString attributeName);
         bool validateXMLDeclaration(XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);

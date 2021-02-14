@@ -34,13 +34,16 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
+    // DTD attribute list type tokens
+    std::set<XString> XML::m_dtdAttrListTypes;
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
     // ===============
     // PRIVATE METHODS
     // ===============
-    XString XML::parseDTDAttributeType(ISource &source)
+    XString
+    XML::parseDTDAttributeType(ISource &source)
     {
         XString type;
         for (auto attrType : XML::m_dtdAttrListTypes)
@@ -111,7 +114,7 @@ namespace H4
         source.ignoreWS();
         XAttribute notation;
         std::string name = m_UTF8.to_bytes(parseName(source));
-        notation.name =  m_UTF8.to_bytes(parseName(source));
+        notation.name = m_UTF8.to_bytes(parseName(source));
         while (source.more() && source.current() != '>')
         {
             notation.value += m_UTF8.to_bytes(source.current());

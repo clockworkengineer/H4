@@ -1,0 +1,300 @@
+//
+// Class: XML
+//
+// Description:
+// Dependencies:   C20++ - Language standard features used.
+//
+// =================
+// CLASS DEFINITIONS
+// =================
+#include "XMLConfig.hpp"
+#include "XML.hpp"
+#include "XMLSources.hpp"
+#include "XMLDestinations.hpp"
+// ====================
+// CLASS IMPLEMENTATION
+// ====================
+//
+// C++ STL
+//
+#include <vector>
+#include <cstring>
+#include <algorithm>
+// =========
+// NAMESPACE
+// =========
+namespace H4
+{
+    // ===========================
+    // PRIVATE TYPES AND CONSTANTS
+    // ===========================
+    // ==========================
+    // PUBLIC TYPES AND CONSTANTS
+    // ==========================
+    // ========================
+    // PRIVATE STATIC VARIABLES
+    // ========================;
+    // =======================
+    // PUBLIC STATIC VARIABLES
+    // =======================
+    // ===============
+    // PRIVATE METHODS
+    // ===============
+    XString XML::parseName(ISource &source)
+    {
+        XString name;
+        while (source.more() && validNameChar(source.current()))
+        {
+            name += source.current();
+            source.next();
+        }
+        source.ignoreWS();
+        if (!validateName(name))
+        {
+            throw XML::SyntaxError();
+        }
+        return (name);
+    }
+    void XML::parseTagName(ISource &source, XNodeElement *xNodeElement)
+    {
+        xNodeElement->name = XML::m_UTF8.to_bytes(parseName(source));
+    }
+    XString XML::parseEncodedCharacter(ISource &source)
+    {
+        XString characters;
+        if (source.current() == '&')
+        {
+            source.next();
+            characters = parseReferenceOrEntity(source);
+        }
+        else
+        {
+            characters = source.current();
+            source.next();
+        }
+        for (auto ch : characters)
+        {
+            if (!validChar(ch))
+            {
+                throw XML::SyntaxError();
+            }
+        }
+        return (characters);
+    }
+    XString XML::parseValue(ISource &source)
+    {
+        if ((source.current() == '\'') || ((source.current() == '"')))
+        {
+            XString value;
+            XChar quote = source.current();
+            source.next();
+            while (source.more() && source.current() != quote)
+            {
+                value += parseEncodedCharacter(source);
+            }
+            source.next();
+            source.ignoreWS();
+            return (value);
+        }
+        throw XML::SyntaxError();
+    }
+    XString XML::parseReferenceOrEntity(ISource &source)
+    {
+        XString entityName;
+        while (source.current() && source.current() != ';')
+        {
+            entityName += source.current();
+            source.next();
+        }
+        source.next();
+        if (entityName[0] == '#')
+        {
+            return (XString(1, calculatecharacterReference(entityName.substr(1))));
+        }
+        else if (m_entityMapping.count(U"&"+entityName+U";") > 0)
+        {
+            return (m_entityMapping[U"&"+entityName+U";"]);
+        }
+        throw XML::SyntaxError();
+    }
+    void XML::parseComment(ISource &source, XNodeElement *xNodeElement)
+    {
+        XNodeComment xNodeComment;
+        while (source.more() && !source.match(U"--"))
+        {
+            xNodeComment.comment += XML::m_UTF8.to_bytes(source.current());
+            source.next();
+        }
+        if (source.current() != '>')
+        {
+            throw SyntaxError();
+        }
+        source.next();
+        xNodeElement->elements.emplace_back(std::make_unique<XNodeComment>(xNodeComment));
+    }
+    void XML::parsePI(ISource &source, XNodeElement *xNodeElement)
+    {
+        XNodePI xNodePI;
+        XString piName = parseName(source);
+        xNodePI.name = XML::m_UTF8.to_bytes(piName);
+        while (source.more() && !source.match(U"?>"))
+        {
+            xNodePI.parameters += XML::m_UTF8.to_bytes(source.current());
+            source.next();
+        }
+        xNodeElement->elements.emplace_back(std::make_unique<XNodePI>(xNodePI));
+    }
+    void XML::parseCDATA(ISource &source, XNodeElement *xNodeElement)
+    {
+        XNodeCDATA xNodeCDATA;
+        while (source.more() && !source.match(U"]]>"))
+        {
+            if (source.match(U"<![CDATA["))
+            {
+                throw XML::SyntaxError();
+            }
+            xNodeElement->content += XML::m_UTF8.to_bytes(source.current());
+            xNodeCDATA.cdata += XML::m_UTF8.to_bytes(source.current());
+            source.next();
+        }
+        xNodeElement->elements.emplace_back(std::make_unique<XNodeCDATA>(xNodeCDATA));
+    }
+    void XML::parseAttributes(ISource &source, XNodeElement *xNodeElement)
+    {
+        std::vector<XAttribute> namespaces;
+        while (source.current() != '?' &&
+               source.current() != '/' &&
+               source.current() != '>')
+        {
+            XString attributeName = parseName(source);
+            source.next();
+            source.ignoreWS();
+            XString attributeValue = parseValue(source);
+            if (attributeName.starts_with(U"xmlns"))
+            {
+                // Defining a namespace
+                attributeName = (attributeName.size() > 5) ? attributeName.substr(6) : U":";
+                addNameValuePairToList(namespaces, attributeName, attributeValue);
+                xNodeElement->namespaces.emplace_back(namespaces.back());
+            }
+            else
+            {
+                // Defining a normal attribute
+                addNameValuePairToList(xNodeElement->attributes, attributeName, attributeValue);
+            }
+        }
+    }
+    void XML::parseProlog(ISource &source, XNodeElement *xNodeElement)
+    {
+        source.ignoreWS();
+        if (source.match(U"<?xml"))
+        {
+            source.ignoreWS();
+            parseAttributes(source, xNodeElement);
+            if (!source.match(U"?>") || !validateXMLDeclaration(xNodeElement))
+            {
+                throw XML::SyntaxError();
+            }
+        }
+        source.ignoreWS();
+        while (source.more())
+        {
+            if (source.match(U"<!--"))
+            {
+                parseComment(source, xNodeElement);
+            }
+            else if (source.match(U"<?"))
+            {
+                parsePI(source, xNodeElement);
+            }
+            else if (source.match(U"<!DOCTYPE"))
+            {
+                parseDTD(source, xNodeElement);
+            }
+            else
+            {
+                break;
+            }
+            source.ignoreWS();
+        }
+    }
+    void XML::parseChildElement(ISource &source, XNodeElement *xNodeElement)
+    {
+        XNodeElement xNodeChildElement;
+        xNodeChildElement.namespaces = xNodeElement->namespaces;
+        parseElement(source, &xNodeChildElement);
+        if (auto pos = xNodeChildElement.name.find(':'); pos  != std::string::npos)
+        {
+            if (!namePresentInAttributeList(xNodeChildElement.namespaces,
+                                            XML::m_UTF8.from_bytes(xNodeChildElement.name.substr(0, pos))))
+            {
+                throw XML::SyntaxError();
+            }
+        }
+        xNodeElement->elements.push_back(std::make_unique<XNodeElement>(std::move(xNodeChildElement)));
+    }
+    void XML::parseDefault(ISource &source, XNodeElement *xNodeElement)
+    {
+        if (source.match(U"]]>"))
+        {
+            throw XML::SyntaxError();
+        }
+        xNodeElement->content += XML::m_UTF8.to_bytes(parseEncodedCharacter(source));
+    }
+    void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
+    {
+        if (source.match(U"<!--"))
+        {
+            parseComment(source, xNodeElement);
+        }
+        else if (source.match(U"<?"))
+        {
+            parsePI(source, xNodeElement);
+        }
+        else if (source.match(U"<![CDATA["))
+        {
+            parseCDATA(source, xNodeElement);
+        }
+        else if (source.match(U"<"))
+        {
+            parseChildElement(source, xNodeElement);
+        }
+        else
+        {
+            parseDefault(source, xNodeElement);
+        }
+    }
+    void XML::parseElement(ISource &source, XNodeElement *xNodeElement)
+    {
+        parseTagName(source, xNodeElement);
+        parseAttributes(source, xNodeElement);
+        if (source.match(U">"))
+        {
+            XString closingTag = U"</" + XML::m_UTF8.from_bytes(xNodeElement->name) + U">";
+            while (source.more() && !source.match(closingTag))
+            {
+                parseElementContents(source, xNodeElement);
+            } 
+        }
+        else if (!source.match(U"/>"))
+        {
+            throw XML::SyntaxError();
+        }
+    }
+    std::unique_ptr<XNode> XML::parseXML(ISource &source)
+    {
+        XNodeElement xNodeRoot;
+        parseProlog(source, &xNodeRoot);
+        if (source.current() == '<')
+        {
+            source.next();
+            xNodeRoot.elements.emplace_back(std::make_unique<XNodeElement>());
+            parseElement(source, static_cast<XNodeElement *>(xNodeRoot.elements.back().get()));
+        }
+        else
+        {
+            throw XML::SyntaxError();
+        }
+        return (std::make_unique<XNodeElement>(std::move(xNodeRoot)));
+    }
+} // namespace H4
