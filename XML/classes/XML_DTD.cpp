@@ -96,58 +96,50 @@ namespace H4
     {
         source.ignoreWS();
         std::string elementName = m_UTF8.to_bytes(parseName(source));
-        while (source.current() != '>')
+        while (source.more() && source.current() != '>')
         {
             XDTDAttribute xDTDAttribute;
             xDTDAttribute.name = m_UTF8.to_bytes(parseName(source));
             xDTDAttribute.type = m_UTF8.to_bytes(parseDTDAttributeType(source));
             xDTDAttribute.value = m_UTF8.to_bytes(parseDTDAttributeValue(source));
-            source.ignoreWS();
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
+            source.ignoreWS();
         }
+    }
+    void XML::parseDTDNotation(ISource &source, XNodeDTD *xNodeDTD)
+    {
+        source.ignoreWS();
+        XAttribute notation;
+        notation.name = m_UTF8.to_bytes(parseName(source));
+        while (source.more() && source.current() != '>')
+        {
+            notation.value += m_UTF8.to_bytes(source.current());
+            source.next();
+        }
+        xNodeDTD->notations.emplace_back(notation);
         source.ignoreWS();
     }
     void XML::parseDTDEntity(ISource &source, XNodeDTD *xNodeDTD)
     {
-        XString entity=U"&";
+        std::string entity = "&";
         source.ignoreWS();
-        if (source.current()=='%') {
-            entity = U"%";
+        if (source.current() == '%')
+        {
+            entity = "%";
             source.next();
             source.ignoreWS();
         }
-        entity += parseName(source)+U";";
+        entity += m_UTF8.to_bytes(parseName(source)) + ";";
         XString entityValue = parseValue(source);
-        m_entityMapping[entity] = entityValue;
-        xNodeDTD->entityMapping[entity] = entityValue;
+        m_entityMapping[m_UTF8.from_bytes(entity)] = entityValue;
+        xNodeDTD->entityMapping[entity] = m_UTF8.to_bytes(entityValue);
     }
     void XML::parseDTDElement(ISource &source, XNodeDTD *xNodeDTD)
     {
         source.ignoreWS();
         XString elementName = parseName(source);
         XString elementContent;
-        if (source.current() == '(')
-        {
-            int bracketCount = 1;
-            elementContent += source.current();
-            source.next();
-            while (source.more() && bracketCount != 0)
-            {
-                elementContent += source.current();
-                source.next();
-                if (source.current() == '(')
-                {
-                    bracketCount++;
-                }
-                else if (source.current() == ')')
-                {
-                    bracketCount--;
-                }
-            }
-            elementContent += source.current();
-            source.next();
-        }
-        else if (source.match(U"EMPTY"))
+        if (source.match(U"EMPTY"))
         {
             elementContent = U"EMPTY";
         }
@@ -157,11 +149,15 @@ namespace H4
         }
         else
         {
-            throw XML::SyntaxError();
+            while (source.more() && source.current() != '>')
+            {
+                elementContent += source.current();
+                source.next();
+            }
         }
-        source.ignoreWS();
         XDTDElement element(m_UTF8.to_bytes(elementName), m_UTF8.to_bytes(elementContent));
         xNodeDTD->elements.emplace(std::pair(element.name, element));
+        source.ignoreWS();
     }
     void XML::parseDTDExternal(ISource &source, XNodeDTD *xNodeDTD)
     {
@@ -182,6 +178,7 @@ namespace H4
             throw XML::SyntaxError();
         }
         source.next();
+        source.ignoreWS();
     }
     void XML::parseDTDInternal(ISource &source, XNodeDTD *xNodeDTD)
     {
@@ -200,6 +197,10 @@ namespace H4
             else if (source.match(U"<!ATTLIST"))
             {
                 parseDTDAttributeList(source, xNodeDTD);
+            }
+            else if (source.match(U"<!NOTATION"))
+            {
+                parseDTDNotation(source, xNodeDTD);
             }
             if (source.current() != '>')
             {

@@ -788,14 +788,22 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with internal DTD with elements with multiple attributes and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<!DOCTYPE CATALOG [<!ENTITY AUTHOR \"John Doe\"><!ENTITY COMPANY \"JD Power Tools, Inc.\">"
-                "<!ENTITY EMAIL \"jd@jd-tools.com\"><!ELEMENT CATALOG (PRODUCT+)><!ELEMENT PRODUCT(SPECIFICATIONS+,OPTIONS?,PRICE+,NOTES?)>"
+    xmlString = "<!DOCTYPE CATALOG ["
+                "<!ENTITY AUTHOR \"John Doe\">"
+                "<!ENTITY COMPANY \"JD Power Tools, Inc.\">"
+                "<!ENTITY EMAIL \"jd@jd-tools.com\">"
+                "<!ELEMENT CATALOG (PRODUCT+)>"
+                "<!ELEMENT PRODUCT(SPECIFICATIONS+,OPTIONS?,PRICE+,NOTES?)>"
                 "<!ATTLIST PRODUCT NAME CDATA #IMPLIED CATEGORY (HandTool|Table|Shop-Professional) \"HandTool\""
                 "PARTNUM CDATA #IMPLIED PLANT (Pittsburgh|Milwaukee|Chicago) \"Chicago\" INVENTORY (InStock|Backordered|Discontinued)"
-                " \"InStock\"><!ELEMENT SPECIFICATIONS (#PCDATA)><!ATTLIST SPECIFICATIONS WEIGHT CDATA #IMPLIED POWER CDATA #IMPLIED>"
-                "<!ELEMENT OPTIONS (#PCDATA)><!ATTLIST OPTIONS FINISH (Metal|Polished|Matte) \"Matte\" ADAPTER (Included|Optional|NotApplicable)"
-                " \"Included\" CASE (HardShell|Soft|NotApplicable) \"HardShell\"><!ELEMENT PRICE (#PCDATA)><!ATTLIST PRICE MSRP CDATA #IMPLIED"
-                "WHOLESALE CDATA #IMPLIED STREET CDATA #IMPLIED SHIPPING CDATA #IMPLIED><!ELEMENT NOTES (#PCDATA)> ]>"
+                " \"InStock\">"
+                "<!ELEMENT SPECIFICATIONS (#PCDATA)><!ATTLIST SPECIFICATIONS WEIGHT CDATA #IMPLIED POWER CDATA #IMPLIED>"
+                "<!ELEMENT OPTIONS (#PCDATA)>"
+                "<!ATTLIST OPTIONS FINISH (Metal|Polished|Matte) \"Matte\" ADAPTER (Included|Optional|NotApplicable)"
+                " \"Included\" CASE (HardShell|Soft|NotApplicable) \"HardShell\">"
+                "<!ELEMENT PRICE (#PCDATA)><!ATTLIST PRICE MSRP CDATA #IMPLIED"
+                "WHOLESALE CDATA #IMPLIED STREET CDATA #IMPLIED SHIPPING CDATA #IMPLIED>"
+                "<!ELEMENT NOTES (#PCDATA)> ]>"
                 "<CATALOG> </CATALOG>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
@@ -833,7 +841,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<area></area>";
     REQUIRE(xml.parse(xmlString));
   }
-    SECTION("XML with internal DTD with both types of entities an check values", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with both types of entities an check values", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE REPORT ["
                 "<!ELEMENT residence (%area;, %contact;)>"
@@ -843,34 +851,47 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ENTITY asg \"dummy test\">"
                 "<!ENTITY % area \"name, street, pincode, city\">"
                 "<!ENTITY % contact \"phone\"> ]>"
-                "<area></area>";
-    REQUIRE(xml.parse(xmlString));
+                "<REPORT></REPORT>";
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == "REPORT");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).entityMapping["&asg;"] == "dummy test");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).entityMapping["%contact;"] == "phone");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).entityMapping["%area;"] == "name, street, pincode, city");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements.size() == 4);
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["residence"].name == "residence");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).elements["residence"].content == "(%area;, %contact;)");
   }
-  // xmlString = "<!DOCTYPE REPORT ["
-  //             "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>"
-  //             "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>"
-  //             "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>"
-  //             "<!ELEMENT SHORTSECT (TITLE,%BODY;)>"
-  //             "<!ELEMENT TITLE %TEXT;>"
-  //             "<!ELEMENT PARA %TEXT;>"
-  //             "<!ELEMENT LIST (ITEM)+>"
-  //             "<!ELEMENT ITEM (%BLOCK;)>"
-  //             "<!ELEMENT CODE (#PCDATA)>"
-  //             "<!ELEMENT KEYWORD (#PCDATA)>"
-  //             "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>"
-  //             "<!ELEMENT GRAPHIC EMPTY>"
-  //             "<!ATTLIST REPORT security (high | medium | low ) \"low\">"
-  //             "<!ATTLIST CODE type CDATA #IMPLIED>"
-  //             "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>"
-  //             "<!ENTITY xml \"Extensible Markup Language\">"
-  //             "<!ENTITY sgml \"Standard Generalized Markup Language\">"
-  //             "<!ENTITY pxa \"Professional XML Authoring\">"
-  //             "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">"
-  //             "<!ENTITY % BLOCK \"(PARA|LIST)+\">"
-  //             "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">"
-  //             "<!NOTATION GIF SYSTEM \"\">"
-  //             "<!NOTATION JPG SYSTEM \"\">"
-  //             "<!NOTATION BMP SYSTEM \"\">"
-  //             "]>"
-  //             "<REPORT> </REPORT>";
+  SECTION("XML with internal DTD with !NOTIFCATION to parse.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT ["
+                "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>"
+                "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>"
+                "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>"
+                "<!ELEMENT SHORTSECT (TITLE,%BODY;)>"
+                "<!ELEMENT TITLE %TEXT;>"
+                "<!ELEMENT PARA %TEXT;>"
+                "<!ELEMENT LIST (ITEM)+>"
+                "<!ELEMENT ITEM (%BLOCK;)>"
+                "<!ELEMENT CODE (#PCDATA)>"
+                "<!ELEMENT KEYWORD (#PCDATA)>"
+                "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>"
+                "<!ELEMENT GRAPHIC EMPTY>"
+                "<!ATTLIST REPORT security (high | medium | low ) \"low\">"
+                "<!ATTLIST CODE type CDATA #IMPLIED>"
+                "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>"
+                "<!ENTITY xml \"Extensible Markup Language\">"
+                "<!ENTITY sgml \"Standard Generalized Markup Language\">"
+                "<!ENTITY pxa \"Professional XML Authoring\">"
+                "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">"
+                "<!ENTITY % BLOCK \"(PARA|LIST)+\">"
+                "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">"
+                "<!NOTATION GIF SYSTEM \"\">"
+                "<!NOTATION JPG SYSTEM \"\">"
+                "<!NOTATION BMP SYSTEM \"\">"
+                "]>"
+                "<REPORT> </REPORT>";
+    REQUIRE_NOTHROW(xml.parse(xmlString));
+  }
 }

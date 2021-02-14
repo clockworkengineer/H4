@@ -145,7 +145,7 @@ namespace H4
     }
     bool XML::validReservedName(const XString &name)
     {
-        return (name.starts_with(U"xmlns") || name.starts_with(U"xml-stylesheet"));
+        return (name.starts_with(U"xmlns") || name.starts_with(U"xml-stylesheet")||name==U"xml");
     }
     bool XML::validateName(XString name)
     {
