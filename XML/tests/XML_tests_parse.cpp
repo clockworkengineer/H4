@@ -690,10 +690,17 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\" ?>"
-                "<!DOCTYPE address [   <!ELEMENT address (name,company,phone)>"
+                "<!DOCTYPE address [  "
+                "<!ELEMENT address (name,company,phone)>"
                 "<!ELEMENT name (#PCDATA)><!ELEMENT company (#PCDATA)>"
-                "<!ELEMENT phone (#PCDATA)><!ELEMENT br EMPTY><!ELEMENT footer ANY>]><address><name>Tanmay Patil</name>"
-                "<company>TutorialsPoint</company><phone>(011) 123-4567</phone></address>";
+                "<!ELEMENT phone (#PCDATA)><!ELEMENT br EMPTY>"
+                "<!ELEMENT footer ANY>]>"
+                "<address>"
+                "<name>Tanmay Patil</name>"
+                "<company>TutorialsPoint</company>"
+                "<phone>(011) 123-4567"
+                "</phone>"
+                "</address>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
@@ -712,8 +719,11 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE note SYSTEM \"Note.dtd\"><note><to>Tove"
-                "</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>";
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                "<!DOCTYPE note SYSTEM \"Note.dtd\">"
+                "<note><to>Tove"
+                "</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body>"
+                "</note>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
@@ -723,7 +733,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   SECTION("XML with external URL DTD to parse and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+                "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\""
+                " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
                 "<html></html>";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
