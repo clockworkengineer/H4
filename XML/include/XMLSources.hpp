@@ -36,6 +36,12 @@ namespace H4
                 throw std::runtime_error("Parse buffer empty before parse complete.");
             }
             m_bufferPosition++;
+            m_column++;
+            if (current() == 0x0A)
+            {
+                m_lineNo++;
+                m_column = 0;
+            }
         }
         bool more()
         {
@@ -59,9 +65,20 @@ namespace H4
             }
             return (false);
         }
+        long getLine()
+        {
+            return (m_lineNo);
+        }
+        long getColumn()
+        {
+            return (m_column);
+        }
+
     private:
         std::size_t m_bufferPosition = 0;
         XString m_parseBuffer;
+        long m_lineNo = 1;
+        long m_column = 1;
     };
     class FileSource : public XML::ISource
     {
@@ -101,6 +118,7 @@ namespace H4
             m_source.seekg(-index, std::ios_base::cur);
             return (false);
         }
+
     private:
         std::ifstream m_source;
     };

@@ -52,7 +52,7 @@ namespace H4
         source.ignoreWS();
         if (!validateName(name))
         {
-            throw SyntaxError();
+            throw SyntaxError(source);
         }
         return (name);
     }
@@ -77,7 +77,7 @@ namespace H4
         {
             if (!validChar(ch))
             {
-                throw SyntaxError();
+                throw SyntaxError(source);
             }
         }
         return (characters);
@@ -97,7 +97,23 @@ namespace H4
             source.ignoreWS();
             return (value);
         }
-        throw SyntaxError();
+        throw SyntaxError(source);
+    }
+    long XML::parseCharacterReference(ISource &source, XString reference)
+    {
+        char *end;
+        long temp = 10;
+        if (reference[0] == 'x')
+        {
+            reference = reference.substr(1);
+            temp = 16;
+        }
+        temp = std::strtol(XML::m_UTF8.to_bytes(reference).c_str(), &end, temp);
+        if (*end == '\0')
+        {
+            return (temp);
+        }
+        throw SyntaxError(source);
     }
     XString XML::parseReferenceOrEntity(ISource &source)
     {
@@ -110,13 +126,13 @@ namespace H4
         source.next();
         if (entityName[0] == '#')
         {
-            return (XString(1, calculatecharacterReference(entityName.substr(1))));
+            return (XString(1, parseCharacterReference(source, entityName.substr(1))));
         }
         else if (m_entityMapping.count(U"&" + entityName + U";") > 0)
         {
             return (m_entityMapping[U"&" + entityName + U";"]);
         }
-        throw SyntaxError();
+        throw SyntaxError(source);
     }
     void XML::parseComment(ISource &source, XNodeElement *xNodeElement)
     {
@@ -128,7 +144,7 @@ namespace H4
         }
         if (source.current() != '>')
         {
-            throw SyntaxError();
+            throw SyntaxError(source);
         }
         source.next();
         xNodeElement->elements.emplace_back(std::make_unique<XNodeComment>(xNodeComment));
@@ -152,7 +168,7 @@ namespace H4
         {
             if (source.match(U"<![CDATA["))
             {
-                throw SyntaxError();
+                throw SyntaxError(source);
             }
             xNodeElement->content += XML::m_UTF8.to_bytes(source.current());
             xNodeCDATA.cdata += XML::m_UTF8.to_bytes(source.current());
@@ -169,18 +185,18 @@ namespace H4
             XString attributeName = parseName(source);
             if (source.current() != '=')
             {
-                throw SyntaxError();
+                throw SyntaxError(source);
             }
             source.next();
             source.ignoreWS();
             XString attributeValue = parseValue(source);
-            if (!namePresentInAttributeList(xNodeElement->attributes, attributeName))
+            if (!isAttributePresent(xNodeElement->attributes, attributeName))
             {
                 xNodeElement->attributes.emplace_back(XML::m_UTF8.to_bytes(attributeName), XML::m_UTF8.to_bytes(attributeValue));
             }
             else
             {
-                throw SyntaxError();
+                throw SyntaxError(source);
             }
         }
         addNamespacesToList(xNodeElement);
@@ -194,7 +210,7 @@ namespace H4
             parseAttributes(source, xNodeElement);
             if (!source.match(U"?>") || !validateXMLDeclaration(xNodeElement))
             {
-                throw SyntaxError();
+                throw SyntaxError(source);
             }
         }
         source.ignoreWS();
@@ -226,10 +242,10 @@ namespace H4
         parseElement(source, &xNodeChildElement);
         if (auto pos = xNodeChildElement.name.find(':'); pos != std::string::npos)
         {
-            if (!namePresentInAttributeList(xNodeChildElement.namespaces,
+            if (!isAttributePresent(xNodeChildElement.namespaces,
                                             XML::m_UTF8.from_bytes(xNodeChildElement.name.substr(0, pos))))
             {
-                throw SyntaxError();
+                throw SyntaxError(source);
             }
         }
         xNodeElement->elements.push_back(std::make_unique<XNodeElement>(std::move(xNodeChildElement)));
@@ -238,7 +254,7 @@ namespace H4
     {
         if (source.match(U"]]>"))
         {
-            throw SyntaxError();
+            throw SyntaxError(source);
         }
         xNodeElement->content += XML::m_UTF8.to_bytes(parseEncodedCharacter(source));
     }
@@ -279,7 +295,7 @@ namespace H4
         }
         else if (!source.match(U"/>"))
         {
-            throw SyntaxError();
+            throw SyntaxError(source);
         }
     }
     std::unique_ptr<XNode> XML::parseXML(ISource &source)
@@ -294,7 +310,7 @@ namespace H4
         }
         else
         {
-            throw SyntaxError();
+            throw SyntaxError(source);
         }
         return (std::make_unique<XNodeElement>(std::move(xNodeRoot)));
     }

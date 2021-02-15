@@ -66,7 +66,7 @@ namespace H4
             }
             else
             {
-                throw SyntaxError();
+                throw SyntaxError(source);
             }
         }
         source.ignoreWS();
@@ -178,11 +178,11 @@ namespace H4
         }
         else
         {
-            throw SyntaxError();
+            throw SyntaxError(source);
         }
         if (source.current() != '>')
         {
-            throw SyntaxError();
+            throw SyntaxError(source);
         }
         source.next();
         source.ignoreWS();
@@ -211,11 +211,11 @@ namespace H4
             }
             else
             {
-                throw SyntaxError();
+                throw SyntaxError(source);
             }
             if (source.current() != '>')
             {
-                throw SyntaxError();
+                throw SyntaxError(source);
             }
             source.next();
             source.ignoreWS();

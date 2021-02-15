@@ -63,27 +63,12 @@ namespace H4
              U"NOTATION",
              U"ID"});
     }
-    bool XML::namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name)
+    bool XML::isAttributePresent(std::vector<XAttribute> attributes, const XString &name)
     {
         return (std::find_if(attributes.rbegin(), attributes.rend(),
                              [&name](const XAttribute &attr) { return (attr.name == XML::m_UTF8.to_bytes(name)); }) != attributes.rend());
     }
-    long XML::calculatecharacterReference(XString reference)
-    {
-        char *end;
-        long temp = 10;
-        if (reference[0] == 'x')
-        {
-            reference = reference.substr(1);
-            temp = 16;
-        }
-        temp = std::strtol(XML::m_UTF8.to_bytes(reference).c_str(), &end, temp);
-        if (*end == '\0')
-        {
-            return (temp);
-        }
-        throw SyntaxError();
-    }
+
     std::string XML::convertCRLFToLF(const std::string &xmlString)
     {
         std::string converted = xmlString;

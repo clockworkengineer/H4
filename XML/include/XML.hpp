@@ -31,15 +31,18 @@ namespace H4
         //
         // XML syntax error.
         //
+        class ISource;
         struct SyntaxError : public std::exception
         {
         public:
-            SyntaxError(const std::string &errorMessage = "") : errorMessage(errorMessage) {}
+            SyntaxError(ISource &/*source*/, const std::string &description = "")
+            {
+                errorMessage = "XML syntax error detected."+description;
+            }
             virtual const char *what() const throw()
             {
-                return ("XML syntax error detected.");
+                return (errorMessage.c_str());
             }
-
         private:
             std::string errorMessage;
         };
@@ -53,6 +56,8 @@ namespace H4
             virtual void next() = 0;
             virtual bool more() = 0;
             virtual bool match(const XString &targetString) = 0;
+            virtual long getLine() = 0;
+            virtual long getColumn() = 0;
             void ignoreWS()
             {
                 while (more() && std::iswspace(current()))
@@ -102,9 +107,9 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void initialiseTables();
-        long calculatecharacterReference(XString reference);
+        long parseCharacterReference(ISource &source, XString reference);
         std::string convertCRLFToLF(const std::string &xmlToParse);
-        bool namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name);
+        bool isAttributePresent(std::vector<XAttribute> attributes, const XString &name);
         void addNamespacesToList(XNodeElement *XNodeElement);
         bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
