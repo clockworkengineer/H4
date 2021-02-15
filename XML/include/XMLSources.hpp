@@ -73,7 +73,6 @@ namespace H4
         {
             return (m_column);
         }
-
     private:
         std::size_t m_bufferPosition = 0;
         XString m_parseBuffer;
@@ -99,6 +98,12 @@ namespace H4
         {
             char c;
             m_source.get(c);
+            m_column++;
+            if (current() == 0x0A)
+            {
+                m_lineNo++;
+                m_column = 0;
+            }
         }
         bool more()
         {
@@ -118,9 +123,18 @@ namespace H4
             m_source.seekg(-index, std::ios_base::cur);
             return (false);
         }
-
+        long getLine()
+        {
+            return (m_lineNo);
+        }
+        long getColumn()
+        {
+            return (m_column);
+        }
     private:
         std::ifstream m_source;
+        long m_lineNo = 1;
+        long m_column = 1;
     };
 } // namespace H4
 #endif /* XMLSOURCES_HPP */

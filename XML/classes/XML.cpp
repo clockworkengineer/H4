@@ -95,12 +95,12 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-    std::unique_ptr<XNode> XML::parse(const std::string &xmlToParse)
+    std::unique_ptr<XNode> XML::parseBuffer(const std::string &xmlToParse)
     {
-        BufferSource xml(XML::m_UTF8.from_bytes(convertCRLFToLF(xmlToParse)));
-        return (parseXML(xml));
+        BufferSource xmlSource(XML::m_UTF8.from_bytes(convertCRLFToLF(xmlToParse)));
+        return (parseXML(xmlSource));
     }
-    std::unique_ptr<XNode> XML::parse(const std::u16string &xmlToParse)
+    std::unique_ptr<XNode> XML::parseBuffer(const std::u16string &xmlToParse)
     {
         std::u16string utf16xml{xmlToParse};
         if (!xmlToParse.starts_with(u"<?xml"))
@@ -110,6 +110,11 @@ namespace H4
                 ch = (static_cast<u_int16_t>(ch) >> 8) | (static_cast<u_int16_t>(ch) << 8);
             }
         }
-        return (parse(XML::m_UTF16.to_bytes(utf16xml)));
+        return (parseBuffer(XML::m_UTF16.to_bytes(utf16xml)));
+    }
+    std::unique_ptr<XNode> XML::parseFile(const std::string &xmlFileName)
+    {
+        FileSource xmlSource(xmlFileName);
+        return (parseXML(xmlSource));
     }
 } // namespace H4

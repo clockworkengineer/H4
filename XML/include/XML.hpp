@@ -35,9 +35,9 @@ namespace H4
         struct SyntaxError : public std::exception
         {
         public:
-            SyntaxError(ISource &/*source*/, const std::string &description = "")
+            SyntaxError(ISource & /*source*/, const std::string &description = "")
             {
-                errorMessage = "XML syntax error detected."+description;
+                errorMessage = "XML syntax error detected." + description;
             }
             virtual const char *what() const throw()
             {
@@ -91,8 +91,9 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        std::unique_ptr<XNode> parse(const std::string &xmlToParse);
-        std::unique_ptr<XNode> parse(const std::u16string &xmlToParse);
+        std::unique_ptr<XNode> parseBuffer(const std::string &xmlToParse);
+        std::unique_ptr<XNode> parseBuffer(const std::u16string &xmlToParse);
+        std::unique_ptr<XNode> parseFile(const std::string &xmlFileName);
         // ================
         // PUBLIC VARIABLES
         // ================
