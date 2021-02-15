@@ -39,6 +39,7 @@ namespace H4
             {
                 return ("XML syntax error detected.");
             }
+
         private:
             std::string errorMessage;
         };
@@ -104,13 +105,13 @@ namespace H4
         long calculatecharacterReference(XString reference);
         std::string convertCRLFToLF(const std::string &xmlToParse);
         bool namePresentInAttributeList(std::vector<XAttribute> attributes, const XString &name);
+        void addNamespacesToList(XNodeElement *XNodeElement);
         bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
         bool validNameChar(XChar c);
         bool validateName(XString attributeName);
         bool validateXMLDeclaration(XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);
-        void addNameValuePairToList(std::vector<XAttribute> &attributes, const XString &attributeName, const XString &attributeValue);
         XString parseName(ISource &source);
         XString parseValue(ISource &source);
         XString parseEncodedCharacter(ISource &source);

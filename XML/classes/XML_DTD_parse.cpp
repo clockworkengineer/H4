@@ -42,8 +42,7 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    XString
-    XML::parseDTDAttributeType(ISource &source)
+    XString XML::parseDTDAttributeType(ISource &source)
     {
         XString type;
         for (auto attrType : XML::m_dtdAttrListTypes)
@@ -67,7 +66,7 @@ namespace H4
             }
             else
             {
-                throw XML::SyntaxError();
+                throw SyntaxError();
             }
         }
         source.ignoreWS();
@@ -177,9 +176,13 @@ namespace H4
             xNodeDTD->external.name = m_UTF8.to_bytes(U"PUBLIC");
             xNodeDTD->external.value = m_UTF8.to_bytes(parseValue(source)) + ", " + m_UTF8.to_bytes(parseValue(source));
         }
+        else
+        {
+            throw SyntaxError();
+        }
         if (source.current() != '>')
         {
-            throw XML::SyntaxError();
+            throw SyntaxError();
         }
         source.next();
         source.ignoreWS();
@@ -206,9 +209,13 @@ namespace H4
             {
                 parseDTDNotation(source, xNodeDTD);
             }
+            else
+            {
+                throw SyntaxError();
+            }
             if (source.current() != '>')
             {
-                throw XML::SyntaxError();
+                throw SyntaxError();
             }
             source.next();
             source.ignoreWS();
@@ -227,7 +234,6 @@ namespace H4
         {
             parseDTDExternal(source, &xNodeDTD);
         }
-        source.ignoreWS();
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
     }
 } // namespace H4

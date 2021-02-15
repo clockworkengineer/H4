@@ -82,7 +82,7 @@ namespace H4
         {
             return (temp);
         }
-        throw XML::SyntaxError();
+        throw SyntaxError();
     }
     std::string XML::convertCRLFToLF(const std::string &xmlString)
     {
@@ -95,15 +95,16 @@ namespace H4
         }
         return (converted);
     }
-    void XML::addNameValuePairToList(std::vector<XAttribute> &attributes, const XString &attributeName, const XString &attributeValue)
+    void XML::addNamespacesToList(XNodeElement *XNodeElement)
     {
-        if (!namePresentInAttributeList(attributes, attributeName))
+        for (auto attribute : XNodeElement->attributes)
         {
-            attributes.emplace_back(XML::m_UTF8.to_bytes(attributeName), XML::m_UTF8.to_bytes(attributeValue));
-        }
-        else
-        {
-            throw XML::SyntaxError();
+            if (attribute.name.starts_with("xmlns"))
+            {
+                // Defining a namespace
+                attribute.name = (attribute.name.size() > 5) ? attribute.name.substr(6) : ":";
+                XNodeElement->namespaces.emplace_back(attribute);
+            }
         }
     }
     // ==============
