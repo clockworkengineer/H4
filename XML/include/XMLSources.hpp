@@ -40,7 +40,7 @@ namespace H4
             if (current() == 0x0A)
             {
                 m_lineNo++;
-                m_column = 0;
+                m_column = 1;
             }
         }
         bool more()
@@ -102,7 +102,7 @@ namespace H4
             if (current() == 0x0A)
             {
                 m_lineNo++;
-                m_column = 0;
+                m_column = 1;
             }
         }
         bool more()
