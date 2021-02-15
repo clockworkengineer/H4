@@ -20,64 +20,64 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   std::string xmlString;
   SECTION("XML with internal DTD", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\"?>"
-                "<!DOCTYPE note [<!ELEMENT note (to,from,heading,body)>"
-                "<!ELEMENT to (#PCDATA)>"
-                "<!ELEMENT from (#PCDATA)>"
-                "<!ELEMENT heading (#PCDATA)>"
-                "<!ELEMENT body (#PCDATA)>"
-                "]>"
-                "<note>"
-                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>"
-                "<body>Don't forget me this weekend</body>"
-                "</note>";
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE note [<!ELEMENT note (to,from,heading,body)>\n"
+                "<!ELEMENT to (#PCDATA)>\n"
+                "<!ELEMENT from (#PCDATA)>\n"
+                "<!ELEMENT heading (#PCDATA)>\n"
+                "<!ELEMENT body (#PCDATA)>\n"
+                "]>\n"
+                "<note>\n"
+                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
+                "<body>Don't forget me this weekend</body>\n"
+                "</note>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("XML with external (SYSTEM) DTD", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                "<!DOCTYPE note SYSTEM \"Note.dtd\">"
-                "<note>"
-                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>"
-                "<body>Don't forget me this weekend!</body>"
-                "</note>";
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                "<!DOCTYPE note SYSTEM \"Note.dtd\">\n"
+                "<note>\n"
+                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
+                "<body>Don't forget me this weekend!</body>\n"
+                "</note>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("XML with external (PUBLIC) DTD", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note PUBLIC "
-                "\"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
-                "<note>"
-                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>"
-                "<body>Don't forget me this weekend!</body>"
-                "</note>";
+                "\"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+                "<note>\n"
+                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
+                "<body>Don't forget me this weekend!</body>\n"
+                "</note>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("XML with DTD with !ENTITY definitions and uses", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note "
-                "[<!ENTITY nbsp \"&#xA0;\">"
-                "<!ENTITY writer \"Writer: Donald Duck.\">"
-                "<!ENTITY copyright \"Copyright: W3Schools.\">]>"
-                "<note>"
-                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>"
-                "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer>"
-                "</note>";
+                "[<!ENTITY nbsp \"&#xA0;\">\n"
+                "<!ENTITY writer \"Writer: Donald Duck.\">\n"
+                "<!ENTITY copyright \"Copyright: W3Schools.\">]>\n"
+                "<note>\n"
+                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
+                "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer>\n"
+                "</note>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("XML with DTD with !ENTITY definitions and uses. Check translation of entity values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note "
-                "[<!ENTITY nbsp \"&#xA0;\">"
-                "<!ENTITY writer \"Writer: Donald Duck.\">"
-                "<!ENTITY copyright \"Copyright: W3Schools.\">]>"
-                "<note>"
-                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>"
-                "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer>"
-                "</note>";
+                "[<!ENTITY nbsp \"&#xA0;\">\n"
+                "<!ENTITY writer \"Writer: Donald Duck.\">\n"
+                "<!ENTITY copyright \"Copyright: W3Schools.\">]>\n"
+                "<note>\n"
+                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
+                "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer>\n"
+                "</note>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::element);
@@ -86,18 +86,18 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\" ?>"
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\" ?>\n"
                 "<!DOCTYPE address [  "
-                "<!ELEMENT address (name,company,phone)>"
-                "<!ELEMENT name (#PCDATA)><!ELEMENT company (#PCDATA)>"
-                "<!ELEMENT phone (#PCDATA)><!ELEMENT br EMPTY>"
-                "<!ELEMENT footer ANY>]>"
-                "<address>"
-                "<name>Tanmay Patil</name>"
-                "<company>TutorialsPoint</company>"
+                "<!ELEMENT address (name,company,phone)>\n"
+                "<!ELEMENT name (#PCDATA)><!ELEMENT company (#PCDATA)>\n"
+                "<!ELEMENT phone (#PCDATA)><!ELEMENT br EMPTY>\n"
+                "<!ELEMENT footer ANY>]>\n"
+                "<address>\n"
+                "<name>Tanmay Patil</name>\n"
+                "<company>TutorialsPoint</company>\n"
                 "<phone>(011) 123-4567"
-                "</phone>"
-                "</address>";
+                "</phone>\n"
+                "</address>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
@@ -116,12 +116,12 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                "<!DOCTYPE note SYSTEM \"Note.dtd\">"
-                "<note>"
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                "<!DOCTYPE note SYSTEM \"Note.dtd\">\n"
+                "<note>\n"
                 "<to>Tove"
-                "</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body>"
-                "</note>";
+                "</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body>\n"
+                "</note>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
@@ -130,10 +130,10 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with external URL DTD to parse and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\""
-                " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
-                "<html></html>";
+                " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+                "<html></html>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
@@ -142,39 +142,39 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with internal DTD with attributes to parse ", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                "<!DOCTYPE TVSCHEDULE [<!ELEMENT TVSCHEDULE (CHANNEL+)><!ELEMENT CHANNEL (BANNER,DAY+)>"
-                "<!ELEMENT BANNER (#PCDATA)><!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>"
-                "<!ELEMENT HOLIDAY (#PCDATA)><!ELEMENT DATE (#PCDATA)>"
-                "<!ELEMENT PROGRAMSLOT (TIME,TITLE,DESCRIPTION?)>"
-                "<!ELEMENT TIME (#PCDATA)>"
-                "<!ELEMENT TITLE (#PCDATA)>"
-                "<!ELEMENT DESCRIPTION (#PCDATA)>"
-                "<!ATTLIST TVSCHEDULE NAME CDATA #REQUIRED>"
-                "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED><!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>"
-                "<!ATTLIST TITLE RATING CDATA #IMPLIED><!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>"
-                "<TVSCHEDULE></TVSCHEDULE>";
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                "<!DOCTYPE TVSCHEDULE [<!ELEMENT TVSCHEDULE (CHANNEL+)><!ELEMENT CHANNEL (BANNER,DAY+)>\n"
+                "<!ELEMENT BANNER (#PCDATA)><!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>\n"
+                "<!ELEMENT HOLIDAY (#PCDATA)><!ELEMENT DATE (#PCDATA)>\n"
+                "<!ELEMENT PROGRAMSLOT (TIME,TITLE,DESCRIPTION?)>\n"
+                "<!ELEMENT TIME (#PCDATA)>\n"
+                "<!ELEMENT TITLE (#PCDATA)>\n"
+                "<!ELEMENT DESCRIPTION (#PCDATA)>\n"
+                "<!ATTLIST TVSCHEDULE NAME CDATA #REQUIRED>\n"
+                "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED><!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>\n"
+                "<!ATTLIST TITLE RATING CDATA #IMPLIED><!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>\n"
+                "<TVSCHEDULE></TVSCHEDULE>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("XML with internal DTD with attributes to parse and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                "<!DOCTYPE TVSCHEDULE [<!ELEMENT TVSCHEDULE (CHANNEL+)>"
-                "<!ELEMENT CHANNEL (BANNER,DAY+)>"
-                "<!ELEMENT BANNER (#PCDATA)>"
-                "<!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>"
-                "<!ELEMENT HOLIDAY (#PCDATA)>"
-                "<!ELEMENT DATE (#PCDATA)>"
-                "<!ELEMENT PROGRAMSLOT (TIME,TITLE,DESCRIPTION?)>"
-                "<!ELEMENT TIME (#PCDATA)>"
-                "<!ELEMENT TITLE (#PCDATA)>"
-                "<!ELEMENT DESCRIPTION (#PCDATA)>"
-                "<!ATTLIST TVSCHEDULE NAME CDATA #REQUIRED>"
-                "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED>"
-                "<!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>"
-                "<!ATTLIST TITLE RATING CDATA #IMPLIED>"
-                "<!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>"
-                "<TVSCHEDULE></TVSCHEDULE>";
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                "<!DOCTYPE TVSCHEDULE [<!ELEMENT TVSCHEDULE (CHANNEL+)>\n"
+                "<!ELEMENT CHANNEL (BANNER,DAY+)>\n"
+                "<!ELEMENT BANNER (#PCDATA)>\n"
+                "<!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>\n"
+                "<!ELEMENT HOLIDAY (#PCDATA)>\n"
+                "<!ELEMENT DATE (#PCDATA)>\n"
+                "<!ELEMENT PROGRAMSLOT (TIME,TITLE,DESCRIPTION?)>\n"
+                "<!ELEMENT TIME (#PCDATA)>\n"
+                "<!ELEMENT TITLE (#PCDATA)>\n"
+                "<!ELEMENT DESCRIPTION (#PCDATA)>\n"
+                "<!ATTLIST TVSCHEDULE NAME CDATA #REQUIRED>\n"
+                "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED>\n"
+                "<!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>\n"
+                "<!ATTLIST TITLE RATING CDATA #IMPLIED>\n"
+                "<!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>\n"
+                "<TVSCHEDULE></TVSCHEDULE>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
@@ -212,22 +212,22 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   SECTION("XML with internal DTD with elements with multiple attributes to parse and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE CATALOG ["
-                "<!ENTITY AUTHOR \"John Doe\">"
-                "<!ENTITY COMPANY \"JD Power Tools, Inc.\">"
-                "<!ENTITY EMAIL \"jd@jd-tools.com\">"
-                "<!ELEMENT CATALOG (PRODUCT+)>"
-                "<!ELEMENT PRODUCT(SPECIFICATIONS+,OPTIONS?,PRICE+,NOTES?)>"
+                "<!ENTITY AUTHOR \"John Doe\">\n"
+                "<!ENTITY COMPANY \"JD Power Tools, Inc.\">\n"
+                "<!ENTITY EMAIL \"jd@jd-tools.com\">\n"
+                "<!ELEMENT CATALOG (PRODUCT+)>\n"
+                "<!ELEMENT PRODUCT(SPECIFICATIONS+,OPTIONS?,PRICE+,NOTES?)>\n"
                 "<!ATTLIST PRODUCT NAME CDATA #IMPLIED CATEGORY (HandTool|Table|Shop-Professional) \"HandTool\""
                 "PARTNUM CDATA #IMPLIED PLANT (Pittsburgh|Milwaukee|Chicago) \"Chicago\" INVENTORY (InStock|Backordered|Discontinued)"
-                " \"InStock\">"
-                "<!ELEMENT SPECIFICATIONS (#PCDATA)><!ATTLIST SPECIFICATIONS WEIGHT CDATA #IMPLIED POWER CDATA #IMPLIED>"
-                "<!ELEMENT OPTIONS (#PCDATA)>"
+                " \"InStock\">\n"
+                "<!ELEMENT SPECIFICATIONS (#PCDATA)><!ATTLIST SPECIFICATIONS WEIGHT CDATA #IMPLIED POWER CDATA #IMPLIED>\n"
+                "<!ELEMENT OPTIONS (#PCDATA)>\n"
                 "<!ATTLIST OPTIONS FINISH (Metal|Polished|Matte) \"Matte\" ADAPTER (Included|Optional|NotApplicable)"
-                " \"Included\" CASE (HardShell|Soft|NotApplicable) \"HardShell\">"
+                " \"Included\" CASE (HardShell|Soft|NotApplicable) \"HardShell\">\n"
                 "<!ELEMENT PRICE (#PCDATA)><!ATTLIST PRICE MSRP CDATA #IMPLIED"
-                "WHOLESALE CDATA #IMPLIED STREET CDATA #IMPLIED SHIPPING CDATA #IMPLIED>"
-                "<!ELEMENT NOTES (#PCDATA)> ]>"
-                "<CATALOG> </CATALOG>";
+                "WHOLESALE CDATA #IMPLIED STREET CDATA #IMPLIED SHIPPING CDATA #IMPLIED>\n"
+                "<!ELEMENT NOTES (#PCDATA)> ]>\n"
+                "<CATALOG> </CATALOG>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
@@ -255,26 +255,26 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   SECTION("XML with internal DTD with parameter entities to parse.", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE REPORT ["
-                "<!ELEMENT residence (%area;, %contact;)>"
-                "<!ELEMENT apartment (%area;, %contact;)>"
-                "<!ELEMENT office (%area;, %contact;)>"
-                "<!ELEMENT shop (%area;, %contact;)>"
-                "<!ENTITY % area \"name, street, pincode, city\">"
-                "<!ENTITY % contact \"phone\"> ]>"
-                "<area></area>";
+                "<!ELEMENT residence (%area;, %contact;)>\n"
+                "<!ELEMENT apartment (%area;, %contact;)>\n"
+                "<!ELEMENT office (%area;, %contact;)>\n"
+                "<!ELEMENT shop (%area;, %contact;)>\n"
+                "<!ENTITY % area \"name, street, pincode, city\">\n"
+                "<!ENTITY % contact \"phone\"> ]>\n"
+                "<area></area>\n";
     REQUIRE(xml.parse(xmlString));
   }
   SECTION("XML with internal DTD with both types of entities to parse an check values", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE REPORT ["
-                "<!ELEMENT residence (%area;, %contact;)>"
-                "<!ELEMENT apartment (%area;, %contact;)>"
-                "<!ELEMENT office (%area;, %contact;)>"
-                "<!ELEMENT shop (%area;, %contact;)>"
-                "<!ENTITY asg \"dummy test\">"
-                "<!ENTITY % area \"name, street, pincode, city\">"
-                "<!ENTITY % contact \"phone\"> ]>"
-                "<REPORT></REPORT>";
+                "<!ELEMENT residence (%area;, %contact;)>\n"
+                "<!ELEMENT apartment (%area;, %contact;)>\n"
+                "<!ELEMENT office (%area;, %contact;)>\n"
+                "<!ELEMENT shop (%area;, %contact;)>\n"
+                "<!ENTITY asg \"dummy test\">\n"
+                "<!ENTITY % area \"name, street, pincode, city\">\n"
+                "<!ENTITY % contact \"phone\"> ]>\n"
+                "<REPORT></REPORT>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
@@ -289,32 +289,32 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   SECTION("XML with internal DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE REPORT ["
-                "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>"
-                "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>"
-                "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>"
-                "<!ELEMENT SHORTSECT (TITLE,%BODY;)>"
-                "<!ELEMENT TITLE %TEXT;>"
-                "<!ELEMENT PARA %TEXT;>"
-                "<!ELEMENT LIST (ITEM)+>"
-                "<!ELEMENT ITEM (%BLOCK;)>"
-                "<!ELEMENT CODE (#PCDATA)>"
-                "<!ELEMENT KEYWORD (#PCDATA)>"
-                "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>"
-                "<!ELEMENT GRAPHIC EMPTY>"
-                "<!ATTLIST REPORT security (high | medium | low ) \"low\">"
-                "<!ATTLIST CODE type CDATA #IMPLIED>"
-                "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>"
-                "<!ENTITY xml \"Extensible Markup Language\">"
-                "<!ENTITY sgml \"Standard Generalized Markup Language\">"
-                "<!ENTITY pxa \"Professional XML Authoring\">"
-                "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">"
-                "<!ENTITY % BLOCK \"(PARA|LIST)+\">"
-                "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">"
-                "<!NOTATION GIF SYSTEM \"\">"
-                "<!NOTATION JPG SYSTEM \"\">"
-                "<!NOTATION BMP SYSTEM \"\">"
-                "]>"
-                "<REPORT> </REPORT>";
+                "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
+                "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\n"
+                "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\n"
+                "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\n"
+                "<!ELEMENT TITLE %TEXT;>\n"
+                "<!ELEMENT PARA %TEXT;>\n"
+                "<!ELEMENT LIST (ITEM)+>\n"
+                "<!ELEMENT ITEM (%BLOCK;)>\n"
+                "<!ELEMENT CODE (#PCDATA)>\n"
+                "<!ELEMENT KEYWORD (#PCDATA)>\n"
+                "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\n"
+                "<!ELEMENT GRAPHIC EMPTY>\n"
+                "<!ATTLIST REPORT security (high | medium | low ) \"low\">\n"
+                "<!ATTLIST CODE type CDATA #IMPLIED>\n"
+                "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\n"
+                "<!ENTITY xml \"Extensible Markup Language\">\n"
+                "<!ENTITY sgml \"Standard Generalized Markup Language\">\n"
+                "<!ENTITY pxa \"Professional XML Authoring\">\n"
+                "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\n"
+                "<!ENTITY % BLOCK \"(PARA|LIST)+\">\n"
+                "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\n"
+                "<!NOTATION GIF SYSTEM \"\">\n"
+                "<!NOTATION JPG SYSTEM \"\">\n"
+                "<!NOTATION BMP SYSTEM \"\">\n"
+                "]>\n"
+                "<REPORT> </REPORT>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["GIF"].name == "SYSTEM");

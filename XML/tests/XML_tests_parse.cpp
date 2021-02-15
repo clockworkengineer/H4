@@ -20,8 +20,8 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   std::string xmlString;
   SECTION("Parse XML declaration. ", "[XML]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                "<root></root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
+                "<root></root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
@@ -30,7 +30,7 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   SECTION("Parse version 1.0 encoding == UTF-8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> "
-                "<root></root>";
+                "<root></root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-16");
@@ -38,8 +38,8 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   }
   SECTION("Parse version 1.1 encoding == UTF8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml version = \"1.0\" standalone = \"yes\"?>"
-                "<root></root>";
+    xmlString = "<?xml version = \"1.0\" standalone = \"yes\"?>\n"
+                "<root></root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
@@ -47,26 +47,26 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   }
   SECTION("Check declaration contains at least version attribute.", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml?> <root></root>";
+    xmlString = "<?xml?> <root></root>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Parse empty XML declaration no root tag ", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml version = \"1.0\">";
+    xmlString = "<?xml version = \"1.0\">\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Parse wrongly ordered attributes in XML declaration. ", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?>"
-                " <root></root>";
+    xmlString = "<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?>\n"
+                " <root></root>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Parse XML with declaration but no root element", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), std::runtime_error);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "Parse buffer empty before parse complete.");
   }
@@ -77,54 +77,54 @@ TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
   std::string xmlString;
   SECTION("Allow tag names to with alpha numeric characters and '.','_', '-' ", "[XML][Parse][Tags]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>"
-                "</abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>\n"
+                "</abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Tag names are case sensitive", "[XML][Parse][Tags]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<AddressBook> </addressbook>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<AddressBook> </addressbook>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Incorrect closing tag ", "[XML][Parse][Tags]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<AddressBook> </Address>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<AddressBook> </Address>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Self closing tag ", "[XML][Parse][Tags]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<AddressBook/>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<AddressBook/>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Tag starts with a '.', '-' or a numeric digit", "[XML][Parse][Tags]")
   {
     xmlString = "<?xml version = \"1.0\"?> "
-                "<.AddressBook> </.AddressBook>";
+                "<.AddressBook> </.AddressBook>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
-    xmlString = "<?xml version = \"1.0\"?> <-AddressBook> </-AddressBook>";
+    xmlString = "<?xml version = \"1.0\"?> <-AddressBook> </-AddressBook>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
-    xmlString = "<?xml version = \"1.0\"?> <0AddressBook> </0AddressBook>";
+    xmlString = "<?xml version = \"1.0\"?> <0AddressBook> </0AddressBook>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Tag starts with a xml/XML/Xml etc", "[XML][Parse][Tags]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                " <xmlAddressBook> </xmlAddressBook>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                " <xmlAddressBook> </xmlAddressBook>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
-    xmlString = "<?xml version = \"1.0\"?> <XMLAddressBook> </XMLAddressBook>";
+    xmlString = "<?xml version = \"1.0\"?> <XMLAddressBook> </XMLAddressBook>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
-    xmlString = "<?xml version = \"1.0\"?> <XmlAddressBook> </XmlAddressBook>";
+    xmlString = "<?xml version = \"1.0\"?> <XmlAddressBook> </XmlAddressBook>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
@@ -135,8 +135,8 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
   std::string xmlString;
   SECTION("Empty root element <contact-info> ", "[XML][Parse]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<contact-info></contact-info>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<contact-info></contact-info>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
@@ -146,8 +146,8 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
   }
   SECTION("Empty root element <AddressBook> ", "[XML][Parse][Root]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<AddressBook> </AddressBook>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<AddressBook> </AddressBook>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
@@ -157,10 +157,10 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
   }
   SECTION("Root element <AddressBook> and one child <Address> with contents ", "[XML][Parse][Root]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<AddressBook>"
-                "<Address>    This is some contents    </Address>"
-                "</AddressBook>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<AddressBook>\n"
+                "<Address>    This is some contents    </Address>\n"
+                "</AddressBook>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
@@ -172,18 +172,18 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
   }
   SECTION("Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<AddressBook>"
-                "<Address>"
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<AddressBook>\n"
+                "<Address>\n"
                 "    This is some contents 1   "
-                "</Address>"
-                "<Address>"
+                "</Address>\n"
+                "<Address>\n"
                 "    This is some contents 2   "
-                "</Address>"
-                "<Address>"
+                "</Address>\n"
+                "<Address>\n"
                 "    This is some contents 3   "
-                "</Address>"
-                "</AddressBook>";
+                "</Address>\n"
+                "</AddressBook>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
@@ -191,11 +191,11 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).content == "    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).content == "\n    This is some contents 1   ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).content == "    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).content == "\n    This is some contents 2   ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).content == "    This is some contents 3   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).content == "\n    This is some contents 3   ");
   }
 }
 TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
@@ -219,9 +219,9 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
   std::string xmlString;
   SECTION("Root attribute with one attached attribute number", "[XML][Parse][[Attributes]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<AddressBook number='15'>"
-                "</AddressBook>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<AddressBook number='15'>\n"
+                "</AddressBook>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
@@ -234,9 +234,9 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
   }
   SECTION("Root attribute with 3 attached attributes number, away, flat", "[XML][Parse][[Attributes]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                " <AddressBook number='15' away=\"yes\" flat='no'>"
-                " </AddressBook>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                " <AddressBook number='15' away=\"yes\" flat='no'>\n"
+                " </AddressBook>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
@@ -253,17 +253,17 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
   }
   SECTION("Empty elements with attributes are allowed.", "[XML][Parse][[Attributes]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<AddressBook number='15'>"
-                "<AddressBook/>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<AddressBook number='15'>\n"
+                "<AddressBook/>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Root element with duplicate attributes.", "[XML][Parse][[Attributes]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<AddressBook number='15' colour='red' number='16'>"
-                " </AddressBook>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<AddressBook number='15' colour='red' number='16'>\n"
+                " </AddressBook>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
@@ -274,31 +274,31 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
   std::string xmlString;
   SECTION("A simple single line comment", "[XML][Parse][[Comments]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                "<!-- A single line comment -->"
-                "<root></root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
+                "<!-- A single line comment -->\n"
+                "<root></root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Multiple single line comments beifre root tag", "[XML][Parse][[Comments]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                "<!-- A single line comment -->"
-                " <!-- A single line comment -->"
-                " <!-- A single line comment -->"
-                " <root></root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
+                "<!-- A single line comment -->\n"
+                " <!-- A single line comment -->\n"
+                " <!-- A single line comment -->\n"
+                " <root></root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Multiple comments inside root element and between its children ", "[XML][Parse][[Comments]")
   {
-    xmlString = "<?xml version = \"1.0\"?>"
-                "<AddressBook>"
-                "<!--Address one -->"
-                "<Address>    This is some contents 1   </Address>"
-                "<!--Address two -->"
-                "<Address>    This is some contents 2   </Address>"
-                "<!--Address three -->"
-                "<Address>    This is some contents 3   </Address>"
-                "</AddressBook>";
+    xmlString = "<?xml version = \"1.0\"?>\n"
+                "<AddressBook>\n"
+                "<!--Address one -->\n"
+                "<Address>    This is some contents 1   </Address>\n"
+                "<!--Address two -->\n"
+                "<Address>    This is some contents 2   </Address>\n"
+                "<!--Address three -->\n"
+                "<Address>    This is some contents 3   </Address>\n"
+                "</AddressBook>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
@@ -317,48 +317,48 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
   }
   SECTION("A single comment after root element", "[XML][Parse][[Comments]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                "<root></root>"
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
+                "<root></root>\n"
                 "<!-- A single line comment --> ";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("A simple multi line comment", "[XML][Parse][[Comments]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<!-- A single line comment\n"
                 " another line\n"
                 " another line\n"
                 " and another line\n"
-                "--> <root></root>";
+                "--> <root></root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("A simple comment within element content", "[XML][Parse][[Comments]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<root>Test<!-- a simple comment -->Test"
-                "</root>";
+                "</root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "TestTest");
   }
   SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][[Comments]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<root>Test  <!-- a simple comment -->  Test"
-                "</root>";
+                "</root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "Test    Test");
   }
   SECTION("A simple single line comment containing -- is illegal", "[XML][Parse][[Comments]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<!-- A single line comment-- --> "
-                "<root></root>";
+                "<root></root>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<!-- A single line comment ---> "
-                "<root></root>";
+                "<root></root>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
@@ -369,13 +369,13 @@ TEST_CASE("Parse XML with Unicode character in element names, attributes, commen
   std::string xmlString;
   SECTION("Japanese characters", "[XML][Parse][[Unicode]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><config><start_text>転送</start_text></config>";
+    xmlString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><config><start_text>転送</start_text></config>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Well-formed XML document including Chinese, Armenian and Cyrillic characters", "[XML][Parse][[Unicode]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                "<俄语 լեզու=\"ռուսերեն\">данные</俄语>";
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                "<俄语 լեզու=\"ռուսերեն\">данные</俄语>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "俄语");
@@ -392,43 +392,43 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
   SECTION("Parse entity &amp; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> "
-                "<root> &amp; </root>";
+                "<root> &amp; </root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " & ");
   }
   SECTION("Parse entity &quot; in contents area", "[XML][Parse][Entities]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>"
-                " <root> &quot; </root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>\n"
+                " <root> &quot; </root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " \" ");
   }
   SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Entities]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>"
-                " <root> &apos; &lt; &gt; </root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>\n"
+                " <root> &apos; &lt; &gt; </root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " ' < > ");
   }
   SECTION("Parse reference &#x00A5; in contents area", "[XML][Parse][Entities]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>"
-                " <root> &#x00A5; </root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>\n"
+                " <root> &#x00A5; </root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " ¥ ");
   }
   SECTION("Parse reference &#163; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> "
-                "<root> &#163; </root>";
+                "<root> &#163; </root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " £ ");
   }
   SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Entities]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>"
-                " <root attr1=\" &amp;&quot;&apos;&gt;&lt; \">"
-                "</root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>\n"
+                " <root attr1=\" &amp;&quot;&apos;&gt;&lt; \">\n"
+                "</root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].name == "attr1");
@@ -436,8 +436,8 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
   }
   SECTION("Parse references &#x00A5;&#163 in attribute value", "[XML][Parse][Entities]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>"
-                " <root attr1=\" &#x00A5;&#163; \"></root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>\n"
+                " <root attr1=\" &#x00A5;&#163; \"></root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].name == "attr1");
@@ -450,31 +450,31 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
   std::string xmlString;
   SECTION("Parse XML containing PI after declaration", "[XML][Parse][PI]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
-                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>"
-                "<root></root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>\n"
+                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>\n"
+                "<root></root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Parse XML containing multiple PI after declaration", "[XML][Parse][PI]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>\n"
                 "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?> "
-                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>"
-                "  <root></root>";
+                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>\n"
+                "  <root></root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Parse XML containing PI in root section", "[XML][Parse][PI]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
-                "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>"
-                "</root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>\n"
+                "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>\n"
+                "</root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Parse XML containing PI after declaration and check values", "[XML][Parse][PI]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
-                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>"
-                "<root></root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>\n"
+                "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>\n"
+                "<root></root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::pi);
     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0]).name == "xml-stylesheet");
@@ -482,9 +482,9 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
   }
   SECTION("Parse XML containing PI in root section and check values", "[XML][Parse][PI]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>"
-                "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>"
-                "</root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>\n"
+                "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>\n"
+                "</root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0][0]).getNodeType() == XNodeType::pi);
     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0][0]).name == "xml-stylesheet");
@@ -497,37 +497,37 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
   std::string xmlString;
   SECTION("Parse XML root containing CDDATA containing a XML tags", "[XML][Parse][CDATA]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                " <root>"
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
+                " <root>\n"
                 "   <![CDATA[<message> Welcome to TutorialsPoint </message>   ]]>   "
-                "</root>";
+                "</root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
   SECTION("Parse XML root containing CDDATA containing a XML tags and check contents", "[XML][Parse][CDATA]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                " <root>"
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
+                " <root>\n"
                 "   <![CDATA[<message> Welcome to TutorialsPoint </message>]]>   "
-                "</root>";
+                "</root>\n";
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "   <message> Welcome to TutorialsPoint </message>   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "\n   <message> Welcome to TutorialsPoint </message>   ");
     REQUIRE(XNodeRef<XNodeCDATA>((*xNodeRoot)[0][0]).cdata == "<message> Welcome to TutorialsPoint </message>");
   }
   SECTION("Parse XML root containing CDDATA containing nested CDATA ", "[XML][Parse][CDATA]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                " <root>"
-                "   <![CDATA[< Test test <![CDATA[ Test text ]]> ]]>"
-                "   </root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
+                " <root>\n"
+                "   <![CDATA[< Test test <![CDATA[ Test text ]]> ]]>\n"
+                "   </root>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("Parse XML root containing CDDATA containing ]]> ", "[XML][Parse][CDATA]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                " <root>"
-                "   <![CDATA[< Test Test text ]]>  ]]>"
-                "   </root>";
+    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
+                " <root>\n"
+                "   <![CDATA[< Test Test text ]]>  ]]>\n"
+                "   </root>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
@@ -553,16 +553,16 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
   std::string xmlString;
   SECTION("A root document and two namespaces defined in the child two table elements.", "[XML][Parse][Namespace]")
   {
-    xmlString = "<root>"
-                "<h:table xmlns:h=\"http://www.w3.org/TR/html4/\">"
-                "<h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr>"
-                "</h:table>"
-                "<f:table xmlns:f=\"https://www.w3schools.com/furniture\">"
-                "<f:name>African Coffee Table</f:name>"
-                "<f:width>80</f:width>"
-                "<f:length>120</f:length>"
-                "</f:table>"
-                "</root>";
+    xmlString = "<root>\n"
+                "<h:table xmlns:h=\"http://www.w3.org/TR/html4/\">\n"
+                "<h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr>\n"
+                "</h:table>\n"
+                "<f:table xmlns:f=\"https://www.w3schools.com/furniture\">\n"
+                "<f:name>African Coffee Table</f:name>\n"
+                "<f:width>80</f:width>\n"
+                "<f:length>120</f:length>\n"
+                "</f:table>\n"
+                "</root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "h:table");
@@ -576,9 +576,9 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
   }
   SECTION("A root document and two namespaces defined in the root element.", "[XML][Parse][Namespace]")
   {
-    xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">"
-                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table>"
-                "<f:table><f:name>African Coffee Table</f:name><f:width>80</f:width><f:length>120</f:length></f:table></root>";
+    xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">\n"
+                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table>\n"
+                "<f:table><f:name>African Coffee Table</f:name><f:width>80</f:width><f:length>120</f:length></f:table></root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "h:table");
@@ -596,16 +596,16 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
   }
   SECTION("A root document and two namespaces defined in the root element and non-existant namespace g for one of tables.", "[XML][Parse][Namespace]")
   {
-    xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">"
-                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table><g:table>"
-                "<g:name>African Coffee Table</g:name><g:width>80</g:width>"
-                "<g:length>120</g:length></g:table></root>";
+    xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">\n"
+                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table><g:table>\n"
+                "<g:name>African Coffee Table</g:name><g:width>80</g:width>\n"
+                "<g:length>120</g:length></g:table></root>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("A root documement with a default namespace", "[XML][Parse][Namespace]")
   {
-    xmlString = "<table xmlns=\"http://www.w3.org/TR/html4/\"><tr><td>Apples</td><td>Bananas</td></tr></table>";
+    xmlString = "<table xmlns=\"http://www.w3.org/TR/html4/\"><tr><td>Apples</td><td>Bananas</td></tr></table>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlString);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "tr");
@@ -615,20 +615,20 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
   }
   SECTION("A root document and two namespaces (the same name) defined in the root element.", "[XML][Parse][Namespace]")
   {
-    xmlString = "<root xmlns:f=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">"
-                "<f:table><f:tr><f:td>Apples</f:td><f:td>Bananas</f:td></f:tr></f:table><f:table>"
-                "<f:name>African Coffee Table</f:name><f:width>80</f:width>"
-                "<f:length>120</f:length></f:table></root>";
+    xmlString = "<root xmlns:f=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">\n"
+                "<f:table><f:tr><f:td>Apples</f:td><f:td>Bananas</f:td></f:tr></f:table><f:table>\n"
+                "<f:name>African Coffee Table</f:name><f:width>80</f:width>\n"
+                "<f:length>120</f:length></f:table></root>\n";
     REQUIRE_THROWS_AS(xml.parse(xmlString), XML::SyntaxError);
     REQUIRE_THROWS_WITH(xml.parse(xmlString), "XML syntax error detected.");
   }
   SECTION("A root document defining one namespae tha is overridden by a child", "[XML][Parse][Namespace]")
   {
-    xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">"
-                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table>"
-                "<f:table xmlns:f=\"https://www.w3schools.com/furniture\">"
-                "<f:name>African Coffee Table</f:name><f:width>80</f:width>"
-                "<f:length>120</f:length></f:table></root>";
+    xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">\n"
+                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table>\n"
+                "<f:table xmlns:f=\"https://www.w3schools.com/furniture\">\n"
+                "<f:name>African Coffee Table</f:name><f:width>80</f:width>\n"
+                "<f:length>120</f:length></f:table></root>\n";
     REQUIRE_NOTHROW(xml.parse(xmlString));
   }
 }
