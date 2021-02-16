@@ -35,10 +35,10 @@ namespace H4
         struct SyntaxError : public std::exception
         {
         public:
-            SyntaxError(ISource & source, const std::string &description = "")
+            SyntaxError(ISource &source, const std::string &description = "")
             {
-                errorMessage = "XML Syntax Error [Line: "+std::to_string(source.getLine()) +
-                                                " Column: "+std::to_string(source.getColumn())+"]"+ description;
+                errorMessage = "XML Syntax Error [Line: " + std::to_string(source.getLine()) +
+                               " Column: " + std::to_string(source.getColumn()) + "]" + description;
             }
             virtual const char *what() const throw()
             {

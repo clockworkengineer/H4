@@ -24,11 +24,12 @@ namespace H4
         {
             return (m_stringifyBuffer);
         }
+
     private:
         XString m_stringifyBuffer;
     };
     class FileDestination : public XML::IDestination
-    { 
+    {
     public:
         FileDestination(const std::string &desinationFileName)
         {
@@ -43,6 +44,7 @@ namespace H4
             m_destination.write(bytes.c_str(), bytes.length());
             m_destination.flush();
         }
+
     private:
         std::ofstream m_destination;
     };

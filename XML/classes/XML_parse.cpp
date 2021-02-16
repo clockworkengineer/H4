@@ -40,7 +40,6 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-
     XString XML::parseName(ISource &source)
     {
         XString name;
@@ -52,7 +51,7 @@ namespace H4
         source.ignoreWS();
         if (!validateName(name))
         {
-            throw SyntaxError(source);
+            throw SyntaxError(source, "Invalid name encountered.");
         }
         return (name);
     }
@@ -77,7 +76,7 @@ namespace H4
         {
             if (!validChar(ch))
             {
-                throw SyntaxError(source);
+                throw SyntaxError(source, "Invalid character value encountered.");
             }
         }
         return (characters);
@@ -97,7 +96,7 @@ namespace H4
             source.ignoreWS();
             return (value);
         }
-        throw SyntaxError(source);
+        throw SyntaxError(source, "Invalid attribute value.");
     }
     long XML::parseCharacterReference(ISource &source, XString reference)
     {
@@ -113,7 +112,7 @@ namespace H4
         {
             return (temp);
         }
-        throw SyntaxError(source);
+        throw SyntaxError(source, "Cannot convert character reference.");
     }
     XString XML::parseReferenceOrEntity(ISource &source)
     {
@@ -132,7 +131,7 @@ namespace H4
         {
             return (m_entityMapping[U"&" + entityName + U";"]);
         }
-        throw SyntaxError(source);
+        throw SyntaxError(source, "Invalidly formed  character reference or entity.");
     }
     void XML::parseComment(ISource &source, XNodeElement *xNodeElement)
     {
@@ -144,7 +143,7 @@ namespace H4
         }
         if (source.current() != '>')
         {
-            throw SyntaxError(source);
+            throw SyntaxError(source, "Missing closing '>' for comment line.");
         }
         source.next();
         xNodeElement->elements.emplace_back(std::make_unique<XNodeComment>(xNodeComment));
@@ -185,7 +184,7 @@ namespace H4
             XString attributeName = parseName(source);
             if (source.current() != '=')
             {
-                throw SyntaxError(source);
+                throw SyntaxError(source, "Missing '=' between attribute name and value.");
             }
             source.next();
             source.ignoreWS();
@@ -196,7 +195,7 @@ namespace H4
             }
             else
             {
-                throw SyntaxError(source);
+                throw SyntaxError(source, "Attribute defined more than once within start tag.");
             }
         }
         addNamespacesToList(xNodeElement);
@@ -210,7 +209,7 @@ namespace H4
             parseAttributes(source, xNodeElement);
             if (!source.match(U"?>") || !validateXMLDeclaration(xNodeElement))
             {
-                throw SyntaxError(source);
+                throw SyntaxError(source, "Declaration invalid or end tag not found.");
             }
         }
         source.ignoreWS();
@@ -243,9 +242,9 @@ namespace H4
         if (auto pos = xNodeChildElement.name.find(':'); pos != std::string::npos)
         {
             if (!isAttributePresent(xNodeChildElement.namespaces,
-                                            XML::m_UTF8.from_bytes(xNodeChildElement.name.substr(0, pos))))
+                                    XML::m_UTF8.from_bytes(xNodeChildElement.name.substr(0, pos))))
             {
-                throw SyntaxError(source);
+                throw SyntaxError(source, "Namespace used but not defined.");
             }
         }
         xNodeElement->elements.push_back(std::make_unique<XNodeElement>(std::move(xNodeChildElement)));
@@ -254,7 +253,7 @@ namespace H4
     {
         if (source.match(U"]]>"))
         {
-            throw SyntaxError(source);
+            throw SyntaxError(source, "']]>' invalid in element content area.");
         }
         xNodeElement->content += XML::m_UTF8.to_bytes(parseEncodedCharacter(source));
     }
@@ -295,7 +294,7 @@ namespace H4
         }
         else if (!source.match(U"/>"))
         {
-            throw SyntaxError(source);
+            throw SyntaxError(source, "Missing /> for closing tag.");
         }
     }
     std::unique_ptr<XNode> XML::parseXML(ISource &source)
@@ -310,7 +309,7 @@ namespace H4
         }
         else
         {
-            throw SyntaxError(source);
+            throw SyntaxError(source, "Missing declaration or root element.");
         }
         return (std::make_unique<XNodeElement>(std::move(xNodeRoot)));
     }

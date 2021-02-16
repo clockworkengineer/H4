@@ -73,6 +73,7 @@ namespace H4
         {
             return (m_column);
         }
+
     private:
         std::size_t m_bufferPosition = 0;
         XString m_parseBuffer;
@@ -131,6 +132,7 @@ namespace H4
         {
             return (m_column);
         }
+
     private:
         std::ifstream m_source;
         long m_lineNo = 1;

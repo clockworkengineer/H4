@@ -68,7 +68,6 @@ namespace H4
         return (std::find_if(attributes.rbegin(), attributes.rend(),
                              [&name](const XAttribute &attr) { return (attr.name == XML::m_UTF8.to_bytes(name)); }) != attributes.rend());
     }
-
     std::string XML::convertCRLFToLF(const std::string &xmlString)
     {
         std::string converted = xmlString;
@@ -86,7 +85,6 @@ namespace H4
         {
             if (attribute.name.starts_with("xmlns"))
             {
-                // Defining a namespace
                 attribute.name = (attribute.name.size() > 5) ? attribute.name.substr(6) : ":";
                 XNodeElement->namespaces.emplace_back(attribute);
             }
