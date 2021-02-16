@@ -8,6 +8,8 @@
 // Class under test includes
 // =========================
 #include "XML.hpp"
+#include "XMLSources.hpp"
+#include "XMLDestinations.hpp"
 // ============
 // STL includes
 // ============

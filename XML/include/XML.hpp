@@ -44,6 +44,7 @@ namespace H4
             {
                 return (errorMessage.c_str());
             }
+
         private:
             std::string errorMessage;
         };
@@ -110,7 +111,6 @@ namespace H4
         // ===============
         void initialiseTables();
         long parseCharacterReference(ISource &source, XString reference);
-        std::string convertCRLFToLF(const std::string &xmlToParse);
         bool isAttributePresent(std::vector<XAttribute> attributes, const XString &name);
         void addNamespacesToList(XNodeElement *XNodeElement);
         bool validChar(XChar ch);

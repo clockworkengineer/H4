@@ -36,7 +36,6 @@ namespace H4
     // ========================
     // Translation between UTF8/UTF16 and UTF32
     std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> XML::m_UTF8;
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> XML::m_UTF16;
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -68,17 +67,6 @@ namespace H4
         return (std::find_if(attributes.rbegin(), attributes.rend(),
                              [&name](const XAttribute &attr) { return (attr.name == XML::m_UTF8.to_bytes(name)); }) != attributes.rend());
     }
-    std::string XML::convertCRLFToLF(const std::string &xmlString)
-    {
-        std::string converted = xmlString;
-        size_t pos = converted.find("\x0D\x0A");
-        while (pos != std::string::npos)
-        {
-            converted.replace(pos, 2, "\x0A");
-            pos = converted.find("\x0D\x0A", pos + 1);
-        }
-        return (converted);
-    }
     void XML::addNamespacesToList(XNodeElement *XNodeElement)
     {
         for (auto attribute : XNodeElement->attributes)
@@ -95,20 +83,13 @@ namespace H4
     // ==============
     std::unique_ptr<XNode> XML::parseBuffer(const std::string &xmlToParse)
     {
-        BufferSource xmlSource(XML::m_UTF8.from_bytes(convertCRLFToLF(xmlToParse)));
+        BufferSource xmlSource(xmlToParse);
         return (parseXML(xmlSource));
     }
     std::unique_ptr<XNode> XML::parseBuffer(const std::u16string &xmlToParse)
     {
-        std::u16string utf16xml{xmlToParse};
-        if (!xmlToParse.starts_with(u"<?xml"))
-        {
-            for (char16_t &ch : utf16xml)
-            {
-                ch = (static_cast<u_int16_t>(ch) >> 8) | (static_cast<u_int16_t>(ch) << 8);
-            }
-        }
-        return (parseBuffer(XML::m_UTF16.to_bytes(utf16xml)));
+        UFT16BufferSource xmlSource(xmlToParse);
+        return (parseXML(xmlSource));
     }
     std::unique_ptr<XNode> XML::parseFile(const std::string &xmlFileName)
     {
