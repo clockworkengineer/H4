@@ -81,21 +81,6 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-    std::unique_ptr<XNode> XML::parseBuffer(const std::string &xmlToParse)
-    {
-        BufferSource xmlSource(xmlToParse);
-        return (parseXML(xmlSource));
-    }
-    std::unique_ptr<XNode> XML::parseBuffer(const std::u16string &xmlToParse)
-    {
-        BufferSource xmlSource(xmlToParse);
-        return (parseXML(xmlSource));
-    }
-    std::unique_ptr<XNode> XML::parseFile(const std::string &xmlFileName)
-    {
-        FileSource xmlSource(xmlFileName);
-        return (parseXML(xmlSource));
-    }
     std::unique_ptr<XNode> XML::parse(ISource &xmlSource)
     {
         return (parseXML(xmlSource));

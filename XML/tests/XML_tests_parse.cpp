@@ -107,31 +107,43 @@ TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
     BufferSource xmlSource(xmlString);
     REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
-  SECTION("Tag starts with a '.', '-' or a numeric digit", "[XML][Parse][Tags]")
+  SECTION("Tag starts with a '.' ", "[XML][Parse][Tags]")
   {
     xmlString = "<?xml version = \"1.0\"?> "
                 "<.AddressBook> </.AddressBook>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 1 Column: 41]Invalid name encountered.");
-    xmlString = "<?xml version = \"1.0\"?> <-AddressBook> </-AddressBook>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 1 Column: 41]Invalid name encountered.");
-    xmlString = "<?xml version = \"1.0\"?> <0AddressBook> </0AddressBook>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 1 Column: 41]Invalid name encountered.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 41]Invalid name encountered.");
   }
-  SECTION("Tag starts with a xml/XML/Xml etc", "[XML][Parse][Tags]")
+  SECTION("Tag starts with a '-' ", "[XML][Parse][Tags]")
+  {
+    xmlString = "<?xml version = \"1.0\"?> <-AddressBook> </-AddressBook>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 41]Invalid name encountered.");
+  }
+  SECTION("Tag starts with a numeric digit", "[XML][Parse][Tags]")
+  {
+    xmlString = "<?xml version = \"1.0\"?> <0AddressBook> </0AddressBook>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 41]Invalid name encountered.");
+  }
+  SECTION("Tag starts with a xml etc", "[XML][Parse][Tags]")
   {
     xmlString = "<?xml version = \"1.0\"?>\n"
                 " <xmlAddressBook> </xmlAddressBook>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 2 Column: 21]Invalid name encountered.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 21]Invalid name encountered.");
+  }
+  SECTION("Tag starts with a XML etc", "[XML][Parse][Tags]")
+  {
     xmlString = "<?xml version = \"1.0\"?> <XMLAddressBook> </XMLAddressBook>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 1 Column: 43]Invalid name encountered.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 43]Invalid name encountered.");
+  }
+  SECTION("Tag starts with a Xml etc", "[XML][Parse][Tags]")
+  {
     xmlString = "<?xml version = \"1.0\"?> <XmlAddressBook> </XmlAddressBook>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 1 Column: 43]Invalid name encountered.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 43]Invalid name encountered.");
   }
 }
 TEST_CASE("Use XML object to parse declaration, root element and check parsed information ", "[XML][Parse][Root]")
@@ -361,7 +373,6 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<root>Test<!-- a simple comment -->Test"
                 "</root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "TestTest");
@@ -380,13 +391,16 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<!-- A single line comment-- --> "
                 "<root></root>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 2 Column: 30]Missing closing '>' for comment line.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 30]Missing closing '>' for comment line.");
+  }
+  SECTION("A simple single line comment ending with -- is illegal", "[XML][Parse][[Comments]")
+  {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<!-- A single line comment ---> "
                 "<root></root>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 2 Column: 31]Missing closing '>' for comment line.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 31]Missing closing '>' for comment line.");
   }
 }
 TEST_CASE("Parse XML with Unicode character in element names, attributes, comments, character data, and processing instructions. ", "[XML][Parse][Unicode]")
