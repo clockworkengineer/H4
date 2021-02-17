@@ -9,19 +9,6 @@ namespace H4
     //
     class BufferSource : public XML::ISource
     {
-    private: 
-        std::string convertCRLFToLF(const std::string &xmlString)
-        {
-            std::string converted = xmlString;
-            size_t pos = converted.find("\x0D\x0A");
-            while (pos != std::string::npos)
-            {
-                converted.replace(pos, 2, "\x0A");
-                pos = converted.find("\x0D\x0A", pos + 1);
-            }
-            return (converted);
-        }
-
     public:
         BufferSource() {}
         BufferSource(const std::u16string &sourceBuffer)
@@ -38,7 +25,8 @@ namespace H4
                     ch = (static_cast<u_int16_t>(ch) >> 8) | (static_cast<u_int16_t>(ch) << 8);
                 }
             }
-            m_parseBuffer = m_UTF8.from_bytes(convertCRLFToLF(m_UTF16.to_bytes(utf16xml)));
+            m_parseBuffer = m_UTF8.from_bytes(m_UTF16.to_bytes(utf16xml));
+            convertCRLFToLF(m_parseBuffer);
         }
         BufferSource(const std::string &sourceBuffer)
         {
@@ -46,7 +34,8 @@ namespace H4
             {
                 throw std::invalid_argument("Empty source buffer passed to be parsed.");
             }
-            m_parseBuffer = m_UTF8.from_bytes(convertCRLFToLF(sourceBuffer));
+            m_parseBuffer = m_UTF8.from_bytes(sourceBuffer);
+            convertCRLFToLF(m_parseBuffer);
         }
         XChar current()
         {
@@ -104,7 +93,17 @@ namespace H4
             return (m_column);
         }
 
-    protected:
+    private:
+        void convertCRLFToLF(XString &xmlString)
+        {
+
+            size_t pos = xmlString.find(U"\x0D\x0A");
+            while (pos != std::string::npos)
+            {
+                xmlString.replace(pos, 2, U"\x0A");
+                pos = xmlString.find(U"\x0D\x0A", pos + 1);
+            }
+        }
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
         std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         std::size_t m_bufferPosition = 0;

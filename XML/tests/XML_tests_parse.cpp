@@ -229,7 +229,7 @@ TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
       "./testData/testfile005.xml",
       "./testData/testfile007.xml",
       "./testData/testfile010.xml",
-      //        "./testData/testfile011.xml"
+      "./testData/testfile011.xml"
   }));
   SECTION("Load file into buffer and parse.", "[XML][Parse]")
   {

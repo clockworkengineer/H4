@@ -34,7 +34,7 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
-    // Translation between UTF8/UTF16 and UTF32
+    // Translation between UTF8 and UTF32
     std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> XML::m_UTF8;
     // =======================
     // PUBLIC STATIC VARIABLES

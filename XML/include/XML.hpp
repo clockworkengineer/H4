@@ -144,8 +144,7 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        static std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
-        static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
+        static std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;;
         static XAttribute m_defaultAtributes[3];
         static std::set<XString> m_dtdAttrListTypes;
         std::unordered_map<XString, XString> m_entityMapping;
