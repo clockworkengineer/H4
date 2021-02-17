@@ -9,7 +9,7 @@ namespace H4
     //
     class BufferSource : public XML::ISource
     {
-    protected:
+    private: 
         std::string convertCRLFToLF(const std::string &xmlString)
         {
             std::string converted = xmlString;
@@ -21,8 +21,25 @@ namespace H4
             }
             return (converted);
         }
+
     public:
         BufferSource() {}
+        BufferSource(const std::u16string &sourceBuffer)
+        {
+            if (sourceBuffer.empty())
+            {
+                throw std::invalid_argument("Empty source buffer passed to be parsed.");
+            }
+            std::u16string utf16xml{sourceBuffer};
+            if (!utf16xml.starts_with(u"<?xml"))
+            {
+                for (char16_t &ch : utf16xml)
+                {
+                    ch = (static_cast<u_int16_t>(ch) >> 8) | (static_cast<u_int16_t>(ch) << 8);
+                }
+            }
+            m_parseBuffer = m_UTF8.from_bytes(convertCRLFToLF(m_UTF16.to_bytes(utf16xml)));
+        }
         BufferSource(const std::string &sourceBuffer)
         {
             if (sourceBuffer.empty())
@@ -86,7 +103,9 @@ namespace H4
         {
             return (m_column);
         }
+
     protected:
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
         std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         std::size_t m_bufferPosition = 0;
         XString m_parseBuffer;
@@ -96,28 +115,6 @@ namespace H4
     //
     // Source classes for parsers.
     //
-    class UFT16BufferSource : public BufferSource
-    {
-    public:
-        UFT16BufferSource(const std::u16string &sourceBuffer)
-        {
-            if (sourceBuffer.empty())
-            {
-                throw std::invalid_argument("Empty source buffer passed to be parsed.");
-            }
-            std::u16string utf16xml{sourceBuffer};
-            if (!utf16xml.starts_with(u"<?xml"))
-            {
-                for (char16_t &ch : utf16xml)
-                {
-                    ch = (static_cast<u_int16_t>(ch) >> 8) | (static_cast<u_int16_t>(ch) << 8);
-                }
-            }
-            m_parseBuffer = m_UTF8.from_bytes(convertCRLFToLF(m_UTF16.to_bytes(utf16xml)));
-        }
-    private:
-        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
-    };
     class FileSource : public XML::ISource
     {
     public:
@@ -170,6 +167,7 @@ namespace H4
         {
             return (m_column);
         }
+
     private:
         std::ifstream m_source;
         long m_lineNo = 1;

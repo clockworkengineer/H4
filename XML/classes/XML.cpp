@@ -88,7 +88,7 @@ namespace H4
     }
     std::unique_ptr<XNode> XML::parseBuffer(const std::u16string &xmlToParse)
     {
-        UFT16BufferSource xmlSource(xmlToParse);
+        BufferSource xmlSource(xmlToParse);
         return (parseXML(xmlSource));
     }
     std::unique_ptr<XNode> XML::parseFile(const std::string &xmlFileName)
