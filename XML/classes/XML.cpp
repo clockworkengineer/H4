@@ -96,4 +96,8 @@ namespace H4
         FileSource xmlSource(xmlFileName);
         return (parseXML(xmlSource));
     }
+    std::unique_ptr<XNode> XML::parse(ISource &xmlSource)
+    {
+        return (parseXML(xmlSource));
+    }
 } // namespace H4

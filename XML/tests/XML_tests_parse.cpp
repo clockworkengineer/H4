@@ -22,7 +22,8 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<root></root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
@@ -31,7 +32,8 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?> "
                 "<root></root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-16");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "yes");
@@ -40,7 +42,8 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   {
     xmlString = "<?xml version = \"1.0\" standalone = \"yes\"?>\n"
                 "<root></root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "yes");
@@ -48,27 +51,27 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   SECTION("Check declaration contains at least version attribute.", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml?> <root></root>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 1 Column: 8]Declaration invalid or end tag not found.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 8]Declaration invalid or end tag not found.");
   }
   SECTION("Parse empty XML declaration no root tag ", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version = \"1.0\">\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 1 Column: 22]Declaration invalid or end tag not found.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 22]Declaration invalid or end tag not found.");
   }
   SECTION("Parse wrongly ordered attributes in XML declaration. ", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version = \"1.0\" standalone = \"no\" encoding = \"UTF-8\"?>\n"
                 " <root></root>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 2 Column: 1]Declaration invalid or end tag not found.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 1]Declaration invalid or end tag not found.");
   }
   SECTION("Parse XML with declaration but no root element", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), std::runtime_error);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "Parse buffer empty before parse complete.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "Parse buffer empty before parse complete.");
   }
 }
 TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
@@ -80,27 +83,29 @@ TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
     xmlString = "<?xml version = \"1.0\"?>\n"
                 "<abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>\n"
                 "</abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Tag names are case sensitive", "[XML][Parse][Tags]")
   {
     xmlString = "<?xml version = \"1.0\"?>\n"
                 "<AddressBook> </addressbook>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 2 Column: 25]Invalid name encountered.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 25]Invalid name encountered.");
   }
   SECTION("Incorrect closing tag ", "[XML][Parse][Tags]")
   {
     xmlString = "<?xml version = \"1.0\"?>\n"
                 "<AddressBook> </Address>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 2 Column: 32]Invalid name encountered.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 32]Invalid name encountered.");
   }
   SECTION("Self closing tag ", "[XML][Parse][Tags]")
   {
     xmlString = "<?xml version = \"1.0\"?>\n"
                 "<AddressBook/>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Tag starts with a '.', '-' or a numeric digit", "[XML][Parse][Tags]")
   {
@@ -137,7 +142,8 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
   {
     xmlString = "<?xml version = \"1.0\"?>\n"
                 "<contact-info></contact-info>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
@@ -148,7 +154,8 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
   {
     xmlString = "<?xml version = \"1.0\"?>\n"
                 "<AddressBook> </AddressBook>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
@@ -161,7 +168,8 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
                 "<AddressBook>\n"
                 "<Address>    This is some contents    </Address>\n"
                 "</AddressBook>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
@@ -184,7 +192,8 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
                 "    This is some contents 3   "
                 "</Address>\n"
                 "</AddressBook>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
@@ -212,12 +221,13 @@ TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
   }));
   SECTION("Load file into buffer and parse.", "[XML][Parse]")
   {
-    std::string jsonXMLBuffer = readXMLFromFileUTF8(testFile);
-    REQUIRE_NOTHROW(xml.parseBuffer(jsonXMLBuffer));
+    BufferSource xmlSource(readXMLFromFileUTF8(testFile));
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Parse XML from file.", "[XML][Parse]")
   {
-    REQUIRE_NOTHROW(xml.parseFile(testFile));
+    FileSource xmlSource(testFile);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
 }
 TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attributes]")
@@ -229,7 +239,8 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     xmlString = "<?xml version = \"1.0\"?>\n"
                 "<AddressBook number='15'>\n"
                 "</AddressBook>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
@@ -244,7 +255,8 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     xmlString = "<?xml version = \"1.0\"?>\n"
                 " <AddressBook number='15' away=\"yes\" flat='no'>\n"
                 " </AddressBook>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
@@ -263,16 +275,16 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     xmlString = "<?xml version = \"1.0\"?>\n"
                 "<AddressBook number='15'>\n"
                 "<AddressBook/>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Root element with duplicate attributes.", "[XML][Parse][[Attributes]")
   {
     xmlString = "<?xml version = \"1.0\"?>\n"
                 "<AddressBook number='15' colour='red' number='16'>\n"
                 " </AddressBook>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 2 Column: 54]Attribute defined more than once within start tag.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 54]Attribute defined more than once within start tag.");
   }
 }
 TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
@@ -284,7 +296,8 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<!-- A single line comment -->\n"
                 "<root></root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Multiple single line comments beifre root tag", "[XML][Parse][[Comments]")
   {
@@ -293,7 +306,8 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 " <!-- A single line comment -->\n"
                 " <!-- A single line comment -->\n"
                 " <root></root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Multiple comments inside root element and between its children ", "[XML][Parse][[Comments]")
   {
@@ -306,7 +320,8 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "<!--Address three -->\n"
                 "<Address>    This is some contents 3   </Address>\n"
                 "</AddressBook>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
@@ -327,7 +342,8 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<root></root>\n"
                 "<!-- A single line comment --> ";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("A simple multi line comment", "[XML][Parse][[Comments]")
   {
@@ -337,7 +353,8 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 " another line\n"
                 " and another line\n"
                 "--> <root></root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("A simple comment within element content", "[XML][Parse][[Comments]")
   {
@@ -345,7 +362,8 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "<root>Test<!-- a simple comment -->Test"
                 "</root>\n";
     REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "TestTest");
   }
   SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][[Comments]")
@@ -353,7 +371,8 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n"
                 "<root>Test  <!-- a simple comment -->  Test"
                 "</root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "Test    Test");
   }
   SECTION("A simple single line comment containing -- is illegal", "[XML][Parse][[Comments]")
@@ -377,14 +396,15 @@ TEST_CASE("Parse XML with Unicode character in element names, attributes, commen
   SECTION("Japanese characters", "[XML][Parse][[Unicode]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><config><start_text>転送</start_text></config>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Well-formed XML document including Chinese, Armenian and Cyrillic characters", "[XML][Parse][[Unicode]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<俄语 լեզու=\"ռուսերեն\">данные</俄语>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "俄语");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].name == "լեզու");
@@ -400,35 +420,40 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> "
                 "<root> &amp; </root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " & ");
   }
   SECTION("Parse entity &quot; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>\n"
                 " <root> &quot; </root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " \" ");
   }
   SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>\n"
                 " <root> &apos; &lt; &gt; </root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " ' < > ");
   }
   SECTION("Parse reference &#x00A5; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>\n"
                 " <root> &#x00A5; </root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " ¥ ");
   }
   SECTION("Parse reference &#163; in contents area", "[XML][Parse][Entities]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?> "
                 "<root> &#163; </root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " £ ");
   }
   SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Entities]")
@@ -436,7 +461,8 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>\n"
                 " <root attr1=\" &amp;&quot;&apos;&gt;&lt; \">\n"
                 "</root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].name == "attr1");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].value == " &\"'>< ");
@@ -445,7 +471,8 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\"?>\n"
                 " <root attr1=\" &#x00A5;&#163; \"></root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].name == "attr1");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].value == " ¥£ ");
@@ -460,7 +487,8 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>\n"
                 "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>\n"
                 "<root></root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Parse XML containing multiple PI after declaration", "[XML][Parse][PI]")
   {
@@ -468,21 +496,24 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
                 "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?> "
                 "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>\n"
                 "  <root></root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Parse XML containing PI in root section", "[XML][Parse][PI]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>\n"
                 "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>\n"
                 "</root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Parse XML containing PI after declaration and check values", "[XML][Parse][PI]")
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>\n"
                 "<?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>\n"
                 "<root></root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::pi);
     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0]).name == "xml-stylesheet");
     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0]).parameters == "href = \"tutorialspointstyle.css\" type = \"text/css\"");
@@ -492,7 +523,8 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"yes\"?>\n"
                 "<root><?xml-stylesheet href = \"tutorialspointstyle.css\" type = \"text/css\"?>\n"
                 "</root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0][0]).getNodeType() == XNodeType::pi);
     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0][0]).name == "xml-stylesheet");
     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[0][0]).parameters == "href = \"tutorialspointstyle.css\" type = \"text/css\"");
@@ -508,7 +540,8 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
                 " <root>\n"
                 "   <![CDATA[<message> Welcome to TutorialsPoint </message>   ]]>   "
                 "</root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Parse XML root containing CDDATA containing a XML tags and check contents", "[XML][Parse][CDATA]")
   {
@@ -516,7 +549,8 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
                 " <root>\n"
                 "   <![CDATA[<message> Welcome to TutorialsPoint </message>]]>   "
                 "</root>\n";
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "\n   <message> Welcome to TutorialsPoint </message>   ");
     REQUIRE(XNodeRef<XNodeCDATA>((*xNodeRoot)[0][0]).cdata == "<message> Welcome to TutorialsPoint </message>");
   }
@@ -526,8 +560,8 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
                 " <root>\n"
                 "   <![CDATA[< Test test <![CDATA[ Test text ]]> ]]>\n"
                 "   </root>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 3 Column: 40]");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 3 Column: 40]");
   }
   SECTION("Parse XML root containing CDDATA containing ]]> ", "[XML][Parse][CDATA]")
   {
@@ -535,8 +569,8 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
                 " <root>\n"
                 "   <![CDATA[< Test Test text ]]>  ]]>\n"
                 "   </root>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 4 Column: 1]']]>' invalid in element content area.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 1]']]>' invalid in element content area.");
   }
 }
 TEST_CASE("Parse UTF-16 encoded files.", "[XML][Parse][UTF16]")
@@ -545,13 +579,13 @@ TEST_CASE("Parse UTF-16 encoded files.", "[XML][Parse][UTF16]")
   std::string xmlString;
   SECTION("Parse UTF16 encoded file LE ", "[XML][Parse][UTF16]")
   {
-    std::u16string jsonXMLBuffer = readXMLFromFileUTF16("./testData/testfile008.xml");
-    REQUIRE_NOTHROW(xml.parseBuffer(jsonXMLBuffer));
+    BufferSource xmlSource(readXMLFromFileUTF16("./testData/testfile008.xml"));
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
   SECTION("Parse UTF16 encoded file BE ", "[XML][Parse][UTF16]")
   {
-    std::u16string jsonXMLBuffer = readXMLFromFileUTF16("./testData/testfile009.xml");
-    REQUIRE_NOTHROW(xml.parseBuffer(jsonXMLBuffer));
+    BufferSource xmlSource(readXMLFromFileUTF16("./testData/testfile009.xml"));
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
 }
 TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
@@ -570,8 +604,8 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
                 "<f:length>120</f:length>\n"
                 "</f:table>\n"
                 "</root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "h:table");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].name == "h");
@@ -586,8 +620,8 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
     xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">\n"
                 "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table>\n"
                 "<f:table><f:name>African Coffee Table</f:name><f:width>80</f:width><f:length>120</f:length></f:table></root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "h:table");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces.size() == 2);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].name == "h");
@@ -607,14 +641,14 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
                 "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table><g:table>\n"
                 "<g:name>African Coffee Table</g:name><g:width>80</g:width>\n"
                 "<g:length>120</g:length></g:table></root>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 3 Column: 43]Namespace used but not defined.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 3 Column: 43]Namespace used but not defined.");
   }
   SECTION("A root documement with a default namespace", "[XML][Parse][Namespace]")
   {
     xmlString = "<table xmlns=\"http://www.w3.org/TR/html4/\"><tr><td>Apples</td><td>Bananas</td></tr></table>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
-    std::unique_ptr<XNode> xNodeRoot = xml.parseBuffer(xmlString);
+    BufferSource xmlSource(xmlString);
+    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "tr");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].name == ":");
@@ -626,8 +660,8 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
                 "<f:table><f:tr><f:td>Apples</f:td><f:td>Bananas</f:td></f:tr></f:table><f:table>\n"
                 "<f:name>African Coffee Table</f:name><f:width>80</f:width>\n"
                 "<f:length>120</f:length></f:table></root>\n";
-    REQUIRE_THROWS_AS(xml.parseBuffer(xmlString), XML::SyntaxError);
-    REQUIRE_THROWS_WITH(xml.parseBuffer(xmlString), "XML Syntax Error [Line: 1 Column: 94]Attribute defined more than once within start tag.");
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 94]Attribute defined more than once within start tag.");
   }
   SECTION("A root document defining one namespae tha is overridden by a child", "[XML][Parse][Namespace]")
   {
@@ -636,6 +670,7 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
                 "<f:table xmlns:f=\"https://www.w3schools.com/furniture\">\n"
                 "<f:name>African Coffee Table</f:name><f:width>80</f:width>\n"
                 "<f:length>120</f:length></f:table></root>\n";
-    REQUIRE_NOTHROW(xml.parseBuffer(xmlString));
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
 }
