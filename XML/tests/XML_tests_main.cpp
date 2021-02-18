@@ -79,7 +79,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][ISource
       xmlSource.next();
       length++;
     }
-    REQUIRE(length == 8697);                 // eof
+    REQUIRE(length == 8697);                    // eof
     REQUIRE(xmlSource.current() == (XChar)EOF); // eof
   }
 }
@@ -117,7 +117,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       xmlSource.next();
       length++;
     }
-    REQUIRE(length == 8697);                 // eof
+    REQUIRE(length == 8697);                    // eof
     REQUIRE(xmlSource.current() == (XChar)EOF); // eof
   }
   std::string xmlString;
@@ -170,18 +170,29 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
   }
   SECTION("Check that ISource is ignoring whitespace corectly.", "[XML][Parse][ISource]")
   {
-    xmlString = "   Test\t\t\t\r\r\r\r\r\r\r\f\n       Test       Test   \r\r\r\r";
+    xmlString = "<root>   Test\t\t\t\r\r\r\r\r\r\r\f\n       Test       Test   \r\r\r\r</root>";
     BufferSource xmlSource(xmlString);
     XString xmlResult;
-    xmlSource.ignoreWS();
     while (xmlSource.more())
     {
+      xmlSource.ignoreWS();
       xmlResult += xmlSource.current();
       xmlSource.next();
-      xmlSource.ignoreWS();
     }
-    REQUIRE(xmlResult == U"TestTestTest");
-    REQUIRE(xmlSource.current() == (XChar) EOF);
+    REQUIRE(xmlResult == U"<root>TestTestTest</root>");
+    REQUIRE(xmlSource.current() == (XChar)EOF);
+  }
+  SECTION("Check that ISource ignoreWS() at end of file does not throw but next() does.", "[XML][Parse][ISource]")
+  {
+    xmlString = "<root>Test Test Test Test</root>";
+    BufferSource xmlSource(xmlString);
+    while (xmlSource.more())
+    {
+      xmlSource.next();
+    }
+    REQUIRE_NOTHROW(xmlSource.ignoreWS());
+    REQUIRE_THROWS_AS(xmlSource.next(), std::runtime_error);
+    REQUIRE_THROWS_WITH(xmlSource.next(), "Parse buffer empty before parse complete.");
   }
 }
 TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[XML][Parse][ISource]")
