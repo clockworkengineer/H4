@@ -111,7 +111,7 @@ namespace H4
     bool XML::validateXMLDeclaration(XNodeElement *xNodeElement)
     {
         // Syntax error if no version present
-        if (!isAttributePresent(xNodeElement->attributes, U"version"))
+        if (!isAttributePresent(xNodeElement->attributes, "version"))
         {
             return (false);
         }

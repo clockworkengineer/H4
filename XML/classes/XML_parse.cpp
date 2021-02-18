@@ -181,17 +181,17 @@ namespace H4
                source.current() != '/' &&
                source.current() != '>')
         {
-            XString attributeName = parseName(source);
+            std::string attributeName = m_UTF8.to_bytes(parseName(source));
             if (source.current() != '=')
             {
                 throw SyntaxError(source, "Missing '=' between attribute name and value.");
             }
             source.next();
             source.ignoreWS();
-            XString attributeValue = parseValue(source);
+            std::string  attributeValue = m_UTF8.to_bytes(parseValue(source));
             if (!isAttributePresent(xNodeElement->attributes, attributeName))
             {
-                xNodeElement->attributes.emplace_back(XML::m_UTF8.to_bytes(attributeName), XML::m_UTF8.to_bytes(attributeValue));
+                xNodeElement->attributes.emplace_back(attributeName, attributeValue);
             }
             else
             {
@@ -242,7 +242,7 @@ namespace H4
         if (auto pos = xNodeChildElement.name.find(':'); pos != std::string::npos)
         {
             if (!isAttributePresent(xNodeChildElement.namespaces,
-                                    XML::m_UTF8.from_bytes(xNodeChildElement.name.substr(0, pos))))
+                                    xNodeChildElement.name.substr(0, pos)))
             {
                 throw SyntaxError(source, "Namespace used but not defined.");
             }

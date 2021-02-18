@@ -37,8 +37,8 @@ namespace H4
         public:
             SyntaxError(ISource &source, const std::string &description = "")
             {
-                errorMessage = "XML Syntax Error [Line: " + std::to_string(source.getLine()) +
-                               " Column: " + std::to_string(source.getColumn()) + "]" + description;
+                errorMessage = "XML Syntax Error [Line: " + std::to_string(source.getLineNo()) +
+                               " Column: " + std::to_string(source.getColumnNo()) + "]" + description;
             }
             virtual const char *what() const throw()
             {
@@ -57,9 +57,7 @@ namespace H4
             virtual XChar current() = 0;
             virtual void next() = 0;
             virtual bool more() = 0;
-            virtual bool match(const XString &targetString) = 0;
-            virtual long getLine() = 0;
-            virtual long getColumn() = 0;
+            virtual void backup(long length) = 0;
             void ignoreWS()
             {
                 while (more() && std::iswspace(current()))
@@ -71,6 +69,32 @@ namespace H4
                     throw std::runtime_error("Parse buffer empty before parse complete.");
                 }
             }
+            bool match(const XString &targetString)
+            {
+                long index = 0;
+                while (more() && current() == targetString[index])
+                {
+                    next();
+                    if (++index == (long)targetString.length())
+                    {
+                        return (true);
+                    }
+                }
+                backup(index);
+                return (false);
+            }
+            long getLineNo()
+            {
+                return (m_lineNo);
+            }
+            long getColumnNo()
+            {
+                return (m_column);
+            }
+
+        protected:
+            long m_lineNo = 1;
+            long m_column = 1;
         };
         //
         // Destination interface
@@ -109,7 +133,7 @@ namespace H4
         // ===============
         void initialiseTables();
         long parseCharacterReference(ISource &source, XString reference);
-        bool isAttributePresent(std::vector<XAttribute> attributes, const XString &name);
+        bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
         void addNamespacesToList(XNodeElement *XNodeElement);
         bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
@@ -144,7 +168,7 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        static std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;;
+        static std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         static XAttribute m_defaultAtributes[3];
         static std::set<XString> m_dtdAttrListTypes;
         std::unordered_map<XString, XString> m_entityMapping;

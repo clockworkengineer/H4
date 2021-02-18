@@ -66,37 +66,19 @@ namespace H4
         {
             return (m_bufferPosition < m_parseBuffer.size());
         }
-        bool match(const XString &targetString)
+
+        void backup(long length)
         {
-            long index = 0;
-            while (more() && current() == targetString[index])
-            {
-                next();
-                if (++index == (long)targetString.length())
-                {
-                    return (true);
-                }
-            }
-            m_bufferPosition -= index;
+            m_bufferPosition -= length;
             if (m_bufferPosition < 0)
             {
                 m_bufferPosition = 0;
             }
-            return (false);
-        }
-        long getLine()
-        {
-            return (m_lineNo);
-        }
-        long getColumn()
-        {
-            return (m_column);
         }
 
     private:
         void convertCRLFToLF(XString &xmlString)
         {
-
             size_t pos = xmlString.find(U"\x0D\x0A");
             while (pos != std::string::npos)
             {
@@ -108,8 +90,6 @@ namespace H4
         std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         std::size_t m_bufferPosition = 0;
         XString m_parseBuffer;
-        long m_lineNo = 1;
-        long m_column = 1;
     };
     //
     // Source classes for parsers.
@@ -133,6 +113,12 @@ namespace H4
         {
             char c;
             m_source.get(c);
+            if (current()==0x0D) {
+                m_source.get(c);
+                if (current()!=0x0A) {
+                    m_source.unget();
+                }
+            }
             m_column++;
             if (current() == 0x0A)
             {
@@ -144,33 +130,13 @@ namespace H4
         {
             return (m_source.peek() != EOF);
         }
-        bool match(const XString &targetString)
+        void backup(long length)
         {
-            long index = 0;
-            while (more() && current() == targetString[index])
-            {
-                next();
-                if (++index == (long)targetString.length())
-                {
-                    return (true);
-                }
-            }
-            m_source.seekg(-index, std::ios_base::cur);
-            return (false);
-        }
-        long getLine()
-        {
-            return (m_lineNo);
-        }
-        long getColumn()
-        {
-            return (m_column);
+            m_source.seekg(-length, std::ios_base::cur);
         }
 
     private:
         std::ifstream m_source;
-        long m_lineNo = 1;
-        long m_column = 1;
     };
 } // namespace H4
 #endif /* XMLSOURCES_HPP */

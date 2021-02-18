@@ -44,7 +44,7 @@ namespace H4
     // ===============
     void XML::initialiseTables()
     {
-        // Default entity mappins
+        // Default entity mappings
         m_entityMapping[U"&amp;"] = U"&";
         m_entityMapping[U"&quot;"] = U"\"";
         m_entityMapping[U"&apos;"] = U"\'";
@@ -62,10 +62,10 @@ namespace H4
              U"NOTATION",
              U"ID"});
     }
-    bool XML::isAttributePresent(std::vector<XAttribute> attributes, const XString &name)
+    bool XML::isAttributePresent(std::vector<XAttribute> attributes, const std::string &name)
     {
         return (std::find_if(attributes.rbegin(), attributes.rend(),
-                             [&name](const XAttribute &attr) { return (attr.name == XML::m_UTF8.to_bytes(name)); }) != attributes.rend());
+                             [&name](const XAttribute &attr) { return (attr.name == name); }) != attributes.rend());
     }
     void XML::addNamespacesToList(XNodeElement *XNodeElement)
     {
