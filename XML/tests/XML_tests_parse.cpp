@@ -71,7 +71,7 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   {
     xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "Parse buffer empty before parse complete.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 2]Missing declaration or root element.");
   }
 }
 TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")

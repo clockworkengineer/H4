@@ -59,28 +59,28 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][ISource
   }
   SECTION("Create FileSource with testfile001.xml. and positioned on the correct first character", "[XML][Parse][ISource]")
   {
-    FileSource source(kSingleXMLFile);
-    REQUIRE_FALSE(!source.more());
-    REQUIRE((char)source.current() == '<');
+    FileSource xmlSource(kSingleXMLFile);
+    REQUIRE_FALSE(!xmlSource.more());
+    REQUIRE((char)xmlSource.current() == '<');
   }
   SECTION("Create FileSource with testfile001.xml and then check more positions to correct next character", "[XML][Parse][ISource]")
   {
-    FileSource source(kSingleXMLFile);
-    source.next();
-    REQUIRE_FALSE(!source.more());
-    REQUIRE((char)source.current() == 'C');
+    FileSource xmlSource(kSingleXMLFile);
+    xmlSource.next();
+    REQUIRE_FALSE(!xmlSource.more());
+    REQUIRE((char)xmlSource.current() == 'C');
   }
   SECTION("Create FileSource with testfile001.xml  move past last character, check it and the bytes moved.", "[XML][Parse][ISource]")
   {
-    FileSource source(kSingleXMLFile);
+    FileSource xmlSource(kSingleXMLFile);
     long length = 0;
-    while (source.more())
+    while (xmlSource.more())
     {
-      source.next();
+      xmlSource.next();
       length++;
     }
-    REQUIRE(length == 8697);                   // eof
-    REQUIRE(source.current() == (XChar)EOF); // eof
+    REQUIRE(length == 8697);                 // eof
+    REQUIRE(xmlSource.current() == (XChar)EOF); // eof
   }
 }
 TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file testfile001.xml).", "[XML][Parse][ISource]")
@@ -97,28 +97,91 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
   }
   SECTION("Create BufferSource with testfile001.xml and that it is positioned on the correct first character", "[XML][Parse][ISource]")
   {
-    BufferSource source(buffer);
-    REQUIRE_FALSE(!source.more());
-    REQUIRE((char)source.current() == '<');
+    BufferSource xmlSource(buffer);
+    REQUIRE_FALSE(!xmlSource.more());
+    REQUIRE((char)xmlSource.current() == '<');
   }
   SECTION("Create BufferSource with testfile001.xml and then check more positions to correct next character", "[XML][Parse][ISource]")
   {
-    BufferSource source(buffer);
-    source.next();
-    REQUIRE_FALSE(!source.more());
-    REQUIRE((char)source.current() == 'C');
+    BufferSource xmlSource(buffer);
+    xmlSource.next();
+    REQUIRE_FALSE(!xmlSource.more());
+    REQUIRE((char)xmlSource.current() == 'C');
   }
   SECTION("Create BufferSource with testfile001.xml move past last character, check it and the bytes moved.", "[XML][Parse][ISource]")
   {
-    BufferSource source(buffer);
+    BufferSource xmlSource(buffer);
     long length = 0;
-    while (source.more())
+    while (xmlSource.more())
     {
-      source.next();
+      xmlSource.next();
       length++;
     }
-    REQUIRE(length == 8697);                     // eof
-    REQUIRE(source.current() == (XChar)EOF); // eof
+    REQUIRE(length == 8697);                 // eof
+    REQUIRE(xmlSource.current() == (XChar)EOF); // eof
+  }
+  std::string xmlString;
+  SECTION("Check that ISource performing CRLF to LF conversion correctly.", "[XML][Parse][ISource]")
+  {
+    xmlString = "<!DOCTYPE REPORT ["
+                "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
+                "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
+                "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
+                "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\r\n"
+                "<!ELEMENT TITLE %TEXT;>\r\n"
+                "<!ELEMENT PARA %TEXT;>\r\n"
+                "<!ELEMENT LIST (ITEM)+>\r\n"
+                "<!ELEMENT ITEM (%BLOCK;)>\r\n"
+                "<!ELEMENT CODE (#PCDATA)>\r\n"
+                "<!ELEMENT KEYWORD (#PCDATA)>\r\n"
+                "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\r\n"
+                "<!ELEMENT GRAPHIC EMPTY>\r\n"
+                "<!ATTLIST REPORT security (high | medium | low ) \"low\">\r\n"
+                "<!ATTLIST CODE type CDATA #IMPLIED>\r\n"
+                "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\r\n"
+                "<!ENTITY xml \"Extensible Markup Language\">\r\n"
+                "<!ENTITY sgml \"Standard Generalized Markup Language\">\r\n"
+                "<!ENTITY pxa \"Professional XML Authoring\">\r\n"
+                "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\r\n"
+                "<!ENTITY % BLOCK \"(PARA|LIST)+\">\r\n"
+                "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\r\n"
+                "<!NOTATION GIF SYSTEM \"\">\r\n"
+                "<!NOTATION JPG SYSTEM \"\">\r\n"
+                "<!NOTATION BMP SYSTEM \"\">\r\n"
+                "]>\r\n"
+                "<REPORT> </REPORT>\r\n";
+    long crCount = 0;
+    long lfCount = 0;
+    BufferSource xmlSource(xmlString);
+    while (xmlSource.more())
+    {
+      if (xmlSource.current() == 0x0A)
+      {
+        lfCount++;
+      }
+      if (xmlSource.current() == 0x0D)
+      {
+        crCount++;
+      }
+      xmlSource.next();
+    }
+    REQUIRE(lfCount == 26);
+    REQUIRE(crCount == 0);
+  }
+  SECTION("Check that ISource is ignoring whitespace corectly.", "[XML][Parse][ISource]")
+  {
+    xmlString = "   Test\t\t\t\r\r\r\r\r\r\r\f\n       Test       Test   \r\r\r\r";
+    BufferSource xmlSource(xmlString);
+    XString xmlResult;
+    xmlSource.ignoreWS();
+    while (xmlSource.more())
+    {
+      xmlResult += xmlSource.current();
+      xmlSource.next();
+      xmlSource.ignoreWS();
+    }
+    REQUIRE(xmlResult == U"TestTestTest");
+    REQUIRE(xmlSource.current() == (XChar) EOF);
   }
 }
 TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[XML][Parse][ISource]")
@@ -182,7 +245,7 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[XML][Parse][IS
     file.add("65767");
     std::filesystem::path filePath(kGeneratedXMLFile);
     REQUIRE(std::filesystem::file_size(filePath) == 5);
-    std::string expected = readXMLFromFileUTF8 (kGeneratedXMLFile);
+    std::string expected = readXMLFromFileUTF8(kGeneratedXMLFile);
     REQUIRE(expected == "65767");
   }
 }

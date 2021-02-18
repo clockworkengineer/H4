@@ -64,10 +64,6 @@ namespace H4
                 {
                     next();
                 }
-                if (!more())
-                {
-                    throw std::runtime_error("Parse buffer empty before parse complete.");
-                }
             }
             bool match(const XString &targetString)
             {
