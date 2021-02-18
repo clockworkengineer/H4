@@ -70,7 +70,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[JSON][Parse][ISourc
 {
   SECTION("Create FileSource with testfile001.json.", "[JSON][Parse][ISource]")
   {
-    REQUIRE_NOTHROW(FileSource(kGeneratedTorrentFile));
+    REQUIRE_NOTHROW(FileSource(kGeneratedXMLFile));
   }
   SECTION("Create FileSource with non existants file.", "[JSON][Parse][ISource][Exception]")
   {
@@ -170,39 +170,39 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Parse][I
 {
   SECTION("Create FileDestination.", "[JSON][Stringify][IDesination]")
   {
-    std::filesystem::remove(kGeneratedTorrentFile);
-    REQUIRE_NOTHROW(FileDestination(kGeneratedTorrentFile));
+    std::filesystem::remove(kGeneratedXMLFile);
+    REQUIRE_NOTHROW(FileDestination(kGeneratedXMLFile));
   }
   SECTION("Create FileDestination when file already exists.", "[JSON][Stringify][IDesination]")
   {
-    FileDestination file(kGeneratedTorrentFile);
-    file = FileDestination(kGeneratedTorrentFile);
-    REQUIRE_NOTHROW(FileDestination(kGeneratedTorrentFile));
+    FileDestination file(kGeneratedXMLFile);
+    file = FileDestination(kGeneratedXMLFile);
+    REQUIRE_NOTHROW(FileDestination(kGeneratedXMLFile));
   }
   SECTION("Create FileDestination and test file exists and should be empty.", "[JSON][Stringify][IDesination]")
   {
-    std::filesystem::remove(kGeneratedTorrentFile);
-    FileDestination file(kGeneratedTorrentFile);
-    REQUIRE_FALSE(!std::filesystem::exists(kGeneratedTorrentFile));
-    std::filesystem::path filePath(kGeneratedTorrentFile);
+    std::filesystem::remove(kGeneratedXMLFile);
+    FileDestination file(kGeneratedXMLFile);
+    REQUIRE_FALSE(!std::filesystem::exists(kGeneratedXMLFile));
+    std::filesystem::path filePath(kGeneratedXMLFile);
     REQUIRE(std::filesystem::file_size(filePath) == 0);
   }
   SECTION("Create FileDestination and add one character.", "[JSON][Stringify][IDesination]")
   {
-    std::filesystem::remove(kGeneratedTorrentFile);
-    FileDestination file(kGeneratedTorrentFile);
+    std::filesystem::remove(kGeneratedXMLFile);
+    FileDestination file(kGeneratedXMLFile);
     file.addBytes("t");
-    std::filesystem::path filePath(kGeneratedTorrentFile);
+    std::filesystem::path filePath(kGeneratedXMLFile);
     REQUIRE(std::filesystem::file_size(filePath) == 1);
   }
   SECTION("Create FileDestination, add an stringified integer and check result.", "[JSON][Stringify][IDesination]")
   {
-    std::filesystem::remove(kGeneratedTorrentFile);
-    FileDestination file(kGeneratedTorrentFile);
+    std::filesystem::remove(kGeneratedXMLFile);
+    FileDestination file(kGeneratedXMLFile);
     file.addBytes("65767");
-    std::filesystem::path filePath(kGeneratedTorrentFile);
+    std::filesystem::path filePath(kGeneratedXMLFile);
     REQUIRE(std::filesystem::file_size(filePath) == 5);
-    std::string expected = readXMLFromFile(kGeneratedTorrentFile);
+    std::string expected = readXMLFromFile(kGeneratedXMLFile);
     REQUIRE(expected == "65767");
   }
 }

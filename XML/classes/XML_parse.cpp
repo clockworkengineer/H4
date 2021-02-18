@@ -151,8 +151,7 @@ namespace H4
     void XML::parsePI(ISource &source, XNodeElement *xNodeElement)
     {
         XNodePI xNodePI;
-        XString piName = parseName(source);
-        xNodePI.name = XML::m_UTF8.to_bytes(piName);
+        xNodePI.name = XML::m_UTF8.to_bytes(parseName(source));
         while (source.more() && !source.match(U"?>"))
         {
             xNodePI.parameters += XML::m_UTF8.to_bytes(source.current());
@@ -294,7 +293,7 @@ namespace H4
         }
         else if (!source.match(U"/>"))
         {
-            throw SyntaxError(source, "Missing /> for closing tag.");
+            throw SyntaxError(source, "Missing '/>' for closing tag.");
         }
     }
     std::unique_ptr<XNode> XML::parseXML(ISource &source)

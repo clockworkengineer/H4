@@ -14,9 +14,13 @@
 // STL includes
 // ============
 #include <fstream>
+#include <filesystem>
 // ===================
 // Unit test constants
 // ===================
+#define kGeneratedXMLFile "./testData/generated.xml"
+#define kSingleXMLFile "./testData/testfile001.xml"
+#define kNonExistantXMLFile "./testData/doesntexist.xml"
 // ==========================
 // Unit test helper functions
 // ==========================
