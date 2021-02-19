@@ -111,14 +111,11 @@ namespace H4
         }
         void next()
         {
-            char c;
-            m_source.get(c);
-            if (current()==0x0D) {
-                m_source.get(c);
-                if (current()!=0x0A) {
-                    m_source.unget();
-                }
+            if (!more())
+            {
+                throw std::runtime_error("Parse buffer empty before parse complete.");
             }
+            m_source.get();
             m_column++;
             if (current() == 0x0A)
             {

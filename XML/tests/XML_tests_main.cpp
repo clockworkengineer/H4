@@ -194,6 +194,33 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE_THROWS_AS(xmlSource.next(), std::runtime_error);
     REQUIRE_THROWS_WITH(xmlSource.next(), "Parse buffer empty before parse complete.");
   }
+  SECTION("Check that ISource match works correctly when match found and or not.", "[XML][Parse][ISource]")
+  {
+    xmlString = "<root>Match1    Match2 2hctam        MMAATTCCHHHH4 &</root>";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_FALSE(xmlSource.match(U"<root> "));
+    REQUIRE_FALSE(!xmlSource.match(U"<root>"));
+    REQUIRE(xmlSource.current() == 'M');
+    REQUIRE_FALSE(!xmlSource.match(U"Match1"));
+    REQUIRE(xmlSource.current() == ' ');
+    xmlSource.ignoreWS();
+    REQUIRE(xmlSource.current() == 'M');
+    REQUIRE_FALSE(xmlSource.match(U"Match3"));
+    REQUIRE_FALSE(!xmlSource.match(U"Match2"));
+    xmlSource.ignoreWS();
+    REQUIRE(xmlSource.current() == '2');
+    REQUIRE_FALSE(!xmlSource.match(U"2hctam"));
+    REQUIRE(xmlSource.current() == ' ');
+    xmlSource.ignoreWS();
+    REQUIRE_FALSE(!xmlSource.match(U"MMAATTCCHHHH4"));
+    REQUIRE(xmlSource.current() == ' ');
+    xmlSource.next();
+    REQUIRE(xmlSource.current() == '&');
+    xmlSource.next();
+    REQUIRE_FALSE(!xmlSource.match(U"</root>"));
+    REQUIRE(xmlSource.current() == (XChar)EOF);
+    REQUIRE_THROWS_WITH(xmlSource.next(), "Parse buffer empty before parse complete.");
+  }
 }
 TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[XML][Parse][ISource]")
 {
