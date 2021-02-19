@@ -79,8 +79,8 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][ISource
       xmlSource.next();
       length++;
     }
-    REQUIRE(length == 8697);                    // eof
-    REQUIRE(xmlSource.current() == (XChar)EOF); // eof
+    REQUIRE(length == 8697);                                 // eof
+    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF)); // eof
   }
 }
 TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file testfile001.xml).", "[XML][Parse][ISource]")
@@ -117,11 +117,11 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       xmlSource.next();
       length++;
     }
-    REQUIRE(length == 8697);                    // eof
-    REQUIRE(xmlSource.current() == (XChar)EOF); // eof
+    REQUIRE(length == 8697);                                 // eof
+    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF)); // eof
   }
   std::string xmlString;
-  SECTION("Check that ISource performing CRLF to LF conversion correctly.", "[XML][Parse][ISource]")
+  SECTION("Check that BufferSource is  performing CRLF to LF conversion correctly.", "[XML][Parse][ISource]")
   {
     xmlString = "<!DOCTYPE REPORT ["
                 "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
@@ -168,7 +168,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE(lfCount == 26);
     REQUIRE(crCount == 0);
   }
-  SECTION("Check that ISource is ignoring whitespace corectly.", "[XML][Parse][ISource]")
+  SECTION("Check that BufferSource is ignoring whitespace corectly.", "[XML][Parse][ISource]")
   {
     xmlString = "<root>   Test\t\t\t\r\r\r\r\r\r\r\f\n       Test       Test   \r\r\r\r</root>";
     BufferSource xmlSource(xmlString);
@@ -180,9 +180,9 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       xmlSource.next();
     }
     REQUIRE(xmlResult == U"<root>TestTestTest</root>");
-    REQUIRE(xmlSource.current() == (XChar)EOF);
+    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF));
   }
-  SECTION("Check that ISource ignoreWS() at end of file does not throw but next() does.", "[XML][Parse][ISource]")
+  SECTION("Check that BufefrSource ignoreWS() at end of file does not throw but next() does.", "[XML][Parse][ISource]")
   {
     xmlString = "<root>Test Test Test Test</root>";
     BufferSource xmlSource(xmlString);
@@ -194,7 +194,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE_THROWS_AS(xmlSource.next(), std::runtime_error);
     REQUIRE_THROWS_WITH(xmlSource.next(), "Parse buffer empty before parse complete.");
   }
-  SECTION("Check that ISource match works correctly when match found and or not.", "[XML][Parse][ISource]")
+  SECTION("Check that BufferSource match works correctly when match found and or not.", "[XML][Parse][ISource]")
   {
     xmlString = "<root>Match1    Match2 2hctam        MMAATTCCHHHH4 &</root>";
     BufferSource xmlSource(xmlString);
@@ -218,8 +218,26 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE(xmlSource.current() == '&');
     xmlSource.next();
     REQUIRE_FALSE(!xmlSource.match(U"</root>"));
-    REQUIRE(xmlSource.current() == (XChar)EOF);
+    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF));
     REQUIRE_THROWS_WITH(xmlSource.next(), "Parse buffer empty before parse complete.");
+  }
+  SECTION("Check that BufferSource backup works and doesnt go negative.", "[XML][Parse][ISource]")
+  {
+    xmlString = "<root>Match1    Match2 2hctam        MMAATTCCHHHH4 &</root>";
+    BufferSource xmlSource(xmlString);
+    xmlSource.match(U"<root>Match1");
+    REQUIRE(xmlSource.current() == ' ');
+    xmlSource.backup(12);
+    REQUIRE(xmlSource.current() == '<');
+    xmlSource.backup(12);
+    REQUIRE(xmlSource.current() == '<');
+    while (xmlSource.more())
+    {
+      xmlSource.next();
+    }
+    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF));
+    xmlSource.backup(1);
+    REQUIRE(xmlSource.current() == '>');
   }
 }
 TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[XML][Parse][ISource]")

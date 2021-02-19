@@ -64,7 +64,7 @@ namespace H4
         }
         bool more()
         {
-            return (m_bufferPosition < m_parseBuffer.size());
+            return (m_bufferPosition < static_cast<long>(m_parseBuffer.size()));
         }
 
         void backup(long length)
@@ -88,7 +88,7 @@ namespace H4
         }
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
         std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
-        std::size_t m_bufferPosition = 0;
+        long m_bufferPosition = 0;
         XString m_parseBuffer;
     };
     //
