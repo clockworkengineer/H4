@@ -128,7 +128,7 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void initialiseTables();
-        long parseCharacterReference(ISource &source, XString reference);
+        long parseCharacterReference(ISource &xmlSource, XString reference);
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
         void addNamespacesToList(XNodeElement *XNodeElement);
         bool validChar(XChar ch);
