@@ -66,7 +66,6 @@ namespace H4
         {
             return (m_bufferPosition < static_cast<long>(m_parseBuffer.size()));
         }
-
         void backup(long length)
         {
             m_bufferPosition -= length;
@@ -75,7 +74,6 @@ namespace H4
                 m_bufferPosition = 0;
             }
         }
-
     private:
         void convertCRLFToLF(XString &xmlString)
         {
@@ -129,9 +127,16 @@ namespace H4
         }
         void backup(long length)
         {
-            m_source.seekg(-length, std::ios_base::cur);
+            if ((m_source.tellg() - length >= 0) || (current() == (XChar)EOF))
+            {
+                m_source.clear();
+                m_source.seekg(-length, std::ios_base::cur);
+            }
+            else
+            {
+                m_source.seekg(0, std::ios_base::beg);
+            }
         }
-
     private:
         std::ifstream m_source;
     };
