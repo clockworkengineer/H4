@@ -93,7 +93,6 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][ISource
   std::string xmlString;
   SECTION("Check that FileSource is  performing CRLF to LF conversion correctly.", "[XML][Parse][ISource]")
   {
-    // Windows format CR/LF
     xmlString = "\r\n<!DOCTYPE REPORT [\r\n"
                 "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
                 "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
@@ -469,6 +468,40 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     xmlSource.backup(1);
     REQUIRE(xmlSource.current() == '>');
   }
+
+  SECTION("Check that BufferSource is reporting correct line/column number in an error.", "[XML][Parse][ISource]")
+  {
+    xmlString = "\r\n<!DOCTYPE REPORT [\r\n"
+                "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
+                "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
+                "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
+                "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\r\n"
+                "<!ELEMENT TITLE %TEXT;>\r\n"
+                "<!ELEMENT PARA %TEXT;>\r\n"
+                "<!ELEMENT LIST (ITEM)+>\r\n"
+                "<!ELEMENT ITEM (%BLOCK;)>\r\n"
+                "<!ELEMENT CODE (#PCDATA)>\r\n"
+                "<!ELEMENT KEYWORD (#PCDATA)>\r\n"
+                "<!ELEMEN EXAMPLE (TITLE?,%BLOCK;)>\r\n"
+                "<!ELEMENT GRAPHIC EMPTY>\r\n"
+                "<!ATTLIST REPORT security (high | medium | low ) \"low\">\r\n"
+                "<!ATTLIST CODE type CDATA #IMPLIED>\r\n"
+                "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\r\n"
+                "<!ENTITY xml \"Extensible Markup Language\">\r\n"
+                "<!ENTITY sgml \"Standard Generalized Markup Language\">\r\n"
+                "<!ENTITY pxa \"Professional XML Authoring\">\r\n"
+                "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\r\n"
+                "<!ENTITY % BLOCK \"(PARA|LIST)+\">\r\n"
+                "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\r\n"
+                "<!NOTATION GIF SYSTEM \"\">\r\n"
+                "<!NOTATION JPG SYSTEM \"\">\r\n"
+                "<!NOTATION BMP SYSTEM \"\">\r\n"
+                "]>\r\n"
+                "<REPORT> </REPORT>\r\n";
+    BufferSource xmlSource(xmlString);
+    XML xml;
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 12 Column: 17]");
+  }
 }
 TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[XML][Parse][ISource]")
 {
@@ -494,6 +527,7 @@ TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[XML][Parse][
     REQUIRE(buffer.getBuffer().size() == 5);
     REQUIRE(buffer.getBuffer() == (U"65767"));
   }
+  
 }
 TEST_CASE("Creation and use of IDestination (File) interface.", "[XML][Parse][ISource]")
 {
