@@ -74,6 +74,7 @@ namespace H4
                 m_bufferPosition = 0;
             }
         }
+
     private:
         void convertCRLFToLF(XString &xmlString)
         {
@@ -102,6 +103,14 @@ namespace H4
             {
                 throw std::runtime_error("XML file input stream failed to open or does not exist.");
             }
+            if (current() == 0x0D)
+            {
+                m_source.get();
+                if (current() != 0x0A)
+                {
+                    m_source.unget();
+                }
+            }
         }
         XChar current()
         {
@@ -114,6 +123,14 @@ namespace H4
                 throw std::runtime_error("Parse buffer empty before parse complete.");
             }
             m_source.get();
+            if (current() == 0x0D)
+            {
+                m_source.get();
+                if (current() != 0x0A)
+                {
+                    m_source.unget();
+                }
+            }
             m_column++;
             if (current() == 0x0A)
             {
@@ -137,6 +154,7 @@ namespace H4
                 m_source.seekg(0, std::ios_base::beg);
             }
         }
+
     private:
         std::ifstream m_source;
     };

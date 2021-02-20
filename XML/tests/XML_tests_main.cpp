@@ -94,7 +94,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][ISource
   SECTION("Check that FileSource is  performing CRLF to LF conversion correctly.", "[XML][Parse][ISource]")
   {
     // Windows format CR/LF
-    xmlString = "<!DOCTYPE REPORT ["
+    xmlString = "\r\n<!DOCTYPE REPORT [\r\n"
                 "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
                 "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
                 "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
@@ -137,12 +137,12 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][ISource
       }
       xmlSource.next();
     }
-    REQUIRE(lfCount == 26);
+    REQUIRE(lfCount == 28);
     REQUIRE(crCount == 0);
   }
-   SECTION("Check that FileSource is  performing CRLF to LF conversion on linux format data correctly.", "[XML][Parse][ISource]")
+  SECTION("Check that FileSource is  performing CRLF to LF conversion on linux format data correctly.", "[XML][Parse][ISource]")
   {
-    xmlString = "<!DOCTYPE REPORT ["
+    xmlString = "\n<!DOCTYPE REPORT [\n"
                 "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
                 "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\n"
                 "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\n"
@@ -185,7 +185,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][ISource
       }
       xmlSource.next();
     }
-    REQUIRE(lfCount == 26);
+    REQUIRE(lfCount == 28);
     REQUIRE(crCount == 0);
   }
   SECTION("Check that FileSource is ignoring whitespace corectly.", "[XML][Parse][ISource]")
@@ -254,6 +254,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][ISource
     xmlSource.backup(12);
     REQUIRE(xmlSource.current() == '<');
     xmlSource.next();
+    REQUIRE(xmlSource.current() == 'r');
     xmlSource.backup(12);
     REQUIRE(xmlSource.current() == '<');
     while (xmlSource.more())
@@ -305,7 +306,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
   std::string xmlString;
   SECTION("Check that BufferSource is  performing CRLF to LF conversion on windows format data correctly.", "[XML][Parse][ISource]")
   {
-    xmlString = "<!DOCTYPE REPORT ["
+    xmlString = "\r\n<!DOCTYPE REPORT [\r\n"
                 "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
                 "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
                 "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
@@ -347,12 +348,12 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       }
       xmlSource.next();
     }
-    REQUIRE(lfCount == 26);
+    REQUIRE(lfCount == 28);
     REQUIRE(crCount == 0);
   }
   SECTION("Check that BufferSource is  performing CRLF to LF conversion on linux format data correctly.", "[XML][Parse][ISource]")
   {
-    xmlString = "<!DOCTYPE REPORT ["
+    xmlString = "\n<!DOCTYPE REPORT [\n"
                 "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
                 "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\n"
                 "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\n"
@@ -394,7 +395,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       }
       xmlSource.next();
     }
-    REQUIRE(lfCount == 26);
+    REQUIRE(lfCount == 28);
     REQUIRE(crCount == 0);
   }
   SECTION("Check that BufferSource is ignoring whitespace corectly.", "[XML][Parse][ISource]")
