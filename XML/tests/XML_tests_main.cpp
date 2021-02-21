@@ -22,7 +22,7 @@ using namespace H4;
 //  and return the buffer.
 /// </summary>
 /// <param name="xmlFileName">XML file name</param>
-/// <returns></returns>
+/// <returns>String containing UTF8 encoded XML.</returns>
 std::string readXMLFromFileUTF8(const std::string &xmlFileName)
 {
   std::ifstream xmlFile;
@@ -36,7 +36,7 @@ std::string readXMLFromFileUTF8(const std::string &xmlFileName)
 //  and return the buffer.
 /// </summary>
 /// <param name="xmlFileName">XML file name</param>
-/// <returns></returns>
+/// <returnsString containign UTF16 encoded XML.</returns>
 std::u16string readXMLFromFileUTF16(const std::string &xmlFileName)
 {
   std::ifstream fin(xmlFileName, std::ios::binary);
@@ -52,6 +52,12 @@ std::u16string readXMLFromFileUTF16(const std::string &xmlFileName)
   }
   return (u16);
 }
+/// <summary>
+/// Create an XML file and write XML to it in UTF8 encoding.
+/// </summary>
+/// <param name="xmlFileName">XML file name</param>
+/// <param name="xmlFileName">XML</param>
+/// <returns></returns>
 void writeXMLToFileUTF8(const std::string &xmlFileName, const std::string &xmlString)
 {
   std::remove(xmlFileName.c_str());
@@ -60,6 +66,12 @@ void writeXMLToFileUTF8(const std::string &xmlFileName, const std::string &xmlSt
   xmlFile << xmlString;
   xmlFile.close();
 }
+/// <summary>
+/// Create an XML file and write XML to it in UTF16 encoding.
+/// </summary>
+/// <param name="xmlFileName">XML file name</param>
+/// <param name="xmlFileName">XML</param>
+/// <returns></returns>
 void writeXMLToFileUTF16(const std::string &xmlFileName, const std::u16string &xmlString, bool be = true)
 {
   std::remove(xmlFileName.c_str());
@@ -82,6 +94,14 @@ void writeXMLToFileUTF16(const std::string &xmlFileName, const std::u16string &x
   }
   xmlFile.close();
 }
+/// <summary>
+/// Convert CRLF to LF for xmlSource and check number of CR/LF left after with
+/// REQUIRE.
+/// </summary>
+/// <param name="xmlFileName">XML source</param>
+/// <param name="crFinal">Final number of CR</param>
+/// <param name="lfFinal">FInal number of LF</param>
+/// <returns></returns>
 void verifyCRLFCount(XML::ISource &xmlSource, long lfFinal, long crFinal)
 {
   long crCount = 0;
@@ -236,7 +256,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
     REQUIRE_THROWS_AS(xmlSource.next(), std::runtime_error);
     REQUIRE_THROWS_WITH(xmlSource.next(), "Parse buffer empty before parse complete.");
   }
-  SECTION("Check that FileSource match works correctly when match found and or not.", "[XML][Parse][FileSource]")
+  SECTION("Check that FileSource match works correctly when match found or not.", "[XML][Parse][FileSource]")
   {
     xmlString = "<root>Match1    Match2 2hctam        MMAATTCCHHHH4 &</root>";
     writeXMLToFileUTF8(kGeneratedXMLFile, xmlString);
@@ -414,7 +434,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE_THROWS_AS(xmlSource.next(), std::runtime_error);
     REQUIRE_THROWS_WITH(xmlSource.next(), "Parse buffer empty before parse complete.");
   }
-  SECTION("Check that BufferSource match works correctly when match found and or not.", "[XML][Parse][BufferSource]")
+  SECTION("Check that BufferSource match works correctly when match found or not.", "[XML][Parse][BufferSource]")
   {
     xmlString = "<root>Match1    Match2 2hctam        MMAATTCCHHHH4 &</root>";
     BufferSource xmlSource(xmlString);
