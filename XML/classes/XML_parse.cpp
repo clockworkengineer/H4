@@ -199,14 +199,14 @@ namespace H4
         }
         addNamespacesToList(xNodeElement);
     }
-    void XML::parseProlog(ISource &source, XNodeElement *xNodeElement)
+    void XML::parseProlog(ISource &source, XNodeElement *xNodeProlog)
     {
         source.ignoreWS();
         if (source.match(U"<?xml"))
         {
             source.ignoreWS();
-            parseAttributes(source, xNodeElement);
-            if (!source.match(U"?>") || !validateXMLDeclaration(xNodeElement))
+            parseAttributes(source, xNodeProlog);
+            if (!source.match(U"?>") || !validateXMLDeclaration(xNodeProlog))
             {
                 throw SyntaxError(source, "Declaration invalid or end tag not found.");
             }
@@ -216,15 +216,15 @@ namespace H4
         {
             if (source.match(U"<!--"))
             {
-                parseComment(source, xNodeElement);
+                parseComment(source, xNodeProlog);
             }
             else if (source.match(U"<?"))
             {
-                parsePI(source, xNodeElement);
+                parsePI(source, xNodeProlog);
             }
             else if (source.match(U"<!DOCTYPE"))
             {
-                parseDTD(source, xNodeElement);
+                parseDTD(source, xNodeProlog);
             }
             else
             {
@@ -298,18 +298,18 @@ namespace H4
     }
     std::unique_ptr<XNode> XML::parseXML(ISource &source)
     {
-        XNodeElement xNodeRoot;
-        parseProlog(source, &xNodeRoot);
+        XNodeElement xNodeProlog(XNodeType::prolog);
+        parseProlog(source, &xNodeProlog);
         if (source.current() == '<')
         {
             source.next();
-            xNodeRoot.elements.emplace_back(std::make_unique<XNodeElement>());
-            parseElement(source, static_cast<XNodeElement *>(xNodeRoot.elements.back().get()));
+            xNodeProlog.elements.emplace_back(std::make_unique<XNodeElement>());
+            parseElement(source, static_cast<XNodeElement *>(xNodeProlog.elements.back().get()));
         }
         else
         {
             throw SyntaxError(source, "Missing declaration or root element.");
         }
-        return (std::make_unique<XNodeElement>(std::move(xNodeRoot)));
+        return (std::make_unique<XNodeElement>(std::move(xNodeProlog)));
     }
 } // namespace H4

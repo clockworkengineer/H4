@@ -114,6 +114,7 @@ namespace H4
         // PUBLIC METHODS
         // ==============
         std::unique_ptr<XNode> parse(ISource &xmlSource);
+        std::string stringify(std::unique_ptr<XNode> &xNodeRoot);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -159,8 +160,9 @@ namespace H4
         void parsePI(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
         void parseElement(ISource &xmlSource, XNodeElement *XNodeElement);
-        void parseProlog(ISource &xmlSource, XNodeElement *xNodeRoot);
+        void parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
         std::unique_ptr<XNode> parseXML(ISource &xmlSource);
+        std::string stringifyXML(XNode *xNodeRoot);
         // =================
         // PRIVATE VARIABLES
         // =================

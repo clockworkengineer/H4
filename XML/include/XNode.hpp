@@ -54,7 +54,7 @@ namespace H4
     enum XNodeType
     {
         base = 0,
-        root = 1,
+        prolog = 1,
         element = 2,
         comment = 3,
         cdata = 4,
@@ -156,7 +156,7 @@ namespace H4
     }
     inline XNode &XNode::operator[](int index) // Array
     {
-        if (nodeType == XNodeType::element)
+        if ((nodeType == XNodeType::element)||(nodeType==XNodeType::prolog))
         {
             if ((index >= 0) && (index < ((int)XNodeRef<XNodeElement>(*this).elements.size())))
             {
