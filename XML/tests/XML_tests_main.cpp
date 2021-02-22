@@ -306,7 +306,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
     REQUIRE(xmlSource.current() == '>');
   }
 }
-TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file testfile001.xml).", "[XML][Parse][FileSource]")
+TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file testfile001.xml).", "[XML][Parse][BufferSource]")
 {
   std::string buffer = readXMLFromFileUTF8(kSingleXMLFile);
   SECTION("Create BufferSource.", "[XML][Parse][BufferSource]")
@@ -514,24 +514,24 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 12 Column: 17]");
   }
 }
-TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[XML][Parse][IDesination]")
+TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[XML][Parse][BufferDestination]")
 {
   SECTION("Create BufferDesination.", "[XML][Stringify][IDesination]")
   {
     REQUIRE_NOTHROW(BufferDestination());
   }
-  SECTION("Create BufferDestination and get buffer which should be empty.", "[XML][Stringify][IDesination]")
+  SECTION("Create BufferDestination and get buffer which should be empty.", "[XML][Stringify][BufferDestination]")
   {
     BufferDestination buffer;
     REQUIRE_FALSE(!buffer.getBuffer().empty());
   }
-  SECTION("Create BufferDestination and add one character.", "[XML][Stringify][IDesination]")
+  SECTION("Create BufferDestination and add one character.", "[XML][Stringify][BufferDestination]")
   {
     BufferDestination buffer;
     buffer.add("i");
     REQUIRE(buffer.getBuffer().size() == 1);
   }
-  SECTION("Create BufferDestination and add an stringified integer and check result.", "[XML][Stringify][IDesination]")
+  SECTION("Create BufferDestination and add an stringified integer and check result.", "[XML][Stringify][BufferDestination]")
   {
     BufferDestination buffer;
     buffer.add("65767");
@@ -539,20 +539,20 @@ TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[XML][Parse][
     REQUIRE(buffer.getBuffer() == (U"65767"));
   }
 }
-TEST_CASE("Creation and use of IDestination (File) interface.", "[XML][Parse][ISource]")
+TEST_CASE("Creation and use of IDestination (File) interface.", "[XML][Parse][FileDestination]")
 {
-  SECTION("Create FileDestination.", "[XML][Stringify][IDesination]")
+  SECTION("Create FileDestination.", "[XML][Stringify][FileDestination]")
   {
     std::filesystem::remove(kGeneratedXMLFile);
     REQUIRE_NOTHROW(FileDestination(kGeneratedXMLFile));
   }
-  SECTION("Create FileDestination when file already exists.", "[XML][Stringify][IDesination]")
+  SECTION("Create FileDestination when file already exists.", "[XML][Stringify][FileDestination]")
   {
     FileDestination file(kGeneratedXMLFile);
     file = FileDestination(kGeneratedXMLFile);
     REQUIRE_NOTHROW(FileDestination(kGeneratedXMLFile));
   }
-  SECTION("Create FileDestination and test file exists and should be empty.", "[XML][Stringify][IDesination]")
+  SECTION("Create FileDestination and test file exists and should be empty.", "[XML][Stringify][FileDestination]")
   {
     std::filesystem::remove(kGeneratedXMLFile);
     FileDestination file(kGeneratedXMLFile);
@@ -560,7 +560,7 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[XML][Parse][IS
     std::filesystem::path filePath(kGeneratedXMLFile);
     REQUIRE(std::filesystem::file_size(filePath) == 0);
   }
-  SECTION("Create FileDestination and add one character.", "[XML][Stringify][IDesination]")
+  SECTION("Create FileDestination and add one character.", "[XML][Stringify][FileDestination]")
   {
     std::filesystem::remove(kGeneratedXMLFile);
     FileDestination file(kGeneratedXMLFile);
@@ -568,7 +568,7 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[XML][Parse][IS
     std::filesystem::path filePath(kGeneratedXMLFile);
     REQUIRE(std::filesystem::file_size(filePath) == 1);
   }
-  SECTION("Create FileDestination, add an stringified integer and check result.", "[XML][Stringify][IDesination]")
+  SECTION("Create FileDestination, add an stringified integer and check result.", "[XML][Stringify][FileDestination]")
   {
     std::filesystem::remove(kGeneratedXMLFile);
     FileDestination file(kGeneratedXMLFile);
