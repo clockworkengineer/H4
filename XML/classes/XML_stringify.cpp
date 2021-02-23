@@ -40,14 +40,43 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    std::string XML::stringifyXML(XNode* xNodeRoot) {
+    std::string XML::stringifyXML(XNode *xNode)
+    {
         std::string xmlResult;
-        if (xNodeRoot->getNodeType()==XNodeType::prolog) {
-            xmlResult =  "<?xml version = \""+XNodeRef<XNodeElement>((*xNodeRoot)).attributes[0].value+"\""+
-            " encoding = \""+XNodeRef<XNodeElement>((*xNodeRoot)).attributes[1].value+"\""+
-            " standalone = \""+XNodeRef<XNodeElement>((*xNodeRoot)).attributes[2].value+"\"?>"; 
+        switch (xNode->getNodeType())
+        {
+        case XNodeType::prolog:
+        {
+            xmlResult = "<?xml version = \"" + XNodeRef<XNodeElement>((*xNode)).attributes[0].value + "\"" +
+                        " encoding = \"" + XNodeRef<XNodeElement>((*xNode)).attributes[1].value + "\"" +
+                        " standalone = \"" + XNodeRef<XNodeElement>((*xNode)).attributes[2].value + "\"?>";
+            for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
+            {
+                xmlResult += stringifyXML(static_cast<XNodeElement *>(element.get()));
+            }
+            break;
         }
-        return(xmlResult);
+        case XNodeType::root:
+        case XNodeType::element:
+        {
+            XNodeElement *xNodeElement = static_cast<XNodeElement *>(xNode);
+            xmlResult += "<" + xNodeElement->name + ">" + xNodeElement->content;
+            for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
+            {
+                xmlResult += stringifyXML(static_cast<XNodeElement *>(element.get()));
+            }
+            xmlResult += "</" + xNodeElement->name + ">";
+            break;
+        }
+        case XNodeType::self:
+        {
+            XNodeElement *xNodeElement = static_cast<XNodeElement *>(xNode);
+            xmlResult += "<" + xNodeElement->name + "/>";
+            break;
+        }
+        default:
+            break;
+        }
+        return (xmlResult);
     }
-
 } // namespace H4

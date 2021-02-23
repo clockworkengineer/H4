@@ -25,7 +25,7 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         BufferSource xmlSource(xmlString);
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
-        REQUIRE(xml.stringify(xNodeRoot)+"<root></root>" == xmlString);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML UTF-16 declaration.", "[XML][Stringify]")
     {
@@ -34,6 +34,24 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         BufferSource xmlSource(xmlString);
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
-        REQUIRE(xml.stringify(xNodeRoot)+"<root></root>" == xmlString);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML with minimal declaration and self closing root tag.", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version = \"1.0\"?>\n"
+                    "<AddressBook/>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?><AddressBook/>");
+    }
+    SECTION("Stringify XML with root and child elements plus contents.", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                    "<AddressBook><Address>Address 1</Address><Address>Address 2</Address></AddressBook>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
 }

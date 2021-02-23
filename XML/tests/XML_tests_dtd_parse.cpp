@@ -85,7 +85,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
-    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::element);
+    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::root);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).name == "footer");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).content == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }

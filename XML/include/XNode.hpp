@@ -55,11 +55,13 @@ namespace H4
     {
         base = 0,
         prolog = 1,
-        element = 2,
-        comment = 3,
-        cdata = 4,
-        pi = 5,
-        dtd = 6
+        root = 2,
+        self = 3,
+        element = 4,
+        comment = 6,
+        cdata = 7,
+        pi = 8,
+        dtd = 9
     };
     //
     // Base XNode
@@ -74,7 +76,12 @@ namespace H4
         {
             return (nodeType);
         }
+        void setNodeType(XNodeType nodeType)
+        {
+            this->nodeType = nodeType;
+        }
         XNode &operator[](int index);
+
     private:
         XNodeType nodeType;
     };
@@ -156,7 +163,7 @@ namespace H4
     }
     inline XNode &XNode::operator[](int index) // Array
     {
-        if ((nodeType == XNodeType::element)||(nodeType==XNodeType::prolog))
+        if (nodeType <= XNodeType::element)
         {
             if ((index >= 0) && (index < ((int)XNodeRef<XNodeElement>(*this).elements.size())))
             {

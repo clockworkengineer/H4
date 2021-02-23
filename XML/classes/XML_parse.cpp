@@ -187,7 +187,7 @@ namespace H4
             }
             source.next();
             source.ignoreWS();
-            std::string  attributeValue = m_UTF8.to_bytes(parseValue(source));
+            std::string attributeValue = m_UTF8.to_bytes(parseValue(source));
             if (!isAttributePresent(xNodeElement->attributes, attributeName))
             {
                 xNodeElement->attributes.emplace_back(attributeName, attributeValue);
@@ -291,7 +291,11 @@ namespace H4
                 parseElementContents(source, xNodeElement);
             }
         }
-        else if (!source.match(U"/>"))
+        else if (source.match(U"/>"))
+        {
+            xNodeElement->setNodeType(XNodeType::self);
+        }
+        else
         {
             throw SyntaxError(source, "Missing '/>' for closing tag.");
         }
@@ -303,7 +307,7 @@ namespace H4
         if (source.current() == '<')
         {
             source.next();
-            xNodeProlog.elements.emplace_back(std::make_unique<XNodeElement>());
+            xNodeProlog.elements.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
             parseElement(source, static_cast<XNodeElement *>(xNodeProlog.elements.back().get()));
         }
         else
