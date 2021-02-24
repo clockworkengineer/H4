@@ -52,7 +52,7 @@ namespace H4
                         " standalone = \"" + XNodeRef<XNodeElement>((*xNode)).attributes[2].value + "\"?>";
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
             {
-                xmlResult += stringifyXML(static_cast<XNodeElement *>(element.get()));
+                xmlResult += stringifyXML(element.get());
             }
             break;
         }
@@ -60,10 +60,15 @@ namespace H4
         case XNodeType::element:
         {
             XNodeElement *xNodeElement = static_cast<XNodeElement *>(xNode);
-            xmlResult += "<" + xNodeElement->name + ">" + xNodeElement->content;
+            xmlResult += "<" + xNodeElement->name;
+            for (auto attr : xNodeElement->attributes)
+            {
+                xmlResult += " " + attr.name + " = \"" + attr.value + "\"";
+            }
+            xmlResult += ">" + xNodeElement->content;
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
             {
-                xmlResult += stringifyXML(static_cast<XNodeElement *>(element.get()));
+                xmlResult += stringifyXML(element.get());
             }
             xmlResult += "</" + xNodeElement->name + ">";
             break;

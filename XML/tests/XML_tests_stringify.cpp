@@ -14,7 +14,7 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
+ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
 {
     XML xml;
     std::string xmlString;
@@ -38,8 +38,8 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
     }
     SECTION("Stringify XML with minimal declaration and self closing root tag.", "[XML][Stringify]")
     {
-        xmlString = "<?xml version = \"1.0\"?>\n"
-                    "<AddressBook/>\n";
+        xmlString = "<?xml version = \"1.0\"?>"
+                    "<AddressBook/>";
         BufferSource xmlSource(xmlString);
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
@@ -49,6 +49,34 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
     {
         xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
                     "<AddressBook><Address>Address 1</Address><Address>Address 2</Address></AddressBook>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML with attributes on root tag.", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                    "<AddressBook number = \"46\" type = \"commercial\"></AddressBook>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML with Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                    "<AddressBook>"
+                    "<Address>"
+                    "    This is some contents 1   "
+                    "</Address>"
+                    "<Address>"
+                    "    This is some contents 2   "
+                    "</Address>"
+                    "<Address>"
+                    "    This is some contents 3   "
+                    "</Address>"
+                    "</AddressBook>";
         BufferSource xmlSource(xmlString);
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
