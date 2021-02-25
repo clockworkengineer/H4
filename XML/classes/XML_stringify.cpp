@@ -79,6 +79,18 @@ namespace H4
             xmlResult += "<" + xNodeElement->name + "/>";
             break;
         }
+        case XNodeType::comment:
+        {
+            XNodeComment *xNodeComment = static_cast<XNodeComment *>(xNode);
+            xmlResult += "<!--" + xNodeComment->comment + "-->";
+            break;
+        }
+        case XNodeType::content:
+        {
+            XNodeContent *xNodeContent = static_cast<XNodeContent *>(xNode);
+            xmlResult += xNodeContent->content;
+            break;
+        }
         default:
             break;
         }

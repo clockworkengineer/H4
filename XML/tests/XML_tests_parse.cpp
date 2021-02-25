@@ -188,7 +188,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).content == "    This is some contents    ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).getContents() == "    This is some contents    ");
   }
   SECTION("Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
   {
@@ -212,11 +212,11 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).content == "\n    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).getContents() == "\n    This is some contents 1   ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).content == "\n    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).getContents() == "\n    This is some contents 2   ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).content == "\n    This is some contents 3   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).getContents() == "\n    This is some contents 3   ");
   }
 }
 TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
@@ -341,13 +341,13 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 6);
     REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][0]).comment == "Address one ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).content == "    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).getContents() == "    This is some contents 1   ");
     REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][2]).comment == "Address two ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).content == "    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).getContents() == "    This is some contents 2   ");
     REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][4]).comment == "Address three ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).content == "    This is some contents 3   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).getContents() == "    This is some contents 3   ");
   }
   SECTION("A single comment after root element", "[XML][Parse][[Comments]")
   {
@@ -375,7 +375,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "TestTest");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == "TestTest");
   }
   SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][[Comments]")
   {
@@ -384,7 +384,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "Test    Test");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == "Test    Test");
   }
   SECTION("A simple single line comment containing -- is illegal", "[XML][Parse][[Comments]")
   {
@@ -423,7 +423,7 @@ TEST_CASE("Parse XML with Unicode character in element names, attributes, commen
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].name == "լեզու");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).attributes[0].value == "ռուսերեն");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "данные");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == "данные");
   }
 }
 TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][Entities]")
@@ -436,7 +436,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 "<root> &amp; </root>\n";
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " & ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == " & ");
   }
   SECTION("Parse entity &quot; in contents area", "[XML][Parse][Entities]")
   {
@@ -444,7 +444,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 " <root> &quot; </root>\n";
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " \" ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == " \" ");
   }
   SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Entities]")
   {
@@ -452,7 +452,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 " <root> &apos; &lt; &gt; </root>\n";
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " ' < > ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == " ' < > ");
   }
   SECTION("Parse reference &#x00A5; in contents area", "[XML][Parse][Entities]")
   {
@@ -460,7 +460,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 " <root> &#x00A5; </root>\n";
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " ¥ ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == " ¥ ");
   }
   SECTION("Parse reference &#163; in contents area", "[XML][Parse][Entities]")
   {
@@ -468,7 +468,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 "<root> &#163; </root>\n";
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == " £ ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == " £ ");
   }
   SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Entities]")
   {
@@ -565,7 +565,7 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).content == "\n   <message> Welcome to TutorialsPoint </message>   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == "\n   <message> Welcome to TutorialsPoint </message>   ");
     REQUIRE(XNodeRef<XNodeCDATA>((*xNodeRoot)[0][0]).cdata == "<message> Welcome to TutorialsPoint </message>");
   }
   SECTION("Parse XML root containing CDDATA containing nested CDATA ", "[XML][Parse][CDATA]")

@@ -58,10 +58,11 @@ namespace H4
         root = 2,
         self = 3,
         element = 4,
-        comment = 6,
-        cdata = 7,
-        pi = 8,
-        dtd = 9
+        content = 6,
+        comment = 7,
+        cdata = 8,
+        pi = 9,
+        dtd = 10
     };
     //
     // Base XNode
@@ -81,9 +82,19 @@ namespace H4
             this->nodeType = nodeType;
         }
         XNode &operator[](int index);
-
     private:
         XNodeType nodeType;
+    };
+    //
+    // Content XNode
+    //
+    struct XNodeContent : XNode
+    {
+    public:
+        XNodeContent(XNodeType nodeType = XNodeType::content) : XNode(nodeType)
+        {
+        }
+        std::string content;
     };
     //
     // Element XNode
@@ -103,6 +114,18 @@ namespace H4
         std::vector<XAttribute> attributes;
         std::vector<XAttribute> namespaces;
         std::vector<std::unique_ptr<XNode>> elements;
+        std::string getContents()
+        {
+            std::string result;
+            for (auto &node : elements)
+            {
+                if (node.get()->getNodeType() == XNodeType::content)
+                {
+                    result += static_cast<XNodeContent *>(node.get())->content;
+                }
+            }
+            return(result);
+        }
     };
     //
     // Comment XNode

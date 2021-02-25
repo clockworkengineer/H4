@@ -14,7 +14,7 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
- TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
+TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
 {
     XML xml;
     std::string xmlString;
@@ -75,6 +75,62 @@ using namespace H4;
                     "</Address>"
                     "<Address>"
                     "    This is some contents 3   "
+                    "</Address>"
+                    "</AddressBook>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML with a single line comment in prolog area.", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                    "<!-- A single line comment -->"
+                    "<root></root>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML with multiple single line comments in the prolog area.", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                    "<!-- A single line comment -->"
+                    "<!-- A single line comment -->"
+                    "<!-- A single line comment -->"
+                    "<root></root>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML with multiple comments inside root element and between its children ", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                    "<AddressBook>"
+                    "<!--Address one -->"
+                    "<Address>    This is some contents 1   </Address>"
+                    "<!--Address two -->"
+                    "<Address>    This is some contents 2   </Address>"
+                    "<!--Address three -->"
+                    "<Address>    This is some contents 3   </Address>"
+                    "</AddressBook>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML with multiple comments inside child of root element with contents ", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                    "<AddressBook>"
+                    "<Address>"
+                    "<!--Address one -->"
+                    "This is some contents 1"
+                    "<!--Address two -->"
+                    "This is some contents 2"
+                    "<!--Address three -->"
+                    "This is some contents 3"
                     "</Address>"
                     "</AddressBook>";
         BufferSource xmlSource(xmlString);

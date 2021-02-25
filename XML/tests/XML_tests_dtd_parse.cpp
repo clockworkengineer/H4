@@ -87,7 +87,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::root);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).name == "footer");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).content == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][4]).getContents() == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
   SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
   {

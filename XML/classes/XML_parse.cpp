@@ -256,14 +256,29 @@ namespace H4
         }
         xNodeElement->content += XML::m_UTF8.to_bytes(parseEncodedCharacter(source));
     }
+    void createXNodeContent(XNodeElement *xNodeElement)
+    {
+        if (!xNodeElement->content.empty())
+        {
+            if ((xNodeElement->content[0] != 0x0A) || xNodeElement->content.size() > 1)
+            {
+                XNodeContent xNodeContent;
+                xNodeContent.content = xNodeElement->content;
+                xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>(std::move(xNodeContent)));
+            }
+            xNodeElement->content.clear();
+        }
+    }
     void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
     {
         if (source.match(U"<!--"))
         {
+            createXNodeContent(xNodeElement);
             parseComment(source, xNodeElement);
         }
         else if (source.match(U"<?"))
         {
+            createXNodeContent(xNodeElement);
             parsePI(source, xNodeElement);
         }
         else if (source.match(U"<![CDATA["))
@@ -272,6 +287,7 @@ namespace H4
         }
         else if (source.match(U"<"))
         {
+            createXNodeContent(xNodeElement);
             parseChildElement(source, xNodeElement);
         }
         else
@@ -290,6 +306,7 @@ namespace H4
             {
                 parseElementContents(source, xNodeElement);
             }
+            createXNodeContent(xNodeElement);
         }
         else if (source.match(U"/>"))
         {
