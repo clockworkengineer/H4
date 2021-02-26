@@ -186,9 +186,9 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).getContents() == "    This is some contents    ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).getContents() == "    This is some contents    ");
   }
   SECTION("Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
   {
@@ -210,27 +210,25 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).getContents() == "\n    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 7);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).getContents() == "\n    This is some contents 2   ");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][2]).getContents() == "\n    This is some contents 3   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).getContents() == "\n    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).getContents() == "\n    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).getContents() == "\n    This is some contents 3   ");
   }
 }
 TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
 {
   XML xml;
-  auto testFile = GENERATE(values<std::string>({
-      "./testData/testfile001.xml",
-      "./testData/testfile002.xml",
-      "./testData/testfile003.xml",
-      "./testData/testfile005.xml",
-      "./testData/testfile007.xml",
-      "./testData/testfile010.xml",
-      "./testData/testfile011.xml"
-  }));
+  auto testFile = GENERATE(values<std::string>({"./testData/testfile001.xml",
+                                                "./testData/testfile002.xml",
+                                                "./testData/testfile003.xml",
+                                                "./testData/testfile005.xml",
+                                                "./testData/testfile007.xml",
+                                                "./testData/testfile010.xml",
+                                                "./testData/testfile011.xml"}));
   SECTION("Load file into buffer and parse.", "[XML][Parse]")
   {
     BufferSource xmlSource(readXMLFromFileUTF8(testFile));
@@ -338,16 +336,16 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 6);
-    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][0]).comment == "Address one ");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).getContents() == "    This is some contents 1   ");
-    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][2]).comment == "Address two ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).elements.size() == 13);
+    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][1]).comment == "Address one ");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).getContents() == "    This is some contents 2   ");
-    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][4]).comment == "Address three ");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][5]).getContents() == "    This is some contents 3   ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).getContents() == "    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][5]).comment == "Address two ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][7]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][7]).getContents() == "    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[0][9]).comment == "Address three ");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][11]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][11]).getContents() == "    This is some contents 3   ");
   }
   SECTION("A single comment after root element", "[XML][Parse][[Comments]")
   {
@@ -610,7 +608,10 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
   {
     xmlString = "<root>\n"
                 "<h:table xmlns:h=\"http://www.w3.org/TR/html4/\">\n"
-                "<h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr>\n"
+                "<h:tr>\n"
+                "<h:td>Apples</h:td>\n"
+                "<h:td>Bananas</h:td>\n"
+                "</h:tr>\n"
                 "</h:table>\n"
                 "<f:table xmlns:f=\"https://www.w3schools.com/furniture\">\n"
                 "<f:name>African Coffee Table</f:name>\n"
@@ -620,34 +621,44 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "h:table");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].name == "h");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].value == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "h:table");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "f:table");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].name == "f");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].value == "https://www.w3schools.com/furniture");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].value == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).name == "f:table");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[0].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[0].value == "https://www.w3schools.com/furniture");
   }
   SECTION("A root document and two namespaces defined in the root element.", "[XML][Parse][Namespace]")
   {
     xmlString = "<root xmlns:h=\"http://www.w3.org/TR/html4/\" xmlns:f=\"https://www.w3schools.com/furniture\">\n"
-                "<h:table><h:tr><h:td>Apples</h:td><h:td>Bananas</h:td></h:tr></h:table>\n"
-                "<f:table><f:name>African Coffee Table</f:name><f:width>80</f:width><f:length>120</f:length></f:table></root>\n";
+                "<h:table>\n"
+                "<h:tr>\n"
+                "<h:td>Apples</h:td>\n"
+                "<h:td>Bananas</h:td>\n"
+                "</h:tr>\n"
+                "</h:table>\n"
+                "<f:table>\n"
+                "<f:name>African Coffee Table</f:name>\n"
+                "<f:width>80</f:width>\n"
+                "<f:length>120</f:length>\n"
+                "</f:table>\n"
+                "</root>\n";
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "h:table");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces.size() == 2);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].name == "h");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].value == "http://www.w3.org/TR/html4/");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[1].name == "f");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[1].value == "https://www.w3schools.com/furniture");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "f:table");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "h:table");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces.size() == 2);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].name == "h");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].value == "http://www.w3.org/TR/html4/");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[1].name == "f");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[1].value == "https://www.w3schools.com/furniture");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).name == "f:table");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[0].value == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[1].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[1].value == "https://www.w3schools.com/furniture");
   }
   SECTION("A root document and two namespaces defined in the root element and non-existant namespace g for one of tables.", "[XML][Parse][Namespace]")
   {

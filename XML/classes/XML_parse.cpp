@@ -260,12 +260,12 @@ namespace H4
     {
         if (!xNodeElement->content.empty())
         {
-            if ((xNodeElement->content[0] != 0x0A) || xNodeElement->content.size() > 1)
-            {
+            // if ((xNodeElement->content[0] != 0x0A) || xNodeElement->content.size() > 1)
+         //   {
                 XNodeContent xNodeContent;
                 xNodeContent.content = xNodeElement->content;
                 xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>(std::move(xNodeContent)));
-            }
+          //  }
             xNodeElement->content.clear();
         }
     }
