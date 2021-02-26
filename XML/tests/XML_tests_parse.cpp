@@ -288,7 +288,7 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     BufferSource xmlSource(xmlString);
     REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
-  SECTION("Root element with duplicate attributes.", "[XML][Parse][[Attributes]")
+  SECTION("Element with duplicate attributes not allowed.", "[XML][Parse][[Attributes]")
   {
     xmlString = "<?xml version = \"1.0\"?>\n"
                 "<AddressBook number='15' colour='red' number='16'>\n"

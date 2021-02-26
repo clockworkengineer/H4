@@ -138,6 +138,7 @@ namespace H4
         bool validateName(XString attributeName);
         bool validateXMLDeclaration(XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);
+        void createXNodeContent(XNodeElement *xNodeElement);
         XString parseName(ISource &xmlSource);
         XString parseValue(ISource &xmlSource);
         XString parseEncodedCharacter(ISource &xmlSource);

@@ -82,7 +82,7 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
-    SECTION("Stringify XML with a single line comment in prolog area.", "[XML][Stringify]")
+    SECTION("Stringify XML with a single line comment in prolog area.", "[XML][Stringify][Comments]")
     {
         xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
                     "<!-- A single line comment -->"
@@ -92,7 +92,7 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
-    SECTION("Stringify XML with multiple single line comments in the prolog area.", "[XML][Stringify]")
+    SECTION("Stringify XML with multiple single line comments in the prolog area.", "[XML][Stringify][Comments]")
     {
         xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
                     "<!-- A single line comment -->"
@@ -104,7 +104,7 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
-    SECTION("Stringify XML with multiple comments inside root element and between its children ", "[XML][Stringify]")
+    SECTION("Stringify XML with multiple comments inside root element and between its children ", "[XML][Stringify][Comments]")
     {
         xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
                     "<AddressBook>"
@@ -120,19 +120,45 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
-    SECTION("Stringify XML with multiple comments inside child of root element with contents ", "[XML][Stringify]")
+    SECTION("Stringify XML with multiple comments inside child of root element with contents ", "[XML][Stringify][Comments]")
     {
         xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
-                    "<AddressBook>"
-                    "<Address>"
-                    "<!--Address one -->"
-                    "This is some contents 1"
-                    "<!--Address two -->"
-                    "This is some contents 2"
-                    "<!--Address three -->"
-                    "This is some contents 3"
-                    "</Address>"
+                    "<AddressBook>\n"
+                    "<Address>\n"
+                    "<!--Address one -->\n"
+                    "This is some contents 1\n"
+                    "<!--Address two -->\n"
+                    "This is some contents 2\n"
+                    "<!--Address three -->\n"
+                    "This is some contents 3\n"
+                    "</Address>\n"
                     "</AddressBook>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML with a multi line comment in prolog.", "[XML][Stringify][Comments]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                    "<!-- A single line comment\n"
+                    " another line\n"
+                    " another line\n"
+                    " and another line\n"
+                    "--><root></root>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML with a multiline comment within child element with contents.", "[XML][Stringify][Comments]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                    "<root>Test <!-- A single line comment\n"
+                    " another line\n"
+                    " another line\n"
+                    " and another line\n"
+                    "--> Test Test</root>";
         BufferSource xmlSource(xmlString);
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;

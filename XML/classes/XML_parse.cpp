@@ -40,6 +40,16 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    void XML::createXNodeContent(XNodeElement *xNodeElement)
+    {
+        if (!xNodeElement->content.empty())
+        {
+            XNodeContent xNodeContent;
+            xNodeContent.content = xNodeElement->content;
+            xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>(std::move(xNodeContent)));
+            xNodeElement->content.clear();
+        }
+    }
     XString XML::parseName(ISource &source)
     {
         XString name;
@@ -255,19 +265,6 @@ namespace H4
             throw SyntaxError(source, "']]>' invalid in element content area.");
         }
         xNodeElement->content += XML::m_UTF8.to_bytes(parseEncodedCharacter(source));
-    }
-    void createXNodeContent(XNodeElement *xNodeElement)
-    {
-        if (!xNodeElement->content.empty())
-        {
-            // if ((xNodeElement->content[0] != 0x0A) || xNodeElement->content.size() > 1)
-         //   {
-                XNodeContent xNodeContent;
-                xNodeContent.content = xNodeElement->content;
-                xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>(std::move(xNodeContent)));
-          //  }
-            xNodeElement->content.clear();
-        }
     }
     void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
     {
