@@ -36,6 +36,15 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
+        SECTION("Stringify XML UTF-16 declarationwith prologo containing new lines.", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"no\"?>\n\n\n\n"
+                    "<root></root>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
     SECTION("Stringify XML with minimal declaration and self closing root tag.", "[XML][Stringify]")
     {
         xmlString = "<?xml version = \"1.0\"?>"
@@ -151,7 +160,7 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
-    SECTION("Stringify XML with a multiline comment within child element with contents.", "[XML][Stringify][Comments]")
+    SECTION("Stringify XML with a multi-line comment within child element with contents.", "[XML][Stringify][Comments]")
     {
         xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
                     "<root>Test <!-- A single line comment\n"
@@ -165,3 +174,21 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
 }
+// TEST_CASE("Stringify XML from a list of example files.", "[XML][Stringify]")
+// {
+//     XML xml;
+//     auto testFile = GENERATE(values<std::string>({"./testData/testfile001.xml"}));
+//     //   "./testData/testfile002.xml",
+//     //   "./testData/testfile003.xml",
+//     //   "./testData/testfile005.xml",
+//     //   "./testData/testfile007.xml",
+//     //   "./testData/testfile010.xml",
+//     //   "./testData/testfile011.xml"}));
+//     SECTION("Load file into buffer and parse.", "[XML][Parse]")
+//     {
+//         std::string expected = readXMLFromFileUTF8(testFile);
+//         BufferSource xmlSource(expected);
+//         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+//         REQUIRE(xml.stringify(xNodeRoot) == expected);
+//     }
+// }

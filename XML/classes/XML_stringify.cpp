@@ -65,7 +65,7 @@ namespace H4
             {
                 xmlResult += " " + attr.name + " = \"" + attr.value + "\"";
             }
-            xmlResult += ">" + xNodeElement->content;
+            xmlResult += ">";
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
             {
                 xmlResult += stringifyXML(element.get());

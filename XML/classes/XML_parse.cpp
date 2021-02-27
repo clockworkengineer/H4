@@ -211,6 +211,7 @@ namespace H4
     }
     void XML::parseProlog(ISource &source, XNodeElement *xNodeProlog)
     {
+
         source.ignoreWS();
         if (source.match(U"<?xml"))
         {
@@ -221,7 +222,22 @@ namespace H4
                 throw SyntaxError(source, "Declaration invalid or end tag not found.");
             }
         }
-        source.ignoreWS();
+        else
+        {
+            for (auto attr : XML::m_defaultAtributes)
+            {
+                xNodeProlog->attributes.emplace_back(attr.name, attr.value);
+            }
+        }
+
+        while (source.more() && std::iswspace(source.current()))
+        {
+            if (source.current() == 0x0A)
+            {
+                break;
+            }
+            source.next();
+        }
         while (source.more())
         {
             if (source.match(U"<!--"))
@@ -236,11 +252,25 @@ namespace H4
             {
                 parseDTD(source, xNodeProlog);
             }
+            else if (source.current() == 0x0A)
+            {
+                XNodeContent linefeed;
+                linefeed.content += 0x0A;
+                xNodeProlog->elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
+                source.next();
+            }
             else
             {
                 break;
             }
-            source.ignoreWS();
+            while (source.more() && std::iswspace(source.current()))
+            {
+                if (source.current() == 0x0A)
+                {
+                    break;
+                }
+                source.next();
+            }
         }
     }
     void XML::parseChildElement(ISource &source, XNodeElement *xNodeElement)
