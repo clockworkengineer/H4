@@ -36,7 +36,17 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
-        SECTION("Stringify XML UTF-16 declarationwith prologo containing new lines.", "[XML][Stringify]")
+    SECTION("Stringify to make sure that an LF after the end tag in source XML is mirrored.", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"no\"?>"
+                    "<root></root>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        std::string actual = xml.stringify(xNodeRoot);
+        REQUIRE(actual.back() == 0x0A);
+    }
+    SECTION("Stringify XML UTF-16 declaration with prologo containing new lines.", "[XML][Stringify]")
     {
         xmlString = "<?xml version = \"1.0\" encoding = \"UTF-16\" standalone = \"no\"?>\n\n\n\n"
                     "<root></root>";
@@ -177,13 +187,15 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
 // TEST_CASE("Stringify XML from a list of example files.", "[XML][Stringify]")
 // {
 //     XML xml;
-//     auto testFile = GENERATE(values<std::string>({"./testData/testfile001.xml"}));
-//     //   "./testData/testfile002.xml",
-//     //   "./testData/testfile003.xml",
-//     //   "./testData/testfile005.xml",
-//     //   "./testData/testfile007.xml",
-//     //   "./testData/testfile010.xml",
-//     //   "./testData/testfile011.xml"}));
+//     auto testFile = GENERATE(values<std::string>({"./testData/testfile001.xml",
+//                                                   "./testData/testfile002.xml",
+//                                                   "./testData/testfile003.xml",
+//                                                   "./testData/testfile004.xml",
+//                                                   "./testData/testfile005.xml",
+//                                                   "./testData/testfile006.xml",
+//                                                   "./testData/testfile007.xml",
+//                                                   "./testData/testfile010.xml",
+//                                                   "./testData/testfile011.xml"}));
 //     SECTION("Load file into buffer and parse.", "[XML][Parse]")
 //     {
 //         std::string expected = readXMLFromFileUTF8(testFile);

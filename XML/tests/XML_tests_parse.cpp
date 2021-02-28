@@ -159,7 +159,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "contact-info");
   }
   SECTION("Empty root element <AddressBook> ", "[XML][Parse][Root]")
@@ -171,7 +171,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "AddressBook");
   }
   SECTION("Root element <AddressBook> and one child <Address> with contents ", "[XML][Parse][Root]")
@@ -254,7 +254,7 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].name == "number");
@@ -270,7 +270,7 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value == "no");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].name == "number");
