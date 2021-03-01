@@ -20,7 +20,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   std::string xmlString;
   SECTION("XML with internal DTD", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\"?>\n"
+    xmlString="<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE note ["
                 "<!ELEMENT note (to,from,heading,body)>\n"
                 "<!ELEMENT to (#PCDATA)>\n"
@@ -37,7 +37,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with external (SYSTEM) DTD", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note SYSTEM \"Note.dtd\">\n"
                 "<note>\n"
                 "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
@@ -48,7 +48,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with external (PUBLIC) DTD", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
                 "<note>\n"
                 "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
@@ -59,7 +59,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with DTD with !ENTITY definitions and uses", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note [\n"
                 "<!ENTITY nbsp \"&#xA0;\">\n"
                 "<!ENTITY writer \"Writer: Donald Duck.\">\n"
@@ -73,7 +73,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with DTD with !ENTITY definitions and uses. Check translation of entity values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note [\n"
                 "<!ENTITY nbsp \"&#xA0;\">\n"
                 "<!ENTITY writer \"Writer: Donald Duck.\">\n"
@@ -83,7 +83,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer>\n"
                 "</note>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[3]).getNodeType() == XNodeType::root);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[3][6]).name == "footer");
@@ -91,7 +91,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version = \"1.0\" encoding = \"UTF-8\" standalone = \"yes\" ?>\n"
+    xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\n"
                 "<!DOCTYPE address [\n"
                 "<!ELEMENT address (name,company,phone)>\n"
                 "<!ELEMENT name (#PCDATA)><!ELEMENT company (#PCDATA)>\n"
@@ -104,7 +104,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "</phone>\n"
                 "</address>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).elements["address"].name == "address");
@@ -122,14 +122,14 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note SYSTEM \"Note.dtd\">\n"
                 "<note>\n"
                 "<to>Tove"
                 "</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body>\n"
                 "</note>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).external.name == "SYSTEM");
@@ -137,12 +137,12 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with external URL DTD to parse and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\""
                 " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
                 "<html></html>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).external.name == "PUBLIC");
@@ -150,7 +150,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with internal DTD with attributes to parse ", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE TVSCHEDULE [\n"
                 "<!ELEMENT TVSCHEDULE (CHANNEL+)><!ELEMENT CHANNEL (BANNER,DAY+)>\n"
                 "<!ELEMENT BANNER (#PCDATA)><!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>\n"
@@ -168,7 +168,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with internal DTD with attributes to parse and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE TVSCHEDULE [\n"
                 "<!ELEMENT TVSCHEDULE (CHANNEL+)>\n"
                 "<!ELEMENT CHANNEL (BANNER,DAY+)>\n"
@@ -187,7 +187,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>\n"
                 "<TVSCHEDULE></TVSCHEDULE>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name == "TVSCHEDULE");
@@ -223,7 +223,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with internal DTD with elements with multiple attributes to parse and check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<!DOCTYPE CATALOG [\n"
+    xmlString="<!DOCTYPE CATALOG [\n"
                 "<!ENTITY AUTHOR \"John Doe\">\n"
                 "<!ENTITY COMPANY \"JD Power Tools, Inc.\">\n"
                 "<!ENTITY EMAIL \"jd@jd-tools.com\">\n"
@@ -241,7 +241,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ELEMENT NOTES (#PCDATA)> ]>\n"
                 "<CATALOG> </CATALOG>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[2]).name);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == "CATALOG");
@@ -267,7 +267,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with internal DTD with parameter entities to parse.", "[XML][Parse][DTD]")
   {
-    xmlString = "<!DOCTYPE REPORT [\n"
+    xmlString="<!DOCTYPE REPORT [\n"
                 "<!ELEMENT residence (%area;, %contact;)>\n"
                 "<!ELEMENT apartment (%area;, %contact;)>\n"
                 "<!ELEMENT office (%area;, %contact;)>\n"
@@ -280,7 +280,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with internal DTD with both types of entities to parse an check values", "[XML][Parse][DTD]")
   {
-    xmlString = "<!DOCTYPE REPORT [\n"
+    xmlString="<!DOCTYPE REPORT [\n"
                 "<!ELEMENT residence (%area;, %contact;)>\n"
                 "<!ELEMENT apartment (%area;, %contact;)>\n"
                 "<!ELEMENT office (%area;, %contact;)>\n"
@@ -290,7 +290,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ENTITY % contact \"phone\"> ]>\n"
                 "<REPORT></REPORT>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[2]).name);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).name == "REPORT");
@@ -303,7 +303,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   SECTION("XML with internal DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
   {
-    xmlString = "<!DOCTYPE REPORT [\n"
+    xmlString="<!DOCTYPE REPORT [\n"
                 "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
                 "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\n"
                 "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\n"
@@ -331,7 +331,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "]>\n"
                 "<REPORT> </REPORT>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["GIF"].name == "SYSTEM");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["GIF"].value == "\"\"");

@@ -47,9 +47,9 @@ namespace H4
         {
         case XNodeType::prolog:
         {
-            xmlResult = "<?xml version = \"" + XNodeRef<XNodeElement>((*xNode)).attributes[0].value + "\"" +
-                        " encoding = \"" + XNodeRef<XNodeElement>((*xNode)).attributes[1].value + "\"" +
-                        " standalone = \"" + XNodeRef<XNodeElement>((*xNode)).attributes[2].value + "\"?>";
+            xmlResult = "<?xml version=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[0].value + "\"" +
+                        " encoding=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[1].value + "\"" +
+                        " standalone=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[2].value + "\"?>";
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
             {
                 xmlResult += stringifyXML(element.get());
@@ -63,7 +63,7 @@ namespace H4
             xmlResult += "<" + xNodeElement->name;
             for (auto attr : xNodeElement->attributes)
             {
-                xmlResult += " " + attr.name + " = \"" + attr.value + "\"";
+                xmlResult += " " + attr.name + "=\"" + attr.value + "\"";
             }
             xmlResult += ">";
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
