@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?> 
-<!-- This is code for a real estate business.--> 
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- This is code for a real estate business.-->
 <Listing>
   <!-- A property is created with the Property element.
 	For each property, a random number is created.

@@ -76,7 +76,12 @@ namespace H4
         case XNodeType::self:
         {
             XNodeElement *xNodeElement = static_cast<XNodeElement *>(xNode);
-            xmlResult += "<" + xNodeElement->name + "/>";
+            xmlResult += "<" + xNodeElement->name;
+            for (auto attr : xNodeElement->attributes)
+            {
+                xmlResult += " " + attr.name + "=\"" + attr.value + "\"";
+            }
+            xmlResult += "/>";
             break;
         }
         case XNodeType::comment:

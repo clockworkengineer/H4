@@ -147,7 +147,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
     FileSource xmlSource(kSingleXMLFile);
     xmlSource.next();
     REQUIRE_FALSE(!xmlSource.more());
-    REQUIRE(xmlSource.current() == 'C');
+    REQUIRE(xmlSource.current() == '?');
   }
   SECTION("Create FileSource with testfile001.xml  move past last character, check it and the bytes moved.", "[XML][Parse][FileSource]")
   {
@@ -158,7 +158,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
       xmlSource.next();
       length++;
     }
-    REQUIRE(length == 8697);                                 // eof
+    REQUIRE(length == 8752);                                 // eof
     REQUIRE(xmlSource.current() == static_cast<XChar>(EOF)); // eof
   }
   std::string xmlString;
@@ -329,7 +329,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     BufferSource xmlSource(buffer);
     xmlSource.next();
     REQUIRE_FALSE(!xmlSource.more());
-    REQUIRE((char)xmlSource.current() == 'C');
+    REQUIRE((char)xmlSource.current() == '?');
   }
   SECTION("Create BufferSource with testfile001.xml move past last character, check it and the bytes moved.", "[XML][Parse][BufferSource]")
   {
@@ -340,7 +340,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       xmlSource.next();
       length++;
     }
-    REQUIRE(length == 8697);                                 // eof
+    REQUIRE(length == 8752);                                 // eof
     REQUIRE(xmlSource.current() == static_cast<XChar>(EOF)); // eof
   }
   std::string xmlString;

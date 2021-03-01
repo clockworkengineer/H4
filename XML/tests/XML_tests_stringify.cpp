@@ -20,71 +20,80 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
     std::string xmlString;
     SECTION("Stringify XML UTF-8 declaration.", "[XML][Stringify]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<root></root>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML UTF-16 declaration.", "[XML][Stringify]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"no\"?>"
                     "<root></root>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify to make sure that an LF after the end tag in source XML is mirrored.", "[XML][Stringify]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<root></root>\n";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
-        std::string actual=xml.stringify(xNodeRoot);
+        std::string actual = xml.stringify(xNodeRoot);
         REQUIRE(actual.back() == 0x0A);
     }
-    SECTION("Stringify XML UTF-16 declaration with prologo containing new lines.", "[XML][Stringify]")
+    SECTION("Stringify XML UTF-16 declaration with prolog containing new lines.", "[XML][Stringify]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"no\"?>\n\n\n\n"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"no\"?>\n\n\n\n"
                     "<root></root>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML with minimal declaration and self closing root tag.", "[XML][Stringify]")
     {
-        xmlString="<?xml version=\"1.0\"?>"
+        xmlString = "<?xml version=\"1.0\"?>"
                     "<AddressBook/>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><AddressBook/>");
     }
+    SECTION("Stringify XML with self closing root tag  with attributes.", "[XML][Stringify]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+                    "<AddressBook number=\"46\" street=\"green\"/>";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        BufferDestination xmlDestination;
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
     SECTION("Stringify XML with root and child elements plus contents.", "[XML][Stringify]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<AddressBook><Address>Address 1</Address><Address>Address 2</Address></AddressBook>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML with attributes on root tag.", "[XML][Stringify]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<AddressBook number=\"46\" type=\"commercial\"></AddressBook>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML with Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Stringify]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<AddressBook>"
                     "<Address>"
                     "    This is some contents 1   "
@@ -97,35 +106,35 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
                     "</Address>"
                     "</AddressBook>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML with a single line comment in prolog area.", "[XML][Stringify][Comments]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<!-- A single line comment -->"
                     "<root></root>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML with multiple single line comments in the prolog area.", "[XML][Stringify][Comments]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<!-- A single line comment -->"
                     "<!-- A single line comment -->"
                     "<!-- A single line comment -->"
                     "<root></root>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML with multiple comments inside root element and between its children ", "[XML][Stringify][Comments]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<AddressBook>"
                     "<!--Address one -->"
                     "<Address>    This is some contents 1   </Address>"
@@ -135,13 +144,13 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
                     "<Address>    This is some contents 3   </Address>"
                     "</AddressBook>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML with multiple comments inside child of root element with contents ", "[XML][Stringify][Comments]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<AddressBook>\n"
                     "<Address>\n"
                     "<!--Address one -->\n"
@@ -153,54 +162,54 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
                     "</Address>\n"
                     "</AddressBook>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML with a multi line comment in prolog.", "[XML][Stringify][Comments]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<!-- A single line comment\n"
                     " another line\n"
                     " another line\n"
                     " and another line\n"
                     "--><root></root>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
     SECTION("Stringify XML with a multi-line comment within child element with contents.", "[XML][Stringify][Comments]")
     {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                     "<root>Test <!-- A single line comment\n"
                     " another line\n"
                     " another line\n"
                     " and another line\n"
                     "--> Test Test</root>";
         BufferSource xmlSource(xmlString);
-        std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
 }
-// TEST_CASE("Stringify XML from a list of example files.", "[XML][Stringify]")
-// {
-//     XML xml;
-//     auto testFile=GENERATE(values<std::string>({"./testData/testfile001.xml",
-//                                                   "./testData/testfile002.xml",
-//                                                   "./testData/testfile003.xml",
-//                                                   "./testData/testfile004.xml",
-//                                                   "./testData/testfile005.xml",
-//                                                   "./testData/testfile006.xml",
-//                                                   "./testData/testfile007.xml",
-//                                                   "./testData/testfile010.xml",
-//                                                   "./testData/testfile011.xml"}));
-//     SECTION("Load file into buffer and parse.", "[XML][Parse]")
-//     {
-//         std::string expected=readXMLFromFileUTF8(testFile);
-//         BufferSource xmlSource(expected);
-//         std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-//         REQUIRE(xml.stringify(xNodeRoot) == expected);
-//     }
-// }
+TEST_CASE("Stringify XML from a list of example files.", "[XML][Stringify]")
+{
+    XML xml;
+    auto testFile = GENERATE(values<std::string>({"./testData/testfile001.xml",
+                                                  "./testData/testfile002.xml",
+                                                  "./testData/testfile003.xml",
+                                                  "./testData/testfile004.xml",
+                                                  "./testData/testfile005.xml",
+                                                  "./testData/testfile006.xml",
+                                                  "./testData/testfile007.xml",
+                                                  "./testData/testfile010.xml",
+                                                  "./testData/testfile011.xml"}));
+    SECTION("Load file into buffer and parse.", "[XML][Parse]")
+    {
+        std::string expected = readXMLFromFileUTF8(testFile);
+        BufferSource xmlSource(expected);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        REQUIRE(xml.stringify(xNodeRoot) == expected);
+    }
+}
