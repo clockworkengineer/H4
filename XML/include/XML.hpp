@@ -10,6 +10,7 @@
 #include <locale>
 #include <unordered_map>
 #include <set>
+#include <tuple>
 //
 // XML XNodes
 //
@@ -141,8 +142,8 @@ namespace H4
         void createXNodeContent(XNodeElement *xNodeElement);
         XString parseName(ISource &xmlSource);
         XString parseValue(ISource &xmlSource);
-        XString parseEncodedCharacter(ISource &xmlSource);
-        XString parseReferenceOrEntity(ISource &xmlSource);
+        std::tuple<XString, XString> parseEncodedCharacter(ISource &source);
+        std::tuple<XString, XString> parseReferenceOrEntity(ISource &source);
         XString parseDTDAttributeType(ISource &xmlSource);
         XString parseDTDAttributeValue(ISource &xmlSource);
         void parseDefault(ISource &xmlSource, XNodeElement *xNodeElement);

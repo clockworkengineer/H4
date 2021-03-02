@@ -69,45 +69,6 @@ namespace H4
     {
         xNodeElement->name = XML::m_UTF8.to_bytes(parseName(source));
     }
-    XString XML::parseEncodedCharacter(ISource &source)
-    {
-        XString characters;
-        if (source.current() == '&')
-        {
-            source.next();
-            characters = parseReferenceOrEntity(source);
-        }
-        else
-        {
-            characters = source.current();
-            source.next();
-        }
-        for (auto ch : characters)
-        {
-            if (!validChar(ch))
-            {
-                throw SyntaxError(source, "Invalid character value encountered.");
-            }
-        }
-        return (characters);
-    }
-    XString XML::parseValue(ISource &source)
-    {
-        if ((source.current() == '\'') || ((source.current() == '"')))
-        {
-            XString value;
-            XChar quote = source.current();
-            source.next();
-            while (source.more() && source.current() != quote)
-            {
-                value += parseEncodedCharacter(source);
-            }
-            source.next();
-            source.ignoreWS();
-            return (value);
-        }
-        throw SyntaxError(source, "Invalid attribute value.");
-    }
     long XML::parseCharacterReference(ISource &source, XString reference)
     {
         char *end;
@@ -124,25 +85,72 @@ namespace H4
         }
         throw SyntaxError(source, "Cannot convert character reference.");
     }
-    XString XML::parseReferenceOrEntity(ISource &source)
+    std::tuple<XString, XString> XML::parseReferenceOrEntity(ISource &source)
     {
-        XString entityName;
+        XString entityReferenceName;
+        XString entityReferenceValue;
         while (source.current() && source.current() != ';')
         {
-            entityName += source.current();
+            entityReferenceName += source.current();
             source.next();
         }
         source.next();
-        if (entityName[0] == '#')
+        if (entityReferenceName[0] == '#')
         {
-            return (XString(1, parseCharacterReference(source, entityName.substr(1))));
+            entityReferenceValue = XString(1, parseCharacterReference(source, entityReferenceName.substr(1)));
         }
-        else if (m_entityMapping.count(U"&" + entityName + U";") > 0)
+        else if (m_entityMapping.count(U"&" + entityReferenceName + U";") > 0)
         {
-            return (m_entityMapping[U"&" + entityName + U";"]);
+            entityReferenceValue = m_entityMapping[U"&" + entityReferenceName + U";"];
         }
-        throw SyntaxError(source, "Invalidly formed  character reference or entity.");
+        else
+        {
+            throw SyntaxError(source, "Invalidly formed  character reference or entity.");
+        }
+        return (std::tuple<XString, XString>(entityReferenceName, entityReferenceValue));
     }
+    std::tuple<XString, XString> XML::parseEncodedCharacter(ISource &source)
+    {
+        std::tuple<XString, XString> encodedCharacter;
+        if (source.current() == '&')
+        {
+            source.next();
+            encodedCharacter = parseReferenceOrEntity(source);
+        }
+        else
+        {
+            std::get<0>(encodedCharacter) = U"";
+            std::get<1>(encodedCharacter) = source.current();
+            source.next();
+        }
+        for (auto ch : std::get<1>(encodedCharacter))
+        {
+            if (!validChar(ch))
+            {
+                throw SyntaxError(source, "Invalid character value encountered.");
+            }
+        }
+        return (encodedCharacter);
+    }
+    XString XML::parseValue(ISource &source)
+    {
+        if ((source.current() == '\'') || ((source.current() == '"')))
+        {
+            XString value;
+            XChar quote = source.current();
+            source.next();
+            while (source.more() && source.current() != quote)
+            {
+                auto encodedCharacter = parseEncodedCharacter(source);
+                value += std::get<1>(encodedCharacter);
+            }
+            source.next();
+            source.ignoreWS();
+            return (value);
+        }
+        throw SyntaxError(source, "Invalid attribute value.");
+    }
+
     void XML::parseComment(ISource &source, XNodeElement *xNodeElement)
     {
         XNodeComment xNodeComment;
@@ -294,7 +302,20 @@ namespace H4
         {
             throw SyntaxError(source, "']]>' invalid in element content area.");
         }
-        xNodeElement->content += XML::m_UTF8.to_bytes(parseEncodedCharacter(source));
+        auto encodedCharacter = parseEncodedCharacter(source);
+
+        if (std::get<0>(encodedCharacter) != U"")
+        {
+            createXNodeContent(xNodeElement);
+            XNodeEntity entity;
+            entity.name = m_UTF8.to_bytes(std::get<0>(encodedCharacter));
+            entity.value = m_UTF8.to_bytes(std::get<1>(encodedCharacter));
+            xNodeElement->elements.emplace_back(std::make_unique<XNodeEntity>(std::move(entity)));
+        }
+        else
+        {
+            xNodeElement->content +=m_UTF8.to_bytes(std::get<1>(encodedCharacter));
+        }
     }
     void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
     {

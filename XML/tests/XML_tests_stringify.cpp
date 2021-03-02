@@ -213,3 +213,93 @@ TEST_CASE("Stringify XML from a list of example files.", "[XML][Stringify]")
         REQUIRE(xml.stringify(xNodeRoot) == expected);
     }
 }
+
+TEST_CASE("Stringify XML with Unicode character in element names, attributes, comments, character data, and processing instructions. ", "[XML][Stringify][Unicode]")
+{
+    XML xml;
+    std::string xmlString;
+    SECTION("Japanese characters", "[XML][Stringify][[Unicode]")
+    {
+        xmlString = xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+                                "<config><start_text>転送</start_text></config>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify well-formed XML document including Chinese, Armenian and Cyrillic characters", "[XML][Stringify][[Unicode]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+                    "<俄语 լեզու=\"ռուսերեն\">данные</俄语>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+}
+
+TEST_CASE("Stringify XML with character entities/reference.", "[XML][Stringify][Entities]")
+{
+    XML xml;
+    std::string xmlString;
+    SECTION("Stringify entity &amp; in contents area", "[XML][Stringify][Entities]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+                    "<root> &amp; </root>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+
+//       SECTION("Parse entity &quot; in contents area", "[XML][Parse][Entities]")
+//   {
+//     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+//                 " <root> &quot; </root>\n";
+//     BufferSource xmlSource(xmlString);
+//     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+//     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == " \" ");
+//   }
+//   SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Entities]")
+//   {
+//     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+//                 " <root> &apos; &lt; &gt; </root>\n";
+//     BufferSource xmlSource(xmlString);
+//     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+//     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == " ' < > ");
+//   }
+//   SECTION("Parse reference &#x00A5; in contents area", "[XML][Parse][Entities]")
+//   {
+//     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+//                 " <root> &#x00A5; </root>\n";
+//     BufferSource xmlSource(xmlString);
+//     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+//     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == " ¥ ");
+//   }
+//   SECTION("Parse reference &#163; in contents area", "[XML][Parse][Entities]")
+//   {
+//     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> "
+//                 "<root> &#163; </root>\n";
+//     BufferSource xmlSource(xmlString);
+//     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+//     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == " £ ");
+//   }
+//   SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Entities]")
+//   {
+//     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+//                 " <root attr1=\" &amp;&quot;&apos;&gt;&lt; \">\n"
+//                 "</root>\n";
+//     BufferSource xmlSource(xmlString);
+//     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+//     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes.size() == 1);
+//     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].name == "attr1");
+//     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].value == " &\"'>< ");
+//   }
+//   SECTION("Parse references &#x00A5;&#163 in attribute value", "[XML][Parse][Entities]")
+//   {
+//     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+//                 " <root attr1=\" &#x00A5;&#163; \"></root>\n";
+//     BufferSource xmlSource(xmlString);
+//     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+//     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes.size() == 1);
+//     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].name == "attr1");
+//     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].value == " ¥£ ");
+//   }
+}

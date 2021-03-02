@@ -58,7 +58,8 @@ namespace H4
         root = 2,
         self = 3,
         element = 4,
-        content = 6,
+        content = 5,
+        entity = 6,
         comment = 7,
         cdata = 8,
         pi = 9,
@@ -82,6 +83,7 @@ namespace H4
             this->nodeType = nodeType;
         }
         XNode &operator[](int index);
+
     private:
         XNodeType nodeType;
     };
@@ -95,6 +97,18 @@ namespace H4
         {
         }
         std::string content;
+    };
+    //
+    // Content XNode
+    //
+    struct XNodeEntity : XNode
+    {
+    public:
+        XNodeEntity(XNodeType nodeType = XNodeType::entity) : XNode(nodeType)
+        {
+        }
+        std::string name;
+        std::string value;
     };
     //
     // Element XNode
@@ -123,8 +137,12 @@ namespace H4
                 {
                     result += static_cast<XNodeContent *>(node.get())->content;
                 }
+                else if (node.get()->getNodeType() == XNodeType::entity)
+                {
+                    result += static_cast<XNodeEntity *>(node.get())->value;
+                }
             }
-            return(result);
+            return (result);
         }
     };
     //
