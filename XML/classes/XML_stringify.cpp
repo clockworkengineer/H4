@@ -96,6 +96,12 @@ namespace H4
             xmlResult += xNodeContent->content;
             break;
         }
+        case XNodeType::entity:
+        {
+            XNodeEntityReference *xNodeEntity = static_cast<XNodeEntityReference *>(xNode);
+            xmlResult += xNodeEntity->unparsed;
+            break;
+        }
         default:
             break;
         }

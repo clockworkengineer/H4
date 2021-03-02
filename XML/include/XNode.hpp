@@ -101,14 +101,14 @@ namespace H4
     //
     // Content XNode
     //
-    struct XNodeEntity : XNode
+    struct XNodeEntityReference : XNode
     {
     public:
-        XNodeEntity(XNodeType nodeType = XNodeType::entity) : XNode(nodeType)
+        XNodeEntityReference(XNodeType nodeType = XNodeType::entity) : XNode(nodeType)
         {
         }
-        std::string name;
-        std::string value;
+        std::string unparsed;
+        std::string parsed;
     };
     //
     // Element XNode
@@ -139,7 +139,7 @@ namespace H4
                 }
                 else if (node.get()->getNodeType() == XNodeType::entity)
                 {
-                    result += static_cast<XNodeEntity *>(node.get())->value;
+                    result += static_cast<XNodeEntityReference *>(node.get())->parsed;
                 }
             }
             return (result);

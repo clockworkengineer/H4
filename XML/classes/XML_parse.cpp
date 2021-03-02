@@ -87,50 +87,50 @@ namespace H4
     }
     std::tuple<XString, XString> XML::parseReferenceOrEntity(ISource &source)
     {
-        XString entityReferenceName;
-        XString entityReferenceValue;
+        XString unparsedEntityReference;
+        XString parsedEntityReference;
         while (source.current() && source.current() != ';')
         {
-            entityReferenceName += source.current();
+            unparsedEntityReference += source.current();
             source.next();
         }
         source.next();
-        if (entityReferenceName[0] == '#')
+        if (unparsedEntityReference[0] == '#')
         {
-            entityReferenceValue = XString(1, parseCharacterReference(source, entityReferenceName.substr(1)));
+            parsedEntityReference = XString(1, parseCharacterReference(source, unparsedEntityReference.substr(1)));
         }
-        else if (m_entityMapping.count(U"&" + entityReferenceName + U";") > 0)
+        else if (m_entityMapping.count(U"&" + unparsedEntityReference + U";") > 0)
         {
-            entityReferenceValue = m_entityMapping[U"&" + entityReferenceName + U";"];
+            parsedEntityReference = m_entityMapping[U"&" + unparsedEntityReference + U";"];
         }
         else
         {
             throw SyntaxError(source, "Invalidly formed  character reference or entity.");
         }
-        return (std::tuple<XString, XString>(entityReferenceName, entityReferenceValue));
+        return (std::tuple<XString, XString>(U"&"+unparsedEntityReference+U";", parsedEntityReference));
     }
     std::tuple<XString, XString> XML::parseEncodedCharacter(ISource &source)
     {
-        std::tuple<XString, XString> encodedCharacter;
+        std::tuple<XString, XString> entityReference;
         if (source.current() == '&')
         {
             source.next();
-            encodedCharacter = parseReferenceOrEntity(source);
+            entityReference = parseReferenceOrEntity(source);
         }
         else
         {
-            std::get<0>(encodedCharacter) = U"";
-            std::get<1>(encodedCharacter) = source.current();
+            std::get<0>(entityReference) = U"";
+            std::get<1>(entityReference) = source.current();
             source.next();
         }
-        for (auto ch : std::get<1>(encodedCharacter))
+        for (auto ch : std::get<1>(entityReference))
         {
             if (!validChar(ch))
             {
                 throw SyntaxError(source, "Invalid character value encountered.");
             }
         }
-        return (encodedCharacter);
+        return (entityReference);
     }
     XString XML::parseValue(ISource &source)
     {
@@ -141,8 +141,8 @@ namespace H4
             source.next();
             while (source.more() && source.current() != quote)
             {
-                auto encodedCharacter = parseEncodedCharacter(source);
-                value += std::get<1>(encodedCharacter);
+                auto entityReference = parseEncodedCharacter(source);
+                value += std::get<1>(entityReference);
             }
             source.next();
             source.ignoreWS();
@@ -150,7 +150,6 @@ namespace H4
         }
         throw SyntaxError(source, "Invalid attribute value.");
     }
-
     void XML::parseComment(ISource &source, XNodeElement *xNodeElement)
     {
         XNodeComment xNodeComment;
@@ -219,7 +218,6 @@ namespace H4
     }
     void XML::parseProlog(ISource &source, XNodeElement *xNodeProlog)
     {
-
         source.ignoreWS();
         if (source.match(U"<?xml"))
         {
@@ -237,7 +235,6 @@ namespace H4
                 xNodeProlog->attributes.emplace_back(attr.name, attr.value);
             }
         }
-
         while (source.more() && std::iswspace(source.current()))
         {
             if (source.current() == 0x0A)
@@ -302,19 +299,18 @@ namespace H4
         {
             throw SyntaxError(source, "']]>' invalid in element content area.");
         }
-        auto encodedCharacter = parseEncodedCharacter(source);
-
-        if (std::get<0>(encodedCharacter) != U"")
+        auto entityReference = parseEncodedCharacter(source);
+        if (std::get<0>(entityReference) != U"")
         {
             createXNodeContent(xNodeElement);
-            XNodeEntity entity;
-            entity.name = m_UTF8.to_bytes(std::get<0>(encodedCharacter));
-            entity.value = m_UTF8.to_bytes(std::get<1>(encodedCharacter));
-            xNodeElement->elements.emplace_back(std::make_unique<XNodeEntity>(std::move(entity)));
+            XNodeEntityReference xNodeEntityReference;
+            xNodeEntityReference.unparsed = m_UTF8.to_bytes(std::get<0>(entityReference));
+            xNodeEntityReference.parsed = m_UTF8.to_bytes(std::get<1>(entityReference));
+            xNodeElement->elements.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
         }
         else
         {
-            xNodeElement->content +=m_UTF8.to_bytes(std::get<1>(encodedCharacter));
+            xNodeElement->content +=m_UTF8.to_bytes(std::get<1>(entityReference));
         }
     }
     void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
