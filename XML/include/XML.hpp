@@ -141,9 +141,10 @@ namespace H4
         bool validReservedName(const XString &name);
         void createXNodeContent(XNodeElement *xNodeElement);
         XString parseName(ISource &xmlSource);
-        XString parseValue(ISource &xmlSource);
+        XValue parseValue(ISource &xmlSource);
         std::tuple<XString, XString> parseEncodedCharacter(ISource &source);
         std::tuple<XString, XString> parseReferenceOrEntity(ISource &source);
+        XString parseDTDValue(ISource &source);
         XString parseDTDAttributeType(ISource &xmlSource);
         XString parseDTDAttributeValue(ISource &xmlSource);
         void parseDefault(ISource &xmlSource, XNodeElement *xNodeElement);

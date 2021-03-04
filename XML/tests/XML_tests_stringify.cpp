@@ -281,23 +281,21 @@ TEST_CASE("Stringify XML with character entities/reference.", "[XML][Stringify][
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
       }
-    //   SECTION("Stringify entities &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Stringify][Entities]")
-    //   {
-    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
-    //                 "<root attr1=\" &amp;&quot;&apos;&gt;&lt; \">\n"
-    //                 "</root>\n";
-    //     BufferSource xmlSource(xmlString);
-    //     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    //     REQUIRE(xml.stringify(xNodeRoot) == xmlString);
-    //   }
-    //   SECTION("Parse references &#x00A5;&#163 in attribute value", "[XML][Parse][Entities]")
-    //   {
-    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
-    //                 " <root attr1=\" &#x00A5;&#163; \"></root>\n";
-    //     BufferSource xmlSource(xmlString);
-    //     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    //     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes.size() == 1);
-    //     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].name == "attr1");
-    //     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].value == " ¥£ ");
-    //   }
+      SECTION("Stringify entities &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Stringify][Entities]")
+      {
+        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+                    "<root attr1=\" &amp;&quot;&apos;&gt;&lt; \">\n"
+                    "</root>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+      }
+      SECTION("Stringify references &#x00A5;&#163 in attribute value", "[XML][Stringify][Entities]")
+      {
+        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+                    "<root attr1=\" &#x00A5;&#163; \"></root>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+      }
 }

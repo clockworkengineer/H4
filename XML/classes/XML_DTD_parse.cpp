@@ -42,6 +42,24 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    XString XML::parseDTDValue(ISource &source)
+    {
+        if ((source.current() == '\'') || ((source.current() == '"')))
+        {
+            XString value;
+            XChar quote = source.current();
+            source.next();
+            while (source.more() && source.current() != quote)
+            {
+                auto entityReference = parseEncodedCharacter(source);
+                value += std::get<1>(entityReference);
+            }
+            source.next();
+            source.ignoreWS();
+            return (value);
+        }
+        throw SyntaxError(source, "Invalid attribute value.");
+    }
     XString XML::parseDTDAttributeType(ISource &source)
     {
         XString type;
@@ -86,11 +104,11 @@ namespace H4
         else if (source.match(U"#FIXED"))
         {
             value = U"#FIXED ";
-            value += parseValue(source);
+            value += parseDTDValue(source);
         }
         else
         {
-            value = parseValue(source);
+            value = parseDTDValue(source);
         }
         return (value);
     }
@@ -133,7 +151,7 @@ namespace H4
             source.ignoreWS();
         }
         entity += m_UTF8.to_bytes(parseName(source)) + ";";
-        XString entityValue = parseValue(source);
+        XString entityValue = parseDTDValue(source);
         m_entityMapping[m_UTF8.from_bytes(entity)] = entityValue;
         xNodeDTD->entityMapping[entity] = m_UTF8.to_bytes(entityValue);
     }
@@ -168,13 +186,13 @@ namespace H4
         {
             source.ignoreWS();
             xNodeDTD->external.name = m_UTF8.to_bytes(U"SYSTEM");
-            xNodeDTD->external.value = m_UTF8.to_bytes(parseValue(source));
+            xNodeDTD->external.value = m_UTF8.to_bytes(parseDTDValue(source));
         }
         else if (source.match(U"PUBLIC"))
         {
             source.ignoreWS();
             xNodeDTD->external.name = m_UTF8.to_bytes(U"PUBLIC");
-            xNodeDTD->external.value = m_UTF8.to_bytes(parseValue(source)) + ", " + m_UTF8.to_bytes(parseValue(source));
+            xNodeDTD->external.value = m_UTF8.to_bytes(parseDTDValue(source)) + ", " + m_UTF8.to_bytes(parseDTDValue(source));
         }
         else
         {

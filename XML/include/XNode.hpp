@@ -35,6 +35,19 @@ namespace H4
         std::string content;
         std::vector<XDTDAttribute> attributes;
     };
+        //
+    // X Attribute
+    //
+    struct XValue
+    {
+    public:
+        XValue() {}
+        XValue(const std::string &unparsed, const std::string &parsed) : unparsed(unparsed), parsed(parsed)
+        {
+        }
+        std::string unparsed;
+        std::string parsed;
+    };
     //
     // X Attribute
     //
@@ -42,11 +55,12 @@ namespace H4
     {
     public:
         XAttribute() {}
-        XAttribute(const std::string &name, const std::string &value) : name(name), value(value)
+        XAttribute(const std::string &name, const std::string &value, const std::string &unparsed="") : name(name), value(value), unparsed(unparsed)
         {
         }
         std::string name;
         std::string value;
+        std::string unparsed;
     };
     //
     // XNode structure.

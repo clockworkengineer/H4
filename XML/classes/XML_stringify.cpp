@@ -63,7 +63,7 @@ namespace H4
             xmlResult += "<" + xNodeElement->name;
             for (auto attr : xNodeElement->attributes)
             {
-                xmlResult += " " + attr.name + "=\"" + attr.value + "\"";
+                xmlResult += " " + attr.name + "=\"" + attr.unparsed + "\"";
             }
             xmlResult += ">";
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
@@ -79,7 +79,7 @@ namespace H4
             xmlResult += "<" + xNodeElement->name;
             for (auto attr : xNodeElement->attributes)
             {
-                xmlResult += " " + attr.name + "=\"" + attr.value + "\"";
+                xmlResult += " " + attr.name + "=\"" + attr.unparsed + "\"";
             }
             xmlResult += "/>";
             break;

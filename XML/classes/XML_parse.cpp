@@ -107,7 +107,7 @@ namespace H4
         {
             throw SyntaxError(source, "Invalidly formed  character reference or entity.");
         }
-        return (std::tuple<XString, XString>(U"&"+unparsedEntityReference+U";", parsedEntityReference));
+        return (std::tuple<XString, XString>(U"&" + unparsedEntityReference + U";", parsedEntityReference));
     }
     std::tuple<XString, XString> XML::parseEncodedCharacter(ISource &source)
     {
@@ -132,17 +132,25 @@ namespace H4
         }
         return (entityReference);
     }
-    XString XML::parseValue(ISource &source)
+    XValue XML::parseValue(ISource &source)
     {
         if ((source.current() == '\'') || ((source.current() == '"')))
         {
-            XString value;
+            XValue value;
             XChar quote = source.current();
             source.next();
             while (source.more() && source.current() != quote)
             {
                 auto entityReference = parseEncodedCharacter(source);
-                value += std::get<1>(entityReference);
+                if (std::get<0>(entityReference) == U"")
+                {
+                    value.unparsed += m_UTF8.to_bytes(std::get<1>(entityReference));
+                }
+                else
+                {
+                    value.unparsed += m_UTF8.to_bytes(std::get<0>(entityReference));
+                }
+                value.parsed += m_UTF8.to_bytes(std::get<1>(entityReference));
             }
             source.next();
             source.ignoreWS();
@@ -204,10 +212,10 @@ namespace H4
             }
             source.next();
             source.ignoreWS();
-            std::string attributeValue = m_UTF8.to_bytes(parseValue(source));
+            XValue attributeValue = parseValue(source);
             if (!isAttributePresent(xNodeElement->attributes, attributeName))
             {
-                xNodeElement->attributes.emplace_back(attributeName, attributeValue);
+                xNodeElement->attributes.emplace_back(attributeName, attributeValue.parsed, attributeValue.unparsed);
             }
             else
             {
@@ -310,7 +318,7 @@ namespace H4
         }
         else
         {
-            xNodeElement->content +=m_UTF8.to_bytes(std::get<1>(entityReference));
+            xNodeElement->content += m_UTF8.to_bytes(std::get<1>(entityReference));
         }
     }
     void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)
