@@ -564,7 +564,7 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
     BufferSource xmlSource(xmlString);
     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == "\n   <message> Welcome to TutorialsPoint </message>   ");
-    REQUIRE(XNodeRef<XNodeCDATA>((*xNodeRoot)[1][0]).cdata == "<message> Welcome to TutorialsPoint </message>");
+    REQUIRE(XNodeRef<XNodeCDATA>((*xNodeRoot)[1][1]).cdata == "<message> Welcome to TutorialsPoint </message>");
   }
   SECTION("Parse XML root containing CDDATA containing nested CDATA ", "[XML][Parse][CDATA]")
   {

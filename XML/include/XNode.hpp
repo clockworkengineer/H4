@@ -35,7 +35,7 @@ namespace H4
         std::string content;
         std::vector<XDTDAttribute> attributes;
     };
-        //
+    //
     // X Attribute
     //
     struct XValue
@@ -55,7 +55,7 @@ namespace H4
     {
     public:
         XAttribute() {}
-        XAttribute(const std::string &name, const std::string &value, const std::string &unparsed="") : name(name), value(value), unparsed(unparsed)
+        XAttribute(const std::string &name, const std::string &value, const std::string &unparsed = "") : name(name), value(value), unparsed(unparsed)
         {
         }
         std::string name;
@@ -113,7 +113,7 @@ namespace H4
         std::string content;
     };
     //
-    // Content XNode
+    // EntityReference XNode
     //
     struct XNodeEntityReference : XNode
     {
@@ -123,6 +123,17 @@ namespace H4
         }
         std::string unparsed;
         std::string parsed;
+    };
+    //
+    // CDATA XNode
+    //
+    struct XNodeCDATA : XNode
+    {
+    public:
+        XNodeCDATA(XNodeType nodeType = XNodeType::cdata) : XNode(nodeType)
+        {
+        }
+        std::string cdata;
     };
     //
     // Element XNode
@@ -155,6 +166,10 @@ namespace H4
                 {
                     result += static_cast<XNodeEntityReference *>(node.get())->parsed;
                 }
+                else if (node.get()->getNodeType() == XNodeType::cdata)
+                {
+                    result += static_cast<XNodeCDATA *>(node.get())->cdata;
+                }
             }
             return (result);
         }
@@ -170,17 +185,7 @@ namespace H4
         }
         std::string comment;
     };
-    //
-    // CDATA XNode
-    //
-    struct XNodeCDATA : XNode
-    {
-    public:
-        XNodeCDATA(XNodeType nodeType = XNodeType::cdata) : XNode(nodeType)
-        {
-        }
-        std::string cdata;
-    };
+
     //
     // PI XNode
     //
@@ -227,5 +232,6 @@ namespace H4
         }
         throw std::runtime_error("Invalid index used to access array.");
     }
+
 } // namespace H4
 #endif /* XNODE_HPP */

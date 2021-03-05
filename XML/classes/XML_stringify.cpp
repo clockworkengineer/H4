@@ -105,7 +105,13 @@ namespace H4
         case XNodeType::pi:
         {
             XNodePI *xNodePI = static_cast<XNodePI *>(xNode);
-            xmlResult += "<?" + xNodePI->name + " " + xNodePI->parameters +  "?>";
+            xmlResult += "<?" + xNodePI->name + " " + xNodePI->parameters + "?>";
+            break;
+        }
+        case XNodeType::cdata:
+        {
+            XNodeCDATA *xNodeCDATA = static_cast<XNodeCDATA *>(xNode);
+            xmlResult += "<![CDATA[" + xNodeCDATA->cdata + "]]>";
             break;
         }
         default:

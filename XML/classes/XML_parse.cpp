@@ -193,7 +193,7 @@ namespace H4
             {
                 throw SyntaxError(source);
             }
-            xNodeElement->content += XML::m_UTF8.to_bytes(source.current());
+            //   xNodeElement->content += XML::m_UTF8.to_bytes(source.current());
             xNodeCDATA.cdata += XML::m_UTF8.to_bytes(source.current());
             source.next();
         }
@@ -335,6 +335,7 @@ namespace H4
         }
         else if (source.match(U"<![CDATA["))
         {
+            addCurrentXNodeContent(xNodeElement);
             parseCDATA(source, xNodeElement);
         }
         else if (source.match(U"<"))

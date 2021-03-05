@@ -332,3 +332,48 @@ TEST_CASE("Check the Stringify of XML containing program instructions", "[XML][S
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
 }
+
+TEST_CASE("Stringify CDATA SECTION", "[XML][Stringify][CDATA]")
+{
+    XML xml;
+    std::string xmlString;
+    SECTION("Stringify XML root containing CDDATA containing a XML tags", "[XML][Stringify][CDATA]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+                    "<root>\n"
+                    "   <![CDATA[<message> Welcome to TutorialsPoint </message>   ]]>   "
+                    "</root>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    //   SECTION("Parse XML root containing CDDATA containing a XML tags and check contents", "[XML][Parse][CDATA]")
+    //   {
+    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+    //                 " <root>\n"
+    //                 "   <![CDATA[<message> Welcome to TutorialsPoint </message>]]>   "
+    //                 "</root>\n";
+    //     BufferSource xmlSource(xmlString);
+    //     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+    //     REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == "\n   <message> Welcome to TutorialsPoint </message>   ");
+    //     REQUIRE(XNodeRef<XNodeCDATA>((*xNodeRoot)[1][0]).cdata == "<message> Welcome to TutorialsPoint </message>");
+    //   }
+    //   SECTION("Parse XML root containing CDDATA containing nested CDATA ", "[XML][Parse][CDATA]")
+    //   {
+    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+    //                 " <root>\n"
+    //                 "   <![CDATA[< Test test <![CDATA[ Test text ]]> ]]>\n"
+    //                 "   </root>\n";
+    //     BufferSource xmlSource(xmlString);
+    //     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 3 Column: 40]");
+    //   }
+    //   SECTION("Parse XML root containing CDDATA containing ]]> ", "[XML][Parse][CDATA]")
+    //   {
+    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+    //                 " <root>\n"
+    //                 "   <![CDATA[< Test Test text ]]>  ]]>\n"
+    //                 "   </root>\n";
+    //     BufferSource xmlSource(xmlString);
+    //     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 1]']]>' invalid in element content area.");
+    //   }
+}
