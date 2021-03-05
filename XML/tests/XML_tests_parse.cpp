@@ -506,8 +506,8 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
   {
     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
                 "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?> "
-                "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
-                "  <root></root>\n";
+                "<?display table-view?>\n"
+                "<root></root>\n";
     BufferSource xmlSource(xmlString);
     REQUIRE_NOTHROW(xml.parse(xmlSource));
   }

@@ -257,45 +257,98 @@ TEST_CASE("Stringify XML with character entities/reference.", "[XML][Stringify][
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
     }
-      SECTION("Stringify entities &apos; &lt; &gt; in contents area", "[XML][Stringify][Entities]")
-      {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    SECTION("Stringify entities &apos; &lt; &gt; in contents area", "[XML][Stringify][Entities]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                     "<root> &apos; &lt; &gt; </root>\n";
         BufferSource xmlSource(xmlString);
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
-      }
-      SECTION("Stringify character reference &#x00A5; in contents area", "[XML][Stringify][Entities]")
-      {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    }
+    SECTION("Stringify character reference &#x00A5; in contents area", "[XML][Stringify][Entities]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                     "<root> &#x00A5; </root>\n";
         BufferSource xmlSource(xmlString);
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
-      }
-      SECTION("Stringify character reference &#163; in contents area", "[XML][Stringify][Entities]")
-      {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    }
+    SECTION("Stringify character reference &#163; in contents area", "[XML][Stringify][Entities]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                     "<root> &#163; </root>\n";
         BufferSource xmlSource(xmlString);
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
-      }
-      SECTION("Stringify entities &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Stringify][Entities]")
-      {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    }
+    SECTION("Stringify entities &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Stringify][Entities]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                     "<root attr1=\" &amp;&quot;&apos;&gt;&lt; \">\n"
                     "</root>\n";
         BufferSource xmlSource(xmlString);
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
-      }
-      SECTION("Stringify references &#x00A5;&#163 in attribute value", "[XML][Stringify][Entities]")
-      {
-        xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    }
+    SECTION("Stringify references &#x00A5;&#163 in attribute value", "[XML][Stringify][Entities]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                     "<root attr1=\" &#x00A5;&#163; \"></root>\n";
         BufferSource xmlSource(xmlString);
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         REQUIRE(xml.stringify(xNodeRoot) == xmlString);
-      }
+    }
+}
+TEST_CASE("Check the Stringify of XML containing program instructions", "[XML][Stringify][PI]")
+{
+    XML xml;
+    std::string xmlString;
+    //   SECTION("Stringify XML containing PI after declaration", "[XML][Stringify][PI]")
+    //   {
+    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
+    //                 "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
+    //                 "<root></root>\n";
+    //     BufferSource xmlSource(xmlString);
+    //     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+    //     REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    //   }
+    //   SECTION("Parse XML containing multiple PI after declaration", "[XML][Parse][PI]")
+    //   {
+    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
+    //                 "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?> "
+    //                 "<?display table-view?>\n"
+    //                 "<root></root>\n";
+    //     BufferSource xmlSource(xmlString);
+    //     REQUIRE_NOTHROW(xml.parse(xmlSource));
+    //   }
+    //   SECTION("Parse XML containing PI in root section", "[XML][Parse][PI]")
+    //   {
+    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
+    //                 "<root><?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
+    //                 "</root>\n";
+    //     BufferSource xmlSource(xmlString);
+    //     REQUIRE_NOTHROW(xml.parse(xmlSource));
+    //   }
+    //   SECTION("Parse XML containing PI after declaration and check values", "[XML][Parse][PI]")
+    //   {
+    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
+    //                 "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
+    //                 "<root></root>\n";
+    //     BufferSource xmlSource(xmlString);
+    //     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+    //     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::pi);
+    //     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1]).name == "xml-stylesheet");
+    //     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
+    //   }
+    //   SECTION("Parse XML containing PI in root section and check values", "[XML][Parse][PI]")
+    //   {
+    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
+    //                 "<root><?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
+    //                 "</root>\n";
+    //     BufferSource xmlSource(xmlString);
+    //     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
+    //     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1][0]).getNodeType() == XNodeType::pi);
+    //     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1][0]).name == "xml-stylesheet");
+    //     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1][0]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
+    //   }
 }

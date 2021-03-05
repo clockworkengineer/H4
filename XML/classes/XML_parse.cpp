@@ -40,7 +40,7 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    void XML::createXNodeContent(XNodeElement *xNodeElement)
+    void XML::addCurrentXNodeContent(XNodeElement *xNodeElement)
     {
         if (!xNodeElement->content.empty())
         {
@@ -49,25 +49,6 @@ namespace H4
             xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>(std::move(xNodeContent)));
             xNodeElement->content.clear();
         }
-    }
-    XString XML::parseName(ISource &source)
-    {
-        XString name;
-        while (source.more() && validNameChar(source.current()))
-        {
-            name += source.current();
-            source.next();
-        }
-        source.ignoreWS();
-        if (!validateName(name))
-        {
-            throw SyntaxError(source, "Invalid name encountered.");
-        }
-        return (name);
-    }
-    void XML::parseTagName(ISource &source, XNodeElement *xNodeElement)
-    {
-        xNodeElement->name = XML::m_UTF8.to_bytes(parseName(source));
     }
     long XML::parseCharacterReference(ISource &source, XString reference)
     {
@@ -158,6 +139,25 @@ namespace H4
         }
         throw SyntaxError(source, "Invalid attribute value.");
     }
+    std::string XML::parseName(ISource &source)
+    {
+        XString name;
+        while (source.more() && validNameChar(source.current()))
+        {
+            name += source.current();
+            source.next();
+        }
+        source.ignoreWS();
+        if (!validateName(name))
+        {
+            throw SyntaxError(source, "Invalid name encountered.");
+        }
+        return (XML::m_UTF8.to_bytes(name));
+    }
+    void XML::parseTagName(ISource &source, XNodeElement *xNodeElement)
+    {
+        xNodeElement->name = parseName(source);
+    }
     void XML::parseComment(ISource &source, XNodeElement *xNodeElement)
     {
         XNodeComment xNodeComment;
@@ -176,7 +176,7 @@ namespace H4
     void XML::parsePI(ISource &source, XNodeElement *xNodeElement)
     {
         XNodePI xNodePI;
-        xNodePI.name = XML::m_UTF8.to_bytes(parseName(source));
+        xNodePI.name = parseName(source);
         while (source.more() && !source.match(U"?>"))
         {
             xNodePI.parameters += XML::m_UTF8.to_bytes(source.current());
@@ -205,7 +205,7 @@ namespace H4
                source.current() != '/' &&
                source.current() != '>')
         {
-            std::string attributeName = XML::m_UTF8.to_bytes(parseName(source));
+            std::string attributeName = parseName(source);
             if (source.current() != '=')
             {
                 throw SyntaxError(source, "Missing '=' between attribute name and value.");
@@ -310,7 +310,7 @@ namespace H4
         auto entityReference = parseEncodedCharacter(source);
         if (std::get<0>(entityReference) != U"")
         {
-            createXNodeContent(xNodeElement);
+            addCurrentXNodeContent(xNodeElement);
             XNodeEntityReference xNodeEntityReference;
             xNodeEntityReference.unparsed = XML::m_UTF8.to_bytes(std::get<0>(entityReference));
             xNodeEntityReference.parsed = XML::m_UTF8.to_bytes(std::get<1>(entityReference));
@@ -325,12 +325,12 @@ namespace H4
     {
         if (source.match(U"<!--"))
         {
-            createXNodeContent(xNodeElement);
+            addCurrentXNodeContent(xNodeElement);
             parseComment(source, xNodeElement);
         }
         else if (source.match(U"<?"))
         {
-            createXNodeContent(xNodeElement);
+            addCurrentXNodeContent(xNodeElement);
             parsePI(source, xNodeElement);
         }
         else if (source.match(U"<![CDATA["))
@@ -339,7 +339,7 @@ namespace H4
         }
         else if (source.match(U"<"))
         {
-            createXNodeContent(xNodeElement);
+            addCurrentXNodeContent(xNodeElement);
             parseChildElement(source, xNodeElement);
         }
         else
@@ -358,7 +358,7 @@ namespace H4
             {
                 parseElementContents(source, xNodeElement);
             }
-            createXNodeContent(xNodeElement);
+            addCurrentXNodeContent(xNodeElement);
         }
         else if (source.match(U"/>"))
         {
