@@ -144,13 +144,13 @@ namespace H4
                 auto entityReference = parseEncodedCharacter(source);
                 if (std::get<0>(entityReference) == U"")
                 {
-                    value.unparsed += m_UTF8.to_bytes(std::get<1>(entityReference));
+                    value.unparsed += XML::m_UTF8.to_bytes(std::get<1>(entityReference));
                 }
                 else
                 {
-                    value.unparsed += m_UTF8.to_bytes(std::get<0>(entityReference));
+                    value.unparsed += XML::m_UTF8.to_bytes(std::get<0>(entityReference));
                 }
-                value.parsed += m_UTF8.to_bytes(std::get<1>(entityReference));
+                value.parsed += XML::m_UTF8.to_bytes(std::get<1>(entityReference));
             }
             source.next();
             source.ignoreWS();
@@ -205,7 +205,7 @@ namespace H4
                source.current() != '/' &&
                source.current() != '>')
         {
-            std::string attributeName = m_UTF8.to_bytes(parseName(source));
+            std::string attributeName = XML::m_UTF8.to_bytes(parseName(source));
             if (source.current() != '=')
             {
                 throw SyntaxError(source, "Missing '=' between attribute name and value.");
@@ -312,13 +312,13 @@ namespace H4
         {
             createXNodeContent(xNodeElement);
             XNodeEntityReference xNodeEntityReference;
-            xNodeEntityReference.unparsed = m_UTF8.to_bytes(std::get<0>(entityReference));
-            xNodeEntityReference.parsed = m_UTF8.to_bytes(std::get<1>(entityReference));
+            xNodeEntityReference.unparsed = XML::m_UTF8.to_bytes(std::get<0>(entityReference));
+            xNodeEntityReference.parsed = XML::m_UTF8.to_bytes(std::get<1>(entityReference));
             xNodeElement->elements.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
         }
         else
         {
-            xNodeElement->content += m_UTF8.to_bytes(std::get<1>(entityReference));
+            xNodeElement->content += XML::m_UTF8.to_bytes(std::get<1>(entityReference));
         }
     }
     void XML::parseElementContents(ISource &source, XNodeElement *xNodeElement)

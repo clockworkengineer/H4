@@ -115,13 +115,13 @@ namespace H4
     void XML::parseDTDAttributeList(ISource &source, XNodeDTD *xNodeDTD)
     {
         source.ignoreWS();
-        std::string elementName = m_UTF8.to_bytes(parseName(source));
+        std::string elementName = XML::m_UTF8.to_bytes(parseName(source));
         while (source.more() && source.current() != '>')
         {
             XDTDAttribute xDTDAttribute;
-            xDTDAttribute.name = m_UTF8.to_bytes(parseName(source));
-            xDTDAttribute.type = m_UTF8.to_bytes(parseDTDAttributeType(source));
-            xDTDAttribute.value = m_UTF8.to_bytes(parseDTDAttributeValue(source));
+            xDTDAttribute.name = XML::m_UTF8.to_bytes(parseName(source));
+            xDTDAttribute.type = XML::m_UTF8.to_bytes(parseDTDAttributeType(source));
+            xDTDAttribute.value = XML::m_UTF8.to_bytes(parseDTDAttributeValue(source));
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
             source.ignoreWS();
         }
@@ -130,11 +130,11 @@ namespace H4
     {
         source.ignoreWS();
         XAttribute notation;
-        std::string name = m_UTF8.to_bytes(parseName(source));
-        notation.name = m_UTF8.to_bytes(parseName(source));
+        std::string name = XML::m_UTF8.to_bytes(parseName(source));
+        notation.name = XML::m_UTF8.to_bytes(parseName(source));
         while (source.more() && source.current() != '>')
         {
-            notation.value += m_UTF8.to_bytes(source.current());
+            notation.value += XML::m_UTF8.to_bytes(source.current());
             source.next();
         }
         xNodeDTD->notations[name] = notation;
@@ -150,10 +150,10 @@ namespace H4
             source.next();
             source.ignoreWS();
         }
-        entity += m_UTF8.to_bytes(parseName(source)) + ";";
+        entity += XML::m_UTF8.to_bytes(parseName(source)) + ";";
         XString entityValue = parseDTDValue(source);
         m_entityMapping[m_UTF8.from_bytes(entity)] = entityValue;
-        xNodeDTD->entityMapping[entity] = m_UTF8.to_bytes(entityValue);
+        xNodeDTD->entityMapping[entity] = XML::m_UTF8.to_bytes(entityValue);
     }
     void XML::parseDTDElement(ISource &source, XNodeDTD *xNodeDTD)
     {
@@ -176,7 +176,7 @@ namespace H4
                 source.next();
             }
         }
-        XDTDElement element(m_UTF8.to_bytes(elementName), m_UTF8.to_bytes(elementContent));
+        XDTDElement element(m_UTF8.to_bytes(elementName), XML::m_UTF8.to_bytes(elementContent));
         xNodeDTD->elements.emplace(std::pair(element.name, element));
         source.ignoreWS();
     }
@@ -185,14 +185,14 @@ namespace H4
         if (source.match(U"SYSTEM"))
         {
             source.ignoreWS();
-            xNodeDTD->external.name = m_UTF8.to_bytes(U"SYSTEM");
-            xNodeDTD->external.value = m_UTF8.to_bytes(parseDTDValue(source));
+            xNodeDTD->external.name = XML::m_UTF8.to_bytes(U"SYSTEM");
+            xNodeDTD->external.value = XML::m_UTF8.to_bytes(parseDTDValue(source));
         }
         else if (source.match(U"PUBLIC"))
         {
             source.ignoreWS();
-            xNodeDTD->external.name = m_UTF8.to_bytes(U"PUBLIC");
-            xNodeDTD->external.value = m_UTF8.to_bytes(parseDTDValue(source)) + ", " + m_UTF8.to_bytes(parseDTDValue(source));
+            xNodeDTD->external.name = XML::m_UTF8.to_bytes(U"PUBLIC");
+            xNodeDTD->external.value = XML::m_UTF8.to_bytes(parseDTDValue(source)) + ", " + XML::m_UTF8.to_bytes(parseDTDValue(source));
         }
         else
         {
@@ -243,7 +243,7 @@ namespace H4
     {
         XNodeDTD xNodeDTD;
         source.ignoreWS();
-        xNodeDTD.name = m_UTF8.to_bytes(parseName(source));
+        xNodeDTD.name = XML::m_UTF8.to_bytes(parseName(source));
         if (source.current() == '[')
         {
             parseDTDInternal(source, &xNodeDTD);
