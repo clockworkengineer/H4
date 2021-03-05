@@ -303,52 +303,32 @@ TEST_CASE("Check the Stringify of XML containing program instructions", "[XML][S
 {
     XML xml;
     std::string xmlString;
-    //   SECTION("Stringify XML containing PI after declaration", "[XML][Stringify][PI]")
-    //   {
-    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
-    //                 "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
-    //                 "<root></root>\n";
-    //     BufferSource xmlSource(xmlString);
-    //     std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
-    //     REQUIRE(xml.stringify(xNodeRoot) == xmlString);
-    //   }
-    //   SECTION("Parse XML containing multiple PI after declaration", "[XML][Parse][PI]")
-    //   {
-    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
-    //                 "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?> "
-    //                 "<?display table-view?>\n"
-    //                 "<root></root>\n";
-    //     BufferSource xmlSource(xmlString);
-    //     REQUIRE_NOTHROW(xml.parse(xmlSource));
-    //   }
-    //   SECTION("Parse XML containing PI in root section", "[XML][Parse][PI]")
-    //   {
-    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
-    //                 "<root><?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
-    //                 "</root>\n";
-    //     BufferSource xmlSource(xmlString);
-    //     REQUIRE_NOTHROW(xml.parse(xmlSource));
-    //   }
-    //   SECTION("Parse XML containing PI after declaration and check values", "[XML][Parse][PI]")
-    //   {
-    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
-    //                 "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
-    //                 "<root></root>\n";
-    //     BufferSource xmlSource(xmlString);
-    //     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    //     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::pi);
-    //     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1]).name == "xml-stylesheet");
-    //     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
-    //   }
-    //   SECTION("Parse XML containing PI in root section and check values", "[XML][Parse][PI]")
-    //   {
-    //     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
-    //                 "<root><?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
-    //                 "</root>\n";
-    //     BufferSource xmlSource(xmlString);
-    //     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    //     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1][0]).getNodeType() == XNodeType::pi);
-    //     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1][0]).name == "xml-stylesheet");
-    //     REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1][0]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
-    //   }
+    SECTION("Stringify XML containing PI after declaration", "[XML][Stringify][PI]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
+                    "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
+                    "<root></root>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML containing multiple PI after declaration", "[XML][Stringify][PI]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
+                    "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>"
+                    "<?display table-view?>\n"
+                    "<root></root>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
+    SECTION("Stringify XML containing PI in root section", "[XML][Stringify][PI]")
+    {
+        xmlString = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?>\n"
+                    "<root><?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
+                    "</root>\n";
+        BufferSource xmlSource(xmlString);
+        std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
+        REQUIRE(xml.stringify(xNodeRoot) == xmlString);
+    }
 }

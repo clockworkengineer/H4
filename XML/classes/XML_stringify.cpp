@@ -102,6 +102,12 @@ namespace H4
             xmlResult += xNodeEntity->unparsed;
             break;
         }
+        case XNodeType::pi:
+        {
+            XNodePI *xNodePI = static_cast<XNodePI *>(xNode);
+            xmlResult += "<?" + xNodePI->name + " " + xNodePI->parameters +  "?>";
+            break;
+        }
         default:
             break;
         }
