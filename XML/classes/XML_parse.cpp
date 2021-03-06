@@ -66,23 +66,26 @@ namespace H4
         }
         throw SyntaxError(source, "Cannot convert character reference.");
     }
-    std::tuple<XString, XString> XML::parseReferenceOrEntity(ISource &source)
+    XValue XML::parseReferenceOrEntity(ISource &source)
     {
-        XString unparsedEntityReference;
+        XValue entityReference;
+        XString unparsedEntityReference = U"&";
         XString parsedEntityReference;
-        while (source.current() && source.current() != ';')
+        source.next();
+        while (source.more() && source.current() != ';')
         {
             unparsedEntityReference += source.current();
             source.next();
         }
+        unparsedEntityReference += ';';
         source.next();
-        if (unparsedEntityReference[0] == '#')
+        if (unparsedEntityReference[1] == '#')
         {
-            parsedEntityReference = XString(1, parseCharacterReference(source, unparsedEntityReference.substr(1)));
+            parsedEntityReference = XString(1, parseCharacterReference(source, unparsedEntityReference.substr(2, unparsedEntityReference.size()-3)));
         }
-        else if (m_entityMapping.count(U"&" + unparsedEntityReference + U";") > 0)
+        else if (m_entityMapping.count(unparsedEntityReference) > 0)
         {
-            parsedEntityReference = m_entityMapping[U"&" + unparsedEntityReference + U";"];
+            parsedEntityReference = m_entityMapping[unparsedEntityReference];
         }
         else
         {
@@ -95,28 +98,27 @@ namespace H4
                 throw SyntaxError(source, "Invalid character value encountered.");
             }
         }
-        return (std::tuple<XString, XString>(U"&" + unparsedEntityReference + U";", parsedEntityReference));
+        entityReference.unparsed = m_UTF8.to_bytes(unparsedEntityReference);
+        entityReference.parsed = m_UTF8.to_bytes(parsedEntityReference);
+        return (entityReference);
     }
     XValue XML::parseCharacter(ISource &source)
     {
         XValue character;
-        std::tuple<XString, XString> entityReference;
         if (source.current() == '&')
         {
-            source.next();
-            entityReference = parseReferenceOrEntity(source);
-            character.unparsed = m_UTF8.to_bytes(std::get<0>(entityReference));
-            character.parsed = m_UTF8.to_bytes(std::get<1>(entityReference));
+
+            character = parseReferenceOrEntity(source);
         }
-        else
+        else if (validChar(source.current()))
         {
-            if (!validChar(source.current()))
-            {
-                throw SyntaxError(source, "Invalid character value encountered.");
-            }
             character.unparsed = "";
             character.parsed = m_UTF8.to_bytes(source.current());
             source.next();
+        }
+        else
+        {
+            throw SyntaxError(source, "Invalid character value encountered.");
         }
         return (character);
     }
@@ -200,7 +202,6 @@ namespace H4
             {
                 throw SyntaxError(source);
             }
-            //   xNodeElement->content += XML::m_UTF8.to_bytes(source.current());
             xNodeCDATA.cdata += XML::m_UTF8.to_bytes(source.current());
             source.next();
         }

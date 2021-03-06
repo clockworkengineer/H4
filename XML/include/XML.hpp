@@ -143,7 +143,7 @@ namespace H4
         std::string parseName(ISource &xmlSource);
         XValue parseValue(ISource &xmlSource);
         XValue parseCharacter(ISource &source);
-        std::tuple<XString, XString> parseReferenceOrEntity(ISource &source);
+        XValue parseReferenceOrEntity(ISource &source);
         std::string parseDTDValue(ISource &source);
         std::string parseDTDAttributeType(ISource &xmlSource);
         std::string parseDTDAttributeValue(ISource &xmlSource);
