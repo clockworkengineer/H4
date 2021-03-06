@@ -36,7 +36,7 @@ namespace H4
         std::vector<XDTDAttribute> attributes;
     };
     //
-    // X Attribute
+    // XML Attribute
     //
     struct XValue
     {
@@ -49,7 +49,7 @@ namespace H4
         std::string parsed;
     };
     //
-    // X Attribute
+    // XML Attribute
     //
     struct XAttribute
     {

@@ -142,7 +142,7 @@ namespace H4
         void addCurrentXNodeContent(XNodeElement *xNodeElement);
         std::string parseName(ISource &xmlSource);
         XValue parseValue(ISource &xmlSource);
-        std::tuple<XString, XString> parseEncodedCharacter(ISource &source);
+        XValue parseCharacter(ISource &source);
         std::tuple<XString, XString> parseReferenceOrEntity(ISource &source);
         std::string parseDTDValue(ISource &source);
         std::string parseDTDAttributeType(ISource &xmlSource);
