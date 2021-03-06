@@ -88,6 +88,13 @@ namespace H4
         {
             throw SyntaxError(source, "Invalidly formed  character reference or entity.");
         }
+        for (auto ch : parsedEntityReference)
+        {
+            if (!validChar(ch))
+            {
+                throw SyntaxError(source, "Invalid character value encountered.");
+            }
+        }
         return (std::tuple<XString, XString>(U"&" + unparsedEntityReference + U";", parsedEntityReference));
     }
     XValue XML::parseCharacter(ISource &source)
@@ -103,16 +110,13 @@ namespace H4
         }
         else
         {
-            character.unparsed = "";
-            character.parsed = m_UTF8.to_bytes(source.current());
-            source.next();
-        }
-        for (auto ch : std::get<1>(entityReference))
-        {
-            if (!validChar(ch))
+            if (!validChar(source.current()))
             {
                 throw SyntaxError(source, "Invalid character value encountered.");
             }
+            character.unparsed = "";
+            character.parsed = m_UTF8.to_bytes(source.current());
+            source.next();
         }
         return (character);
     }
@@ -125,16 +129,16 @@ namespace H4
             source.next();
             while (source.more() && source.current() != quote)
             {
-                auto entityReference = parseCharacter(source);
-                if (entityReference.unparsed == "")
+                XValue character = parseCharacter(source);
+                if (character.unparsed == "")
                 {
-                    value.unparsed += entityReference.parsed;
+                    value.unparsed += character.parsed;
                 }
                 else
                 {
-                    value.unparsed += entityReference.unparsed;
+                    value.unparsed += character.unparsed;
                 }
-                value.parsed += entityReference.parsed;
+                value.parsed += character.parsed;
             }
             source.next();
             source.ignoreWS();
