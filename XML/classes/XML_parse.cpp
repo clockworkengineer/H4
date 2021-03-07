@@ -232,7 +232,7 @@ namespace H4
             XValue attributeValue = parseValue(source);
             if (!isAttributePresent(xNodeElement->attributes, attributeName))
             {
-                xNodeElement->attributes.emplace_back(attributeName, attributeValue.parsed, attributeValue.unparsed);
+                xNodeElement->attributes.emplace_back(attributeName, attributeValue);
             }
             else
             {

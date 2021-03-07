@@ -55,12 +55,11 @@ namespace H4
     {
     public:
         XAttribute() {}
-        XAttribute(const std::string &name, const std::string &value, const std::string &unparsed = "") : name(name), value(value), unparsed(unparsed)
+        XAttribute(const std::string &name, const XValue &value) : name(name), value(value)
         {
         }
         std::string name;
-        std::string value;
-        std::string unparsed;
+        XValue value;
     };
     //
     // XNode structure.

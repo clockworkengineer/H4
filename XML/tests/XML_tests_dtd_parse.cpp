@@ -133,7 +133,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).external.name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).external.value == "Note.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).external.value.parsed == "Note.dtd");
   }
   SECTION("XML with external URL DTD to parse and check values", "[XML][Parse][DTD]")
   {
@@ -146,7 +146,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name == XNodeRef<XNodeDTD>((*xNodeRoot)[1]).name);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).external.name == "PUBLIC");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).external.value == "-//W3C//DTD XHTML 1.0 Transitional//EN, http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[1]).external.value.parsed == "-//W3C//DTD XHTML 1.0 Transitional//EN, http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
   }
   SECTION("XML with internal DTD with attributes to parse ", "[XML][Parse][DTD]")
   {
@@ -334,10 +334,10 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>((*xNodeRoot)[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["GIF"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["GIF"].value == "\"\"");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["GIF"].value.parsed == "\"\"");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["JPG"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["JPG"].value == "\"\"");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["JPG"].value.parsed == "\"\"");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["BMP"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["BMP"].value == "\"\"");
+    REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["BMP"].value.parsed == "\"\"");
   }
 }

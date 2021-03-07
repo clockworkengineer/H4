@@ -35,7 +35,7 @@ namespace H4
     // PRIVATE STATIC VARIABLES
     // ========================
     // Defaults for XML declaration
-    XAttribute XML::m_defaultAtributes[3] = {{"version", "1.0"}, {"encoding", "UTF-8"}, {"standalone", "no"}};
+    XAttribute XML::m_defaultAtributes[3] = {{"version", {"1.0", "1.0"}}, {"encoding", {"UTF-8", "UTF-8"}}, {"standalone", {"no", "no"}}};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -137,12 +137,12 @@ namespace H4
             return (false);
         }
         // Encoding all upper case
-        std::transform(validatedAttributes[1].value.begin(), validatedAttributes[1].value.end(),
-                       validatedAttributes[1].value.begin(), [](unsigned int c) { return std::toupper(c); });
+        std::transform(validatedAttributes[1].value.parsed.begin(), validatedAttributes[1].value.parsed.end(),
+                       validatedAttributes[1].value.parsed.begin(), [](unsigned int c) { return std::toupper(c); });
         // Check valid declaration values
-        if ((validatedAttributes[0].value != "1.0") ||
-            ((validatedAttributes[1].value != "UTF-8") && (validatedAttributes[1].value != "UTF-16")) ||
-            ((validatedAttributes[2].value) != "yes" && (validatedAttributes[2].value != "no")))
+        if ((validatedAttributes[0].value.parsed != "1.0") ||
+            ((validatedAttributes[1].value.parsed != "UTF-8") && (validatedAttributes[1].value.parsed != "UTF-16")) ||
+            ((validatedAttributes[2].value.parsed != "yes") && (validatedAttributes[2].value.parsed != "no")))
         {
             return (false);
         }

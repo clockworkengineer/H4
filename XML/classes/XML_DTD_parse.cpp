@@ -121,7 +121,7 @@ namespace H4
         notation.name = parseName(source);
         while (source.more() && source.current() != '>')
         {
-            notation.value += source.to_bytes(source.current());
+            notation.value.parsed += source.to_bytes(source.current());
             source.next();
         }
         xNodeDTD->notations[name] = notation;
@@ -173,13 +173,13 @@ namespace H4
         {
             source.ignoreWS();
             xNodeDTD->external.name = "SYSTEM";
-            xNodeDTD->external.value = parseDTDValue(source);
+            xNodeDTD->external.value.parsed = parseDTDValue(source);
         }
         else if (source.match(U"PUBLIC"))
         {
             source.ignoreWS();
             xNodeDTD->external.name = "PUBLIC";
-            xNodeDTD->external.value = parseDTDValue(source) + ", " + parseDTDValue(source);
+            xNodeDTD->external.value.parsed = parseDTDValue(source) + ", " + parseDTDValue(source);
         }
         else
         {
