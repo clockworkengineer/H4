@@ -307,9 +307,7 @@ namespace H4
         if (entityReference.unparsed != "")
         {
             addCurrentXNodeContent(xNodeElement);
-            XNodeEntityReference xNodeEntityReference;
-            xNodeEntityReference.unparsed = entityReference.unparsed;
-            xNodeEntityReference.parsed = entityReference.parsed;
+            XNodeEntityReference xNodeEntityReference(entityReference);
             xNodeElement->elements.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
         }
         else

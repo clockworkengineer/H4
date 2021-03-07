@@ -99,7 +99,7 @@ namespace H4
         case XNodeType::entity:
         {
             XNodeEntityReference *xNodeEntity = static_cast<XNodeEntityReference *>(xNode);
-            xmlResult += xNodeEntity->unparsed;
+            xmlResult += xNodeEntity->value.unparsed;
             break;
         }
         case XNodeType::pi:

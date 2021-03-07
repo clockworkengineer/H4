@@ -19,24 +19,7 @@ namespace H4
     using XString = std::u32string;
     using XChar = XString::value_type;
     //
-    // DTD element definition
-    //
-    struct XDTDAttribute
-    {
-        std::string name;
-        std::string type;
-        std::string value;
-    };
-    struct XDTDElement
-    {
-        XDTDElement() {}
-        XDTDElement(const std::string &name, const std::string &content) : name(name), content(content) {}
-        std::string name;
-        std::string content;
-        std::vector<XDTDAttribute> attributes;
-    };
-    //
-    // XML Attribute
+    // XML value
     //
     struct XValue
     {
@@ -61,6 +44,24 @@ namespace H4
         std::string name;
         XValue value;
     };
+    //
+    // DTD element definition
+    //
+    struct XDTDAttribute
+    {
+        std::string name;
+        std::string type;
+        std::string value;
+    };
+    struct XDTDElement
+    {
+        XDTDElement() {}
+        XDTDElement(const std::string &name, const std::string &content) : name(name), content(content) {}
+        std::string name;
+        std::string content;
+        std::vector<XDTDAttribute> attributes;
+    };
+
     //
     // XNode structure.
     //
@@ -117,11 +118,10 @@ namespace H4
     struct XNodeEntityReference : XNode
     {
     public:
-        XNodeEntityReference(XNodeType nodeType = XNodeType::entity) : XNode(nodeType)
+        XNodeEntityReference(const XValue &value, XNodeType nodeType = XNodeType::entity) : XNode(nodeType), value(value)
         {
         }
-        std::string unparsed;
-        std::string parsed;
+        XValue value;
     };
     //
     // CDATA XNode
@@ -163,7 +163,7 @@ namespace H4
                 }
                 else if (node.get()->getNodeType() == XNodeType::entity)
                 {
-                    result += static_cast<XNodeEntityReference *>(node.get())->parsed;
+                    result += static_cast<XNodeEntityReference *>(node.get())->value.parsed;
                 }
                 else if (node.get()->getNodeType() == XNodeType::cdata)
                 {
