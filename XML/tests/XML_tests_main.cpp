@@ -110,10 +110,10 @@ void verifyCRLFCount(XML::ISource &xmlSource, long lfFinal, long crFinal)
   {
     switch (xmlSource.current())
     {
-    case 0x0A:
+    case kLineFeed:
       lfCount++;
       break;
-    case 0x0D:
+    case kCarriageReturn:
       crCount++;
       break;
     }

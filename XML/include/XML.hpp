@@ -30,6 +30,11 @@ namespace H4
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
         //
+        // XML character constants
+        //
+        #define kCarriageReturn 0x0D
+        #define kLineFeed 0x0A
+        //
         // XML syntax error.
         //
         class ISource;
@@ -92,7 +97,7 @@ namespace H4
             {
                 return (m_UTF8.to_bytes(from));
             }
-            std::string to_bytes(const XChar from)
+            std::string to_bytes(const XChar &from)
             {
                 return (m_UTF8.to_bytes(from));
             }

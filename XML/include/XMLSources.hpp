@@ -56,7 +56,7 @@ namespace H4
             }
             m_bufferPosition++;
             m_column++;
-            if (current() == 0x0A)
+            if (current() == kLineFeed)
             {
                 m_lineNo++;
                 m_column = 1;
@@ -101,10 +101,10 @@ namespace H4
             {
                 throw std::runtime_error("XML file input stream failed to open or does not exist.");
             }
-            if (current() == 0x0D)
+            if (current() == kCarriageReturn)
             {
                 m_source.get();
-                if (current() != 0x0A)
+                if (current() != kLineFeed)
                 {
                     m_source.unget();
                 }
@@ -121,16 +121,16 @@ namespace H4
                 throw std::runtime_error("Parse buffer empty before parse complete.");
             }
             m_source.get();
-            if (current() == 0x0D)
+            if (current() == kCarriageReturn)
             {
                 m_source.get();
-                if (current() != 0x0A)
+                if (current() != kLineFeed)
                 {
                     m_source.unget();
                 }
             }
             m_column++;
-            if (current() == 0x0A)
+            if (current() == kLineFeed)
             {
                 m_lineNo++;
                 m_column = 1;

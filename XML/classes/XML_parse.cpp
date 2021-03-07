@@ -44,7 +44,7 @@ namespace H4
     {
         while (source.more() && std::iswspace(source.current()))
         {
-            if (source.current() == 0x0A) 
+            if (source.current() == kLineFeed) 
             {
                 break;
             }
@@ -268,10 +268,10 @@ namespace H4
             {
                 parseDTD(source, xNodeProlog);
             }
-            else if (source.current() == 0x0A)
+            else if (source.current() == kLineFeed)
             {
                 XNodeContent linefeed;
-                linefeed.content += 0x0A;
+                linefeed.content += kLineFeed;
                 xNodeProlog->elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
                 source.next();
             }
@@ -375,10 +375,10 @@ namespace H4
             source.next();
             xNodeProlog.elements.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
             parseElement(source, static_cast<XNodeElement *>(xNodeProlog.elements.back().get()));
-            if (source.current() == 0x0A)
+            if (source.current() == kLineFeed)
             {
                 XNodeContent linefeed;
-                linefeed.content += 0x0A;
+                linefeed.content += kLineFeed;
                 xNodeProlog.elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
             }
         }

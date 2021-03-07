@@ -44,7 +44,7 @@ TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
         std::unique_ptr<XNode> xNodeRoot = xml.parse(xmlSource);
         BufferDestination xmlDestination;
         std::string actual = xml.stringify(xNodeRoot);
-        REQUIRE(actual.back() == 0x0A);
+        REQUIRE(actual.back() == kLineFeed);
     }
     SECTION("Stringify XML UTF-16 declaration with prolog containing new lines.", "[XML][Stringify]")
     {

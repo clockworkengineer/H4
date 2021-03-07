@@ -45,8 +45,8 @@ namespace H4
     bool XML::validChar(XChar ch)
     {
         return ((ch == 0x09) ||
-                (ch == 0x0A) ||
-                (ch == 0x0D) ||
+                (ch == kLineFeed) ||
+                (ch == kCarriageReturn) ||
                 (ch >= 0x20 && ch <= 0xD7FF) ||
                 (ch >= 0xE000 && ch <= 0xFFFD) ||
                 (ch >= 0x10000 && ch <= 0x10FFFF));
