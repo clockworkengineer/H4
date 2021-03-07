@@ -88,10 +88,24 @@ namespace H4
             {
                 return (m_column);
             }
+            std::string to_bytes(const XString &from)
+            {
+                return (m_UTF8.to_bytes(from));
+            }
+            std::string to_bytes(const XChar from)
+            {
+                return (m_UTF8.to_bytes(from));
+            }
+            XString from_bytes(const std::string &from)
+            {
+                return (m_UTF8.from_bytes(from));
+            }
 
         protected:
             long m_lineNo = 1;
             long m_column = 1;
+            std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
+            std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         };
         //
         // Destination interface
@@ -133,6 +147,7 @@ namespace H4
         long parseCharacterReference(ISource &xmlSource, XString reference);
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
         void addNamespacesToList(XNodeElement *XNodeElement);
+        void moveToNextLineFeed(ISource &source);
         bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
         bool validNameChar(XChar c);
@@ -169,7 +184,6 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        static std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         static XAttribute m_defaultAtributes[3];
         static std::set<XString> m_dtdAttrListTypes;
         std::unordered_map<XString, XString> m_entityMapping;

@@ -85,8 +85,6 @@ namespace H4
                 pos = xmlString.find(U"\x0D\x0A", pos + 1);
             }
         }
-        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
-        std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         long m_bufferPosition = 0;
         XString m_parseBuffer;
     };

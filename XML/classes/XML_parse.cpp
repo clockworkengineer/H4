@@ -40,6 +40,17 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    void XML::moveToNextLineFeed(ISource &source)
+    {
+        while (source.more() && std::iswspace(source.current()))
+        {
+            if (source.current() == 0x0A) 
+            {
+                break;
+            }
+            source.next();
+        }
+    }
     void XML::addCurrentXNodeContent(XNodeElement *xNodeElement)
     {
         if (!xNodeElement->content.empty())
@@ -53,16 +64,16 @@ namespace H4
     long XML::parseCharacterReference(ISource &source, XString reference)
     {
         char *end;
-        long temp = 10;
+        long result = 10;
         if (reference[0] == 'x')
         {
             reference = reference.substr(1);
-            temp = 16;
+            result = 16;
         }
-        temp = std::strtol(XML::m_UTF8.to_bytes(reference).c_str(), &end, temp);
+        result = std::strtol(source.to_bytes(reference).c_str(), &end, result);
         if (*end == '\0')
         {
-            return (temp);
+            return (result);
         }
         throw SyntaxError(source, "Cannot convert character reference.");
     }
@@ -81,7 +92,7 @@ namespace H4
         source.next();
         if (unparsedEntityReference[1] == '#')
         {
-            parsedEntityReference = XString(1, parseCharacterReference(source, unparsedEntityReference.substr(2, unparsedEntityReference.size()-3)));
+            parsedEntityReference = XString(1, parseCharacterReference(source, unparsedEntityReference.substr(2, unparsedEntityReference.size() - 3)));
         }
         else if (m_entityMapping.count(unparsedEntityReference) > 0)
         {
@@ -98,8 +109,8 @@ namespace H4
                 throw SyntaxError(source, "Invalid character value encountered.");
             }
         }
-        entityReference.unparsed = m_UTF8.to_bytes(unparsedEntityReference);
-        entityReference.parsed = m_UTF8.to_bytes(parsedEntityReference);
+        entityReference.unparsed = source.to_bytes(unparsedEntityReference);
+        entityReference.parsed = source.to_bytes(parsedEntityReference);
         return (entityReference);
     }
     XValue XML::parseCharacter(ISource &source)
@@ -107,13 +118,11 @@ namespace H4
         XValue character;
         if (source.current() == '&')
         {
-
             character = parseReferenceOrEntity(source);
         }
         else if (validChar(source.current()))
         {
-            character.unparsed = "";
-            character.parsed = m_UTF8.to_bytes(source.current());
+            character.parsed = source.to_bytes(source.current());
             source.next();
         }
         else
@@ -161,7 +170,7 @@ namespace H4
         {
             throw SyntaxError(source, "Invalid name encountered.");
         }
-        return (XML::m_UTF8.to_bytes(name));
+        return (source.to_bytes(name));
     }
     void XML::parseTagName(ISource &source, XNodeElement *xNodeElement)
     {
@@ -172,7 +181,7 @@ namespace H4
         XNodeComment xNodeComment;
         while (source.more() && !source.match(U"--"))
         {
-            xNodeComment.comment += XML::m_UTF8.to_bytes(source.current());
+            xNodeComment.comment += source.to_bytes(source.current());
             source.next();
         }
         if (source.current() != '>')
@@ -188,7 +197,7 @@ namespace H4
         xNodePI.name = parseName(source);
         while (source.more() && !source.match(U"?>"))
         {
-            xNodePI.parameters += XML::m_UTF8.to_bytes(source.current());
+            xNodePI.parameters += source.to_bytes(source.current());
             source.next();
         }
         xNodeElement->elements.emplace_back(std::make_unique<XNodePI>(xNodePI));
@@ -202,7 +211,7 @@ namespace H4
             {
                 throw SyntaxError(source);
             }
-            xNodeCDATA.cdata += XML::m_UTF8.to_bytes(source.current());
+            xNodeCDATA.cdata += source.to_bytes(source.current());
             source.next();
         }
         xNodeElement->elements.emplace_back(std::make_unique<XNodeCDATA>(xNodeCDATA));
@@ -244,21 +253,7 @@ namespace H4
                 throw SyntaxError(source, "Declaration invalid or end tag not found.");
             }
         }
-        else
-        {
-            for (auto attr : XML::m_defaultAtributes)
-            {
-                xNodeProlog->attributes.emplace_back(attr.name, attr.value);
-            }
-        }
-        while (source.more() && std::iswspace(source.current()))
-        {
-            if (source.current() == 0x0A)
-            {
-                break;
-            }
-            source.next();
-        }
+        moveToNextLineFeed(source);
         while (source.more())
         {
             if (source.match(U"<!--"))
@@ -284,14 +279,7 @@ namespace H4
             {
                 break;
             }
-            while (source.more() && std::iswspace(source.current()))
-            {
-                if (source.current() == 0x0A)
-                {
-                    break;
-                }
-                source.next();
-            }
+            moveToNextLineFeed(source);
         }
     }
     void XML::parseChildElement(ISource &source, XNodeElement *xNodeElement)
@@ -362,7 +350,7 @@ namespace H4
         parseAttributes(source, xNodeElement);
         if (source.match(U">"))
         {
-            XString closingTag = U"</" + XML::m_UTF8.from_bytes(xNodeElement->name) + U">";
+            XString closingTag = U"</" + source.from_bytes(xNodeElement->name) + U">";
             while (source.more() && !source.match(closingTag))
             {
                 parseElementContents(source, xNodeElement);
