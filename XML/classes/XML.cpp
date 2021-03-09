@@ -83,7 +83,6 @@ namespace H4
     {
         return (parseXML(xmlSource));
     }
-
     std::string XML::stringify(std::unique_ptr<XNode> &xNodeRoot)
     {
         return(stringifyXML(xNodeRoot.get()));

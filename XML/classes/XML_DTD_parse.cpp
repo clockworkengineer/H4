@@ -71,7 +71,7 @@ namespace H4
             }
             else
             {
-                throw SyntaxError(source);
+                throw SyntaxError(source, "Invalid attribute type specified.");
             }
         }
         source.ignoreWS();
@@ -183,11 +183,11 @@ namespace H4
         }
         else
         {
-            throw SyntaxError(source);
+            throw SyntaxError(source, "Invalid external DTD specifier.");
         }
         if (source.current() != '>')
         {
-            throw SyntaxError(source);
+            throw SyntaxError(source, "Missing terminator '>'.");
         }
         source.next();
         source.ignoreWS();
@@ -216,11 +216,11 @@ namespace H4
             }
             else
             {
-                throw SyntaxError(source);
+                throw SyntaxError(source, "Invalid DTD description.");
             }
             if (source.current() != '>')
             {
-                throw SyntaxError(source);
+                throw SyntaxError(source, "Missing '>' terminator.");
             }
             source.next();
             source.ignoreWS();
@@ -228,7 +228,7 @@ namespace H4
     }
     void XML::parseDTD(ISource &source, XNodeElement *xNodeElement)
     {
-        // We take the easy option for allowing a DTD to be strinfyed 
+        // We take the easy option for allowing a DTD to be stringifyed 
         // and keeping the correct order for its components by storing it
         // in its raw unparsed form.
         XNodeDTD xNodeDTD;

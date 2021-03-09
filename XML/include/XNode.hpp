@@ -24,10 +24,6 @@ namespace H4
     struct XValue
     {
     public:
-        XValue() {}
-        XValue(const std::string &unparsed, const std::string &parsed) : unparsed(unparsed), parsed(parsed)
-        {
-        }
         std::string unparsed;
         std::string parsed;
     };
@@ -45,7 +41,7 @@ namespace H4
         XValue value;
     };
     //
-    // DTD element definition
+    // XML DTD attribute definition
     //
     struct XDTDAttribute
     {
@@ -53,6 +49,9 @@ namespace H4
         std::string type;
         std::string value;
     };
+    //
+    // XML DTD element definition
+    //
     struct XDTDElement
     {
         XDTDElement() {}
@@ -61,9 +60,8 @@ namespace H4
         std::string content;
         std::vector<XDTDAttribute> attributes;
     };
-
     //
-    // XNode structure.
+    // XML XNode structure
     //
     enum XNodeType
     {
@@ -184,7 +182,6 @@ namespace H4
         }
         std::string comment;
     };
-
     //
     // PI XNode
     //
@@ -221,6 +218,9 @@ namespace H4
     {
         return (static_cast<T &>(xNode));
     }
+    //
+    // XNode index access
+    //
     inline XNode &XNode::operator[](int index) // Array
     {
         if (nodeType <= XNodeType::element)
@@ -232,6 +232,5 @@ namespace H4
         }
         throw std::runtime_error("Invalid index used to access array.");
     }
-
 } // namespace H4
 #endif /* XNODE_HPP */
