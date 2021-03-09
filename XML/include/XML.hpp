@@ -64,6 +64,8 @@ namespace H4
             virtual void next() = 0;
             virtual bool more() = 0;
             virtual void backup(long length) = 0;
+            virtual long position() = 0;
+            virtual std::string getRange(long start, long end) = 0;
             void ignoreWS()
             {
                 while (more() && std::iswspace(current()))

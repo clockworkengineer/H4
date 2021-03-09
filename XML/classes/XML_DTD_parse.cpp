@@ -45,7 +45,7 @@ namespace H4
     std::string XML::parseDTDValue(ISource &source)
     {
         auto value = parseValue(source);
-        return(value.parsed);
+        return (value.parsed);
     }
     std::string XML::parseDTDAttributeType(ISource &source)
     {
@@ -229,6 +229,7 @@ namespace H4
     void XML::parseDTD(ISource &source, XNodeElement *xNodeElement)
     {
         XNodeDTD xNodeDTD;
+        long start = source.position();
         source.ignoreWS();
         xNodeDTD.name = parseName(source);
         if (source.current() == '[')
@@ -239,6 +240,7 @@ namespace H4
         {
             parseDTDExternal(source, &xNodeDTD);
         }
+        xNodeDTD.unparsed += "<!DOCTYPE" + source.getRange(start, source.position());
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
     }
 } // namespace H4

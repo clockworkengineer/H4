@@ -114,6 +114,12 @@ namespace H4
             xmlResult += "<![CDATA[" + xNodeCDATA->cdata + "]]>";
             break;
         }
+        case XNodeType::dtd:
+        {
+            XNodeDTD *xNodeDTD = static_cast<XNodeDTD *>(xNode);
+            xmlResult += xNodeDTD->unparsed;
+            break;
+        }
         default:
             break;
         }

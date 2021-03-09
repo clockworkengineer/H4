@@ -74,6 +74,14 @@ namespace H4
                 m_bufferPosition = 0;
             }
         }
+        virtual long position()
+        {
+            return (m_bufferPosition);
+        }
+        virtual std::string getRange(long start, long end)
+        {
+            return (m_UTF8.to_bytes(m_parseBuffer.substr(start, end-start)));
+        }
 
     private:
         void convertCRLFToLF(XString &xmlString)
@@ -151,6 +159,16 @@ namespace H4
             {
                 m_source.seekg(0, std::ios_base::beg);
             }
+        }
+
+        virtual long position()
+        {
+            return (m_source.tellg());
+        }
+        virtual std::string getRange(long /*start*/, long /*end*/)
+        {
+          //  return (m_UTF8.to_bytes(m_parseBuffer.substr(start, end)));
+          return("");
         }
 
     private:

@@ -211,6 +211,7 @@ namespace H4
         std::unordered_map<std::string, XAttribute> notations;
         std::unordered_map<std::string, XDTDElement> elements;
         std::unordered_map<std::string, std::string> entityMapping;
+        std::string unparsed;
     };
     //
     // Convert base XNode reference
