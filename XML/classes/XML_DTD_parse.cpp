@@ -228,6 +228,9 @@ namespace H4
     }
     void XML::parseDTD(ISource &source, XNodeElement *xNodeElement)
     {
+        // We take the easy option for allowing a DTD to be strinfyed 
+        // and keeping the correct order for its components by storing it
+        // in its raw unparsed form.
         XNodeDTD xNodeDTD;
         long start = source.position();
         source.ignoreWS();
@@ -240,7 +243,8 @@ namespace H4
         {
             parseDTDExternal(source, &xNodeDTD);
         }
-        xNodeDTD.unparsed += "<!DOCTYPE" + source.getRange(start, source.position());
+        // Save away unparsed form
+        xNodeDTD.unparsed = "<!DOCTYPE" + source.getRange(start, source.position());
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
     }
 } // namespace H4

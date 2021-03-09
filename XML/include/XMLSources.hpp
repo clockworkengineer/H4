@@ -74,13 +74,13 @@ namespace H4
                 m_bufferPosition = 0;
             }
         }
-        virtual long position()
+        long position()
         {
             return (m_bufferPosition);
         }
-        virtual std::string getRange(long start, long end)
+        std::string getRange(long start, long end)
         {
-            return (m_UTF8.to_bytes(m_parseBuffer.substr(start, end-start)));
+            return (m_UTF8.to_bytes(m_parseBuffer.substr(start, end - start)));
         }
 
     private:
@@ -160,15 +160,18 @@ namespace H4
                 m_source.seekg(0, std::ios_base::beg);
             }
         }
-
-        virtual long position()
+        long position()
         {
             return (m_source.tellg());
         }
-        virtual std::string getRange(long /*start*/, long /*end*/)
+        std::string getRange(long start, long end)
         {
-          //  return (m_UTF8.to_bytes(m_parseBuffer.substr(start, end)));
-          return("");
+            std::string rangeBuffer(end - start, ' ');
+            long currentPosition = (long)m_source.tellg();
+            m_source.seekg(start, std::ios_base::beg);
+            m_source.read(&rangeBuffer[0], end - start);
+            m_source.seekg(currentPosition, std::ios_base::beg);
+            return (rangeBuffer);
         }
 
     private:
