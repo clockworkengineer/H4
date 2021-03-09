@@ -214,9 +214,16 @@ namespace H4
             {
                 parseDTDNotation(source, xNodeDTD);
             }
+            else if (source.match(U"<--"))
+            {
+                while (source.more() && !source.match(U"--"))
+                {
+                    source.next();
+                }
+            }
             else
             {
-                throw SyntaxError(source, "Invalid DTD description.");
+                throw SyntaxError(source, "Invalid DTD tag.");
             }
             if (source.current() != '>')
             {
@@ -228,7 +235,7 @@ namespace H4
     }
     void XML::parseDTD(ISource &source, XNodeElement *xNodeElement)
     {
-        // We take the easy option for allowing a DTD to be stringifyed 
+        // We take the easy option for allowing a DTD to be stringifyed
         // and keeping the correct order for its components by storing it
         // in its raw unparsed form.
         XNodeDTD xNodeDTD;
