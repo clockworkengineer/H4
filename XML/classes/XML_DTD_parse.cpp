@@ -192,6 +192,13 @@ namespace H4
         source.next();
         source.ignoreWS();
     }
+    void XML::parseDTDComment(ISource &source, XNodeDTD */*xNodeDTD*/)
+    {
+        while (source.more() && !source.match(U"--"))
+        {
+            source.next();
+        }
+    }
     void XML::parseDTDInternal(ISource &source, XNodeDTD *xNodeDTD)
     {
         source.next();
@@ -216,10 +223,7 @@ namespace H4
             }
             else if (source.match(U"<--"))
             {
-                while (source.more() && !source.match(U"--"))
-                {
-                    source.next();
-                }
+                parseDTDComment(source, xNodeDTD);
             }
             else
             {

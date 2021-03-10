@@ -340,7 +340,6 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["BMP"].name == "SYSTEM");
     REQUIRE(XNodeRef<XNodeDTD>((*xNodeRoot)[0]).notations["BMP"].value.parsed == "\"\"");
   }
-
   SECTION("XML with internal DTD containing comments.", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"

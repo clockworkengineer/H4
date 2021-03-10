@@ -26,14 +26,14 @@ namespace H4
     class XML
     {
     public:
-        // ==========================
-        // PUBLIC TYPES AND CONSTANTS
-        // ==========================
-        //
-        // XML character constants
-        //
-        #define kCarriageReturn 0x0D
-        #define kLineFeed 0x0A
+// ==========================
+// PUBLIC TYPES AND CONSTANTS
+// ==========================
+//
+// XML character constants
+//
+#define kCarriageReturn 0x0D
+#define kLineFeed 0x0A
         //
         // XML syntax error.
         //
@@ -169,6 +169,7 @@ namespace H4
         std::string parseDTDValue(ISource &source);
         std::string parseDTDAttributeType(ISource &xmlSource);
         std::string parseDTDAttributeValue(ISource &xmlSource);
+        void parseDTDComment(ISource &source, XNodeDTD *xNodeDTD);
         void parseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);
