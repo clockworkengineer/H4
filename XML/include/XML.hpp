@@ -15,6 +15,11 @@
 // XML XNodes
 //
 #include "XNode.hpp"
+//
+// XML character constants
+//
+#define kCarriageReturn 0x0D
+#define kLineFeed 0x0A
 // =========
 // NAMESPACE
 // =========
@@ -26,14 +31,9 @@ namespace H4
     class XML
     {
     public:
-// ==========================
-// PUBLIC TYPES AND CONSTANTS
-// ==========================
-//
-// XML character constants
-//
-#define kCarriageReturn 0x0D
-#define kLineFeed 0x0A
+        // ==========================
+        // PUBLIC TYPES AND CONSTANTS
+        // ==========================
         //
         // XML syntax error.
         //
@@ -55,7 +55,7 @@ namespace H4
             std::string errorMessage;
         };
         //
-        // Source interface
+        // Source Interface
         //
         class ISource
         {
@@ -122,6 +122,17 @@ namespace H4
         public:
             virtual void add(const std::string &bytes) = 0;
         };
+        //
+        // XObject
+        //
+        struct XMLObject
+        {
+            XMLObject()
+            {
+                xNodeRoot.setNodeType(XNodeType::prolog);
+            }
+            XNodeElement xNodeRoot;
+        };
         // ============
         // CONSTRUCTORS
         // ============
@@ -135,8 +146,8 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        std::unique_ptr<XNode> parse(ISource &xmlSource);
-        std::string stringify(std::unique_ptr<XNode> &xNodeRoot);
+        XMLObject parse(ISource &xmlSource);
+        std::string stringify(XMLObject &xmlObject);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -187,7 +198,7 @@ namespace H4
         void parseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
         void parseElement(ISource &xmlSource, XNodeElement *XNodeElement);
         void parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
-        std::unique_ptr<XNode> parseXML(ISource &xmlSource);
+        XMLObject parseXML(ISource &xmlSource);
         std::string stringifyXML(XNode *xNodeRoot);
         // =================
         // PRIVATE VARIABLES
@@ -196,5 +207,9 @@ namespace H4
         static std::set<XString> m_dtdAttrListTypes;
         std::unordered_map<XString, XString> m_entityMapping;
     };
+    //
+    // Shortcuts
+    //
+    using XMLObject = XML::XMLObject;
 } // namespace H4
 #endif /* XML_HPP */

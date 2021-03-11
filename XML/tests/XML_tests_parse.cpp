@@ -23,30 +23,30 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value.parsed == "no");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
   }
   SECTION("Parse version 1.0 encoding == UTF-8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
     xmlString="<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?> "
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value.parsed == "UTF-16");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value.parsed == "yes");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-16");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "yes");
   }
   SECTION("Parse version 1.1 encoding == UTF8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
     xmlString="<?xml version=\"1.0\" standalone=\"yes\"?>\n"
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value.parsed == "yes");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "yes");
   }
   SECTION("Check declaration contains at least version attribute.", "[XML][Parse][Declaration]")
   {
@@ -155,24 +155,24 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     xmlString="<?xml version=\"1.0\"?>\n"
                 "<contact-info></contact-info>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "contact-info");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "contact-info");
   }
   SECTION("Empty root element <AddressBook> ", "[XML][Parse][Root]")
   {
     xmlString="<?xml version=\"1.0\"?>\n"
                 "<AddressBook> </AddressBook>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "AddressBook");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
   }
   SECTION("Root element <AddressBook> and one child <Address> with contents ", "[XML][Parse][Root]")
   {
@@ -181,14 +181,14 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
                 "<Address>    This is some contents    </Address>\n"
                 "</AddressBook>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][1]).getContents() == "    This is some contents    ");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][1]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][1]).getContents() == "    This is some contents    ");
   }
   SECTION("Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
   {
@@ -205,18 +205,18 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
                 "</Address>\n"
                 "</AddressBook>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).elements.size() == 7);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][1]).getContents() == "\n    This is some contents 1   ");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][3]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][3]).getContents() == "\n    This is some contents 2   ");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][5]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][5]).getContents() == "\n    This is some contents 3   ");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).elements.size() == 7);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][1]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][1]).getContents() == "\n    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][3]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][3]).getContents() == "\n    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][5]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][5]).getContents() == "\n    This is some contents 3   ");
   }
 }
 TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
@@ -250,15 +250,15 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
                 "<AddressBook number='15'>\n"
                 "</AddressBook>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].name == "number");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].value.parsed == "15");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].value.parsed == "15");
   }
   SECTION("Root attribute with 3 attached attributes number, away, flat", "[XML][Parse][[Attributes]")
   {
@@ -266,19 +266,19 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
                 " <AddressBook number='15' away=\"yes\" flat='no'>\n"
                 " </AddressBook>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].name == "number");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].value.parsed == "15");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[1].name == "away");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[1].value.parsed == "yes");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[2].name == "flat");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[2].value.parsed == "no");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].value.parsed == "15");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[1].name == "away");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[1].value.parsed == "yes");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[2].name == "flat");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[2].value.parsed == "no");
   }
   SECTION("Empty elements with attributes are allowed.", "[XML][Parse][[Attributes]")
   {
@@ -331,21 +331,21 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "<Address>    This is some contents 3   </Address>\n"
                 "</AddressBook>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(*xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).elements.size() == 13);
-    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[1][1]).comment == "Address one ");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][3]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][3]).getContents() == "    This is some contents 1   ");
-    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[1][5]).comment == "Address two ");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][7]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][7]).getContents() == "    This is some contents 2   ");
-    REQUIRE(XNodeRef<XNodeComment>((*xNodeRoot)[1][9]).comment == "Address three ");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][11]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1][11]).getContents() == "    This is some contents 3   ");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).elements.size() == 13);
+    REQUIRE(XNodeRef<XNodeComment>((xmlObject.xNodeRoot)[1][1]).comment == "Address one ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][3]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][3]).getContents() == "    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeComment>((xmlObject.xNodeRoot)[1][5]).comment == "Address two ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][7]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][7]).getContents() == "    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeComment>((xmlObject.xNodeRoot)[1][9]).comment == "Address three ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][11]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][11]).getContents() == "    This is some contents 3   ");
   }
   SECTION("A single comment after root element", "[XML][Parse][[Comments]")
   {
@@ -372,8 +372,8 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "<root>Test<!-- a simple comment -->Test"
                 "</root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == "TestTest");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == "TestTest");
   }
   SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][[Comments]")
   {
@@ -381,8 +381,8 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "<root>Test  <!-- a simple comment -->  Test"
                 "</root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == "Test    Test");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == "Test    Test");
   }
   SECTION("A simple single line comment containing -- is illegal", "[XML][Parse][[Comments]")
   {
@@ -416,12 +416,12 @@ TEST_CASE("Parse XML with Unicode character in element names, attributes, commen
     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<俄语 լեզու=\"ռուսերեն\">данные</俄语>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).name == "俄语");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].name == "լեզու");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].value.parsed == "ռուսերեն");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == "данные");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "俄语");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].name == "լեզու");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].value.parsed == "ռուսերեն");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == "данные");
   }
 }
 TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][Entities]")
@@ -433,40 +433,40 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> "
                 "<root> &amp; </root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == " & ");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0]).getContents() == " & ");
   }
   SECTION("Parse entity &quot; in contents area", "[XML][Parse][Entities]")
   {
     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                 " <root> &quot; </root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == " \" ");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == " \" ");
   }
   SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Entities]")
   {
     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                 " <root> &apos; &lt; &gt; </root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == " ' < > ");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == " ' < > ");
   }
   SECTION("Parse reference &#x00A5; in contents area", "[XML][Parse][Entities]")
   {
     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                 " <root> &#x00A5; </root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == " ¥ ");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == " ¥ ");
   }
   SECTION("Parse reference &#163; in contents area", "[XML][Parse][Entities]")
   {
     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> "
                 "<root> &#163; </root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0]).getContents() == " £ ");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0]).getContents() == " £ ");
   }
   SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Entities]")
   {
@@ -474,20 +474,20 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 " <root attr1=\" &amp;&quot;&apos;&gt;&lt; \">\n"
                 "</root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].name == "attr1");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].value.parsed == " &\"'>< ");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].name == "attr1");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].value.parsed == " &\"'>< ");
   }
   SECTION("Parse references &#x00A5;&#163 in attribute value", "[XML][Parse][Entities]")
   {
     xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                 " <root attr1=\" &#x00A5;&#163; \"></root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].name == "attr1");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).attributes[0].value.parsed == " ¥£ ");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].name == "attr1");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].value.parsed == " ¥£ ");
   }
 }
 TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Parse][PI]")
@@ -525,10 +525,10 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
                 "<?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1]).getNodeType() == XNodeType::pi);
-    REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1]).name == "xml-stylesheet");
-    REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>((xmlObject.xNodeRoot)[1]).getNodeType() == XNodeType::pi);
+    REQUIRE(XNodeRef<XNodePI>((xmlObject.xNodeRoot)[1]).name == "xml-stylesheet");
+    REQUIRE(XNodeRef<XNodePI>((xmlObject.xNodeRoot)[1]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
   }
   SECTION("Parse XML containing PI in root section and check values", "[XML][Parse][PI]")
   {
@@ -536,10 +536,10 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
                 "<root><?xml-stylesheet href=\"tutorialspointstyle.css\" type=\"text/css\"?>\n"
                 "</root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNode>((*xNodeRoot)[1][0]).getNodeType() == XNodeType::pi);
-    REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1][0]).name == "xml-stylesheet");
-    REQUIRE(XNodeRef<XNodePI>((*xNodeRoot)[1][0]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>((xmlObject.xNodeRoot)[1][0]).getNodeType() == XNodeType::pi);
+    REQUIRE(XNodeRef<XNodePI>((xmlObject.xNodeRoot)[1][0]).name == "xml-stylesheet");
+    REQUIRE(XNodeRef<XNodePI>((xmlObject.xNodeRoot)[1][0]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
   }
 }
 TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
@@ -562,9 +562,9 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
                 "   <![CDATA[<message> Welcome to TutorialsPoint </message>]]>   "
                 "</root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[1]).getContents() == "\n   <message> Welcome to TutorialsPoint </message>   ");
-    REQUIRE(XNodeRef<XNodeCDATA>((*xNodeRoot)[1][1]).cdata == "<message> Welcome to TutorialsPoint </message>");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == "\n   <message> Welcome to TutorialsPoint </message>   ");
+    REQUIRE(XNodeRef<XNodeCDATA>((xmlObject.xNodeRoot)[1][1]).cdata == "<message> Welcome to TutorialsPoint </message>");
   }
   SECTION("Parse XML root containing CDDATA containing nested CDATA ", "[XML][Parse][CDATA]")
   {
@@ -620,15 +620,15 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
                 "</f:table>\n"
                 "</root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "h:table");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].name == "h");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).name == "f:table");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[0].name == "f");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[0].value.parsed == "https://www.w3schools.com/furniture");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).name == "h:table");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).name == "f:table");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[0].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[0].value.parsed == "https://www.w3schools.com/furniture");
   }
   SECTION("A root document and two namespaces defined in the root element.", "[XML][Parse][Namespace]")
   {
@@ -646,19 +646,19 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
                 "</f:table>\n"
                 "</root>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).name == "h:table");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces.size() == 2);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].name == "h");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[1].name == "f");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][1]).namespaces[1].value.parsed == "https://www.w3schools.com/furniture");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).name == "f:table");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces.size() == 2);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[0].name == "h");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[1].name == "f");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][3]).namespaces[1].value.parsed == "https://www.w3schools.com/furniture");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).name == "h:table");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[1].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[1].value.parsed == "https://www.w3schools.com/furniture");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).name == "f:table");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[1].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[1].value.parsed == "https://www.w3schools.com/furniture");
   }
   SECTION("A root document and two namespaces defined in the root element and non-existant namespace g for one of tables.", "[XML][Parse][Namespace]")
   {
@@ -673,11 +673,11 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
   {
     xmlString="<table xmlns=\"http://www.w3.org/TR/html4/\"><tr><td>Apples</td><td>Bananas</td></tr></table>\n";
     BufferSource xmlSource(xmlString);
-    std::unique_ptr<XNode> xNodeRoot=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).name == "tr");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].name == ":");
-    REQUIRE(XNodeRef<XNodeElement>((*xNodeRoot)[0][0]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
+    XMLObject xmlObject=xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][0]).name == "tr");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][0]).namespaces.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][0]).namespaces[0].name == ":");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][0]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
   }
   SECTION("A root document and two namespaces (the same name) defined in the root element.", "[XML][Parse][Namespace]")
   {

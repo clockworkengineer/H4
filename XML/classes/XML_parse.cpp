@@ -364,26 +364,26 @@ namespace H4
             throw SyntaxError(source, "Missing '/>' for closing tag.");
         }
     }
-    std::unique_ptr<XNode> XML::parseXML(ISource &source)
+    XMLObject XML::parseXML(ISource &source)
     {
-        XNodeElement xNodeProlog(XNodeType::prolog);
-        parseProlog(source, &xNodeProlog);
+        XMLObject xObject;
+        parseProlog(source, &xObject.xNodeRoot);
         if (source.current() == '<')
         {
             source.next();
-            xNodeProlog.elements.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
-            parseElement(source, static_cast<XNodeElement *>(xNodeProlog.elements.back().get()));
+            xObject.xNodeRoot.elements.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
+            parseElement(source, static_cast<XNodeElement *>(xObject.xNodeRoot.elements.back().get()));
             if (source.current() == kLineFeed)
             {
                 XNodeContent linefeed;
                 linefeed.content += kLineFeed;
-                xNodeProlog.elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
+                xObject.xNodeRoot.elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
             }
         }
         else
         {
             throw SyntaxError(source, "Missing declaration or root element.");
         }
-        return (std::make_unique<XNodeElement>(std::move(xNodeProlog)));
+        return (xObject);
     }
 } // namespace H4

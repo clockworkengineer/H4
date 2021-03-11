@@ -79,12 +79,12 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-    std::unique_ptr<XNode> XML::parse(ISource &xmlSource)
+    XMLObject XML::parse(ISource &xmlSource)
     {
         return (parseXML(xmlSource));
     }
-    std::string XML::stringify(std::unique_ptr<XNode> &xNodeRoot)
+    std::string XML::stringify(XMLObject &xmlObject)
     {
-        return(stringifyXML(xNodeRoot.get()));
+        return(stringifyXML(&xmlObject.xNodeRoot));
     }
 } // namespace H4
