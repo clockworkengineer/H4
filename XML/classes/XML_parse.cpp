@@ -367,17 +367,17 @@ namespace H4
     XMLObject XML::parseXML(ISource &source)
     {
         XMLObject xObject;
-        parseProlog(source, &xObject.xNodeRoot);
+        parseProlog(source, &xObject.prolog);
         if (source.current() == '<')
         {
             source.next();
-            xObject.xNodeRoot.elements.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
-            parseElement(source, static_cast<XNodeElement *>(xObject.xNodeRoot.elements.back().get()));
+            xObject.prolog.elements.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
+            parseElement(source, static_cast<XNodeElement *>(xObject.prolog.elements.back().get()));
             if (source.current() == kLineFeed)
             {
                 XNodeContent linefeed;
                 linefeed.content += kLineFeed;
-                xObject.xNodeRoot.elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
+                xObject.prolog.elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
             }
         }
         else

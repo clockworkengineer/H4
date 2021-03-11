@@ -85,6 +85,6 @@ namespace H4
     }
     std::string XML::stringify(XMLObject &xmlObject)
     {
-        return(stringifyXML(&xmlObject.xNodeRoot));
+        return(stringifyXML(&xmlObject.prolog));
     }
 } // namespace H4

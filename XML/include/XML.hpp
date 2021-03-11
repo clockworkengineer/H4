@@ -129,9 +129,9 @@ namespace H4
         {
             XMLObject()
             {
-                xNodeRoot.setNodeType(XNodeType::prolog);
+                prolog.setNodeType(XNodeType::prolog);
             }
-            XNodeElement xNodeRoot;
+            XNodeElement prolog;
         };
         // ============
         // CONSTRUCTORS

@@ -24,9 +24,9 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
   }
   SECTION("Parse version 1.0 encoding == UTF-8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
@@ -34,9 +34,9 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-16");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "yes");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-16");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "yes");
   }
   SECTION("Parse version 1.1 encoding == UTF8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
@@ -44,9 +44,9 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "yes");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "yes");
   }
   SECTION("Check declaration contains at least version attribute.", "[XML][Parse][Declaration]")
   {
@@ -156,11 +156,11 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
                 "<contact-info></contact-info>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "contact-info");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).name == "contact-info");
   }
   SECTION("Empty root element <AddressBook> ", "[XML][Parse][Root]")
   {
@@ -168,11 +168,11 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
                 "<AddressBook> </AddressBook>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).name == "AddressBook");
   }
   SECTION("Root element <AddressBook> and one child <Address> with contents ", "[XML][Parse][Root]")
   {
@@ -182,13 +182,13 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
                 "</AddressBook>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][1]).getContents() == "    This is some contents    ");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][1]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][1]).getContents() == "    This is some contents    ");
   }
   SECTION("Root element <AddressBook> with multiple sibling <Address> elements and contents ", "[XML][Parse][Root]")
   {
@@ -206,17 +206,17 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
                 "</AddressBook>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).elements.size() == 7);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][1]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][1]).getContents() == "\n    This is some contents 1   ");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][3]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][3]).getContents() == "\n    This is some contents 2   ");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][5]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][5]).getContents() == "\n    This is some contents 3   ");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).elements.size() == 7);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][1]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][1]).getContents() == "\n    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][3]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][3]).getContents() == "\n    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][5]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][5]).getContents() == "\n    This is some contents 3   ");
   }
 }
 TEST_CASE("Sample XML files to read and parse.", "[XML][Parse]")
@@ -251,14 +251,14 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
                 "</AddressBook>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].name == "number");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].value.parsed == "15");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[0].value.parsed == "15");
   }
   SECTION("Root attribute with 3 attached attributes number, away, flat", "[XML][Parse][[Attributes]")
   {
@@ -267,18 +267,18 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
                 " </AddressBook>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).elements.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].name == "number");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].value.parsed == "15");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[1].name == "away");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[1].value.parsed == "yes");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[2].name == "flat");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[0].value.parsed == "15");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[1].name == "away");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[1].value.parsed == "yes");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[2].name == "flat");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[2].value.parsed == "no");
   }
   SECTION("Empty elements with attributes are allowed.", "[XML][Parse][[Attributes]")
   {
@@ -332,20 +332,20 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "</AddressBook>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.xNodeRoot).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).elements.size() == 13);
-    REQUIRE(XNodeRef<XNodeComment>((xmlObject.xNodeRoot)[1][1]).comment == "Address one ");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][3]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][3]).getContents() == "    This is some contents 1   ");
-    REQUIRE(XNodeRef<XNodeComment>((xmlObject.xNodeRoot)[1][5]).comment == "Address two ");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][7]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][7]).getContents() == "    This is some contents 2   ");
-    REQUIRE(XNodeRef<XNodeComment>((xmlObject.xNodeRoot)[1][9]).comment == "Address three ");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][11]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1][11]).getContents() == "    This is some contents 3   ");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).name == "AddressBook");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).elements.size() == 13);
+    REQUIRE(XNodeRef<XNodeComment>((xmlObject.prolog)[1][1]).comment == "Address one ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][3]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][3]).getContents() == "    This is some contents 1   ");
+    REQUIRE(XNodeRef<XNodeComment>((xmlObject.prolog)[1][5]).comment == "Address two ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][7]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][7]).getContents() == "    This is some contents 2   ");
+    REQUIRE(XNodeRef<XNodeComment>((xmlObject.prolog)[1][9]).comment == "Address three ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][11]).name == "Address");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1][11]).getContents() == "    This is some contents 3   ");
   }
   SECTION("A single comment after root element", "[XML][Parse][[Comments]")
   {
@@ -373,7 +373,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == "TestTest");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).getContents() == "TestTest");
   }
   SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][[Comments]")
   {
@@ -382,7 +382,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == "Test    Test");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).getContents() == "Test    Test");
   }
   SECTION("A simple single line comment containing -- is illegal", "[XML][Parse][[Comments]")
   {
@@ -417,11 +417,11 @@ TEST_CASE("Parse XML with Unicode character in element names, attributes, commen
                 "<俄语 լեզու=\"ռուսերեն\">данные</俄语>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).name == "俄语");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].name == "լեզու");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].value.parsed == "ռուսերեն");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == "данные");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).name == "俄语");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[0].name == "լեզու");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[0].value.parsed == "ռուսերեն");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).getContents() == "данные");
   }
 }
 TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][Entities]")
@@ -434,7 +434,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 "<root> &amp; </root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0]).getContents() == " & ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0]).getContents() == " & ");
   }
   SECTION("Parse entity &quot; in contents area", "[XML][Parse][Entities]")
   {
@@ -442,7 +442,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 " <root> &quot; </root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == " \" ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).getContents() == " \" ");
   }
   SECTION("Parse entities &apos; &lt; &gt; in contents area", "[XML][Parse][Entities]")
   {
@@ -450,7 +450,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 " <root> &apos; &lt; &gt; </root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == " ' < > ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).getContents() == " ' < > ");
   }
   SECTION("Parse reference &#x00A5; in contents area", "[XML][Parse][Entities]")
   {
@@ -458,7 +458,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 " <root> &#x00A5; </root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == " ¥ ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).getContents() == " ¥ ");
   }
   SECTION("Parse reference &#163; in contents area", "[XML][Parse][Entities]")
   {
@@ -466,7 +466,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 "<root> &#163; </root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0]).getContents() == " £ ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0]).getContents() == " £ ");
   }
   SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Entities]")
   {
@@ -475,9 +475,9 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].name == "attr1");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].value.parsed == " &\"'>< ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[0].name == "attr1");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[0].value.parsed == " &\"'>< ");
   }
   SECTION("Parse references &#x00A5;&#163 in attribute value", "[XML][Parse][Entities]")
   {
@@ -485,9 +485,9 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
                 " <root attr1=\" &#x00A5;&#163; \"></root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].name == "attr1");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).attributes[0].value.parsed == " ¥£ ");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[0].name == "attr1");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).attributes[0].value.parsed == " ¥£ ");
   }
 }
 TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Parse][PI]")
@@ -526,9 +526,9 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNode>((xmlObject.xNodeRoot)[1]).getNodeType() == XNodeType::pi);
-    REQUIRE(XNodeRef<XNodePI>((xmlObject.xNodeRoot)[1]).name == "xml-stylesheet");
-    REQUIRE(XNodeRef<XNodePI>((xmlObject.xNodeRoot)[1]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
+    REQUIRE(XNodeRef<XNode>((xmlObject.prolog)[1]).getNodeType() == XNodeType::pi);
+    REQUIRE(XNodeRef<XNodePI>((xmlObject.prolog)[1]).name == "xml-stylesheet");
+    REQUIRE(XNodeRef<XNodePI>((xmlObject.prolog)[1]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
   }
   SECTION("Parse XML containing PI in root section and check values", "[XML][Parse][PI]")
   {
@@ -537,9 +537,9 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNode>((xmlObject.xNodeRoot)[1][0]).getNodeType() == XNodeType::pi);
-    REQUIRE(XNodeRef<XNodePI>((xmlObject.xNodeRoot)[1][0]).name == "xml-stylesheet");
-    REQUIRE(XNodeRef<XNodePI>((xmlObject.xNodeRoot)[1][0]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
+    REQUIRE(XNodeRef<XNode>((xmlObject.prolog)[1][0]).getNodeType() == XNodeType::pi);
+    REQUIRE(XNodeRef<XNodePI>((xmlObject.prolog)[1][0]).name == "xml-stylesheet");
+    REQUIRE(XNodeRef<XNodePI>((xmlObject.prolog)[1][0]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
   }
 }
 TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
@@ -563,8 +563,8 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[1]).getContents() == "\n   <message> Welcome to TutorialsPoint </message>   ");
-    REQUIRE(XNodeRef<XNodeCDATA>((xmlObject.xNodeRoot)[1][1]).cdata == "<message> Welcome to TutorialsPoint </message>");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[1]).getContents() == "\n   <message> Welcome to TutorialsPoint </message>   ");
+    REQUIRE(XNodeRef<XNodeCDATA>((xmlObject.prolog)[1][1]).cdata == "<message> Welcome to TutorialsPoint </message>");
   }
   SECTION("Parse XML root containing CDDATA containing nested CDATA ", "[XML][Parse][CDATA]")
   {
@@ -621,14 +621,14 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).name == "h:table");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[0].name == "h");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).name == "f:table");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[0].name == "f");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[0].value.parsed == "https://www.w3schools.com/furniture");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][1]).name == "h:table");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][1]).namespaces.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][1]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][1]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][3]).namespaces.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][3]).name == "f:table");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][3]).namespaces[0].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][3]).namespaces[0].value.parsed == "https://www.w3schools.com/furniture");
   }
   SECTION("A root document and two namespaces defined in the root element.", "[XML][Parse][Namespace]")
   {
@@ -647,18 +647,18 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).name == "h:table");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces.size() == 2);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[0].name == "h");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[1].name == "f");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][1]).namespaces[1].value.parsed == "https://www.w3schools.com/furniture");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).name == "f:table");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces.size() == 2);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[0].name == "h");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[1].name == "f");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][3]).namespaces[1].value.parsed == "https://www.w3schools.com/furniture");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][1]).name == "h:table");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][1]).namespaces.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][1]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][1]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][1]).namespaces[1].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][1]).namespaces[1].value.parsed == "https://www.w3schools.com/furniture");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][3]).name == "f:table");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][3]).namespaces.size() == 2);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][3]).namespaces[0].name == "h");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][3]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][3]).namespaces[1].name == "f");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][3]).namespaces[1].value.parsed == "https://www.w3schools.com/furniture");
   }
   SECTION("A root document and two namespaces defined in the root element and non-existant namespace g for one of tables.", "[XML][Parse][Namespace]")
   {
@@ -674,10 +674,10 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
     xmlString="<table xmlns=\"http://www.w3.org/TR/html4/\"><tr><td>Apples</td><td>Bananas</td></tr></table>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject=xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][0]).name == "tr");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][0]).namespaces.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][0]).namespaces[0].name == ":");
-    REQUIRE(XNodeRef<XNodeElement>((xmlObject.xNodeRoot)[0][0]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][0]).name == "tr");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][0]).namespaces.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][0]).namespaces[0].name == ":");
+    REQUIRE(XNodeRef<XNodeElement>((xmlObject.prolog)[0][0]).namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
   }
   SECTION("A root document and two namespaces (the same name) defined in the root element.", "[XML][Parse][Namespace]")
   {

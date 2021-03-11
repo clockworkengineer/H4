@@ -95,6 +95,7 @@ namespace H4
             this->nodeType = nodeType;
         }
         XNode &operator[](int index);
+        XNode &operator[](const std::string &name);
 
     private:
         XNodeType nodeType;
@@ -228,6 +229,21 @@ namespace H4
             if ((index >= 0) && (index < ((int)XNodeRef<XNodeElement>(*this).elements.size())))
             {
                 return (*((XNodeRef<XNodeElement>(*this).elements[index].get())));
+            }
+        }
+        throw std::runtime_error("Invalid index used to access array.");
+    }
+    //
+    // XNode name access
+    //
+    inline XNode &XNode::operator[](const std::string &name) // Array
+    {
+        if (nodeType <= XNodeType::element)
+        {
+            for (auto &element : XNodeRef<XNodeElement>(*this).elements) {
+                if (XNodeRef<XNodeElement>(*element).name==name) {
+                    return(*element);
+                }
             }
         }
         throw std::runtime_error("Invalid index used to access array.");
