@@ -1,7 +1,11 @@
 //
 // Class: XML
 //
-// Description:
+// Description: Parse XML into an XMLObject (generating an exception 
+// if it is found not to be wellformed XML) so that it can be manipulated,
+// interrogated and saved back to a text form. For more information on the
+// XML standard check out https://www.w3.org/TR/REC-xml/.
+//                 
 // Dependencies:   C20++ - Language standard features used.
 //
 // =================
@@ -59,22 +63,6 @@ namespace H4
              U"ENTITIES",
              U"NOTATION",
              U"ID"});
-    }
-    bool XML::isAttributePresent(std::vector<XAttribute> attributes, const std::string &name)
-    {
-        return (std::find_if(attributes.rbegin(), attributes.rend(),
-                             [&name](const XAttribute &attr) { return (attr.name == name); }) != attributes.rend());
-    }
-    void XML::addNamespacesToList(XNodeElement *XNodeElement)
-    {
-        for (auto attribute : XNodeElement->attributes)
-        {
-            if (attribute.name.starts_with("xmlns"))
-            {
-                attribute.name = (attribute.name.size() > 5) ? attribute.name.substr(6) : ":";
-                XNodeElement->namespaces.emplace_back(attribute);
-            }
-        }
     }
     // ==============
     // PUBLIC METHODS

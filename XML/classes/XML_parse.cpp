@@ -40,11 +40,16 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    bool XML::isAttributePresent(std::vector<XAttribute> attributes, const std::string &name)
+    {
+        return (std::find_if(attributes.rbegin(), attributes.rend(),
+                             [&name](const XAttribute &attr) { return (attr.name == name); }) != attributes.rend());
+    }
     void XML::moveToNextLineFeed(ISource &source)
     {
         while (source.more() && std::iswspace(source.current()))
         {
-            if (source.current() == kLineFeed) 
+            if (source.current() == kLineFeed)
             {
                 break;
             }
@@ -239,7 +244,14 @@ namespace H4
                 throw SyntaxError(source, "Attribute defined more than once within start tag.");
             }
         }
-        addNamespacesToList(xNodeElement);
+        for (auto attribute : xNodeElement->attributes)
+        {
+            if (attribute.name.starts_with("xmlns"))
+            {
+                attribute.name = (attribute.name.size() > 5) ? attribute.name.substr(6) : ":";
+                xNodeElement->namespaces.emplace_back(attribute);
+            }
+        }
     }
     void XML::parseProlog(ISource &source, XNodeElement *xNodeProlog)
     {

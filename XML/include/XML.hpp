@@ -160,9 +160,7 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void initialiseTables();
-        long parseCharacterReference(ISource &xmlSource, XString reference);
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
-        void addNamespacesToList(XNodeElement *XNodeElement);
         void moveToNextLineFeed(ISource &source);
         bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
@@ -172,6 +170,7 @@ namespace H4
         bool validReservedName(const XString &name);
         void addCurrentXNodeContent(XNodeElement *xNodeElement);
         std::string parseName(ISource &xmlSource);
+        long parseCharacterReference(ISource &xmlSource, XString reference);
         XValue parseValue(ISource &xmlSource);
         XValue parseCharacter(ISource &source);
         XValue parseReferenceOrEntity(ISource &source);
