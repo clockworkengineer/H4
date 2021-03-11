@@ -50,7 +50,6 @@ namespace H4
             {
                 return (errorMessage.c_str());
             }
-
         private:
             std::string errorMessage;
         };
@@ -107,7 +106,6 @@ namespace H4
             {
                 return (m_UTF8.from_bytes(from));
             }
-
         protected:
             long m_lineNo = 1;
             long m_column = 1;
