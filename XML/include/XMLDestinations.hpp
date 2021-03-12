@@ -20,13 +20,13 @@ namespace H4
                 m_stringifyBuffer.push_back(b);
             }
         }
-        XString getBuffer()
+        std::string getBuffer()
         {
             return (m_stringifyBuffer);
         }
 
     private:
-        XString m_stringifyBuffer;
+        std::string m_stringifyBuffer;
     };
     class FileDestination : public XML::IDestination
     {

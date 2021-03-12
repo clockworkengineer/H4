@@ -86,8 +86,8 @@ namespace H4
     /// </summary>
     /// <param name="xmlObject">XML object to create text for.</param>
     /// <returns>XML text for XMLObject.</returns>
-    std::string XML::stringify(XMLObject &xmlObject)
+    void XML::stringify(XMLObject &xmlObject, IDestination &xmlDestination)
     {
-        return (stringifyXML(&xmlObject.prolog));
+        stringifyXML(&xmlObject.prolog, xmlDestination);
     }
 } // namespace H4

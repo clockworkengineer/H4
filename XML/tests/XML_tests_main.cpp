@@ -572,7 +572,7 @@ TEST_CASE("Creation and use of IDestination (Buffer) interface.", "[XML][Parse][
     BufferDestination buffer;
     buffer.add("65767");
     REQUIRE(buffer.getBuffer().size() == 5);
-    REQUIRE(buffer.getBuffer() == (U"65767"));
+    REQUIRE(buffer.getBuffer() == ("65767"));
   }
 }
 TEST_CASE("Creation and use of IDestination (File) interface.", "[XML][Parse][FileDestination]")

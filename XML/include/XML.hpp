@@ -145,7 +145,7 @@ namespace H4
         // PUBLIC METHODS
         // ==============
         XMLObject parse(ISource &xmlSource);
-        std::string stringify(XMLObject &xmlObject);
+        void stringify(XMLObject &xmlObject, IDestination &xmlDestination);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -196,7 +196,7 @@ namespace H4
         void parseElement(ISource &xmlSource, XNodeElement *XNodeElement);
         void parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
         XMLObject parseXML(ISource &xmlSource);
-        std::string stringifyXML(XNode *xNodeRoot);
+        void stringifyXML(XNode *xNodeRoot, IDestination &xmlDestination);
         // =================
         // PRIVATE VARIABLES
         // =================
