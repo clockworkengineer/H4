@@ -14,14 +14,7 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-void checkStringify(XML &xml, const std::string &xmlString)
-{
-    BufferSource xmlSource(xmlString);
-    XMLObject xmlObject = xml.parse(xmlSource);
-    BufferDestination xmlDestination;
-    xml.stringify(xmlObject, xmlDestination);
-    REQUIRE(xmlDestination.getBuffer() == xmlString);
-}
+
 TEST_CASE("Use XML to stringify previously parsed XML.", "[XML][Stringify")
 {
     XML xml;

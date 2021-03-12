@@ -122,6 +122,18 @@ void verifyCRLFCount(XML::ISource &xmlSource, long lfFinal, long crFinal)
   REQUIRE(lfCount == lfFinal);
   REQUIRE(crCount == crFinal);
 }
+/// <summary>
+/// </summary>
+/// <param name=""></param>
+/// <returns></returns>
+void checkStringify(XML &xml, const std::string &xmlString)
+{
+  BufferSource xmlSource(xmlString);
+  XMLObject xmlObject = xml.parse(xmlSource);
+  BufferDestination xmlDestination;
+  xml.stringify(xmlObject, xmlDestination);
+  REQUIRE(xmlDestination.getBuffer() == xmlString);
+}
 // ==========
 // Test cases
 // ==========

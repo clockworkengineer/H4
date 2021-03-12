@@ -34,7 +34,7 @@ namespace H4
     // ==========================
     // ========================
     // PRIVATE STATIC VARIABLES
-    // ========================;
+    // ========================
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -87,10 +87,10 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Parse a character reference returning its value.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="xmlSource">Source stream.</param>
+    /// <returns>Character reference value.</returns>
     long XML::parseCharacterReference(ISource &xmlSource, XString reference)
     {
         char *end;
@@ -108,10 +108,10 @@ namespace H4
         throw SyntaxError(xmlSource, "Cannot convert character reference.");
     }
     /// <summary>
-    ///
+    /// Parse XML string value representing a character reference or entity.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="xmlSource">Source stream.</param>
+    /// <returns>Value for reference or enity.</returns>
     XValue XML::parseReferenceOrEntity(ISource &xmlSource)
     {
         XValue entityReference;
