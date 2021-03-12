@@ -1,11 +1,11 @@
 //
 // Class: XML
 //
-// Description: Parse XML into an XMLObject (generating an exception 
+// Description: Parse XML into an XMLObject (generating an exception
 // if it is found not to be wellformed XML) so that it can be manipulated,
 // interrogated and saved back to a text form. For more information on the
 // XML standard check out https://www.w3.org/TR/REC-xml/.
-//                 
+//
 // Dependencies:   C20++ - Language standard features used.
 //
 // =================
@@ -44,6 +44,11 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    /// <summary>
+    /// Intialise internal tables used by  XML parser.
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     void XML::initialiseTables()
     {
         // Default entity mappings
@@ -67,12 +72,22 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
+    /// <summary>
+    /// Parse XML read from xmlSource.
+    /// </summary>
+    /// <param name="xmlSource">Source stream for XML chacaters.</param>
+    /// <returns>XMLObject that represents the parsed XML.</returns>
     XMLObject XML::parse(ISource &xmlSource)
     {
         return (parseXML(xmlSource));
     }
+    /// <summary>
+    /// Create XML text for an XMLObject.
+    /// </summary>
+    /// <param name="xmlObject">XML object to create text for.</param>
+    /// <returns>XML text for XMLObject.</returns>
     std::string XML::stringify(XMLObject &xmlObject)
     {
-        return(stringifyXML(&xmlObject.prolog));
+        return (stringifyXML(&xmlObject.prolog));
     }
 } // namespace H4

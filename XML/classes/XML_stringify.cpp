@@ -1,7 +1,8 @@
 //
 // Class: XML
 //
-// Description:
+// Description: XMLObject strinigification code.
+//
 // Dependencies:   C20++ - Language standard features used.
 //
 // =================
@@ -40,6 +41,11 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     std::string XML::stringifyXML(XNode *xNode)
     {
         std::string xmlResult;

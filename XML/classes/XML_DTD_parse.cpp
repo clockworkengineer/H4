@@ -1,7 +1,8 @@
 //
 // Class: XML
 //
-// Description:
+// Description: XML Document Type Definition parser.
+//
 // Dependencies:   C20++ - Language standard features used.
 //
 // =================
@@ -42,220 +43,275 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    std::string XML::parseDTDValue(ISource &source)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    std::string XML::parseDTDValue(ISource &xmlSource)
     {
-        auto value = parseValue(source);
+        auto value = parseValue(xmlSource);
         return (value.parsed);
     }
-    std::string XML::parseDTDAttributeType(ISource &source)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    std::string XML::parseDTDAttributeType(ISource &xmlSource)
     {
         XString type;
         for (auto attrType : XML::m_dtdAttrListTypes)
         {
-            if (source.match(attrType))
+            if (xmlSource.match(attrType))
             {
                 type = attrType;
             }
         }
         if (type.empty())
         {
-            if (source.current() == '(')
+            if (xmlSource.current() == '(')
             {
-                while (source.more() && source.current() != ')')
+                while (xmlSource.more() && xmlSource.current() != ')')
                 {
-                    type += source.current();
-                    source.next();
+                    type += xmlSource.current();
+                    xmlSource.next();
                 }
-                type += source.current();
-                source.next();
+                type += xmlSource.current();
+                xmlSource.next();
             }
             else
             {
-                throw SyntaxError(source, "Invalid attribute type specified.");
+                throw SyntaxError(xmlSource, "Invalid attribute type specified.");
             }
         }
-        source.ignoreWS();
-        return (source.to_bytes(type));
+        xmlSource.ignoreWS();
+        return (xmlSource.to_bytes(type));
     }
-    std::string XML::parseDTDAttributeValue(ISource &source)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    std::string XML::parseDTDAttributeValue(ISource &xmlSource)
     {
         std::string value;
-        if (source.match(U"#REQUIRED"))
+        if (xmlSource.match(U"#REQUIRED"))
         {
             value = "#REQUIRED";
         }
-        else if (source.match(U"#IMPLIED"))
+        else if (xmlSource.match(U"#IMPLIED"))
         {
             value = "#IMPLIED";
         }
-        else if (source.match(U"#FIXED"))
+        else if (xmlSource.match(U"#FIXED"))
         {
             value = "#FIXED ";
-            value += parseDTDValue(source);
+            value += parseDTDValue(xmlSource);
         }
         else
         {
-            value = parseDTDValue(source);
+            value = parseDTDValue(xmlSource);
         }
         return (value);
     }
-    void XML::parseDTDAttributeList(ISource &source, XNodeDTD *xNodeDTD)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTDAttributeList(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
-        source.ignoreWS();
-        std::string elementName = parseName(source);
-        while (source.more() && source.current() != '>')
+        xmlSource.ignoreWS();
+        std::string elementName = parseName(xmlSource);
+        while (xmlSource.more() && xmlSource.current() != '>')
         {
             XDTDAttribute xDTDAttribute;
-            xDTDAttribute.name = parseName(source);
-            xDTDAttribute.type = parseDTDAttributeType(source);
-            xDTDAttribute.value = parseDTDAttributeValue(source);
+            xDTDAttribute.name = parseName(xmlSource);
+            xDTDAttribute.type = parseDTDAttributeType(xmlSource);
+            xDTDAttribute.value = parseDTDAttributeValue(xmlSource);
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
-            source.ignoreWS();
+            xmlSource.ignoreWS();
         }
     }
-    void XML::parseDTDNotation(ISource &source, XNodeDTD *xNodeDTD)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTDNotation(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
-        source.ignoreWS();
+        xmlSource.ignoreWS();
         XAttribute notation;
-        std::string name = parseName(source);
-        notation.name = parseName(source);
-        while (source.more() && source.current() != '>')
+        std::string name = parseName(xmlSource);
+        notation.name = parseName(xmlSource);
+        while (xmlSource.more() && xmlSource.current() != '>')
         {
-            notation.value.parsed += source.to_bytes(source.current());
-            source.next();
+            notation.value.parsed += xmlSource.to_bytes(xmlSource.current());
+            xmlSource.next();
         }
         xNodeDTD->notations[name] = notation;
-        source.ignoreWS();
+        xmlSource.ignoreWS();
     }
-    void XML::parseDTDEntity(ISource &source, XNodeDTD *xNodeDTD)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTDEntity(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
         std::string entityName = "&";
-        source.ignoreWS();
-        if (source.current() == '%')
+        xmlSource.ignoreWS();
+        if (xmlSource.current() == '%')
         {
             entityName = "%";
-            source.next();
-            source.ignoreWS();
+            xmlSource.next();
+            xmlSource.ignoreWS();
         }
-        entityName += parseName(source) + ";";
-        std::string entityValue = parseDTDValue(source);
-        m_entityMapping[source.from_bytes(entityName)] = source.from_bytes(entityValue);
+        entityName += parseName(xmlSource) + ";";
+        std::string entityValue = parseDTDValue(xmlSource);
+        m_entityMapping[xmlSource.from_bytes(entityName)] = xmlSource.from_bytes(entityValue);
         xNodeDTD->entityMapping[entityName] = entityValue;
     }
-    void XML::parseDTDElement(ISource &source, XNodeDTD *xNodeDTD)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTDElement(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
-        source.ignoreWS();
-        std::string elementName = parseName(source);
+        xmlSource.ignoreWS();
+        std::string elementName = parseName(xmlSource);
         XString elementContent;
-        if (source.match(U"EMPTY"))
+        if (xmlSource.match(U"EMPTY"))
         {
             elementContent = U"EMPTY";
         }
-        else if (source.match(U"ANY"))
+        else if (xmlSource.match(U"ANY"))
         {
             elementContent = U"ANY";
         }
         else
         {
-            while (source.more() && source.current() != '>')
+            while (xmlSource.more() && xmlSource.current() != '>')
             {
-                elementContent += source.current();
-                source.next();
+                elementContent += xmlSource.current();
+                xmlSource.next();
             }
         }
-        XDTDElement element(elementName, source.to_bytes(elementContent));
+        XDTDElement element(elementName, xmlSource.to_bytes(elementContent));
         xNodeDTD->elements.emplace(std::pair(element.name, element));
-        source.ignoreWS();
+        xmlSource.ignoreWS();
     }
-    void XML::parseDTDExternal(ISource &source, XNodeDTD *xNodeDTD)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTDExternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
-        if (source.match(U"SYSTEM"))
+        if (xmlSource.match(U"SYSTEM"))
         {
-            source.ignoreWS();
+            xmlSource.ignoreWS();
             xNodeDTD->external.name = "SYSTEM";
-            xNodeDTD->external.value.parsed = parseDTDValue(source);
+            xNodeDTD->external.value.parsed = parseDTDValue(xmlSource);
         }
-        else if (source.match(U"PUBLIC"))
+        else if (xmlSource.match(U"PUBLIC"))
         {
-            source.ignoreWS();
+            xmlSource.ignoreWS();
             xNodeDTD->external.name = "PUBLIC";
-            xNodeDTD->external.value.parsed = parseDTDValue(source) + ", " + parseDTDValue(source);
+            xNodeDTD->external.value.parsed = parseDTDValue(xmlSource) + ", " + parseDTDValue(xmlSource);
         }
         else
         {
-            throw SyntaxError(source, "Invalid external DTD specifier.");
+            throw SyntaxError(xmlSource, "Invalid external DTD specifier.");
         }
-        if (source.current() != '>')
+        if (xmlSource.current() != '>')
         {
-            throw SyntaxError(source, "Missing terminator '>'.");
+            throw SyntaxError(xmlSource, "Missing terminator '>'.");
         }
-        source.next();
-        source.ignoreWS();
+        xmlSource.next();
+        xmlSource.ignoreWS();
     }
-    void XML::parseDTDComment(ISource &source, XNodeDTD */*xNodeDTD*/)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTDComment(ISource &xmlSource, XNodeDTD * /*xNodeDTD*/)
     {
-        while (source.more() && !source.match(U"--"))
+        while (xmlSource.more() && !xmlSource.match(U"--"))
         {
-            source.next();
+            xmlSource.next();
         }
     }
-    void XML::parseDTDInternal(ISource &source, XNodeDTD *xNodeDTD)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTDInternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
-        source.next();
-        source.ignoreWS();
-        while (source.more() && !source.match(U"]>"))
+        xmlSource.next();
+        xmlSource.ignoreWS();
+        while (xmlSource.more() && !xmlSource.match(U"]>"))
         {
-            if (source.match(U"<!ENTITY"))
+            if (xmlSource.match(U"<!ENTITY"))
             {
-                parseDTDEntity(source, xNodeDTD);
+                parseDTDEntity(xmlSource, xNodeDTD);
             }
-            else if (source.match(U"<!ELEMENT"))
+            else if (xmlSource.match(U"<!ELEMENT"))
             {
-                parseDTDElement(source, xNodeDTD);
+                parseDTDElement(xmlSource, xNodeDTD);
             }
-            else if (source.match(U"<!ATTLIST"))
+            else if (xmlSource.match(U"<!ATTLIST"))
             {
-                parseDTDAttributeList(source, xNodeDTD);
+                parseDTDAttributeList(xmlSource, xNodeDTD);
             }
-            else if (source.match(U"<!NOTATION"))
+            else if (xmlSource.match(U"<!NOTATION"))
             {
-                parseDTDNotation(source, xNodeDTD);
+                parseDTDNotation(xmlSource, xNodeDTD);
             }
-            else if (source.match(U"<--"))
+            else if (xmlSource.match(U"<--"))
             {
-                parseDTDComment(source, xNodeDTD);
+                parseDTDComment(xmlSource, xNodeDTD);
             }
             else
             {
-                throw SyntaxError(source, "Invalid DTD tag.");
+                throw SyntaxError(xmlSource, "Invalid DTD tag.");
             }
-            if (source.current() != '>')
+            if (xmlSource.current() != '>')
             {
-                throw SyntaxError(source, "Missing '>' terminator.");
+                throw SyntaxError(xmlSource, "Missing '>' terminator.");
             }
-            source.next();
-            source.ignoreWS();
+            xmlSource.next();
+            xmlSource.ignoreWS();
         }
     }
-    void XML::parseDTD(ISource &source, XNodeElement *xNodeElement)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTD(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         // We take the easy option for allowing a DTD to be stringifyed
         // and keeping the correct order for its components by storing it
         // in its raw unparsed form.
         XNodeDTD xNodeDTD;
-        long start = source.position();
-        source.ignoreWS();
-        xNodeDTD.name = parseName(source);
-        if (source.current() == '[')
+        long start = xmlSource.position();
+        xmlSource.ignoreWS();
+        xNodeDTD.name = parseName(xmlSource);
+        if (xmlSource.current() == '[')
         {
-            parseDTDInternal(source, &xNodeDTD);
+            parseDTDInternal(xmlSource, &xNodeDTD);
         }
         else
         {
-            parseDTDExternal(source, &xNodeDTD);
+            parseDTDExternal(xmlSource, &xNodeDTD);
         }
         // Save away unparsed form
-        xNodeDTD.unparsed = "<!DOCTYPE" + source.getRange(start, source.position());
+        xNodeDTD.unparsed = "<!DOCTYPE" + xmlSource.getRange(start, xmlSource.position());
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
     }
 } // namespace H4

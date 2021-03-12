@@ -1,7 +1,8 @@
 //
 // Class: XML
 //
-// Description:
+// Description: XML chracter and field value validation.
+//
 // Dependencies:   C20++ - Language standard features used.
 //
 // =================
@@ -42,6 +43,11 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     bool XML::validChar(XChar ch)
     {
         return ((ch == 0x09) ||
@@ -51,6 +57,11 @@ namespace H4
                 (ch >= 0xE000 && ch <= 0xFFFD) ||
                 (ch >= 0x10000 && ch <= 0x10FFFF));
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     bool XML::validNameStartChar(XChar ch)
     {
         return ((ch == ':') ||
@@ -70,6 +81,11 @@ namespace H4
                 (ch >= 0xFDF0 && ch <= 0xFFFD) ||
                 (ch >= 0x10000 && ch <= 0xEFFFF));
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     bool XML::validNameChar(XChar ch)
     {
         return (validNameStartChar(ch) ||
@@ -80,10 +96,20 @@ namespace H4
                 (ch >= 0x0300 && ch <= 0x036F) ||
                 (ch >= 0x203F && ch <= 0x2040));
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     bool XML::validReservedName(const XString &name)
     {
         return (name.starts_with(U"xmlns") || name.starts_with(U"xml-stylesheet") || name == U"xml");
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     bool XML::validateName(XString name)
     {
         if (name.empty())
@@ -108,6 +134,11 @@ namespace H4
         }
         return (true);
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     bool XML::validateXMLDeclaration(XNodeElement *xNodeElement)
     {
         // Syntax error if no version present
