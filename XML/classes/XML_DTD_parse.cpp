@@ -1,7 +1,7 @@
 //
 // Class: XML
 //
-// Description: XML Document Type Definition parser.
+// Description: XML Document Type Definition parsing.
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -44,20 +44,20 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    ///
+    /// Parse DTD string value (just use XML variant).
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns>String value (UTF-8 encoded).</returns>
     std::string XML::parseDTDValue(ISource &xmlSource)
     {
         auto value = parseValue(xmlSource);
         return (value.parsed);
     }
     /// <summary>
-    ///
+    /// Parse DTD attribute type field.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns>Attribute type as string (UTF-8 encoded).</returns>
     std::string XML::parseDTDAttributeType(ISource &xmlSource)
     {
         XString type;
@@ -89,9 +89,10 @@ namespace H4
         return (xmlSource.to_bytes(type));
     }
     /// <summary>
-    ///
+    /// Parse DTD attribute value.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns>Attribute value as string (UTF-8 encoded).</returns>
     /// <returns></returns>
     std::string XML::parseDTDAttributeValue(ISource &xmlSource)
     {
@@ -116,9 +117,9 @@ namespace H4
         return (value);
     }
     /// <summary>
-    ///
+    /// Parse DTD element attribute list.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseDTDAttributeList(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
@@ -135,9 +136,9 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Parse DTD notation.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseDTDNotation(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
@@ -154,9 +155,9 @@ namespace H4
         xmlSource.ignoreWS();
     }
     /// <summary>
-    ///
+    /// Parse XML DTD entity.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseDTDEntity(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
@@ -174,9 +175,9 @@ namespace H4
         xNodeDTD->entityMapping[entityName] = entityValue;
     }
     /// <summary>
-    ///
+    /// Parse an XML DTD element.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseDTDElement(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
@@ -204,9 +205,9 @@ namespace H4
         xmlSource.ignoreWS();
     }
     /// <summary>
-    ///
+    /// Parse externally defined XML DTD.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseDTDExternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
@@ -234,9 +235,9 @@ namespace H4
         xmlSource.ignoreWS();
     }
     /// <summary>
-    ///
+    /// Parse XML comment in DTD.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseDTDComment(ISource &xmlSource, XNodeDTD * /*xNodeDTD*/)
     {
@@ -246,9 +247,9 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Parse internally defined XML DTD.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseDTDInternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
@@ -289,9 +290,9 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Parse XML DTD.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseDTD(ISource &xmlSource, XNodeElement *xNodeElement)
     {

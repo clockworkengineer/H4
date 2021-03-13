@@ -73,9 +73,9 @@ namespace H4
     // PUBLIC METHODS
     // ==============
     /// <summary>
-    /// Parse XML read from xmlSource.
+    /// Parse XML read from source stream.
     /// </summary>
-    /// <param name="xmlSource">Source stream for XML chacaters.</param>
+    /// <param name="xmlSource">XMLsource stream.</param>
     /// <returns>XMLObject that represents the parsed XML.</returns>
     XMLObject XML::parse(ISource &xmlSource)
     {
@@ -85,6 +85,7 @@ namespace H4
     /// Create XML text for an XMLObject.
     /// </summary>
     /// <param name="xmlObject">XML object to create text for.</param>
+    /// <param name="xmlDestination">XML destination stream.</param>
     /// <returns>XML text for XMLObject.</returns>
     void XML::stringify(XMLObject &xmlObject, IDestination &xmlDestination)
     {

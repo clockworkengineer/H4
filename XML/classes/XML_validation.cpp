@@ -44,10 +44,10 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    ///
+    /// Check whether a character is valid.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="ch">Character to validate</param>
+    /// <returns>true then valid/.</returns>
     bool XML::validChar(XChar ch)
     {
         return ((ch == 0x09) ||
@@ -58,10 +58,10 @@ namespace H4
                 (ch >= 0x10000 && ch <= 0x10FFFF));
     }
     /// <summary>
-    ///
+    /// Check whether character is a valid to start a name with.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="ch">Character value to validate.</param>
+    /// <returns>true then valid.</returns>
     bool XML::validNameStartChar(XChar ch)
     {
         return ((ch == ':') ||
@@ -82,10 +82,10 @@ namespace H4
                 (ch >= 0x10000 && ch <= 0xEFFFF));
     }
     /// <summary>
-    ///
+    /// Check whether character is valid for a name body.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="ch">Character value to validate.</param>
+    /// <returns>true then valid.</returns>
     bool XML::validNameChar(XChar ch)
     {
         return (validNameStartChar(ch) ||

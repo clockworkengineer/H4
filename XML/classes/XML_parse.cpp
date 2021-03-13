@@ -1,7 +1,8 @@
 //
 // Class: XML
 //
-// Description: XML parser code.
+// Description: XML parser code. All parsing of characrters takes place having
+// converted the characters to UTF-32 to make the process easier.
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -397,9 +398,9 @@ namespace H4
         xNodeElement->elements.push_back(std::make_unique<XNodeElement>(std::move(xNodeChildElement)));
     }
     /// <summary>
-    /// 
+    /// Parse any element content that is found.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseDefault(ISource &xmlSource, XNodeElement *xNodeElement)
     {
@@ -420,9 +421,10 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Parse element content area generating any XNodes and adding them to the list
+    /// of the current XNodeElement.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XMl source stream.</param>
     /// <returns></returns>
     void XML::parseElementContents(ISource &xmlSource, XNodeElement *xNodeElement)
     {
@@ -452,9 +454,9 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Parse current XML element found.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseElement(ISource &xmlSource, XNodeElement *xNodeElement)
     {
@@ -479,9 +481,9 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Start parsing XML source stream.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     XMLObject XML::parseXML(ISource &xmlSource)
     {
