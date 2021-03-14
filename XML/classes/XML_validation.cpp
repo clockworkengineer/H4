@@ -82,9 +82,9 @@ namespace H4
                 (ch >= 0x10000 && ch <= 0xEFFFF));
     }
     /// <summary>
-    /// Check whether character is valid for a name body.
+    /// Check whether a name has all valid characters.
     /// </summary>
-    /// <param name="ch">Character value to validate.</param>
+    /// <param name="ch">Name to validate.</param>
     /// <returns>true then valid.</returns>
     bool XML::validNameChar(XChar ch)
     {
@@ -97,18 +97,18 @@ namespace H4
                 (ch >= 0x203F && ch <= 0x2040));
     }
     /// <summary>
-    ///
+    /// Check name that starts with xml is a valid reserved name.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     bool XML::validReservedName(const XString &name)
     {
         return (name.starts_with(U"xmlns") || name.starts_with(U"xml-stylesheet") || name == U"xml");
     }
     /// <summary>
-    ///
+    /// Validate XMl tag/ attribute names.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     bool XML::validateName(XString name)
     {
@@ -135,10 +135,11 @@ namespace H4
         return (true);
     }
     /// <summary>
-    ///
+    /// Validate XMl declaration. This includes that it has at least a version and that
+    /// its atributes version, encoding and standalone occur in the correct order.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns>true when declaration valid.</returns>
     bool XML::validateXMLDeclaration(XNodeElement *xNodeElement)
     {
         // Syntax error if no version present
