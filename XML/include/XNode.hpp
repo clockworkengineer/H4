@@ -147,7 +147,6 @@ namespace H4
             this->name = name;
         }
         std::string name;
-        std::string content;
         std::vector<XAttribute> attributes;
         std::vector<XAttribute> namespaces;
         std::vector<std::unique_ptr<XNode>> elements;

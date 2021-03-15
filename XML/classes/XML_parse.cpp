@@ -70,24 +70,6 @@ namespace H4
         }
     }
     /// <summary>
-    /// Create content XNode and add to XNode elements from current element content
-    /// buffer before it is cleared ready to recieve more content or a different
-    //  type of XNode. This keeps XML order for stringification by using sequential
-    /// list of XNodes to reconstruct elements.
-    /// </summary>
-    /// <param name="xNodeElement">Current XML element.</param>
-    /// <returns></returns>
-    void XML::addCurrentXNodeContent(XNodeElement *xNodeElement)
-    {
-        if (!xNodeElement->content.empty())
-        {
-            XNodeContent xNodeContent;
-            xNodeContent.content = xNodeElement->content;
-            xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>(std::move(xNodeContent)));
-            xNodeElement->content.clear();
-        }
-    }
-    /// <summary>
     /// Parse a character reference returning its value.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
@@ -301,7 +283,8 @@ namespace H4
     /// <returns></returns>
     void XML::parseAttributes(ISource &xmlSource, XNodeElement *xNodeElement)
     {
-        while (xmlSource.current() != '?' &&
+        while (xmlSource.more() &&
+               xmlSource.current() != '?' &&
                xmlSource.current() != '/' &&
                xmlSource.current() != '>')
         {
@@ -411,13 +394,18 @@ namespace H4
         XValue entityReference = parseCharacter(xmlSource);
         if (entityReference.unparsed != "")
         {
-            addCurrentXNodeContent(xNodeElement);
             XNodeEntityReference xNodeEntityReference(entityReference);
             xNodeElement->elements.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
         }
         else
         {
-            xNodeElement->content += entityReference.parsed;
+            // Make sure there is a content node to recieve characters
+            if (xNodeElement->elements.empty() ||
+                xNodeElement->elements.back()->getNodeType() != XNodeType::content)
+            {
+                xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>());
+            }
+            XNodeRef<XNodeContent>(*xNodeElement->elements.back()).content += entityReference.parsed;
         }
     }
     /// <summary>
@@ -430,22 +418,18 @@ namespace H4
     {
         if (xmlSource.match(U"<!--"))
         {
-            addCurrentXNodeContent(xNodeElement);
             parseComment(xmlSource, xNodeElement);
         }
         else if (xmlSource.match(U"<?"))
         {
-            addCurrentXNodeContent(xNodeElement);
             parsePI(xmlSource, xNodeElement);
         }
         else if (xmlSource.match(U"<![CDATA["))
         {
-            addCurrentXNodeContent(xNodeElement);
             parseCDATA(xmlSource, xNodeElement);
         }
         else if (xmlSource.match(U"<"))
         {
-            addCurrentXNodeContent(xNodeElement);
             parseChildElement(xmlSource, xNodeElement);
         }
         else
@@ -469,7 +453,6 @@ namespace H4
             {
                 parseElementContents(xmlSource, xNodeElement);
             }
-            addCurrentXNodeContent(xNodeElement);
         }
         else if (xmlSource.match(U"/>"))
         {

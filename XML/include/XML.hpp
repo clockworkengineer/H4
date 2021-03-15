@@ -168,7 +168,6 @@ namespace H4
         bool validateName(XString attributeName);
         bool validateXMLDeclaration(XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);
-        void addCurrentXNodeContent(XNodeElement *xNodeElement);
         std::string parseName(ISource &xmlSource);
         long parseCharacterReference(ISource &xmlSource, XString reference);
         XValue parseValue(ISource &xmlSource);
