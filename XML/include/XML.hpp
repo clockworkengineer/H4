@@ -159,6 +159,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        void dtdValidateElement(ISource &xmlSource, XNodeDTD *dtd, XNodeElement *xNodeElement);
         void initialiseTables();
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
         void moveToNextLineFeed(ISource &source);
@@ -202,6 +203,7 @@ namespace H4
         static XAttribute m_defaultAtributes[3];
         static std::set<XString> m_dtdAttrListTypes;
         std::unordered_map<XString, XString> m_entityMapping;
+        XNodeDTD *m_dtd;
     };
     //
     // Shortcuts

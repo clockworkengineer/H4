@@ -17,6 +17,7 @@ set(TEST_SOURCES
     XML_tests_dtd_parse.cpp
     XML_tests_stringify.cpp
     XML_tests_dtd_stringify.cpp
+    XML_tests_dtd_validate.cpp
 )
 
 add_executable(${TEST_EXECUTABLE} ${TEST_SOURCES})

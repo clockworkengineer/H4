@@ -98,13 +98,14 @@ TEST_CASE("Stringify XML with DTD both internal and external", "[XML][Stringify]
     {
         checkStringify(xml, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                             "<!DOCTYPE REPORT [\n"
+                            "<!ELEMENT REPORT (residence|apartment|office|shop)*>\n"
                             "<!ELEMENT residence (%area;, %contact;)>\n"
                             "<!ELEMENT apartment (%area;, %contact;)>\n"
                             "<!ELEMENT office (%area;, %contact;)>\n"
                             "<!ELEMENT shop (%area;, %contact;)>\n"
                             "<!ENTITY % area \"name, street, pincode, city\">\n"
                             "<!ENTITY % contact \"phone\"> ]>\n"
-                            "<area></area>\n");
+                            "<REPORT></REPORT>\n");
     }
     SECTION("Stringify XML with internal DTD with !NOTATION.", "[XML][Stringify][DTD]")
     {

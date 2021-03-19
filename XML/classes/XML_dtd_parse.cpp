@@ -44,7 +44,7 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    /// Parse DTD string value (just use XML variant).
+    /// Parse XML DTD string value (just use XML variant).
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>String value (UTF-8 encoded).</returns>
@@ -54,7 +54,7 @@ namespace H4
         return (value.parsed);
     }
     /// <summary>
-    /// Parse DTD attribute type field.
+    /// Parse XML DTD attribute type field.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Attribute type as string (UTF-8 encoded).</returns>
@@ -76,6 +76,10 @@ namespace H4
                 {
                     type += xmlSource.current();
                     xmlSource.next();
+                    if (xmlSource.match(U"<!"))
+                    {
+                        throw SyntaxError(xmlSource, "Missing '>' terminator.");
+                    }
                 }
                 type += xmlSource.current();
                 xmlSource.next();
@@ -89,7 +93,7 @@ namespace H4
         return (xmlSource.to_bytes(type));
     }
     /// <summary>
-    /// Parse DTD attribute value.
+    /// Parse XML DTD attribute value.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Attribute value as string (UTF-8 encoded).</returns>
@@ -117,7 +121,7 @@ namespace H4
         return (value);
     }
     /// <summary>
-    /// Parse DTD element attribute list.
+    /// Parse XML DTD element attribute list.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
@@ -133,10 +137,14 @@ namespace H4
             xDTDAttribute.value = parseDTDAttributeValue(xmlSource);
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
             xmlSource.ignoreWS();
+            if (xmlSource.match(U"<!"))
+            {
+                throw SyntaxError(xmlSource, "Missing '>' terminator.");
+            }
         }
     }
     /// <summary>
-    /// Parse DTD notation.
+    /// Parse XML DTD notation.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
@@ -150,6 +158,10 @@ namespace H4
         {
             notation.value.parsed += xmlSource.to_bytes(xmlSource.current());
             xmlSource.next();
+            if (xmlSource.match(U"<!"))
+            {
+                throw SyntaxError(xmlSource, "Missing '>' terminator.");
+            }
         }
         xNodeDTD->notations[name] = notation;
         xmlSource.ignoreWS();
@@ -198,6 +210,10 @@ namespace H4
             {
                 elementContent += xmlSource.current();
                 xmlSource.next();
+                if (xmlSource.match(U"<!"))
+                {
+                    throw SyntaxError(xmlSource, "Missing '>' terminator.");
+                }
             }
         }
         XDTDElement element(elementName, xmlSource.to_bytes(elementContent));
@@ -314,5 +330,6 @@ namespace H4
         // Save away unparsed form
         xNodeDTD.unparsed = "<!DOCTYPE" + xmlSource.getRange(start, xmlSource.position());
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
+        m_dtd = static_cast<XNodeDTD *>(xNodeElement->elements.back().get());
     }
 } // namespace H4
