@@ -215,11 +215,11 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["PROGRAMSLOT"].attributes[0].type == "CDATA");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["TITLE"].attributes[0].type == "CDATA");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["TITLE"].attributes[1].type == "CDATA");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["TVSCHEDULE"].attributes[0].value == "#REQUIRED");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["CHANNEL"].attributes[0].value == "#REQUIRED");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["PROGRAMSLOT"].attributes[0].value == "#IMPLIED");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["TITLE"].attributes[0].value == "#IMPLIED");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["TITLE"].attributes[1].value == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["TVSCHEDULE"].attributes[0].value.parsed == "#REQUIRED");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["CHANNEL"].attributes[0].value.parsed == "#REQUIRED");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["PROGRAMSLOT"].attributes[0].value.parsed == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["TITLE"].attributes[0].value.parsed == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["TITLE"].attributes[1].value.parsed == "#IMPLIED");
   }
   SECTION("XML with internal DTD with elements with multiple attributes to parse and check values", "[XML][Parse][DTD]")
   {
@@ -249,19 +249,19 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes.size() == 5);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[0].name == "NAME");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[0].type == "CDATA");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[0].value == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[0].value.parsed == "#IMPLIED");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[1].name == "CATEGORY");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[1].type == "(HandTool|Table|Shop-Professional)");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[1].value == "HandTool");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[1].value.parsed == "HandTool");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[2].name == "PARTNUM");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[2].type == "CDATA");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[2].value == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[2].value.parsed == "#IMPLIED");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[3].name == "PLANT");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[3].type == "(Pittsburgh|Milwaukee|Chicago)");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[3].value == "Chicago");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[3].value.parsed == "Chicago");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[4].name == "INVENTORY");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[4].type == "(InStock|Backordered|Discontinued)");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[4].value == "InStock");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[4].value.parsed == "InStock");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["NOTES"].name == "NOTES");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["NOTES"].content == "(#PCDATA)");
   }

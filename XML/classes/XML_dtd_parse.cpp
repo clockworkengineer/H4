@@ -59,7 +59,7 @@ namespace H4
             XValue systemValue = parseValue(xmlSource);
             result.name = "PUBLIC";
             result.value.parsed = publicValue.parsed + ", " + systemValue.parsed;
-            result.value.unparsed = publicValue.parsed + " " + systemValue.parsed;
+            result.value.unparsed = publicValue.unparsed + " " + systemValue.unparsed;
         }
         else
         {
@@ -123,9 +123,9 @@ namespace H4
         }
         else if (xmlSource.match(U"#FIXED"))
         {
-            XValue fixed = parseValue(xmlSource);
-            value.parsed = "#FIXED " + fixed.parsed;
-            value.unparsed = "#FIXED" + fixed.unparsed;
+            XValue fixedValue = parseValue(xmlSource);
+            value.parsed = "#FIXED " + fixedValue.parsed;
+            value.unparsed = "#FIXED " + fixedValue.unparsed;
         }
         else
         {
@@ -147,7 +147,7 @@ namespace H4
             XDTDAttribute xDTDAttribute;
             xDTDAttribute.name = parseName(xmlSource);
             xDTDAttribute.type = parseDTDAttributeType(xmlSource);
-            xDTDAttribute.value = parseDTDAttributeValue(xmlSource).parsed;
+            xDTDAttribute.value = parseDTDAttributeValue(xmlSource);
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
             xmlSource.ignoreWS();
         }

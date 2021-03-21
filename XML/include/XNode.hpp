@@ -47,7 +47,7 @@ namespace H4
     {
         std::string name;
         std::string type;
-        std::string value;
+        XValue value;
     };
     //
     // XML DTD element definition
