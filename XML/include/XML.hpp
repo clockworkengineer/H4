@@ -174,9 +174,9 @@ namespace H4
         XValue parseValue(ISource &xmlSource);
         XValue parseCharacter(ISource &source);
         XValue parseReferenceOrEntity(ISource &source);
-        std::string parseDTDValue(ISource &source);
+        XAttribute parseDTDExternalReference(ISource &xmlSource);
         std::string parseDTDAttributeType(ISource &xmlSource);
-        std::string parseDTDAttributeValue(ISource &xmlSource);
+        XValue parseDTDAttributeValue(ISource &xmlSource);
         void parseDTDComment(ISource &source, XNodeDTD *xNodeDTD);
         void parseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseTagName(ISource &xmlSource, XNodeElement *xNodeElement);

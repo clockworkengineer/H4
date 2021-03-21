@@ -336,11 +336,14 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>(xmlObject.prolog[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].value.parsed == "\"\"");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].value.parsed == "");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].value.unparsed == "");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].value.parsed == "\"\"");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].value.parsed == "");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].value.unparsed == "");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].value.parsed == "\"\"");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].value.parsed == "");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].value.unparsed == "");
   }
   SECTION("XML with internal DTD containing comments.", "[XML][Parse][DTD]")
   {
@@ -379,7 +382,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<body>Don't forget me this weekend</body>\n"
                 "</note>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 4]Missing '>' terminator.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 2]Missing '>' terminator.");
   }
   SECTION("XML with internal DTD with missing terminating '>' on !ATTLIST", "[XML][Parse][DTD]")
   {
@@ -402,7 +405,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>\n"
                 "<TVSCHEDULE></TVSCHEDULE>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 15 Column: 4]Missing '>' terminator.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 15 Column: 2]Missing '>' terminator.");
   }
   SECTION("XML with internal DTD with missing terminating '>' on !ENTITY", "[XML][Parse][DTD]")
   {
@@ -418,7 +421,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 8 Column: 2]Missing '>' terminator.");
   }
-    SECTION("XML with internal DTD with missing terminating '>' on !NOTATION", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with missing terminating '>' on !NOTATION", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE REPORT [\n"
                 "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
@@ -448,6 +451,6 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "]>\n"
                 "<REPORT> </REPORT>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 24 Column: 4]Missing '>' terminator.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 24 Column: 2]Missing '>' terminator.");
   }
 }

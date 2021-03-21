@@ -43,15 +43,29 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    /// <summary>
-    /// Parse XML DTD string value (just use XML variant).
-    /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
-    /// <returns>String value (UTF-8 encoded).</returns>
-    std::string XML::parseDTDValue(ISource &xmlSource)
+    XAttribute XML::parseDTDExternalReference(ISource &xmlSource)
     {
-        auto value = parseValue(xmlSource);
-        return (value.parsed);
+        XAttribute result;
+        if (xmlSource.match(U"SYSTEM"))
+        {
+            xmlSource.ignoreWS();
+            result.name = "SYSTEM";
+            result.value = parseValue(xmlSource);
+        }
+        else if (xmlSource.match(U"PUBLIC"))
+        {
+            xmlSource.ignoreWS();
+            XValue publicValue = parseValue(xmlSource);
+            XValue systemValue = parseValue(xmlSource);
+            result.name = "PUBLIC";
+            result.value.parsed = publicValue.parsed + ", " + systemValue.parsed;
+            result.value.unparsed = publicValue.parsed + " " + systemValue.parsed;
+        }
+        else
+        {
+            throw SyntaxError(xmlSource, "Invalid external DTD specifier.");
+        }
+        return (result);
     }
     /// <summary>
     /// Parse XML DTD attribute type field.
@@ -76,10 +90,6 @@ namespace H4
                 {
                     type += xmlSource.current();
                     xmlSource.next();
-                    if (xmlSource.match(U"<!"))
-                    {
-                        throw SyntaxError(xmlSource, "Missing '>' terminator.");
-                    }
                 }
                 type += xmlSource.current();
                 xmlSource.next();
@@ -98,25 +108,28 @@ namespace H4
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Attribute value as string (UTF-8 encoded).</returns>
     /// <returns></returns>
-    std::string XML::parseDTDAttributeValue(ISource &xmlSource)
+    XValue XML::parseDTDAttributeValue(ISource &xmlSource)
     {
-        std::string value;
+        XValue value;
         if (xmlSource.match(U"#REQUIRED"))
         {
-            value = "#REQUIRED";
+            value.parsed = "#REQUIRED";
+            value.unparsed = "#REQUIRED";
         }
         else if (xmlSource.match(U"#IMPLIED"))
         {
-            value = "#IMPLIED";
+            value.parsed = "#IMPLIED";
+            value.unparsed = "#IMPLIED";
         }
         else if (xmlSource.match(U"#FIXED"))
         {
-            value = "#FIXED ";
-            value += parseDTDValue(xmlSource);
+            XValue fixed = parseValue(xmlSource);
+            value.parsed = "#FIXED " + fixed.parsed;
+            value.unparsed = "#FIXED" + fixed.unparsed;
         }
         else
         {
-            value = parseDTDValue(xmlSource);
+            value = parseValue(xmlSource);
         }
         return (value);
     }
@@ -129,18 +142,14 @@ namespace H4
     {
         xmlSource.ignoreWS();
         std::string elementName = parseName(xmlSource);
-        while (xmlSource.more() && xmlSource.current() != '>')
+        while (xmlSource.more() && validNameStartChar(xmlSource.current()))
         {
             XDTDAttribute xDTDAttribute;
             xDTDAttribute.name = parseName(xmlSource);
             xDTDAttribute.type = parseDTDAttributeType(xmlSource);
-            xDTDAttribute.value = parseDTDAttributeValue(xmlSource);
+            xDTDAttribute.value = parseDTDAttributeValue(xmlSource).parsed;
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
             xmlSource.ignoreWS();
-            if (xmlSource.match(U"<!"))
-            {
-                throw SyntaxError(xmlSource, "Missing '>' terminator.");
-            }
         }
     }
     /// <summary>
@@ -153,17 +162,7 @@ namespace H4
         xmlSource.ignoreWS();
         XAttribute notation;
         std::string name = parseName(xmlSource);
-        notation.name = parseName(xmlSource);
-        while (xmlSource.more() && xmlSource.current() != '>')
-        {
-            notation.value.parsed += xmlSource.to_bytes(xmlSource.current());
-            xmlSource.next();
-            if (xmlSource.match(U"<!"))
-            {
-                throw SyntaxError(xmlSource, "Missing '>' terminator.");
-            }
-        }
-        xNodeDTD->notations[name] = notation;
+        xNodeDTD->notations[name] = parseDTDExternalReference(xmlSource);
         xmlSource.ignoreWS();
     }
     /// <summary>
@@ -182,9 +181,9 @@ namespace H4
             xmlSource.ignoreWS();
         }
         entityName += parseName(xmlSource) + ";";
-        std::string entityValue = parseDTDValue(xmlSource);
-        m_entityMapping[xmlSource.from_bytes(entityName)] = xmlSource.from_bytes(entityValue);
-        xNodeDTD->entityMapping[entityName] = entityValue;
+        XValue entityValue = parseValue(xmlSource);
+        m_entityMapping[xmlSource.from_bytes(entityName)] = xmlSource.from_bytes(entityValue.parsed);
+        xNodeDTD->entityMapping[entityName] = entityValue.parsed;
     }
     /// <summary>
     /// Parse an XML DTD element.
@@ -206,14 +205,33 @@ namespace H4
         }
         else
         {
-            while (xmlSource.more() && xmlSource.current() != '>')
+            int bracketLevel = 1;
+            while (xmlSource.more() &&
+                   ((bracketLevel > 0) && (xmlSource.current() != '>')))
             {
                 elementContent += xmlSource.current();
                 xmlSource.next();
-                if (xmlSource.match(U"<!"))
+                if (xmlSource.current() == '(')
                 {
-                    throw SyntaxError(xmlSource, "Missing '>' terminator.");
+                    bracketLevel++;
                 }
+                else if (xmlSource.current() == ')')
+                {
+                    bracketLevel--;
+                }
+            }
+            if (bracketLevel == 0)
+            {
+                elementContent += xmlSource.current();
+                xmlSource.next();
+                xmlSource.ignoreWS();
+            }
+            if (xmlSource.current() == '?' ||
+                xmlSource.current() == '*' ||
+                xmlSource.current() == '+')
+            {
+                xmlSource.next();
+                xmlSource.ignoreWS();
             }
         }
         XDTDElement element(elementName, xmlSource.to_bytes(elementContent));
@@ -227,22 +245,7 @@ namespace H4
     /// <returns></returns>
     void XML::parseDTDExternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
-        if (xmlSource.match(U"SYSTEM"))
-        {
-            xmlSource.ignoreWS();
-            xNodeDTD->external.name = "SYSTEM";
-            xNodeDTD->external.value.parsed = parseDTDValue(xmlSource);
-        }
-        else if (xmlSource.match(U"PUBLIC"))
-        {
-            xmlSource.ignoreWS();
-            xNodeDTD->external.name = "PUBLIC";
-            xNodeDTD->external.value.parsed = parseDTDValue(xmlSource) + ", " + parseDTDValue(xmlSource);
-        }
-        else
-        {
-            throw SyntaxError(xmlSource, "Invalid external DTD specifier.");
-        }
+        xNodeDTD->external = parseDTDExternalReference(xmlSource);
         if (xmlSource.current() != '>')
         {
             throw SyntaxError(xmlSource, "Missing terminator '>'.");
