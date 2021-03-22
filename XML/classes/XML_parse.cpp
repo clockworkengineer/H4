@@ -462,7 +462,6 @@ namespace H4
         {
             throw SyntaxError(xmlSource, "Missing '/>' for closing tag.");
         }
-        dtdValidateElement(xmlSource, m_dtd, xNodeElement);
     }
     /// <summary>
     /// Start parsing XML source stream.

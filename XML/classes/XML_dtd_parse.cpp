@@ -230,6 +230,7 @@ namespace H4
                 xmlSource.current() == '*' ||
                 xmlSource.current() == '+')
             {
+                elementContent += xmlSource.current();
                 xmlSource.next();
                 xmlSource.ignoreWS();
             }
@@ -333,6 +334,5 @@ namespace H4
         // Save away unparsed form
         xNodeDTD.unparsed = "<!DOCTYPE" + xmlSource.getRange(start, xmlSource.position());
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
-        m_dtd = static_cast<XNodeDTD *>(xNodeElement->elements.back().get());
     }
 } // namespace H4

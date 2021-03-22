@@ -82,6 +82,15 @@ namespace H4
         return (parseXML(xmlSource));
     }
     /// <summary>
+    ///
+    /// </summary>
+    /// <param name="xmlObject">XML object to create text for.</param>
+    /// <returns>XML text for XMLObject.</returns>
+    void XML::validate(XMLObject &xmlObject)
+    {
+        validateXML(&xmlObject.prolog);
+    }
+    /// <summary>
     /// Create XML text for an XMLObject.
     /// </summary>
     /// <param name="xmlObject">XML object to create text for.</param>

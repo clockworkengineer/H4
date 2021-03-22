@@ -43,10 +43,10 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    /// Recursively parse XMLObject passed in to produce XML output on an XML
-    /// destination stream in UTF-8 cencoding.
+    /// Recursively parse XNode root passed in to produce XML output on an XML
+    /// destination stream in UTF-8 encoding.
     /// </summary>
-    /// <param name="xmlObject">XML Object to convert into XML.</param>
+    /// <param name="xNodeRoot">XML XNode root to convert into XML.</param>
     /// <returns></returns>
     void XML::stringifyXML(XNode *xNode, IDestination &xmlDestination)
     {

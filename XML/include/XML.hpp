@@ -146,6 +146,7 @@ namespace H4
         // ==============
         XMLObject parse(ISource &xmlSource);
         void stringify(XMLObject &xmlObject, IDestination &xmlDestination);
+        void validate(XMLObject &xmlObject);
         // ================
         // PUBLIC VARIABLES
         // ================
@@ -159,7 +160,8 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        void dtdValidateElement(ISource &xmlSource, XNodeDTD *dtd, XNodeElement *xNodeElement);
+        void validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
+        void vadlidateElements(XNodeDTD *dtd, XNode *xNodeRoot);
         void initialiseTables();
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
         void moveToNextLineFeed(ISource &source);
@@ -195,6 +197,7 @@ namespace H4
         void parseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
         void parseElement(ISource &xmlSource, XNodeElement *XNodeElement);
         void parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
+        void validateXML(XNode *xNodeRoot);
         XMLObject parseXML(ISource &xmlSource);
         void stringifyXML(XNode *xNodeRoot, IDestination &xmlDestination);
         // =================
@@ -203,7 +206,6 @@ namespace H4
         static XAttribute m_defaultAtributes[3];
         static std::set<XString> m_dtdAttrListTypes;
         std::unordered_map<XString, XString> m_entityMapping;
-        XNodeDTD *m_dtd;
     };
     //
     // Shortcuts

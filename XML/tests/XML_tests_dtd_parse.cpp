@@ -152,7 +152,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE TVSCHEDULE [\n"
-                "<!ELEMENT TVSCHEDULE (CHANNEL+)><!ELEMENT CHANNEL (BANNER,DAY+)>\n"
+                "<!ELEMENT TVSCHEDULE (CHANNEL+)>\n"
+                "<!ELEMENT CHANNEL (BANNER,DAY+)>\n"
                 "<!ELEMENT BANNER (#PCDATA)><!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>\n"
                 "<!ELEMENT HOLIDAY (#PCDATA)><!ELEMENT DATE (#PCDATA)>\n"
                 "<!ELEMENT PROGRAMSLOT (TIME,TITLE,DESCRIPTION?)>\n"
@@ -327,23 +328,23 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\n"
                 "<!ENTITY % BLOCK \"(PARA|LIST)+\">\n"
                 "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\n"
-                "<!NOTATION GIF SYSTEM \"\">\n"
-                "<!NOTATION JPG SYSTEM \"\">\n"
-                "<!NOTATION BMP SYSTEM \"\">\n"
+                "<!NOTATION GIF SYSTEM \"GIF\">\n"
+                "<!NOTATION JPG SYSTEM \"JPG\">\n"
+                "<!NOTATION BMP SYSTEM \"BMP\">\n"
                 "]>\n"
                 "<REPORT> </REPORT>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>(xmlObject.prolog[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].value.parsed == "");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].value.unparsed == "");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].value.parsed == "GIF");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].value.unparsed == "GIF");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].value.parsed == "");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].value.unparsed == "");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].value.parsed == "JPG");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].value.unparsed == "JPG");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].value.parsed == "");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].value.unparsed == "");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].value.parsed == "BMP");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].value.unparsed == "BMP");
   }
   SECTION("XML with internal DTD containing comments.", "[XML][Parse][DTD]")
   {
