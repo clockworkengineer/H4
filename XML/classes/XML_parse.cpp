@@ -42,6 +42,16 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    void XML::addContent(XNodeElement *xNodeElement, const std::string &content)
+    {
+        // Make sure there is a content node to recieve characters
+        if (xNodeElement->elements.empty() ||
+            xNodeElement->elements.back()->getNodeType() != XNodeType::content)
+        {
+            xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>());
+        }
+        XNodeRef<XNodeContent>(*xNodeElement->elements.back()).content += content;
+    }
     /// <summary>
     /// Check whether a attribute exists in list of attributes.
     /// </summary>
@@ -331,7 +341,8 @@ namespace H4
                 throw SyntaxError(xmlSource, "Declaration invalid or end tag not found.");
             }
         }
-        moveToNextLineFeed(xmlSource);
+     //   xmlSource.next()();
+     //   moveToNextLineFeed(xmlSource);
         while (xmlSource.more())
         {
             if (xmlSource.match(U"<!--"))
@@ -346,18 +357,16 @@ namespace H4
             {
                 parseDTD(xmlSource, xNodeProlog);
             }
-            else if (xmlSource.current() == kLineFeed)
+            else if (xmlSource.current() != '<')
             {
-                XNodeContent linefeed;
-                linefeed.content += kLineFeed;
-                xNodeProlog->elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
+                addContent(xNodeProlog, std::string(1, xmlSource.current()));
                 xmlSource.next();
             }
             else
             {
                 break;
             }
-            moveToNextLineFeed(xmlSource);
+            // moveToNextLineFeed(xmlSource);
         }
     }
     /// <summary>
@@ -399,13 +408,7 @@ namespace H4
         }
         else
         {
-            // Make sure there is a content node to recieve characters
-            if (xNodeElement->elements.empty() ||
-                xNodeElement->elements.back()->getNodeType() != XNodeType::content)
-            {
-                xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>());
-            }
-            XNodeRef<XNodeContent>(*xNodeElement->elements.back()).content += entityReference.parsed;
+            addContent(xNodeElement, entityReference.parsed);
         }
     }
     /// <summary>
@@ -477,12 +480,16 @@ namespace H4
             xmlSource.next();
             xObject.prolog.elements.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
             parseElement(xmlSource, static_cast<XNodeElement *>(xObject.prolog.elements.back().get()));
-            if (xmlSource.current() == kLineFeed)
-            {
-                XNodeContent linefeed;
-                linefeed.content += kLineFeed;
-                xObject.prolog.elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
+            while (xmlSource.more()) {
+                addContent(&xObject.prolog, std::string(1, xmlSource.current()));
+                xmlSource.next();
             }
+            // if (xmlSource.current() == kLineFeed)
+            // {
+            //     XNodeContent linefeed;
+            //     linefeed.content += kLineFeed;
+            //     xObject.prolog.elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
+            // }
         }
         else
         {

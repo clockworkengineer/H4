@@ -430,11 +430,11 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
   std::string xmlString;
   SECTION("Parse entity &amp; in contents area", "[XML][Parse][Entities]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> "
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                 "<root> &amp; </root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0]).getContents() == " & ");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).getContents() == " & ");
   }
   SECTION("Parse entity &quot; in contents area", "[XML][Parse][Entities]")
   {
@@ -462,11 +462,11 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
   }
   SECTION("Parse reference &#163; in contents area", "[XML][Parse][Entities]")
   {
-    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> "
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
                 "<root> &#163; </root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0]).getContents() == " £ ");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).getContents() == " £ ");
   }
   SECTION("Parse entity &amp;&quot;&apos;&gt;&lt; in attribute value", "[XML][Parse][Entities]")
   {

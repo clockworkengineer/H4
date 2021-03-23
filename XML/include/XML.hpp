@@ -50,6 +50,7 @@ namespace H4
             {
                 return (errorMessage.c_str());
             }
+
         private:
             std::string errorMessage;
         };
@@ -106,6 +107,7 @@ namespace H4
             {
                 return (m_UTF8.from_bytes(from));
             }
+
         protected:
             long m_lineNo = 1;
             long m_column = 1;
@@ -163,6 +165,7 @@ namespace H4
         void validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void vadlidateElements(XNodeDTD *dtd, XNode *xNodeRoot);
         void initialiseTables();
+        void addContent(XNodeElement *xNodeElement, const std::string &content);
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
         void moveToNextLineFeed(ISource &source);
         bool validChar(XChar ch);
