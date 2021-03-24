@@ -194,14 +194,14 @@ namespace H4
     {
         xmlSource.ignoreWS();
         std::string elementName = parseName(xmlSource);
-        XString elementContent;
+        XValue elementContent;
         if (xmlSource.match(U"EMPTY"))
         {
-            elementContent = U"EMPTY";
+            elementContent.unparsed = "EMPTY";
         }
         else if (xmlSource.match(U"ANY"))
         {
-            elementContent = U"ANY";
+            elementContent.unparsed = "ANY";
         }
         else
         {
@@ -209,7 +209,7 @@ namespace H4
             while (xmlSource.more() &&
                    ((bracketLevel > 0) && (xmlSource.current() != '>')))
             {
-                elementContent += xmlSource.current();
+                elementContent.unparsed += xmlSource.current();
                 xmlSource.next();
                 if (xmlSource.current() == '(')
                 {
@@ -222,7 +222,7 @@ namespace H4
             }
             if (bracketLevel == 0)
             {
-                elementContent += xmlSource.current();
+                elementContent.unparsed += xmlSource.current();
                 xmlSource.next();
                 xmlSource.ignoreWS();
             }
@@ -230,12 +230,12 @@ namespace H4
                 xmlSource.current() == '*' ||
                 xmlSource.current() == '+')
             {
-                elementContent += xmlSource.current();
+                elementContent.unparsed += xmlSource.current();
                 xmlSource.next();
                 xmlSource.ignoreWS();
             }
         }
-        XDTDElement element(elementName, xmlSource.to_bytes(elementContent));
+        XDTDElement element(elementName, elementContent);
         xNodeDTD->elements.emplace(std::pair(element.name, element));
         xmlSource.ignoreWS();
     }

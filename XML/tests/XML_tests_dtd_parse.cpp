@@ -108,17 +108,17 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["address"].name == "address");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["address"].content == "(name,company,phone)");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["address"].content.unparsed == "(name,company,phone)");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["name"].name == "name");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["name"].content == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["name"].content.unparsed == "(#PCDATA)");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["company"].name == "company");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["company"].content == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["company"].content.unparsed == "(#PCDATA)");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["phone"].name == "phone");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["phone"].content == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["phone"].content.unparsed == "(#PCDATA)");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["br"].name == "br");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["br"].content == "EMPTY");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["br"].content.unparsed == "EMPTY");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["footer"].name == "footer");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["footer"].content == "ANY");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["footer"].content.unparsed == "ANY");
   }
   SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
   {
@@ -264,7 +264,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[4].type == "(InStock|Backordered|Discontinued)");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["PRODUCT"].attributes[4].value.parsed == "InStock");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["NOTES"].name == "NOTES");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["NOTES"].content == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["NOTES"].content.unparsed == "(#PCDATA)");
   }
   SECTION("XML with internal DTD with parameter entities to parse.", "[XML][Parse][DTD]")
   {
@@ -302,7 +302,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%area;"] == "name, street, pincode, city");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements.size() == 5);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["residence"].name == "residence");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["residence"].content == "(%area;, %contact;)");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["residence"].content.unparsed == "(%area;, %contact;)");
   }
   SECTION("XML with internal DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
   {

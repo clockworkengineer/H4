@@ -64,22 +64,6 @@ namespace H4
                              [&attributeName](const XAttribute &attr) { return (attr.name == attributeName); }) != attributeList.rend());
     }
     /// <summary>
-    /// Find first non-whitespace character or linfeed on source stream
-    /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
-    void XML::moveToNextLineFeed(ISource &xmlSource)
-    {
-        while (xmlSource.more() && std::iswspace(xmlSource.current()))
-        {
-            if (xmlSource.current() == kLineFeed)
-            {
-                break;
-            }
-            xmlSource.next();
-        }
-    }
-    /// <summary>
     /// Parse a character reference returning its value.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
@@ -341,8 +325,6 @@ namespace H4
                 throw SyntaxError(xmlSource, "Declaration invalid or end tag not found.");
             }
         }
-     //   xmlSource.next()();
-     //   moveToNextLineFeed(xmlSource);
         while (xmlSource.more())
         {
             if (xmlSource.match(U"<!--"))
@@ -366,7 +348,6 @@ namespace H4
             {
                 break;
             }
-            // moveToNextLineFeed(xmlSource);
         }
     }
     /// <summary>
@@ -484,12 +465,6 @@ namespace H4
                 addContent(&xObject.prolog, std::string(1, xmlSource.current()));
                 xmlSource.next();
             }
-            // if (xmlSource.current() == kLineFeed)
-            // {
-            //     XNodeContent linefeed;
-            //     linefeed.content += kLineFeed;
-            //     xObject.prolog.elements.emplace_back(std::make_unique<XNodeContent>(std::move(linefeed)));
-            // }
         }
         else
         {

@@ -52,12 +52,12 @@ namespace H4
         {
             throw std::runtime_error("Undefined element <" + xNodeElement->name + "> found.");
         }
-        if (dtd->elements[xNodeElement->name].content == "(#PCDATA)")
+        if (dtd->elements[xNodeElement->name].content.unparsed == "(#PCDATA)")
         {
             return;
         }
         std::string regExp;
-        for (auto ch : dtd->elements[xNodeElement->name].content)
+        for (auto ch : dtd->elements[xNodeElement->name].content.unparsed)
         {
             if (ch != ',')
             {
