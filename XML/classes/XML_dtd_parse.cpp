@@ -349,6 +349,11 @@ namespace H4
         }
         // Save away unparsed form
         xNodeDTD.unparsed = "<!DOCTYPE" + xmlSource.getRange(start, xmlSource.position());
+        for (auto ch: xNodeDTD.unparsed) {
+            if (ch==kLineFeed) {
+                xNodeDTD.lineNumber++;
+            }
+        }
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
     }
 } // namespace H4

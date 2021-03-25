@@ -58,7 +58,7 @@ namespace H4
         }
         if (dtd->elements.count(xNodeElement->name) == 0)
         {
-            throw std::runtime_error("Undefined element <" + xNodeElement->name + "> found.");
+            throw std::runtime_error("[Line "+std::to_string(dtd->lineNumber)+"]Undefined element <" + xNodeElement->name + "> found.");
         }
         if (dtd->elements[xNodeElement->name].content.unparsed == "(#PCDATA)")
         {
@@ -66,27 +66,28 @@ namespace H4
         }
         for (auto ch : dtd->elements[xNodeElement->name].content.unparsed)
         {
-            if (ch != ',')
+            if ((ch != ',') && !std::iswspace(ch))
             {
                 dtd->elements[xNodeElement->name].content.parsed += ch;
             }
         }
         for (auto element : dtd->elements)
         {
-            replace(dtd->elements[xNodeElement->name].content.parsed, element.first, "(" + element.first + ")");
+            replace(dtd->elements[xNodeElement->name].content.parsed, element.first, "(<" + element.first + ">)");
         }
+        std::string ex = dtd->elements[xNodeElement->name].content.parsed;
         std::regex match(dtd->elements[xNodeElement->name].content.parsed);
         std::string elements;
         for (auto &element : xNodeElement->elements)
         {
             if (XNodeRef<XNode>(*element).getNodeType() == XNodeType::element)
             {
-                elements += XNodeRef<XNodeElement>(*element).name;
+                elements += "<" + XNodeRef<XNodeElement>(*element).name + ">";
             }
         }
         if (!std::regex_match(elements, match))
         {
-            throw std::runtime_error("Invalid <" + xNodeElement->name + "> element found.");
+            throw std::runtime_error("[Line "+std::to_string(dtd->lineNumber)+"]Invalid <" + xNodeElement->name + "> element found.");
         }
     }
     void XML::vadlidateElements(XNodeDTD *dtd, XNode *xNode)
@@ -100,6 +101,9 @@ namespace H4
             }
             break;
         case XNodeType::root:
+            if (XNodeRef<XNodeElement>((*xNode)).name != dtd->name) {
+                throw std::runtime_error("[Line "+std::to_string(dtd->lineNumber)+"]DOCTYPE name does not match that of root element "+XNodeRef<XNodeElement>((*xNode)).name+" of XML.");
+            }
         case XNodeType::element:
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
             {
@@ -111,11 +115,19 @@ namespace H4
             validateElement(dtd, static_cast<XNodeElement *>(xNode));
             break;
         case XNodeType::comment:
-        case XNodeType::content:
         case XNodeType::entity:
         case XNodeType::pi:
         case XNodeType::cdata:
         case XNodeType::dtd:
+            break;
+        case XNodeType::content:
+            for (auto &ch : XNodeRef<XNodeContent>((*xNode)).content)
+            {
+                if (ch == kLineFeed)
+                {
+                    dtd->lineNumber++;
+                }
+            }
             break;
         default:
             throw std::runtime_error("Invalid XNode encountered during validation.");
