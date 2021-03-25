@@ -58,7 +58,7 @@ namespace H4
         }
         if (dtd->elements.count(xNodeElement->name) == 0)
         {
-            throw std::runtime_error("[Line "+std::to_string(dtd->lineNumber)+"]Undefined element <" + xNodeElement->name + "> found.");
+            throw std::runtime_error("[Line " + std::to_string(dtd->lineNumber) + "]Undefined element <" + xNodeElement->name + "> found.");
         }
         if (dtd->elements[xNodeElement->name].content.unparsed == "(#PCDATA)")
         {
@@ -75,7 +75,6 @@ namespace H4
         {
             replace(dtd->elements[xNodeElement->name].content.parsed, element.first, "(<" + element.first + ">)");
         }
-        std::string ex = dtd->elements[xNodeElement->name].content.parsed;
         std::regex match(dtd->elements[xNodeElement->name].content.parsed);
         std::string elements;
         for (auto &element : xNodeElement->elements)
@@ -87,7 +86,8 @@ namespace H4
         }
         if (!std::regex_match(elements, match))
         {
-            throw std::runtime_error("[Line "+std::to_string(dtd->lineNumber)+"]Invalid <" + xNodeElement->name + "> element found.");
+            throw std::runtime_error("[Line " + std::to_string(dtd->lineNumber) + "]" + "<"+xNodeElement->name + "> element does not conform to the content specication " +
+                                     dtd->elements[xNodeElement->name].content.unparsed + ".");
         }
     }
     void XML::vadlidateElements(XNodeDTD *dtd, XNode *xNode)
@@ -101,8 +101,9 @@ namespace H4
             }
             break;
         case XNodeType::root:
-            if (XNodeRef<XNodeElement>((*xNode)).name != dtd->name) {
-                throw std::runtime_error("[Line "+std::to_string(dtd->lineNumber)+"]DOCTYPE name does not match that of root element "+XNodeRef<XNodeElement>((*xNode)).name+" of XML.");
+            if (XNodeRef<XNodeElement>((*xNode)).name != dtd->name)
+            {
+                throw std::runtime_error("[Line " + std::to_string(dtd->lineNumber) + "]DOCTYPE name does not match that of root element " + XNodeRef<XNodeElement>((*xNode)).name + " of XML.");
             }
         case XNodeType::element:
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)

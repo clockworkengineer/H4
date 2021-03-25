@@ -53,7 +53,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</note>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "[Line 12]Invalid <note> element found.");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "[Line 12]<note> element does not conform to the content specication (to,from,heading,body).");
   }
   SECTION("XML with an empty notes tag which voilates the DTD.", "[XML][DTD][Validate]")
   {
@@ -70,7 +70,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</notes>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "[Line 11]Invalid <notes> element found.");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "[Line 11]<notes> element does not conform to the content specication (note)+.");
   }
   SECTION("XML with an empty notes tag which is valid given DTD.", "[XML][DTD][Validate]")
   {
@@ -144,6 +144,6 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</album>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "[Line 14]Invalid <album> element found.");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "[Line 14]<album> element does not conform to the content specication ( title, ( songTitle, duration )+ ).");
   }
 }
