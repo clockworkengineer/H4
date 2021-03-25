@@ -42,6 +42,14 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    bool replace(std::string &str, const std::string &from, const std::string &to)
+    {
+        size_t start_pos = str.find(from);
+        if (start_pos == std::string::npos)
+            return false;
+        str.replace(start_pos, from.length(), to);
+        return true;
+    }
     void XML::validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
         if ((dtd == nullptr) || (dtd->elements.empty()))
@@ -56,15 +64,18 @@ namespace H4
         {
             return;
         }
-        std::string regExp;
         for (auto ch : dtd->elements[xNodeElement->name].content.unparsed)
         {
             if (ch != ',')
             {
-                regExp += ch;
+                dtd->elements[xNodeElement->name].content.parsed += ch;
             }
         }
-        std::regex match(regExp);
+        for (auto element : dtd->elements)
+        {
+            replace(dtd->elements[xNodeElement->name].content.parsed, element.first, "(" + element.first + ")");
+        }
+        std::regex match(dtd->elements[xNodeElement->name].content.parsed);
         std::string elements;
         for (auto &element : xNodeElement->elements)
         {

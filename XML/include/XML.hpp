@@ -167,7 +167,6 @@ namespace H4
         void initialiseTables();
         void addContent(XNodeElement *xNodeElement, const std::string &content);
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
-        void moveToNextLineFeed(ISource &source);
         bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
         bool validNameChar(XChar c);
@@ -189,6 +188,7 @@ namespace H4
         void parseAttributes(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseComment(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseCDATA(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseDTDExternalContents(XNodeDTD *xNodeDTD);
         void parseDTDAttributeList(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTDNotation(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTDEntity(ISource &xmlSource, XNodeDTD *xNodeDTD);

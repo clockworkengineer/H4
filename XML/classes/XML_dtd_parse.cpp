@@ -43,6 +43,21 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    /// <summary>
+    /// Parse externally defined DTD into DTD XNode.
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTDExternalContents(XNodeDTD *xNodeDTD)
+    {
+        if (xNodeDTD->external.name == "SYSTEM")
+        {
+            FileSource dtdFile(xNodeDTD->external.value.parsed);
+            parseDTDInternal(dtdFile, xNodeDTD);
+        } else if (xNodeDTD->external.name == "PUBLIC") {
+            // Public external DTD currently not supported
+        }
+    }
     XAttribute XML::parseDTDExternalReference(ISource &xmlSource)
     {
         XAttribute result;
@@ -247,6 +262,7 @@ namespace H4
     void XML::parseDTDExternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
         xNodeDTD->external = parseDTDExternalReference(xmlSource);
+        parseDTDExternalContents(xNodeDTD);
         if (xmlSource.current() != '>')
         {
             throw SyntaxError(xmlSource, "Missing terminator '>'.");
@@ -273,8 +289,6 @@ namespace H4
     /// <returns></returns>
     void XML::parseDTDInternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
-        xmlSource.next();
-        xmlSource.ignoreWS();
         while (xmlSource.more() && !xmlSource.match(U"]>"))
         {
             if (xmlSource.match(U"<!ENTITY"))
@@ -325,6 +339,8 @@ namespace H4
         xNodeDTD.name = parseName(xmlSource);
         if (xmlSource.current() == '[')
         {
+            xmlSource.next();
+            xmlSource.ignoreWS();
             parseDTDInternal(xmlSource, &xNodeDTD);
         }
         else

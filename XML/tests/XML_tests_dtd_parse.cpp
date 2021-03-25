@@ -38,7 +38,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   SECTION("XML with external (SYSTEM) DTD", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                "<!DOCTYPE note SYSTEM \"Note.dtd\">\n"
+                "<!DOCTYPE note SYSTEM \"./testData/note.dtd\">\n"
                 "<note>\n"
                 "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
                 "<body>Don't forget me this weekend!</body>\n"
@@ -123,7 +123,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                "<!DOCTYPE note SYSTEM \"Note.dtd\">\n"
+                "<!DOCTYPE note SYSTEM \"./testData/note.dtd\">\n"
                 "<note>\n"
                 "<to>Tove"
                 "</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body>\n"
@@ -133,7 +133,9 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.value.parsed == "Note.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.value.parsed == "./testData/note.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["note"].name == "note");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["note"].content.unparsed == "(to,from,heading,body)");
   }
   SECTION("XML with external URL DTD to parse and check values", "[XML][Parse][DTD]")
   {
