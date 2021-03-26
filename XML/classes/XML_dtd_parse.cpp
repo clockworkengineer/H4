@@ -222,34 +222,11 @@ namespace H4
         }
         else
         {
-            int bracketLevel = 1;
             while (xmlSource.more() &&
-                   ((bracketLevel > 0) && (xmlSource.current() != '>')))
+                   ((xmlSource.current()!='<') && (xmlSource.current() != '>')))
             {
                 elementContent.unparsed += xmlSource.current();
                 xmlSource.next();
-                if (xmlSource.current() == '(')
-                {
-                    bracketLevel++;
-                }
-                else if (xmlSource.current() == ')')
-                {
-                    bracketLevel--;
-                }
-            }
-            if (bracketLevel == 0)
-            {
-                elementContent.unparsed += xmlSource.current();
-                xmlSource.next();
-                xmlSource.ignoreWS();
-            }
-            if (xmlSource.current() == '?' ||
-                xmlSource.current() == '*' ||
-                xmlSource.current() == '+')
-            {
-                elementContent.unparsed += xmlSource.current();
-                xmlSource.next();
-                xmlSource.ignoreWS();
             }
         }
         XDTDElement element(elementName, elementContent);
