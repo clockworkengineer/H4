@@ -35,7 +35,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</note>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "[Line 11]Undefined element <date> found.");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 9] <note> element does not conform to the content specication (to,from,heading,body).");
   }
   SECTION("XML with an missing <to> tag which voilates the DTD.", "[XML][DTD][Validate]")
   {
@@ -53,7 +53,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</note>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "[Line 12]<note> element does not conform to the content specication (to,from,heading,body).");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 9] <note> element does not conform to the content specication (to,from,heading,body).");
   }
   SECTION("XML with an empty notes tag which voilates the DTD.", "[XML][DTD][Validate]")
   {
@@ -70,7 +70,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</notes>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "[Line 11]<notes> element does not conform to the content specication (note)+.");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 10] <notes> element does not conform to the content specication (note)+.");
   }
   SECTION("XML with an empty notes tag which is valid given DTD.", "[XML][DTD][Validate]")
   {
@@ -126,7 +126,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_NOTHROW(xml.validate(xmlObject));
   }
-  SECTION("XML with a DTD and data that has out of order duration tag.", "[XML][DTD][Validate]")
+  SECTION("XML with a DTD and XML that has out of sequence duration tag.", "[XML][DTD][Validate]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE album [\n"
@@ -144,6 +144,61 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</album>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "[Line 14]<album> element does not conform to the content specication ( title, ( songTitle, duration )+ ).");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 8] <album> element does not conform to the content specication ( title, ( songTitle, duration )+ ).");
   }
+  SECTION("XML with a DTD that uses '*' (zero or more times) operator and has XML that complies.", "[XML][DTD][Validate]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE library [\n"
+                "<!ELEMENT library ( book* )>\n"
+                "<!ELEMENT book (#PCDATA)>"
+                "]>\n"
+                "<library>\n"
+                "<book>The Wealth of Nations</book>\n"
+                "<book>The Iliad</book>\n"
+                "<book>The Jungle</book>\n"
+                "</library>\n";
+
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_NOTHROW(xml.validate(xmlObject));
+  }
+  SECTION("XML with a DTD that uses '*' (zero or more times) operator and has XML that does not have a book element.", "[XML][DTD][Validate]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE library [\n"
+                "<!ELEMENT library ( book* )>\n"
+                "<!ELEMENT book (#PCDATA)>\n"
+                "]>\n"
+                "<library>\n"
+                "</library>\n";
+
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_NOTHROW(xml.validate(xmlObject));
+  }
+
+  //   SECTION("XML with a DTD that uses '?' (zero or onetimes) operator and has XML conatins occupied and empty seats.", "[XML][DTD][Validate]")
+  // {
+  //   xmlString = "<?xml version=\"1.0\"?>\n"
+  //               "<!DOCTYPE plane [\n"
+  //               "<!ELEMENT plane ( seats )>\n"
+  //               "<!ELEMENT seats ( seat + )>\n"
+  //               "<!ELEMENT seat ( passenger ? )>\n"
+  //               "<!ELEMENT passenger (#PCDATA)>\n"
+  //               "]>\n"
+  //               "<plane>\n"
+  //               "<seats>\n"
+  //               // "<seat>\n"
+  //               // "</seat>\n"
+  //               "<seat>\n"
+  //               "<passenger>John Smith</passenger>\n"
+  //               "</seat>\n"
+  //               "</seats>\n"
+  //               "</plane>\n";
+
+  //   BufferSource xmlSource(xmlString);
+  //   XMLObject xmlObject = xml.parse(xmlSource);
+  //   REQUIRE_NOTHROW(xml.validate(xmlObject));
+  // }
 }

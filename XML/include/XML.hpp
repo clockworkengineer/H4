@@ -54,6 +54,22 @@ namespace H4
         private:
             std::string errorMessage;
         };
+
+        struct ValidationError : public std::exception
+        {
+        public:
+            ValidationError(XNodeDTD *dtd, const std::string &description = "")
+            {
+                errorMessage = "XML Validation Error [Line: " + std::to_string(dtd->lineNumber)+"] " + description;
+            }
+            virtual const char *what() const throw()
+            {
+                return (errorMessage.c_str());
+            }
+
+        private:
+            std::string errorMessage;
+        };
         //
         // Source Interface
         //

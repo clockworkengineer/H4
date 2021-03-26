@@ -213,10 +213,12 @@ namespace H4
         if (xmlSource.match(U"EMPTY"))
         {
             elementContent.unparsed = "EMPTY";
+            elementContent.parsed = "EMPTY";
         }
         else if (xmlSource.match(U"ANY"))
         {
             elementContent.unparsed = "ANY";
+            elementContent.parsed = "ANY";
         }
         else
         {
