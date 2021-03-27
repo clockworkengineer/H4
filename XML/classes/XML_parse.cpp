@@ -412,6 +412,10 @@ namespace H4
         {
             parseCDATA(xmlSource, xNodeElement);
         }
+        if (xmlSource.match(U"</"))
+        {
+           throw SyntaxError(xmlSource, "Missing closing tag.");
+        }
         else if (xmlSource.match(U"<"))
         {
             parseChildElement(xmlSource, xNodeElement);
@@ -432,19 +436,19 @@ namespace H4
         parseAttributes(xmlSource, xNodeElement);
         if (xmlSource.match(U">"))
         {
-            XString closingTag = U"</" + xmlSource.from_bytes(xNodeElement->name) + U">";
+            XString closingTag = U"</" + xmlSource.from_bytes(xNodeElement->name);
             while (xmlSource.more() && !xmlSource.match(closingTag))
             {
                 parseElementContents(xmlSource, xNodeElement);
+            }
+            if (!xmlSource.match(U">"))
+            {
+                throw SyntaxError(xmlSource, "Missing closing tag.");
             }
         }
         else if (xmlSource.match(U"/>"))
         {
             xNodeElement->setNodeType(XNodeType::self);
-        }
-        else
-        {
-            throw SyntaxError(xmlSource, "Missing '/>' for closing tag.");
         }
     }
     /// <summary>
@@ -461,7 +465,8 @@ namespace H4
             xmlSource.next();
             xObject.prolog.elements.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
             parseElement(xmlSource, static_cast<XNodeElement *>(xObject.prolog.elements.back().get()));
-            while (xmlSource.more()) {
+            while (xmlSource.more())
+            {
                 addContent(&xObject.prolog, std::string(1, xmlSource.current()));
                 xmlSource.next();
             }

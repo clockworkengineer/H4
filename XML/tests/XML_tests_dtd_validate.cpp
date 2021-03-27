@@ -236,12 +236,12 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "<assistant>Paul Deitel</assistant>\n"
                 "<credit>3</credit>\n"
                 "</class>\n"
-                "/timetable>\n";
+                "</timetable>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_NOTHROW(xml.validate(xmlObject));
   }
-   SECTION("XML with a DTD that uses '|' (or) operator and has a class without an assistant/instrucor.", "[XML][DTD][Validate]")
+  SECTION("XML with a DTD that uses '|' (or) operator and has a class without an assistant/instrucor.", "[XML][DTD][Validate]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE timetable [\n"
@@ -269,12 +269,12 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "<number>885</number>\n"
                 "<credit>3</credit>\n"
                 "</class>\n"
-                "/timetable>\n";
+                "</timetable>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 23] <class> element does not conform to the content specication ( number, ( instructor | assistant+ ),( credit | noCredit ) ).");
   }
-    SECTION("XML with a DTD that uses all of the content specification operators and has valid XML for it.", "[XML][DTD][Validate]")
+  SECTION("XML with a DTD that uses all of the content specification operators and has valid XML for it.", "[XML][DTD][Validate]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE donutDelivery [\n"
@@ -298,7 +298,38 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "<sugar>semi-sweet</sugar>\n"
                 "<creme>whipped</creme>\n"
                 "<sugar>sweet</sugar>\n"
-                "</donutBox>\n";
+                "</donutBox>\n"
+                  "</donutDelivery>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_NOTHROW(xml.validate(xmlObject));
+  }
+  SECTION("XML with a DTD that uses all of the content specification operators and has XML with an empty box.", "[XML][DTD][Validate]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE donutDelivery [\n"
+                "<!ELEMENT donutDelivery (donutBox)+ >\n"
+                "<!ELEMENT donutBox ( jelly?, lemon*,( ( creme | sugar )+ | glazed ) )\n>"
+                "<!ELEMENT jelly (#PCDATA)>\n"
+                "<!ELEMENT lemon (#PCDATA)>\n"
+                "<!ELEMENT creme (#PCDATA)>\n"
+                "<!ELEMENT sugar (#PCDATA)>\n"
+                "<!ELEMENT glazed (#PCDATA)>\n"
+                "]>\n"
+                "<donutDelivery>\n"
+                "<donutBox>\n"
+                "<jelly>grape</jelly>\n"
+                "<lemon>half-sour</lemon>\n"
+                "<lemon>sour</lemon>\n"
+                "<lemon>half-sour</lemon>\n"
+                "<glazed>chocolate</glazed>\n"
+                "</donutBox>\n"
+                "<donutBox>\n"
+                "<sugar>semi-sweet</sugar>\n"
+                "<creme>whipped</creme>\n"
+                "<sugar>sweet</sugar>\n"
+                "</donutBox>\n"
+                "</donutDelivery>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_NOTHROW(xml.validate(xmlObject));

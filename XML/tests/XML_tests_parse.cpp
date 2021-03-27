@@ -60,6 +60,20 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 20]Declaration invalid or end tag not found.");
   }
+  SECTION("Parse empty XML declaration no closing root tag ", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<root>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 3 Column: 2]Missing closing tag.");
+  }
+  SECTION("Parse empty XML declaration no closing child tag ", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<root><child></root>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 30]Missing closing tag.");
+  }
   SECTION("Parse wrongly ordered attributes in XML declaration. ", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version=\"1.0\" standalone=\"no\" encoding=\"UTF-8\"?>\n"
@@ -91,19 +105,19 @@ TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<AddressBook> </addressbook>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 25]Invalid name encountered.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 26]Missing closing tag.");
   }
   SECTION("Incorrect closing tag ", "[XML][Parse][Tags]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<AddressBook> </Address>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 32]Invalid name encountered.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 33]Missing closing tag.");
   }
   SECTION("Self closing tag ", "[XML][Parse][Tags]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
-                "<AddressBook/>\n";
+                "<root><AddressBook/></root>\n";
     BufferSource xmlSource(xmlString);
     REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
@@ -284,7 +298,7 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<AddressBook number='15'>\n"
-                "<AddressBook/>\n";
+                "</AddressBook>\n";
     BufferSource xmlSource(xmlString);
     REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
@@ -667,7 +681,7 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
                 "<g:name>African Coffee Table</g:name><g:width>80</g:width>\n"
                 "<g:length>120</g:length></g:table></root>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 3 Column: 43]Namespace used but not defined.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 3 Column: 44]Namespace used but not defined.");
   }
   SECTION("A root documement with a default namespace", "[XML][Parse][Namespace]")
   {
