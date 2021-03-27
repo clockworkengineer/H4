@@ -42,26 +42,40 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    bool replace(std::string &str, const std::string &from, const std::string &to)
+    void parseContentsSpecification(XNodeDTD * /*dtd*/, XValue &contents)
     {
-        size_t start_pos = str.find(from);
-        if (start_pos == std::string::npos)
-            return false;
-        str.replace(start_pos, from.length(), to);
-        return true;
-    }
-    void parseContentsSpecification(XNodeDTD *dtd, XValue &contents)
-    {
-        for (auto ch : contents.unparsed)
+        for (size_t index = 0;;)
         {
-            if ((ch != ',') && !std::iswspace(ch))
+            if (contents.unparsed[index] == ',' || std::iswspace(contents.unparsed[index]))
             {
-                contents.parsed += ch;
+                index++;
+                if (index == contents.unparsed.size())
+                {
+                    break;
+                }
             }
-        }
-        for (auto element : dtd->elements)
-        {
-            replace(contents.parsed, element.first, "(<" + element.first + ">)");
+            else if (std::isalpha(contents.unparsed[index]))
+            {
+                contents.parsed += "(<";
+                while (std::isalpha(contents.unparsed[index]))
+                {
+                    contents.parsed += contents.unparsed[index++];
+                    if (index == contents.unparsed.size())
+                    {
+                        contents.parsed += ">)";
+                        break;
+                    }
+                }
+                contents.parsed += ">)";
+            }
+            else
+            {
+                contents.parsed += contents.unparsed[index++];
+                if (index == contents.unparsed.size())
+                {
+                    break;
+                }
+            }
         }
     }
     void XML::validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
@@ -70,15 +84,14 @@ namespace H4
         {
             return;
         }
-        if (dtd->elements.count(xNodeElement->name) == 0)
-        {
-            throw ValidationError(dtd, "Undefined element <" + xNodeElement->name + "> found.");
-        }
         if (dtd->elements[xNodeElement->name].content.unparsed == "(#PCDATA)")
         {
             return;
         }
-        parseContentsSpecification(dtd, dtd->elements[xNodeElement->name].content);
+        if (dtd->elements[xNodeElement->name].content.parsed.empty())
+        {
+            parseContentsSpecification(dtd, dtd->elements[xNodeElement->name].content);
+        }
         std::regex match(dtd->elements[xNodeElement->name].content.parsed);
         std::string elements;
         for (auto &element : xNodeElement->elements)
