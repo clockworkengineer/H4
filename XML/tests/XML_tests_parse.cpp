@@ -49,6 +49,13 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 1]Invalid standalone value of 'maybe'.");
   }
+  SECTION("Parse XML declaration with extra content after root element. ", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+                "<root></root>extra content.\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 18]Extra content at the end of document.");
+  }
   SECTION("Parse version 1.0 encoding == UTF-8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?> "

@@ -446,10 +446,12 @@ namespace H4
                 break;
             }
             else if (std::iswspace(xmlSource.current()))
-            {   
+            {
                 addElementContent(xNodeProlog, std::string(1, xmlSource.current()));
                 xmlSource.next();
-            } else {
+            }
+            else
+            {
                 throw SyntaxError(xmlSource, "Content detected before root element.");
             }
         }
@@ -469,8 +471,19 @@ namespace H4
             parseElement(xmlSource, static_cast<XNodeElement *>(xObject.prolog.elements.back().get()));
             while (xmlSource.more())
             {
-                addElementContent(&xObject.prolog, std::string(1, xmlSource.current()));
-                xmlSource.next();
+                if (xmlSource.match(U"<!--"))
+                {
+                    parseComment(xmlSource, (&xObject.prolog));
+                }
+                else if (std::iswspace(xmlSource.current()))
+                {
+                    addElementContent(&xObject.prolog, std::string(1, xmlSource.current()));
+                    xmlSource.next();
+                }
+                else
+                {
+                    throw SyntaxError(xmlSource, "Extra content at the end of document.");
+                }
             }
         }
         else
