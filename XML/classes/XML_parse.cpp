@@ -198,7 +198,7 @@ namespace H4
         xmlSource.ignoreWS();
         if (!validateName(name))
         {
-            throw SyntaxError(xmlSource, "Invalid name encountered.");
+            throw SyntaxError(xmlSource, "Invalid name '"+xmlSource.to_bytes(name)+"' encountered.");
         }
         return (xmlSource.to_bytes(name));
     }
@@ -225,11 +225,10 @@ namespace H4
             xNodeComment.comment += xmlSource.to_bytes(xmlSource.current());
             xmlSource.next();
         }
-        if (xmlSource.current() != '>')
+        if (!xmlSource.match(U">"))
         {
             throw SyntaxError(xmlSource, "Missing closing '>' for comment line.");
         }
-        xmlSource.next();
         xNodeElement->elements.emplace_back(std::make_unique<XNodeComment>(xNodeComment));
     }
     /// <summary>
@@ -262,7 +261,7 @@ namespace H4
         {
             if (xmlSource.match(U"<![CDATA["))
             {
-                throw SyntaxError(xmlSource);
+                throw SyntaxError(xmlSource, "Nesting of CDATA sections is not allowed.");
             }
             xNodeCDATA.cdata += xmlSource.to_bytes(xmlSource.current());
             xmlSource.next();
@@ -283,11 +282,10 @@ namespace H4
                xmlSource.current() != '>')
         {
             std::string attributeName = parseName(xmlSource);
-            if (xmlSource.current() != '=')
+            if (!xmlSource.match(U"="))
             {
                 throw SyntaxError(xmlSource, "Missing '=' between attribute name and value.");
             }
-            xmlSource.next();
             xmlSource.ignoreWS();
             XValue attributeValue = parseValue(xmlSource);
             if (!isAttributePresent(xNodeElement->attributes, attributeName))
@@ -335,10 +333,6 @@ namespace H4
     /// <returns></returns>
     void XML::parseDefault(ISource &xmlSource, XNodeElement *xNodeElement)
     {
-        if (xmlSource.match(U"]]>"))
-        {
-            throw SyntaxError(xmlSource, "']]>' invalid in element content area.");
-        }
         XValue entityReference = parseCharacter(xmlSource);
         if (entityReference.unparsed != "")
         {
@@ -378,6 +372,10 @@ namespace H4
         {
             parseChildElement(xmlSource, xNodeElement);
         }
+        else if (xmlSource.match(U"]]>"))
+        {
+            throw SyntaxError(xmlSource, "']]>' invalid in element content area.");
+        }
         else
         {
             parseDefault(xmlSource, xNodeElement);
@@ -405,6 +403,7 @@ namespace H4
         }
         else if (xmlSource.match(U"/>"))
         {
+            // Self closing element tag
             xNodeElement->setNodeType(XNodeType::self);
         }
     }

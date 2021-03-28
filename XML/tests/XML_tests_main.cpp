@@ -525,7 +525,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
                 "<REPORT> </REPORT>\r\n";
     BufferSource xmlSource(xmlString);
     XML xml;
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 12 Column: 18]Invalid DTD tag.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 12 Column: 18] Invalid DTD tag.");
   }
   SECTION("Check that BufferSource position() and getRange works correctly.", "[XML][Parse][BufferSource]")
   {

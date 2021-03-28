@@ -44,7 +44,7 @@ namespace H4
             SyntaxError(ISource &source, const std::string &description = "")
             {
                 errorMessage = "XML Syntax Error [Line: " + std::to_string(source.getLineNo()) +
-                               " Column: " + std::to_string(source.getColumnNo()) + "]" + description;
+                               " Column: " + std::to_string(source.getColumnNo()) + "] " + description;
             }
             virtual const char *what() const throw()
             {

@@ -385,7 +385,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<body>Don't forget me this weekend</body>\n"
                 "</note>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 2]Missing '>' terminator.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 2] Missing '>' terminator.");
   }
   SECTION("XML with internal DTD with missing terminating '>' on !ATTLIST", "[XML][Parse][DTD]")
   {
@@ -408,7 +408,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>\n"
                 "<TVSCHEDULE></TVSCHEDULE>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 15 Column: 2]Missing '>' terminator.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 15 Column: 2] Missing '>' terminator.");
   }
   SECTION("XML with internal DTD with missing terminating '>' on !ENTITY", "[XML][Parse][DTD]")
   {
@@ -422,7 +422,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ENTITY % contact \"phone\"> ]>\n"
                 "<REPORT></REPORT>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 8 Column: 2]Missing '>' terminator.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 8 Column: 2] Missing '>' terminator.");
   }
   SECTION("XML with internal DTD with missing terminating '>' on !NOTATION", "[XML][Parse][DTD]")
   {
@@ -454,6 +454,6 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "]>\n"
                 "<REPORT> </REPORT>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 24 Column: 2]Missing '>' terminator.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 24 Column: 2] Missing '>' terminator.");
   }
 }

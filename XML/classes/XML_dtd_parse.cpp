@@ -209,27 +209,28 @@ namespace H4
     {
         xmlSource.ignoreWS();
         std::string elementName = parseName(xmlSource);
-        XValue elementContent;
+        XValue contentSpecification;
         if (xmlSource.match(U"EMPTY"))
         {
-            elementContent.unparsed = "EMPTY";
-            elementContent.parsed = "EMPTY";
+            contentSpecification.unparsed = "EMPTY";
+            contentSpecification.parsed = "EMPTY";
         }
         else if (xmlSource.match(U"ANY"))
         {
-            elementContent.unparsed = "ANY";
-            elementContent.parsed = "ANY";
+            contentSpecification.unparsed = "ANY";
+            contentSpecification.parsed = "ANY";
         }
         else
         {
             while (xmlSource.more() &&
-                   ((xmlSource.current()!='<') && (xmlSource.current() != '>')))
+                   (xmlSource.current()!='<') && 
+                   (xmlSource.current() != '>'))
             {
-                elementContent.unparsed += xmlSource.current();
+                contentSpecification.unparsed += xmlSource.current();
                 xmlSource.next();
             }
         }
-        XDTDElement element(elementName, elementContent);
+        XDTDElement element(elementName, contentSpecification);
         xNodeDTD->elements.emplace(std::pair(element.name, element));
         xmlSource.ignoreWS();
     }
@@ -244,7 +245,7 @@ namespace H4
         parseDTDExternalContents(xNodeDTD);
         if (xmlSource.current() != '>')
         {
-            throw SyntaxError(xmlSource, "Missing terminator '>'.");
+            throw SyntaxError(xmlSource, "Missing '>' terminator.");
         }
         xmlSource.next();
         xmlSource.ignoreWS();
