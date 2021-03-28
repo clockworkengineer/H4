@@ -422,7 +422,7 @@ namespace H4
             parseAttributes(xmlSource, xNodeProlog);
             if (!xmlSource.match(U"?>"))
             {
-                throw SyntaxError(xmlSource, "Declaration invalid or end tag not found.");
+                throw SyntaxError(xmlSource, "Declaration end tag not found.");
             }
             validateXMLDeclaration(xmlSource, xNodeProlog);
         }

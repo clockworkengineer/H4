@@ -35,14 +35,14 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 1]Unsupported version number 1.2.");
   }
-    SECTION("Parse XML declaration with unsupported encoding. ", "[XML][Parse][Declaration]")
+  SECTION("Parse XML declaration with unsupported encoding. ", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-32\" standalone=\"no\"?>\n"
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 1]Unsupported encoding UTF-32 specified.");
   }
-      SECTION("Parse XML declaration with inavlid standalone value. ", "[XML][Parse][Declaration]")
+  SECTION("Parse XML declaration with inavlid standalone value. ", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"maybe\"?>\n"
                 "<root></root>\n";
@@ -75,11 +75,25 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 8]Version missing from declaration.");
   }
-  SECTION("Parse empty XML declaration no root tag ", "[XML][Parse][Declaration]")
+  SECTION("Parse empty XML declaration no end tag ", "[XML][Parse][Declaration]")
   {
-    xmlString = "<?xml version=\"1.0\">\n";
+    xmlString = "<?xml version=\"1.0\">\n"
+                "<root></root>";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 20]Declaration invalid or end tag not found.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 20]Declaration end tag not found.");
+  }
+  SECTION("Parse empty XML declaration no root element.", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 2]Missing root element.");
+  }
+  SECTION("Parse empty XML declaration with content before root element.", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "content<root></root>";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 2]Content detected before root element.");
   }
   SECTION("Parse empty XML declaration no closing root tag ", "[XML][Parse][Declaration]")
   {
