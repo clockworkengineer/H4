@@ -28,6 +28,27 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
   }
+  SECTION("Parse XML declaration with unsupported version. ", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version=\"1.2\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+                "<root></root>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 1]Unsupported version number 1.2.");
+  }
+    SECTION("Parse XML declaration with unsupported encoding. ", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-32\" standalone=\"no\"?>\n"
+                "<root></root>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 1]Unsupported encoding UTF-32 specified.");
+  }
+      SECTION("Parse XML declaration with inavlid standalone value. ", "[XML][Parse][Declaration]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"maybe\"?>\n"
+                "<root></root>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 1]Invalid standalone value of 'maybe'.");
+  }
   SECTION("Parse version 1.0 encoding == UTF-8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-16\" standalone=\"yes\"?> "
@@ -52,7 +73,7 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
   {
     xmlString = "<?xml?> <root></root>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 8]Declaration invalid or end tag not found.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 1 Column: 8]Version missing from declaration.");
   }
   SECTION("Parse empty XML declaration no root tag ", "[XML][Parse][Declaration]")
   {
@@ -72,20 +93,20 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<root><child></root>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 30]Missing closing tag.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 25]Missing closing tag.");
   }
   SECTION("Parse wrongly ordered attributes in XML declaration. ", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version=\"1.0\" standalone=\"no\" encoding=\"UTF-8\"?>\n"
                 " <root></root>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 1]Declaration invalid or end tag not found.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 1]Incorrect order for version, encoding and standalone attributes.");
   }
   SECTION("Parse XML with declaration but no root element", "[XML][Parse][Declaration]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 2]Missing declaration or root element.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 2]Missing root element.");
   }
 }
 TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
@@ -105,14 +126,14 @@ TEST_CASE("Checks for tag names", "[XML][Parse][Tags]")
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<AddressBook> </addressbook>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 26]Missing closing tag.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 21]Missing closing tag.");
   }
   SECTION("Incorrect closing tag ", "[XML][Parse][Tags]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<AddressBook> </Address>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 33]Missing closing tag.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 2 Column: 28]Missing closing tag.");
   }
   SECTION("Self closing tag ", "[XML][Parse][Tags]")
   {

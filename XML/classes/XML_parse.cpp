@@ -42,7 +42,7 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    void XML::addContent(XNodeElement *xNodeElement, const std::string &content)
+    void XML::addElementContent(XNodeElement *xNodeElement, const std::string &content)
     {
         // Make sure there is a content node to recieve characters
         if (xNodeElement->elements.empty() ||
@@ -309,48 +309,6 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse XML prolog and create the necessary XNodeElements for it.
-    /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
-    void XML::parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog)
-    {
-        xmlSource.ignoreWS();
-        if (xmlSource.match(U"<?xml"))
-        {
-            xmlSource.ignoreWS();
-            parseAttributes(xmlSource, xNodeProlog);
-            if (!xmlSource.match(U"?>") || !validateXMLDeclaration(xNodeProlog))
-            {
-                throw SyntaxError(xmlSource, "Declaration invalid or end tag not found.");
-            }
-        }
-        while (xmlSource.more())
-        {
-            if (xmlSource.match(U"<!--"))
-            {
-                parseComment(xmlSource, xNodeProlog);
-            }
-            else if (xmlSource.match(U"<?"))
-            {
-                parsePI(xmlSource, xNodeProlog);
-            }
-            else if (xmlSource.match(U"<!DOCTYPE"))
-            {
-                parseDTD(xmlSource, xNodeProlog);
-            }
-            else if (xmlSource.current() != '<')
-            {
-                addContent(xNodeProlog, std::string(1, xmlSource.current()));
-                xmlSource.next();
-            }
-            else
-            {
-                break;
-            }
-        }
-    }
-    /// <summary>
     /// Recursively parse any child elements of the current XNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
@@ -389,7 +347,7 @@ namespace H4
         }
         else
         {
-            addContent(xNodeElement, entityReference.parsed);
+            addElementContent(xNodeElement, entityReference.parsed);
         }
     }
     /// <summary>
@@ -412,9 +370,9 @@ namespace H4
         {
             parseCDATA(xmlSource, xNodeElement);
         }
-        if (xmlSource.match(U"</"))
+        else if (xmlSource.match(U"</"))
         {
-           throw SyntaxError(xmlSource, "Missing closing tag.");
+            throw SyntaxError(xmlSource, "Missing closing tag.");
         }
         else if (xmlSource.match(U"<"))
         {
@@ -436,12 +394,11 @@ namespace H4
         parseAttributes(xmlSource, xNodeElement);
         if (xmlSource.match(U">"))
         {
-            XString closingTag = U"</" + xmlSource.from_bytes(xNodeElement->name);
-            while (xmlSource.more() && !xmlSource.match(closingTag))
+            while (xmlSource.more() && !xmlSource.match(U"</"))
             {
                 parseElementContents(xmlSource, xNodeElement);
             }
-            if (!xmlSource.match(U">"))
+            if (!xmlSource.match(xmlSource.from_bytes(xNodeElement->name) + U">"))
             {
                 throw SyntaxError(xmlSource, "Missing closing tag.");
             }
@@ -449,6 +406,52 @@ namespace H4
         else if (xmlSource.match(U"/>"))
         {
             xNodeElement->setNodeType(XNodeType::self);
+        }
+    }
+    /// <summary>
+    /// Parse XML prolog and create the necessary XNodeElements for it.
+    /// </summary>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns></returns>
+    void XML::parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog)
+    {
+        xmlSource.ignoreWS();
+        if (xmlSource.match(U"<?xml"))
+        {
+            xmlSource.ignoreWS();
+            parseAttributes(xmlSource, xNodeProlog);
+            if (!xmlSource.match(U"?>"))
+            {
+                throw SyntaxError(xmlSource, "Declaration invalid or end tag not found.");
+            }
+            validateXMLDeclaration(xmlSource, xNodeProlog);
+        }
+        while (xmlSource.more())
+        {
+            if (xmlSource.match(U"<!--"))
+            {
+                parseComment(xmlSource, xNodeProlog);
+            }
+            else if (xmlSource.match(U"<?"))
+            {
+                parsePI(xmlSource, xNodeProlog);
+            }
+            else if (xmlSource.match(U"<!DOCTYPE"))
+            {
+                parseDTD(xmlSource, xNodeProlog);
+            }
+            else if (xmlSource.current() == '<')
+            {
+                // Break out as root element detected
+                break;
+            }
+            else if (std::iswspace(xmlSource.current()))
+            {   
+                addElementContent(xNodeProlog, std::string(1, xmlSource.current()));
+                xmlSource.next();
+            } else {
+                throw SyntaxError(xmlSource, "Content detected before root element.");
+            }
         }
     }
     /// <summary>
@@ -460,20 +463,19 @@ namespace H4
     {
         XMLObject xObject;
         parseProlog(xmlSource, &xObject.prolog);
-        if (xmlSource.current() == '<')
+        if (xmlSource.match(U"<"))
         {
-            xmlSource.next();
             xObject.prolog.elements.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
             parseElement(xmlSource, static_cast<XNodeElement *>(xObject.prolog.elements.back().get()));
             while (xmlSource.more())
             {
-                addContent(&xObject.prolog, std::string(1, xmlSource.current()));
+                addElementContent(&xObject.prolog, std::string(1, xmlSource.current()));
                 xmlSource.next();
             }
         }
         else
         {
-            throw SyntaxError(xmlSource, "Missing declaration or root element.");
+            throw SyntaxError(xmlSource, "Missing root element.");
         }
         return (xObject);
     }

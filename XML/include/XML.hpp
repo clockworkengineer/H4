@@ -181,13 +181,13 @@ namespace H4
         void validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void vadlidateElements(XNodeDTD *dtd, XNode *xNodeRoot);
         void initialiseTables();
-        void addContent(XNodeElement *xNodeElement, const std::string &content);
+        void addElementContent(XNodeElement *xNodeElement, const std::string &content);
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
         bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
         bool validNameChar(XChar c);
         bool validateName(XString attributeName);
-        bool validateXMLDeclaration(XNodeElement *xNodeElement);
+        void validateXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);
         std::string parseName(ISource &xmlSource);
         long parseCharacterReference(ISource &xmlSource, XString reference);

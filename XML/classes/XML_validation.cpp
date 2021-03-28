@@ -140,12 +140,12 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>true when declaration valid.</returns>
-    bool XML::validateXMLDeclaration(XNodeElement *xNodeElement)
+    void XML::validateXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         // Syntax error if no version present
         if (!isAttributePresent(xNodeElement->attributes, "version"))
         {
-            return (false);
+            throw SyntaxError(xmlSource, "Version missing from declaration.");
         }
         // Fill in gaps with default if missing attributes
         std::vector<XAttribute> validatedAttributes;
@@ -166,19 +166,27 @@ namespace H4
         // Order not version, encoding, standalone == syntax error
         if (currentAttribute != (long)xNodeElement->attributes.size())
         {
-            return (false);
+            throw SyntaxError(xmlSource, "Incorrect order for version, encoding and standalone attributes.");
         }
         // Encoding all upper case
         std::transform(validatedAttributes[1].value.parsed.begin(), validatedAttributes[1].value.parsed.end(),
                        validatedAttributes[1].value.parsed.begin(), [](unsigned int c) { return std::toupper(c); });
         // Check valid declaration values
-        if ((validatedAttributes[0].value.parsed != "1.0") ||
-            ((validatedAttributes[1].value.parsed != "UTF-8") && (validatedAttributes[1].value.parsed != "UTF-16")) ||
-            ((validatedAttributes[2].value.parsed != "yes") && (validatedAttributes[2].value.parsed != "no")))
+        std::set<std::string> versions{"1.0", "1.1"};
+        if (!versions.contains(validatedAttributes[0].value.parsed))
         {
-            return (false);
+            throw SyntaxError(xmlSource, "Unsupported version number "+validatedAttributes[0].value.parsed+".");
+        }
+        std::set<std::string> encoding{"UTF-8", "UTF-16"};
+        if (!encoding.contains(validatedAttributes[1].value.parsed))
+        {
+            throw SyntaxError(xmlSource, "Unsupported encoding "+validatedAttributes[1].value.parsed+" specified.");
+        }
+        std::set<std::string> standalone{"yes", "no"};
+        if (!standalone.contains(validatedAttributes[2].value.parsed))
+        {
+            throw SyntaxError(xmlSource, "Invalid standalone value of '"+validatedAttributes[2].value.parsed+"'.");
         }
         xNodeElement->attributes = validatedAttributes;
-        return (true);
     }
 } // namespace H4
