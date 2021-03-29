@@ -42,6 +42,22 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    bool isPCDATA(XNodeElement *xNodeElement)
+    {
+        for (auto &element : xNodeElement->elements)
+        {
+            if ((XNodeRef<XNode>(*element).getNodeType() == XNodeType::element) ||
+                (XNodeRef<XNode>(*element).getNodeType() == XNodeType::self))
+            {
+                return (false);
+            }
+        }
+        return (!xNodeElement->getContents().empty());
+    }
+    bool isEMPTY(XNodeElement *xNodeElement)
+    {
+        return (xNodeElement->elements.empty()||xNodeElement->getNodeType()==XNodeType::self);
+    }
     void parseContentsSpecification(XNodeDTD * /*dtd*/, XValue &contents)
     {
         for (size_t index = 0;;)
@@ -57,7 +73,7 @@ namespace H4
             else if (std::isalpha(contents.unparsed[index]))
             {
                 contents.parsed += "(<";
-                while (std::isalpha(contents.unparsed[index]))
+                while (std::isalnum (contents.unparsed[index]))
                 {
                     contents.parsed += contents.unparsed[index++];
                     if (index == contents.unparsed.size())
@@ -86,6 +102,18 @@ namespace H4
         }
         if (dtd->elements[xNodeElement->name].content.unparsed == "(#PCDATA)")
         {
+            if (!isPCDATA(xNodeElement))
+            {
+                throw ValidationError(dtd, "Element <" + xNodeElement->name + "> does not contain just any parsable data.");
+            }
+            return;
+        }
+        if (dtd->elements[xNodeElement->name].content.unparsed == "EMPTY")
+        {
+            if (!isEMPTY(xNodeElement))
+            {
+                throw ValidationError(dtd, "Element <" + xNodeElement->name + "> is not empty.");
+            }
             return;
         }
         if (dtd->elements[xNodeElement->name].content.parsed.empty())
@@ -96,7 +124,8 @@ namespace H4
         std::string elements;
         for (auto &element : xNodeElement->elements)
         {
-            if (XNodeRef<XNode>(*element).getNodeType() == XNodeType::element)
+            if ((XNodeRef<XNode>(*element).getNodeType() == XNodeType::element)||
+                (XNodeRef<XNode>(*element).getNodeType() == XNodeType::self))
             {
                 elements += "<" + XNodeRef<XNodeElement>(*element).name + ">";
             }

@@ -18,6 +18,21 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
 {
   XML xml;
   std::string xmlString;
+  SECTION("XML with a DTD that specifies elements that do not contain parsable data.", "[XML][DTD][Validate]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root [\n"
+                "<!ELEMENT root (child1)+ >\n"
+                "<!ELEMENT child1 (#PCDATA)>\n"
+                "]>\n"
+                "<root>\n"
+                "<child1>contents</child1>\n"
+                "<child1></child1>\n"
+                "</root>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 8] Element <child1> does not contain just any parsable data.");
+  }
   SECTION("XML with an unedfined element <date> which voilates the DTD.", "[XML][DTD][Validate]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
@@ -279,37 +294,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE donutDelivery [\n"
                 "<!ELEMENT donutDelivery (donutBox)+ >\n"
-                "<!ELEMENT donutBox ( jelly?, lemon*,( ( creme | sugar )+ | glazed ) )\n>"
-                "<!ELEMENT jelly (#PCDATA)>\n"
-                "<!ELEMENT lemon (#PCDATA)>\n"
-                "<!ELEMENT creme (#PCDATA)>\n"
-                "<!ELEMENT sugar (#PCDATA)>\n"
-                "<!ELEMENT glazed (#PCDATA)>\n"
-                "]>\n"
-                "<donutDelivery>\n"
-                "<donutBox>\n"
-                "<jelly>grape</jelly>\n"
-                "<lemon>half-sour</lemon>\n"
-                "<lemon>sour</lemon>\n"
-                "<lemon>half-sour</lemon>\n"
-                "<glazed>chocolate</glazed>\n"
-                "</donutBox>\n"
-                "<donutBox>\n"
-                "<sugar>semi-sweet</sugar>\n"
-                "<creme>whipped</creme>\n"
-                "<sugar>sweet</sugar>\n"
-                "</donutBox>\n"
-                  "</donutDelivery>\n";
-    BufferSource xmlSource(xmlString);
-    XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_NOTHROW(xml.validate(xmlObject));
-  }
-  SECTION("XML with a DTD that uses all of the content specification operators and has XML with an empty box.", "[XML][DTD][Validate]")
-  {
-    xmlString = "<?xml version=\"1.0\"?>\n"
-                "<!DOCTYPE donutDelivery [\n"
-                "<!ELEMENT donutDelivery (donutBox)+ >\n"
-                "<!ELEMENT donutBox ( jelly?, lemon*,( ( creme | sugar )+ | glazed ) )\n>"
+                "<!ELEMENT donutBox ( jelly?, lemon*,( ( creme | sugar )+ | glazed ) )>\n"
                 "<!ELEMENT jelly (#PCDATA)>\n"
                 "<!ELEMENT lemon (#PCDATA)>\n"
                 "<!ELEMENT creme (#PCDATA)>\n"
@@ -333,5 +318,70 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_NOTHROW(xml.validate(xmlObject));
+  }
+  SECTION("XML with a DTD that uses all of the content specification operators and has XML with an empty box.", "[XML][DTD][Validate]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE donutDelivery [\n"
+                "<!ELEMENT donutDelivery (donutBox)+ >\n"
+                "<!ELEMENT donutBox ( jelly?, lemon*,( ( creme | sugar )+ | glazed ) )>\n"
+                "<!ELEMENT jelly (#PCDATA)>\n"
+                "<!ELEMENT lemon (#PCDATA)>\n"
+                "<!ELEMENT creme (#PCDATA)>\n"
+                "<!ELEMENT sugar (#PCDATA)>\n"
+                "<!ELEMENT glazed (#PCDATA)>\n"
+                "]>\n"
+                "<donutDelivery>\n"
+                "<donutBox>\n"
+                "<jelly>grape</jelly>\n"
+                "<lemon>half-sour</lemon>\n"
+                "<lemon>sour</lemon>\n"
+                "<lemon>half-sour</lemon>\n"
+                "<glazed>chocolate</glazed>\n"
+                "</donutBox>\n"
+                "<donutBox>\n"
+                "<sugar>semi-sweet</sugar>\n"
+                "<creme>whipped</creme>\n"
+                "<sugar>sweet</sugar>\n"
+                "</donutBox>\n"
+                "<donutBox></donutBox>\n"
+                "</donutDelivery>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 24] <donutBox> element does not conform to the content specication ( jelly?, lemon*,( ( creme | sugar )+ | glazed ) ).");
+  }
+  SECTION("XML with a DTD that specifies elements that are empty.", "[XML][DTD][Validate]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root [\n"
+                "<!ELEMENT root (child1 | child2)+ >\n"
+                "<!ELEMENT child1 (#PCDATA)>\n"
+                "<!ELEMENT child2 EMPTY>\n"
+                "]>\n"
+                "<root>\n"
+                "<child1>contents</child1>\n"
+                "<child2></child2>\n"
+                "<child2/>\n"
+                "</root>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_NOTHROW(xml.validate(xmlObject));
+  }
+  SECTION("XML with a DTD that specifies elements that are empty but contain data.", "[XML][DTD][Validate]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root [\n"
+                "<!ELEMENT root (child1 | child2)+ >\n"
+                "<!ELEMENT child1 (#PCDATA)>\n"
+                "<!ELEMENT child2 EMPTY>\n"
+                "]>\n"
+                "<root>\n"
+                "<child1>contents</child1>\n"
+                "<child2>contents</child2>\n"
+                "<child2/>\n"
+                "</root>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject),"XML Validation Error [Line: 9] Element <child2> is not empty.");
   }
 }
