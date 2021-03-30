@@ -755,7 +755,7 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
     REQUIRE_NOTHROW(xml.parse(xmlSource));
   }
 }
-TEST_CASE("Use name for accessing elements", "[XML][Access][ByName")
+TEST_CASE("Use name for accessing elements", "[XML][Access][ByName]")
 {
   XML xml;
   std::string xmlString;
@@ -772,5 +772,55 @@ TEST_CASE("Use name for accessing elements", "[XML][Access][ByName")
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"]["Address"]).name == "Address");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"]["Address"]).getContents() == "Flat A, West Road, Wolverhampton, W1SSX9");
+  }
+}
+TEST_CASE("Make sure whitespace is whitespace.", "[XML][Access][ByName]")
+{
+  XML xml;
+  std::string xmlString;
+  SECTION("Content node only whitespace if it contains ONLY whitespace.", "[XML][Parse][Whitespace]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<AddressBook>\n"
+                "<Address>\n"
+                "Flat A, West Road, Wolverhampton, W1SSX9"
+                "</Address>"
+                "<Address>\n"
+                "        "
+                "</Address>"
+                "<Address>\n"
+                "&amp;        "
+                "</Address>"
+                "<Address>\n"
+                "<![CDATA[<message> Welcome to TutorialsPoint </message>   ]]>        "
+                "</Address>"
+                "<Address>\n"
+                "&amp;        "
+                "</Address>"
+                "</AddressBook>";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][0]).isWhiteSpace == true);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][1][0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][1][0]).isWhiteSpace == false);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][2][0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][2][0]).isWhiteSpace == true);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][3][0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][3][0]).isWhiteSpace == true);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][3][1]).getNodeType() == XNodeType::entity);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][3][2]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][3][2]).isWhiteSpace == false);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][4][0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][4][0]).isWhiteSpace == true);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][4][1]).getNodeType() == XNodeType::cdata);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][4][2]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][4][2]).isWhiteSpace == false);
+
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][4][0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][4][0]).isWhiteSpace == true);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][4][1]).getNodeType() == XNodeType::cdata);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][4][2]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][4][2]).isWhiteSpace == false);
   }
 }

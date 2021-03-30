@@ -48,7 +48,28 @@ namespace H4
         if (xNodeElement->elements.empty() ||
             xNodeElement->elements.back()->getNodeType() != XNodeType::content)
         {
+            bool isWWhitespace = true;
+            if (!xNodeElement->elements.empty())
+            {
+                if ((xNodeElement->elements.back()->getNodeType() == XNodeType::cdata) ||
+                    (xNodeElement->elements.back()->getNodeType() == XNodeType::entity))
+                {
+                    isWWhitespace = false;
+                }
+            }
             xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>());
+            XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace = isWWhitespace;
+        }
+        if (XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace)
+        {
+            for (auto ch : content)
+            {
+                if (!std::iswspace(ch))
+                {
+                    XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace = false;
+                    break;
+                }
+            }
         }
         XNodeRef<XNodeContent>(*xNodeElement->elements.back()).content += content;
     }
@@ -198,7 +219,7 @@ namespace H4
         xmlSource.ignoreWS();
         if (!validateName(name))
         {
-            throw SyntaxError(xmlSource, "Invalid name '"+xmlSource.to_bytes(name)+"' encountered.");
+            throw SyntaxError(xmlSource, "Invalid name '" + xmlSource.to_bytes(name) + "' encountered.");
         }
         return (xmlSource.to_bytes(name));
     }

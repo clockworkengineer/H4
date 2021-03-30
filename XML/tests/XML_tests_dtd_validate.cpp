@@ -382,6 +382,43 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</root>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject),"XML Validation Error [Line: 9] Element <child2> is not empty.");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 9] Element <child2> is not empty.");
+  }
+  SECTION("XML with a DTD that specifies elements that are marked as any.", "[XML][DTD][Validate]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root [\n"
+                "<!ELEMENT root (child1 | child2)+ >\n"
+                "<!ELEMENT child1 (#PCDATA)>\n"
+                "<!ELEMENT child2 ANY>\n"
+                "<!ELEMENT child3 EMPTY>\n"
+                "]>\n"
+                "<root>\n"
+                "<child1>contents</child1><child2><child3/></child2>\n"
+                "<child2/>\n"
+                "</root>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_NOTHROW(xml.validate(xmlObject));
+  }
+  SECTION("XML with a DTD that specifies elements that are marked as having mixed content.", "[XML][DTD][Validate]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!-- Fig. B.5 : mixed.xml-->\n"
+                "<!-- Mixed content type elements -->\n"
+                "<!DOCTYPE format [\n"
+                "<!ELEMENT format ( #PCDATA | bold | italic )*>\n"
+                "<!ELEMENT bold ( #PCDATA )>\n"
+                "<!ELEMENT italic ( #PCDATA )>\n"
+                "]>\n"
+                "<format>\n"
+                "Book catalog entry:\n"
+                "<bold>XML</bold>\n"
+                "<italic>XML How to Program</italic>\n"
+                "This book carefully explains XML-based systems development."
+                "</format>";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_NOTHROW(xml.validate(xmlObject));
   }
 }

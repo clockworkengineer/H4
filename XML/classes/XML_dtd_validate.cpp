@@ -56,7 +56,7 @@ namespace H4
     }
     bool isEMPTY(XNodeElement *xNodeElement)
     {
-        return (xNodeElement->elements.empty()||xNodeElement->getNodeType()==XNodeType::self);
+        return (xNodeElement->elements.empty() || xNodeElement->getNodeType() == XNodeType::self);
     }
     void parseContentsSpecification(XNodeDTD * /*dtd*/, XValue &contents)
     {
@@ -70,10 +70,25 @@ namespace H4
                     break;
                 }
             }
+            else if (contents.unparsed[index] == '#')
+            {
+                index++;
+                contents.parsed += "(<#";
+                while (std::isalnum(contents.unparsed[index]))
+                {
+                    contents.parsed += contents.unparsed[index++];
+                    if (index == contents.unparsed.size())
+                    {
+                        contents.parsed += ">)";
+                        break;
+                    }
+                }
+                contents.parsed += ">)";
+            }
             else if (std::isalpha(contents.unparsed[index]))
             {
                 contents.parsed += "(<";
-                while (std::isalnum (contents.unparsed[index]))
+                while (std::isalnum(contents.unparsed[index]))
                 {
                     contents.parsed += contents.unparsed[index++];
                     if (index == contents.unparsed.size())
@@ -116,6 +131,10 @@ namespace H4
             }
             return;
         }
+        if (dtd->elements[xNodeElement->name].content.unparsed == "ANY")
+        {
+            return;
+        }
         if (dtd->elements[xNodeElement->name].content.parsed.empty())
         {
             parseContentsSpecification(dtd, dtd->elements[xNodeElement->name].content);
@@ -124,10 +143,17 @@ namespace H4
         std::string elements;
         for (auto &element : xNodeElement->elements)
         {
-            if ((XNodeRef<XNode>(*element).getNodeType() == XNodeType::element)||
+            if ((XNodeRef<XNode>(*element).getNodeType() == XNodeType::element) ||
                 (XNodeRef<XNode>(*element).getNodeType() == XNodeType::self))
             {
                 elements += "<" + XNodeRef<XNodeElement>(*element).name + ">";
+            }
+            else if (XNodeRef<XNode>(*element).getNodeType() == XNodeType::content)
+            {
+                if (!XNodeRef<XNodeContent>(*element).isWhiteSpace)
+                {
+                    elements += "(<#PCDATA>)";
+                }
             }
         }
         if (!std::regex_match(elements, match))

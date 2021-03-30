@@ -110,6 +110,7 @@ namespace H4
         {
         }
         std::string content;
+        bool isWhiteSpace = true;
     };
     //
     // EntityReference XNode
@@ -209,7 +210,7 @@ namespace H4
         std::unordered_map<std::string, XDTDElement> elements;
         std::unordered_map<std::string, std::string> entityMapping;
         std::string unparsed;
-        long lineNumber=1;
+        long lineNumber = 1;
     };
     //
     // Convert base XNode reference
@@ -240,9 +241,11 @@ namespace H4
     {
         if (nodeType <= XNodeType::element)
         {
-            for (auto &element : XNodeRef<XNodeElement>(*this).elements) {
-                if (XNodeRef<XNodeElement>(*element).name==name) {
-                    return(*element);
+            for (auto &element : XNodeRef<XNodeElement>(*this).elements)
+            {
+                if (XNodeRef<XNodeElement>(*element).name == name)
+                {
+                    return (*element);
                 }
             }
         }
