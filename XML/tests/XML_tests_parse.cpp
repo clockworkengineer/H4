@@ -807,12 +807,12 @@ TEST_CASE("Make sure whitespace is whitespace.", "[XML][Access][ByName]")
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][2][0]).getNodeType() == XNodeType::content);
     REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][2][0]).isWhiteSpace == true);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][3][0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][3][0]).isWhiteSpace == true);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][3][0]).isWhiteSpace == false);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][3][1]).getNodeType() == XNodeType::entity);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][3][2]).getNodeType() == XNodeType::content);
     REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][3][2]).isWhiteSpace == false);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][4][0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][4][0]).isWhiteSpace == true);
+    REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][4][0]).isWhiteSpace == false);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][4][1]).getNodeType() == XNodeType::cdata);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog["AddressBook"][4][2]).getNodeType() == XNodeType::content);
     REQUIRE(XNodeRef<XNodeContent>(xmlObject.prolog["AddressBook"][4][2]).isWhiteSpace == false);

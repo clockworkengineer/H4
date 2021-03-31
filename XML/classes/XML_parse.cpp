@@ -287,6 +287,13 @@ namespace H4
             xNodeCDATA.cdata += xmlSource.to_bytes(xmlSource.current());
             xmlSource.next();
         }
+        if (!xNodeElement->elements.empty())
+        {
+            if (xNodeElement->elements.back()->getNodeType() == XNodeType::content)
+            {
+                XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace = false;
+            }
+        }
         xNodeElement->elements.emplace_back(std::make_unique<XNodeCDATA>(xNodeCDATA));
     }
     /// <summary>
@@ -358,6 +365,13 @@ namespace H4
         if (entityReference.unparsed != "")
         {
             XNodeEntityReference xNodeEntityReference(entityReference);
+            if (!xNodeElement->elements.empty())
+            {
+                if (xNodeElement->elements.back()->getNodeType() == XNodeType::content)
+                {
+                    XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace = false;
+                }
+            }
             xNodeElement->elements.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
         }
         else
