@@ -58,8 +58,13 @@ namespace H4
     {
         return (xNodeElement->elements.empty() || xNodeElement->getNodeType() == XNodeType::self);
     }
-    void parseContentsSpecification(XNodeDTD * /*dtd*/, XValue &contents)
+    void parseContentsSpecification(XNodeDTD *dtd, XValue &contents)
     {
+        if (contents.unparsed == "EMPTY" || contents.unparsed == "ANY")
+        {
+            contents.parsed = contents.unparsed;
+            return;
+        }
         for (size_t index = 0;;)
         {
             if (contents.unparsed[index] == ',' || std::iswspace(contents.unparsed[index]))
@@ -108,6 +113,18 @@ namespace H4
                 }
             }
         }
+        if (contents.parsed != "((<#PCDATA>))")
+        {
+            if (contents.parsed.find("(<#PCDATA>)") != std::string::npos)
+            {
+                if (!contents.parsed.starts_with("((<#PCDATA>)") ||
+                    (contents.unparsed.find(',') != std::string::npos) ||
+                    (contents.unparsed.back() != '*'))
+                {
+                    throw XML::ValidationError(dtd, "Invalid mixed content specification.");
+                }
+            }
+        }
     }
     void XML::validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
@@ -115,7 +132,11 @@ namespace H4
         {
             return;
         }
-        if (dtd->elements[xNodeElement->name].content.unparsed == "(#PCDATA)")
+        if (dtd->elements[xNodeElement->name].content.parsed.empty())
+        {
+            parseContentsSpecification(dtd, dtd->elements[xNodeElement->name].content);
+        }
+        if (dtd->elements[xNodeElement->name].content.parsed == "((<#PCDATA>))")
         {
             if (!isPCDATA(xNodeElement))
             {
@@ -123,7 +144,7 @@ namespace H4
             }
             return;
         }
-        if (dtd->elements[xNodeElement->name].content.unparsed == "EMPTY")
+        if (dtd->elements[xNodeElement->name].content.parsed == "EMPTY")
         {
             if (!isEMPTY(xNodeElement))
             {
@@ -131,14 +152,14 @@ namespace H4
             }
             return;
         }
-        if (dtd->elements[xNodeElement->name].content.unparsed == "ANY")
+        if (dtd->elements[xNodeElement->name].content.parsed == "ANY")
         {
             return;
         }
-        if (dtd->elements[xNodeElement->name].content.parsed.empty())
-        {
-            parseContentsSpecification(dtd, dtd->elements[xNodeElement->name].content);
-        }
+        // if (dtd->elements[xNodeElement->name].content.parsed.empty())
+        // {
+        //     parseContentsSpecification(dtd, dtd->elements[xNodeElement->name].content);
+        // }
         std::regex match(dtd->elements[xNodeElement->name].content.parsed);
         std::string elements;
         for (auto &element : xNodeElement->elements)
@@ -152,7 +173,7 @@ namespace H4
             {
                 if (!XNodeRef<XNodeContent>(*element).isWhiteSpace)
                 {
-                    elements += "(<#PCDATA>)";
+                    elements += "<#PCDATA>";
                 }
             }
         }
