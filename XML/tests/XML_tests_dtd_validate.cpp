@@ -401,24 +401,24 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_NOTHROW(xml.validate(xmlObject));
   }
-  SECTION("XML with a DTD that specifies elements that are marked as having mixed content.", "[XML][DTD][Validate]")
-  {
-    xmlString = "<?xml version=\"1.0\"?>\n"
-                "<!-- Fig. B.5 : mixed.xml-->\n"
-                "<!-- Mixed content type elements -->\n"
-                "<!DOCTYPE format [\n"
-                "<!ELEMENT format ( #PCDATA | bold | italic )*>\n"
-                "<!ELEMENT bold ( #PCDATA )>\n"
-                "<!ELEMENT italic ( #PCDATA )>\n"
-                "]>\n"
-                "<format>\n"
-                "Book catalog entry:\n"
-                "<bold>XML</bold>\n"
-                "<italic>XML How to Program</italic>\n"
-                "This book carefully explains XML-based systems development."
-                "</format>";
-    BufferSource xmlSource(xmlString);
-    XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_NOTHROW(xml.validate(xmlObject));
-  }
+  // SECTION("XML with a DTD that specifies elements that are marked as having mixed content.", "[XML][DTD][Validate]")
+  // {
+  //   xmlString = "<?xml version=\"1.0\"?>\n"
+  //               "<!-- Fig. B.5 : mixed.xml-->\n"
+  //               "<!-- Mixed content type elements -->\n"
+  //               "<!DOCTYPE format [\n"
+  //               "<!ELEMENT format ( #PCDATA | bold | italic )*>\n"
+  //               "<!ELEMENT bold ( #PCDATA )>\n"
+  //               "<!ELEMENT italic ( #PCDATA )>\n"
+  //               "]>\n"
+  //               "<format>\n"
+  //               "Book catalog entry:\n"
+  //               "<bold>XML</bold>\n"
+  //               "<italic>XML How to Program</italic>\n"
+  //               "This book carefully explains XML-based systems development."
+  //               "</format>";
+  //   BufferSource xmlSource(xmlString);
+  //   XMLObject xmlObject = xml.parse(xmlSource);
+  //   REQUIRE_NOTHROW(xml.validate(xmlObject));
+  // }
 }
