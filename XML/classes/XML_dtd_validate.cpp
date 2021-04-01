@@ -60,9 +60,14 @@ namespace H4
     }
     void parseContentsSpecification(XNodeDTD *dtd, XValue &contents)
     {
-        if (contents.unparsed == "EMPTY" || contents.unparsed == "ANY")
+        if (contents.unparsed == U"EMPTY")
         {
-            contents.parsed = contents.unparsed;
+            contents.parsed = "EMPTY";
+            return;
+        }
+        else if (contents.unparsed == U"ANY")
+        {
+            contents.parsed = "ANY";
             return;
         }
         for (size_t index = 0;;)
@@ -179,8 +184,9 @@ namespace H4
         }
         if (!std::regex_match(elements, match))
         {
+            std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> UTF8;
             throw ValidationError(dtd, "<" + xNodeElement->name + "> element does not conform to the content specication " +
-                                           dtd->elements[xNodeElement->name].content.unparsed + ".");
+                                           UTF8.to_bytes(dtd->elements[xNodeElement->name].content.unparsed) + ".");
         }
     }
     void XML::vadlidateElements(XNodeDTD *dtd, XNode *xNode)

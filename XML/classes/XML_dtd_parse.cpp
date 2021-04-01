@@ -74,7 +74,7 @@ namespace H4
             XValue systemValue = parseValue(xmlSource);
             result.name = "PUBLIC";
             result.value.parsed = publicValue.parsed + ", " + systemValue.parsed;
-            result.value.unparsed = publicValue.unparsed + " " + systemValue.unparsed;
+            result.value.unparsed = publicValue.unparsed + U" " + systemValue.unparsed;
         }
         else
         {
@@ -129,18 +129,18 @@ namespace H4
         if (xmlSource.match(U"#REQUIRED"))
         {
             value.parsed = "#REQUIRED";
-            value.unparsed = "#REQUIRED";
+            value.unparsed = U"#REQUIRED";
         }
         else if (xmlSource.match(U"#IMPLIED"))
         {
             value.parsed = "#IMPLIED";
-            value.unparsed = "#IMPLIED";
+            value.unparsed = U"#IMPLIED";
         }
         else if (xmlSource.match(U"#FIXED"))
         {
             XValue fixedValue = parseValue(xmlSource);
             value.parsed = "#FIXED " + fixedValue.parsed;
-            value.unparsed = "#FIXED " + fixedValue.unparsed;
+            value.unparsed = U"#FIXED " + fixedValue.unparsed;
         }
         else
         {
@@ -212,12 +212,12 @@ namespace H4
         XValue contentSpecification;
         if (xmlSource.match(U"EMPTY"))
         {
-            contentSpecification.unparsed = "EMPTY";
+            contentSpecification.unparsed = U"EMPTY";
             contentSpecification.parsed = "EMPTY";
         }
         else if (xmlSource.match(U"ANY"))
         {
-            contentSpecification.unparsed = "ANY";
+            contentSpecification.unparsed = U"ANY";
             contentSpecification.parsed = "ANY";
         }
         else

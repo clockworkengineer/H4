@@ -600,7 +600,6 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[XML][Parse][Fi
   SECTION("Create FileDestination when file already exists.", "[XML][Stringify][FileDestination]")
   {
     FileDestination file(kGeneratedXMLFile);
-    file = FileDestination(kGeneratedXMLFile);
     REQUIRE_NOTHROW(FileDestination(kGeneratedXMLFile));
   }
   SECTION("Create FileDestination and test file exists and should be empty.", "[XML][Stringify][FileDestination]")

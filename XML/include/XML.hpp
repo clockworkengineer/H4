@@ -60,7 +60,7 @@ namespace H4
         public:
             ValidationError(XNodeDTD *dtd, const std::string &description = "")
             {
-                errorMessage = "XML Validation Error [Line: " + std::to_string(dtd->lineNumber)+"] " + description;
+                errorMessage = "XML Validation Error [Line: " + std::to_string(dtd->lineNumber) + "] " + description;
             }
             virtual const char *what() const throw()
             {
@@ -137,6 +137,10 @@ namespace H4
         {
         public:
             virtual void add(const std::string &bytes) = 0;
+            virtual void add(const std::u32string &bytes) = 0;
+
+        protected:
+            std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         };
         //
         // XObject
