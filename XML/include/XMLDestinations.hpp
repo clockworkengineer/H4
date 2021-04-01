@@ -13,9 +13,9 @@ namespace H4
         BufferDestination()
         {
         }
-        void add(const std::u32string &bytes)
+        void add(const std::u32string &utf32string)
         {
-            add(m_UTF8.to_bytes(bytes));
+            add(m_UTF8.to_bytes(utf32string));
         }
         void add(const std::string &bytes)
         {
@@ -43,9 +43,9 @@ namespace H4
                 throw std::runtime_error("XML file output stream failed to open or could not be created.");
             }
         }
-        void add(const std::u32string &bytes)
+        void add(const std::u32string &utf32string)
         {
-            add(m_UTF8.to_bytes(bytes));
+            add(m_UTF8.to_bytes(utf32string));
         }
         void add(const std::string &bytes)
         {
