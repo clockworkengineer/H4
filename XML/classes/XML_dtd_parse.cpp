@@ -44,6 +44,89 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void parseDTDElementContentSpecification(XValue &contents)
+    {
+        for (size_t index = 0;;)
+        {
+            if (contents.unparsed[index] == ',' || std::iswspace(contents.unparsed[index]))
+            {
+                index++;
+                if (index == contents.unparsed.size())
+                {
+                    break;
+                }
+            }
+            else if (contents.unparsed[index] == '#')
+            {
+                index++;
+                contents.parsed += "(<#";
+                while (std::isalnum(contents.unparsed[index]))
+                {
+                    contents.parsed += contents.unparsed[index++];
+                    if (index == contents.unparsed.size())
+                    {
+                        contents.parsed += ">)";
+                        break;
+                    }
+                }
+                contents.parsed += ">)";
+            }
+            else if (std::isalpha(contents.unparsed[index]))
+            {
+                contents.parsed += "(<";
+                while (std::isalnum(contents.unparsed[index]))
+                {
+                    contents.parsed += contents.unparsed[index++];
+                    if (index == contents.unparsed.size())
+                    {
+                        contents.parsed += ">)";
+                        break;
+                    }
+                }
+                contents.parsed += ">)";
+            }
+            else
+            {
+                contents.parsed += contents.unparsed[index++];
+                if (index == contents.unparsed.size())
+                {
+                    break;
+                }
+            }
+        }
+        // if (contents.parsed != "((<#PCDATA>))")
+        // {
+        //     if (contents.parsed.find("(<#PCDATA>)") != std::string::npos)
+        //     {
+        //         if (!contents.parsed.starts_with("((<#PCDATA>)") ||
+        //             (contents.unparsed.find(',') != std::string::npos) ||
+        //             (contents.unparsed.back() != '*'))
+        //         {
+        //             throw XML::ValidationError("Invalid mixed content specification.");
+        //         }
+        //     }
+        // }
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTDPostProcessing(XNodeDTD *xNodeDTD)
+    {
+        for (auto &element : xNodeDTD->elements)
+        {
+            if (element.second.content.parsed.empty())
+            {
+                parseDTDElementContentSpecification(element.second.content);
+            }
+        }
+    }
+    /// <summary>
     /// Parse externally defined DTD into DTD XNode.
     /// </summary>
     /// <param name=""></param>
@@ -54,7 +137,9 @@ namespace H4
         {
             FileSource dtdFile(xNodeDTD->external.value.parsed);
             parseDTDInternal(dtdFile, xNodeDTD);
-        } else if (xNodeDTD->external.name == "PUBLIC") {
+        }
+        else if (xNodeDTD->external.name == "PUBLIC")
+        {
             // Public external DTD currently not supported
         }
     }
@@ -223,7 +308,7 @@ namespace H4
         else
         {
             while (xmlSource.more() &&
-                   (xmlSource.current()!='<') && 
+                   (xmlSource.current() != '<') &&
                    (xmlSource.current() != '>'))
             {
                 contentSpecification.unparsed += xmlSource.current();
@@ -329,11 +414,14 @@ namespace H4
         }
         // Save away unparsed form
         xNodeDTD.unparsed = "<!DOCTYPE" + xmlSource.getRange(start, xmlSource.position());
-        for (auto ch: xNodeDTD.unparsed) {
-            if (ch==kLineFeed) {
+        for (auto ch : xNodeDTD.unparsed)
+        {
+            if (ch == kLineFeed)
+            {
                 xNodeDTD.lineNumber++;
             }
         }
+        parseDTDPostProcessing(&xNodeDTD);
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
     }
 } // namespace H4

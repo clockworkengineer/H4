@@ -208,6 +208,7 @@ namespace H4
         void parseAttributes(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseComment(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseCDATA(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseDTDPostProcessing(XNodeDTD *xNodeDTD);
         void parseDTDExternalContents(XNodeDTD *xNodeDTD);
         void parseDTDAttributeList(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTDNotation(ISource &xmlSource, XNodeDTD *xNodeDTD);

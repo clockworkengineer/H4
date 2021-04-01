@@ -58,88 +58,11 @@ namespace H4
     {
         return (xNodeElement->elements.empty() || xNodeElement->getNodeType() == XNodeType::self);
     }
-    void parseContentsSpecification(XNodeDTD *dtd, XValue &contents)
-    {
-        if (contents.unparsed == U"EMPTY")
-        {
-            contents.parsed = "EMPTY";
-            return;
-        }
-        else if (contents.unparsed == U"ANY")
-        {
-            contents.parsed = "ANY";
-            return;
-        }
-        for (size_t index = 0;;)
-        {
-            if (contents.unparsed[index] == ',' || std::iswspace(contents.unparsed[index]))
-            {
-                index++;
-                if (index == contents.unparsed.size())
-                {
-                    break;
-                }
-            }
-            else if (contents.unparsed[index] == '#')
-            {
-                index++;
-                contents.parsed += "(<#";
-                while (std::isalnum(contents.unparsed[index]))
-                {
-                    contents.parsed += contents.unparsed[index++];
-                    if (index == contents.unparsed.size())
-                    {
-                        contents.parsed += ">)";
-                        break;
-                    }
-                }
-                contents.parsed += ">)";
-            }
-            else if (std::isalpha(contents.unparsed[index]))
-            {
-                contents.parsed += "(<";
-                while (std::isalnum(contents.unparsed[index]))
-                {
-                    contents.parsed += contents.unparsed[index++];
-                    if (index == contents.unparsed.size())
-                    {
-                        contents.parsed += ">)";
-                        break;
-                    }
-                }
-                contents.parsed += ">)";
-            }
-            else
-            {
-                contents.parsed += contents.unparsed[index++];
-                if (index == contents.unparsed.size())
-                {
-                    break;
-                }
-            }
-        }
-        if (contents.parsed != "((<#PCDATA>))")
-        {
-            if (contents.parsed.find("(<#PCDATA>)") != std::string::npos)
-            {
-                if (!contents.parsed.starts_with("((<#PCDATA>)") ||
-                    (contents.unparsed.find(',') != std::string::npos) ||
-                    (contents.unparsed.back() != '*'))
-                {
-                    throw XML::ValidationError(dtd, "Invalid mixed content specification.");
-                }
-            }
-        }
-    }
     void XML::validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
         if ((dtd == nullptr) || (dtd->elements.empty()))
         {
             return;
-        }
-        if (dtd->elements[xNodeElement->name].content.parsed.empty())
-        {
-            parseContentsSpecification(dtd, dtd->elements[xNodeElement->name].content);
         }
         if (dtd->elements[xNodeElement->name].content.parsed == "((<#PCDATA>))")
         {
@@ -161,10 +84,6 @@ namespace H4
         {
             return;
         }
-        // if (dtd->elements[xNodeElement->name].content.parsed.empty())
-        // {
-        //     parseContentsSpecification(dtd, dtd->elements[xNodeElement->name].content);
-        // }
         std::regex match(dtd->elements[xNodeElement->name].content.parsed);
         std::string elements;
         for (auto &element : xNodeElement->elements)
