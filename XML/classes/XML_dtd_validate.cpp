@@ -84,6 +84,7 @@ namespace H4
         {
             return;
         }
+        std::string str= dtd->elements[xNodeElement->name].content.parsed;
         std::regex match(dtd->elements[xNodeElement->name].content.parsed);
         std::string elements;
         for (auto &element : xNodeElement->elements)

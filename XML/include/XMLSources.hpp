@@ -37,6 +37,15 @@ namespace H4
             m_parseBuffer = m_UTF8.from_bytes(sourceBuffer);
             convertCRLFToLF(m_parseBuffer);
         }
+        BufferSource(const XString &sourceBuffer)
+        {
+            if (sourceBuffer.empty())
+            {
+                throw std::invalid_argument("Empty source buffer passed to be parsed.");
+            }
+            m_parseBuffer = sourceBuffer;
+            convertCRLFToLF(m_parseBuffer);
+        }
         XChar current()
         {
             if (more())

@@ -208,6 +208,12 @@ namespace H4
         void parseAttributes(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseComment(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseCDATA(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseDTDElementChoice(ISource &contentSpecSource, std::string &parsed);
+        void parseDTDElementSequence(ISource &contentSpecSource, std::string &parsed);
+        void parseDTDElementChildren(ISource &contentSpecSource, std::string &parsed);
+        void parseDTDElementName(ISource &contentSpecSource, std::string &parsed);
+        void parseDTDElementBracket(ISource &contentSpecSource, std::string &parsed);
+        void parseDTDElementContentSpecification(XValue &contents);
         void parseDTDPostProcessing(XNodeDTD *xNodeDTD);
         void parseDTDExternalContents(XNodeDTD *xNodeDTD);
         void parseDTDAttributeList(ISource &xmlSource, XNodeDTD *xNodeDTD);

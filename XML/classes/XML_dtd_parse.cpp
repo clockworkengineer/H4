@@ -43,73 +43,120 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    void XML::parseDTDElementChoice(ISource &contentSpecSource, std::string &parsed)
+    {
+        while (contentSpecSource.current() == '|')
+        {
+            parsed += '|';
+            contentSpecSource.next();
+            parseDTDElementChildren(contentSpecSource, parsed);
+        }
+    }
+    void XML::parseDTDElementSequence(ISource &contentSpecSource, std::string &parsed)
+    {
+        while (contentSpecSource.current() == ',')
+        {
+            contentSpecSource.next();
+            parseDTDElementChildren(contentSpecSource, parsed);
+        }
+    }
+    void XML::parseDTDElementBracket(ISource &contentSpecSource, std::string &parsed)
+    {
+
+        do
+        {
+            parseDTDElementChildren(contentSpecSource, parsed);
+        } while (contentSpecSource.current() != ')');
+    }
+    void XML::parseDTDElementName(ISource &contentSpecSource, std::string &parsed)
+    {
+        std::string name = parseName(contentSpecSource);
+        parsed += "(<" + name + ">)";
+    }
+    void XML::parseDTDElementChildren(ISource &contentSpecSource, std::string &parsed)
+    {
+
+        contentSpecSource.ignoreWS();
+        if (contentSpecSource.match(U"("))
+        {
+            parsed += '(';
+            parseDTDElementBracket(contentSpecSource, parsed);
+            if (contentSpecSource.current() != ')')
+            {
+                throw std::runtime_error("DTD Parse Error.");
+            }
+            parsed += ')';
+            contentSpecSource.next();
+            if (contentSpecSource.current() == '*' ||
+                contentSpecSource.current() == '+' ||
+                contentSpecSource.current() == '?')
+            {
+                parsed += contentSpecSource.current();
+                contentSpecSource.next();
+            }
+
+        }
+        else if (contentSpecSource.current() == '|')
+        {
+            parseDTDElementChoice(contentSpecSource, parsed);
+        }
+        else if (contentSpecSource.current() == ',')
+        {
+            parseDTDElementSequence(contentSpecSource, parsed);
+        }
+        else if (validNameStartChar(contentSpecSource.current()))
+        {
+            parseDTDElementName(contentSpecSource, parsed);
+            if (contentSpecSource.current() == '*' ||
+                contentSpecSource.current() == '+' ||
+                contentSpecSource.current() == '?')
+            {
+                parsed += contentSpecSource.current();
+                contentSpecSource.next();
+            }
+        }
+        else
+        {
+            throw std::runtime_error("DTD Parse Error.");
+        }
+        contentSpecSource.ignoreWS();
+    }
     /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void parseDTDElementContentSpecification(XValue &contents)
+    void XML::parseDTDElementContentSpecification(XValue &contents)
     {
-        for (size_t index = 0;;)
+        BufferSource contentSpecSource(contents.unparsed);
+        // [47]   	children	   ::=   	(choice | seq) ('?' | '*' | '+')?
+        // [48]   	cp	   ::=   	(Name | choice | seq) ('?' | '*' | '+')?
+        // [49]   	choice	   ::=   	'(' S? cp ( S? '|' S? cp )+ S? ')'	[VC: Proper Group/PE Nesting]
+        // [50]   	seq	   ::=   	'(' S? cp ( S? ',' S? cp )* S? ')'	[VC: Proper Group/PE Nesting]
+        if (contentSpecSource.match(U"(#PCDATA)"))
         {
-            if (contents.unparsed[index] == ',' || std::iswspace(contents.unparsed[index]))
+            contents.parsed="((<#PCDATA>))";
+            return;
+        }
+        contentSpecSource.ignoreWS();
+        if (contentSpecSource.current() == '(')
+        {
+            parseDTDElementChildren(contentSpecSource, contents.parsed);
+            contentSpecSource.ignoreWS();
+            if (contentSpecSource.more())
             {
-                index++;
-                if (index == contents.unparsed.size())
+                if (contentSpecSource.current() == '*' ||
+                    contentSpecSource.current() == '+' ||
+                    contentSpecSource.current() == '?')
                 {
-                    break;
-                }
-            }
-            else if (contents.unparsed[index] == '#')
-            {
-                index++;
-                contents.parsed += "(<#";
-                while (std::isalnum(contents.unparsed[index]))
-                {
-                    contents.parsed += contents.unparsed[index++];
-                    if (index == contents.unparsed.size())
-                    {
-                        contents.parsed += ">)";
-                        break;
-                    }
-                }
-                contents.parsed += ">)";
-            }
-            else if (std::isalpha(contents.unparsed[index]))
-            {
-                contents.parsed += "(<";
-                while (std::isalnum(contents.unparsed[index]))
-                {
-                    contents.parsed += contents.unparsed[index++];
-                    if (index == contents.unparsed.size())
-                    {
-                        contents.parsed += ">)";
-                        break;
-                    }
-                }
-                contents.parsed += ">)";
-            }
-            else
-            {
-                contents.parsed += contents.unparsed[index++];
-                if (index == contents.unparsed.size())
-                {
-                    break;
+                    contentSpecSource.next();
                 }
             }
         }
-        // if (contents.parsed != "((<#PCDATA>))")
-        // {
-        //     if (contents.parsed.find("(<#PCDATA>)") != std::string::npos)
-        //     {
-        //         if (!contents.parsed.starts_with("((<#PCDATA>)") ||
-        //             (contents.unparsed.find(',') != std::string::npos) ||
-        //             (contents.unparsed.back() != '*'))
-        //         {
-        //             throw XML::ValidationError("Invalid mixed content specification.");
-        //         }
-        //     }
-        // }
+        else
+        {
+            throw std::runtime_error("DTD Parse Error.");
+        }
     }
     /// <summary>
     ///
@@ -126,6 +173,7 @@ namespace H4
             }
         }
     }
+
     /// <summary>
     /// Parse externally defined DTD into DTD XNode.
     /// </summary>
