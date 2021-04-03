@@ -182,6 +182,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        XString decode(XNodeDTD *xNodeDTD, const XString &unparsed);
         void validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void vadlidateElements(XNodeDTD *dtd, XNode *xNodeRoot);
         void initialiseTables();
@@ -213,7 +214,8 @@ namespace H4
         void parseDTDElementChildren(ISource &contentSpecSource, std::string &parsed);
         void parseDTDElementName(ISource &contentSpecSource, std::string &parsed);
         void parseDTDElementBracket(ISource &contentSpecSource, std::string &parsed);
-        void parseDTDElementContentSpecification(XValue &contents);
+        void parseDTDElementMixedContent(ISource &contentSpecSource, std::string &parsed);
+        void parseDTDElementContentSpecification(XNodeDTD *xNodeDTD, XValue &contents);
         void parseDTDPostProcessing(XNodeDTD *xNodeDTD);
         void parseDTDExternalContents(XNodeDTD *xNodeDTD);
         void parseDTDAttributeList(ISource &xmlSource, XNodeDTD *xNodeDTD);
