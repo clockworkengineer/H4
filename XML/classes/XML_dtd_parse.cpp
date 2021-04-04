@@ -43,34 +43,26 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    bool replace(XString &str, const XString &from, const XString &to)
-    {
-        size_t start_pos = str.find(from);
-        if (start_pos == std::string::npos)
-            return false;
-        str.replace(start_pos, from.length(), to);
-        return true;
-    }
-    XString XML::decode(XNodeDTD * /*xNodeDTD*/, const XString &unparsed)
+    XString XML::translateDTDEntities(XNodeDTD * /*xNodeDTD*/, const XString &unparsed)
     {
         XString result = unparsed;
-        do
+        while (result.find('%') != std::string::npos)
         {
             bool noMatch = true;
             for (auto entity : m_entityMapping)
             {
-                if (size_t pos = result.find(entity.first) != std::string::npos)
+                size_t pos = result.find(entity.first);
+                if (pos != std::string::npos)
                 {
-                    replace(result, entity.first, entity.second);
+                    result.replace(pos, entity.first.length(), entity.second);
                     noMatch = false;
                 }
             }
             if (noMatch)
             {
-                throw std::runtime_error("DTD Parse Erroe: No match found for notication string.");
+                throw std::runtime_error("DTD Parse Error: No match found for notication string.");
             }
-        } while (result.find('%') != std::string::npos);
-
+        }
         return (result);
     }
     void XML::parseDTDElementChoice(ISource &contentSpecSource, std::string &parsed)
@@ -150,15 +142,45 @@ namespace H4
     }
     void XML::parseDTDElementMixedContent(ISource &contentSpecSource, std::string &parsed)
     {
-
         contentSpecSource.ignoreWS();
         if (contentSpecSource.current() == ')')
         {
             parsed = "((<#PCDATA>))";
             return;
         }
+        parsed = "((<#PCDATA>)";
+        if (contentSpecSource.current() == '|')
+        {
+            while (contentSpecSource.current() == '|')
+            {
+                parsed += "|";
+                contentSpecSource.next();
+                contentSpecSource.ignoreWS();
+                std::string name = parseName(contentSpecSource);
+                parsed += "(<" + name + ">)";
+            }
 
-        contentSpecSource.ignoreWS();
+            if (contentSpecSource.current() != ')')
+            {
+                throw std::runtime_error("DTD Parse Error for content specification.");
+            }
+            parsed += ")";
+            contentSpecSource.next();
+            contentSpecSource.ignoreWS();
+            if (contentSpecSource.current() == '*')
+            {
+                parsed += "*";
+                parsed += contentSpecSource.current();
+                contentSpecSource.next();
+            }
+            if (contentSpecSource.more()) {
+                throw std::runtime_error("DTD Parse Error for content specification.");
+            }
+        }
+        else
+        {
+            throw std::runtime_error("DTD Parse Error for content specification.");
+        }
     }
     /// <summary>
     ///
@@ -167,25 +189,10 @@ namespace H4
     /// <returns></returns>
     void XML::parseDTDElementContentSpecification(XNodeDTD *xNodeDTD, XValue &contents)
     {
-        XString contentSpec;
-        if (contents.unparsed.find('%') != std::string::npos)
-        {
-            contentSpec = decode(xNodeDTD, contents.unparsed);
-        }
-        else
-        {
-            contentSpec = contents.unparsed;
-        }
-        BufferSource contentSpecSource(contentSpec);
-        // if (contentSpecSource.match(U"(#PCDATA)"))
-        // {
-        //     contents.parsed = "((<#PCDATA>))";
-        //     return;
-        // }
+        BufferSource contentSpecSource(translateDTDEntities(xNodeDTD, contents.unparsed));
         contentSpecSource.ignoreWS();
         if (contentSpecSource.current() == '(')
         {
-            //    long cotentSpecStart = contentSpecSource.position();
             contentSpecSource.next();
             contentSpecSource.ignoreWS();
             if (contentSpecSource.match(U"#PCDATA"))

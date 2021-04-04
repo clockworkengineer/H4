@@ -182,7 +182,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        XString decode(XNodeDTD *xNodeDTD, const XString &unparsed);
+
         void validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void vadlidateElements(XNodeDTD *dtd, XNode *xNodeRoot);
         void initialiseTables();
@@ -194,21 +194,7 @@ namespace H4
         bool validateName(XString attributeName);
         void validateXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);
-        std::string parseName(ISource &xmlSource);
-        long parseCharacterReference(ISource &xmlSource, XString reference);
-        XValue parseValue(ISource &xmlSource);
-        XValue parseCharacter(ISource &source);
-        XValue parseReferenceOrEntity(ISource &source);
-        XAttribute parseDTDExternalReference(ISource &xmlSource);
-        std::string parseDTDAttributeType(ISource &xmlSource);
-        XValue parseDTDAttributeValue(ISource &xmlSource);
-        void parseDTDComment(ISource &source, XNodeDTD *xNodeDTD);
-        void parseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseAttributes(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseComment(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseCDATA(ISource &xmlSource, XNodeElement *xNodeElement);
+        XString translateDTDEntities(XNodeDTD *xNodeDTD, const XString &unparsed);
         void parseDTDElementChoice(ISource &contentSpecSource, std::string &parsed);
         void parseDTDElementSequence(ISource &contentSpecSource, std::string &parsed);
         void parseDTDElementChildren(ISource &contentSpecSource, std::string &parsed);
@@ -222,9 +208,24 @@ namespace H4
         void parseDTDNotation(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTDEntity(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTDElement(ISource &xmlSource, XNodeDTD *xNodeElement);
+        XAttribute parseDTDExternalReference(ISource &xmlSource);
+        std::string parseDTDAttributeType(ISource &xmlSource);
+        XValue parseDTDAttributeValue(ISource &xmlSource);
+        void parseDTDComment(ISource &source, XNodeDTD *xNodeDTD);
         void parseDTDExternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTDInternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTD(ISource &xmlSource, XNodeElement *XNodeElement);
+        std::string parseName(ISource &xmlSource);
+        long parseCharacterReference(ISource &xmlSource, XString reference);
+        XValue parseValue(ISource &xmlSource);
+        XValue parseCharacter(ISource &source);
+        XValue parseReferenceOrEntity(ISource &source);
+        void parseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseAttributes(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseComment(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseCDATA(ISource &xmlSource, XNodeElement *xNodeElement);
         void parsePI(ISource &xmlSource, XNodeElement *xNodeElement);
         void parseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
         void parseElement(ISource &xmlSource, XNodeElement *XNodeElement);
