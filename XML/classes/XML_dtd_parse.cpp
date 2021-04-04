@@ -43,13 +43,13 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    XString XML::translateDTDEntities(XNodeDTD * /*xNodeDTD*/, const XString &unparsed)
+    std::string XML::translateDTDEntities(XNodeDTD * xNodeDTD, const std::string &unparsed)
     {
-        XString result = unparsed;
+        std::string result = unparsed;
         while (result.find('%') != std::string::npos)
         {
             bool noMatch = true;
-            for (auto entity : m_entityMapping)
+            for (auto entity : xNodeDTD->entityMapping)
             {
                 size_t pos = result.find(entity.first);
                 if (pos != std::string::npos)
@@ -258,7 +258,7 @@ namespace H4
             XValue systemValue = parseValue(xmlSource);
             result.name = "PUBLIC";
             result.value.parsed = publicValue.parsed + ", " + systemValue.parsed;
-            result.value.unparsed = publicValue.unparsed + U" " + systemValue.unparsed;
+            result.value.unparsed = publicValue.unparsed + " " + systemValue.unparsed;
         }
         else
         {
@@ -313,18 +313,18 @@ namespace H4
         if (xmlSource.match(U"#REQUIRED"))
         {
             value.parsed = "#REQUIRED";
-            value.unparsed = U"#REQUIRED";
+            value.unparsed = "#REQUIRED";
         }
         else if (xmlSource.match(U"#IMPLIED"))
         {
             value.parsed = "#IMPLIED";
-            value.unparsed = U"#IMPLIED";
+            value.unparsed = "#IMPLIED";
         }
         else if (xmlSource.match(U"#FIXED"))
         {
             XValue fixedValue = parseValue(xmlSource);
             value.parsed = "#FIXED " + fixedValue.parsed;
-            value.unparsed = U"#FIXED " + fixedValue.unparsed;
+            value.unparsed = "#FIXED " + fixedValue.unparsed;
         }
         else
         {
@@ -396,12 +396,12 @@ namespace H4
         XValue contentSpecification;
         if (xmlSource.match(U"EMPTY"))
         {
-            contentSpecification.unparsed = U"EMPTY";
+            contentSpecification.unparsed = "EMPTY";
             contentSpecification.parsed = "EMPTY";
         }
         else if (xmlSource.match(U"ANY"))
         {
-            contentSpecification.unparsed = U"ANY";
+            contentSpecification.unparsed = "ANY";
             contentSpecification.parsed = "ANY";
         }
         else

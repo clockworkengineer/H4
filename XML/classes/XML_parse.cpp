@@ -142,7 +142,7 @@ namespace H4
                 throw SyntaxError(xmlSource, "Invalid character value encountered.");
             }
         }
-        entityReference.unparsed = unparsedEntityReference;
+        entityReference.unparsed = xmlSource.to_bytes(unparsedEntityReference);
         entityReference.parsed = xmlSource.to_bytes(parsedEntityReference);
         return (entityReference);
     }
@@ -187,9 +187,9 @@ namespace H4
             while (xmlSource.more() && xmlSource.current() != quote)
             {
                 XValue character = parseCharacter(xmlSource);
-                if (character.unparsed == U"")
+                if (character.unparsed == "")
                 {
-                    value.unparsed += xmlSource.from_bytes(character.parsed);
+                    value.unparsed += character.parsed;
                 }
                 else
                 {
@@ -362,7 +362,7 @@ namespace H4
     void XML::parseDefault(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         XValue entityReference = parseCharacter(xmlSource);
-        if (entityReference.unparsed != U"")
+        if (entityReference.unparsed != "")
         {
             XNodeEntityReference xNodeEntityReference(entityReference);
             if (!xNodeElement->elements.empty())

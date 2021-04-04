@@ -36,7 +36,7 @@ namespace H4
     // PRIVATE STATIC VARIABLES
     // ========================
     // Defaults for XML declaration
-    XAttribute XML::m_defaultAtributes[3] = {{"version", {U"1.0", "1.0"}}, {"encoding", {U"UTF-8", "UTF-8"}}, {"standalone", {U"no", "no"}}};
+    XAttribute XML::m_defaultAtributes[3] = {{"version", {"1.0", "1.0"}}, {"encoding", {"UTF-8", "UTF-8"}}, {"standalone", {"no", "no"}}};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================

@@ -24,7 +24,7 @@ namespace H4
     struct XValue
     {
     public:
-        XString unparsed;
+        std::string unparsed;
         std::string parsed;
     };
     //

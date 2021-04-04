@@ -194,7 +194,7 @@ namespace H4
         bool validateName(XString attributeName);
         void validateXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);
-        XString translateDTDEntities(XNodeDTD *xNodeDTD, const XString &unparsed);
+        std::string translateDTDEntities(XNodeDTD *xNodeDTD, const std::string &unparsed);
         void parseDTDElementChoice(ISource &contentSpecSource, std::string &parsed);
         void parseDTDElementSequence(ISource &contentSpecSource, std::string &parsed);
         void parseDTDElementChildren(ISource &contentSpecSource, std::string &parsed);

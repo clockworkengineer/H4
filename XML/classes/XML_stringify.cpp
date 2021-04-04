@@ -55,9 +55,9 @@ namespace H4
         // XML prolog
         case XNodeType::prolog:
         {
-            xmlDestination.add(U"<?xml version=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[0].value.unparsed + U"\"" +
-                               U" encoding=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[1].value.unparsed + U"\"" +
-                               U" standalone=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[2].value.unparsed + U"\"?>");
+            xmlDestination.add("<?xml version=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[0].value.unparsed + "\"" +
+                               " encoding=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[1].value.unparsed + "\"" +
+                               " standalone=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[2].value.unparsed + "\"?>");
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
             {
                 stringifyXML(element.get(), xmlDestination);
@@ -72,8 +72,7 @@ namespace H4
             xmlDestination.add("<" + xNodeElement->name);
             for (auto attr : xNodeElement->attributes)
             {
-                xmlDestination.add(" " + attr.name);
-                xmlDestination.add(U"=\"" + attr.value.unparsed + U"\"");
+                xmlDestination.add(" " + attr.name+"=\"" + attr.value.unparsed + "\"");
             }
             xmlDestination.add(">");
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
@@ -90,8 +89,7 @@ namespace H4
             xmlDestination.add("<" + xNodeElement->name);
             for (auto attr : xNodeElement->attributes)
             {
-                xmlDestination.add(" " + attr.name);
-                xmlDestination.add(U"=\"" + attr.value.unparsed + U"\"");
+                xmlDestination.add(" " + attr.name+"=\"" + attr.value.unparsed + "\"");
             }
             xmlDestination.add("/>");
             break;

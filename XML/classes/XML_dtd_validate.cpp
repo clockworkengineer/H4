@@ -104,9 +104,8 @@ namespace H4
         }
         if (!std::regex_match(elements, match))
         {
-            std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> UTF8;
             throw ValidationError(dtd, "<" + xNodeElement->name + "> element does not conform to the content specication " +
-                                           UTF8.to_bytes(dtd->elements[xNodeElement->name].content.unparsed) + ".");
+                                           dtd->elements[xNodeElement->name].content.unparsed + ".");
         }
     }
     void XML::vadlidateElements(XNodeDTD *dtd, XNode *xNode)
