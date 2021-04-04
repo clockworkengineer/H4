@@ -50,11 +50,9 @@ namespace H4
             {
                 return (errorMessage.c_str());
             }
-
         private:
             std::string errorMessage;
         };
-
         struct ValidationError : public std::exception
         {
         public:
@@ -66,7 +64,6 @@ namespace H4
             {
                 return (errorMessage.c_str());
             }
-
         private:
             std::string errorMessage;
         };
@@ -123,7 +120,6 @@ namespace H4
             {
                 return (m_UTF8.from_bytes(from));
             }
-
         protected:
             long m_lineNo = 1;
             long m_column = 1;
@@ -137,8 +133,6 @@ namespace H4
         {
         public:
             virtual void add(const std::string &bytes) = 0;
-            virtual void add(const std::u32string &utf32string) = 0;
-
         protected:
             std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         };
@@ -182,7 +176,6 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-
         void validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void vadlidateElements(XNodeDTD *dtd, XNode *xNodeRoot);
         void initialiseTables();
