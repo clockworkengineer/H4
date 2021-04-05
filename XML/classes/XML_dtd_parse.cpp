@@ -65,7 +65,7 @@ namespace H4
             }
             if (noMatch)
             {
-                throw std::runtime_error("DTD Parse Error: No match found for entity string '"+result+"'.");
+                throw std::runtime_error("DTD Parse Error: No match found for entity string '" + result + "'.");
             }
         }
         return (result);
@@ -75,13 +75,13 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementChoice(ISource &contentSpecSource, XValue &contentSpec)
+    void XML::parseDTDElementChoice(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
-        while (contentSpecSource.current() == '|')
+        while (contentSpecSource.more() && contentSpecSource.current() == '|')
         {
-            contentSpec.parsed += '|';
+            contentSpecDestination.add("|");
             contentSpecSource.next();
-            parseDTDElementChildren(contentSpecSource, contentSpec);
+            parseDTDElementChild(contentSpecSource, contentSpecDestination);
         }
     }
     /// <summary>
@@ -89,12 +89,12 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementSequence(ISource &contentSpecSource, XValue &contentSpec)
+    void XML::parseDTDElementSequence(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
-        while (contentSpecSource.current() == ',')
+        while (contentSpecSource.more() && contentSpecSource.current() == ',')
         {
             contentSpecSource.next();
-            parseDTDElementChildren(contentSpecSource, contentSpec);
+            parseDTDElementChild(contentSpecSource, contentSpecDestination);
         }
     }
     /// <summary>
@@ -102,29 +102,29 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementBracket(ISource &contentSpecSource, XValue &contentSpec)
+    void XML::parseDTDElementBracket(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         do
         {
-            parseDTDElementChildren(contentSpecSource, contentSpec);
-        } while (contentSpecSource.current() != ')');
+            parseDTDElementChild(contentSpecSource, contentSpecDestination);
+        } while (contentSpecSource.more() && contentSpecSource.current() != ')');
     }
     /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementName(ISource &contentSpecSource, XValue &contentSpec)
+    void XML::parseDTDElementName(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
-        contentSpec.parsed += "(<";
-        contentSpec.parsed += contentSpecSource.current();
+        contentSpecDestination.add("(<");
+        contentSpecDestination.add(contentSpecSource.current());
         contentSpecSource.next();
-        while (validNameChar(contentSpecSource.current()))
+        while (contentSpecSource.more() && validNameChar(contentSpecSource.current()))
         {
-            contentSpec.parsed += contentSpecSource.current();
+            contentSpecDestination.add(contentSpecSource.current());
             contentSpecSource.next();
         }
-        contentSpec.parsed += ">)";
+        contentSpecDestination.add(">)");
         contentSpecSource.ignoreWS();
     }
     /// <summary>
@@ -132,43 +132,43 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementChildren(ISource &contentSpecSource, XValue &contentSpec)
+    void XML::parseDTDElementChild(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         contentSpecSource.ignoreWS();
         if (contentSpecSource.match(U"("))
         {
-            contentSpec.parsed += '(';
-            parseDTDElementBracket(contentSpecSource, contentSpec);
+            contentSpecDestination.add("(");
+            parseDTDElementBracket(contentSpecSource, contentSpecDestination);
             if (contentSpecSource.current() != ')')
             {
                 throw std::runtime_error("DTD Parse Error for content specification.");
             }
-            contentSpec.parsed += ')';
+            contentSpecDestination.add(")");
             contentSpecSource.next();
             if (contentSpecSource.current() == '*' ||
                 contentSpecSource.current() == '+' ||
                 contentSpecSource.current() == '?')
             {
-                contentSpec.parsed += contentSpecSource.current();
+                contentSpecDestination.add(contentSpecSource.current());
                 contentSpecSource.next();
             }
         }
         else if (contentSpecSource.current() == '|')
         {
-            parseDTDElementChoice(contentSpecSource, contentSpec);
+            parseDTDElementChoice(contentSpecSource, contentSpecDestination);
         }
         else if (contentSpecSource.current() == ',')
         {
-            parseDTDElementSequence(contentSpecSource, contentSpec);
+            parseDTDElementSequence(contentSpecSource, contentSpecDestination);
         }
         else if (validNameStartChar(contentSpecSource.current()))
         {
-            parseDTDElementName(contentSpecSource, contentSpec);
+            parseDTDElementName(contentSpecSource, contentSpecDestination);
             if (contentSpecSource.current() == '*' ||
                 contentSpecSource.current() == '+' ||
                 contentSpecSource.current() == '?')
             {
-                contentSpec.parsed += contentSpecSource.current();
+                contentSpecDestination.add(contentSpecSource.current());
                 contentSpecSource.next();
             }
         }
@@ -183,25 +183,25 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementMixedContent(ISource &contentSpecSource, XValue &contentSpec)
+    void XML::parseDTDElementMixedContent(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         contentSpecSource.ignoreWS();
         if (contentSpecSource.current() == ')')
         {
-            contentSpec.parsed = "((<#PCDATA>))";
+            contentSpecDestination.add("((<#PCDATA>))");
             return;
         }
-        contentSpec.parsed = "((<#PCDATA>)";
+        contentSpecDestination.add("((<#PCDATA>)");
         if (contentSpecSource.current() == '|')
         {
-            while (contentSpecSource.current() == '|')
+            while (contentSpecSource.more() && contentSpecSource.current() == '|')
             {
-                contentSpec.parsed += "|";
+                contentSpecDestination.add("|");
                 contentSpecSource.next();
                 contentSpecSource.ignoreWS();
                 if (validNameStartChar(contentSpecSource.current()))
                 {
-                    parseDTDElementName(contentSpecSource, contentSpec);
+                    parseDTDElementName(contentSpecSource, contentSpecDestination);
                 }
                 else
                 {
@@ -212,16 +212,16 @@ namespace H4
             {
                 throw std::runtime_error("DTD Parse Error for content specification.");
             }
-            contentSpec.parsed += ")";
+            contentSpecDestination.add(")");
             contentSpecSource.next();
             contentSpecSource.ignoreWS();
             if (contentSpecSource.current() == '*')
             {
-                contentSpec.parsed += "*";
-                contentSpec.parsed += contentSpecSource.current();
+                contentSpecDestination.add("*");
+                contentSpecDestination.add(contentSpecSource.current());
                 contentSpecSource.next();
             }
-            if (contentSpecSource.more())
+            if (contentSpecSource.more()&&!std::iswspace(contentSpecSource.current()))
             {
                 throw std::runtime_error("DTD Parse Error for content specification.");
             }
@@ -239,6 +239,7 @@ namespace H4
     void XML::parseDTDElementContentSpecification(XNodeDTD *xNodeDTD, XValue &contentSpec)
     {
         BufferSource contentSpecSource(translateDTDContentSpecEntities(xNodeDTD, contentSpec));
+        BufferDestination contentSpecDestination;
         contentSpecSource.ignoreWS();
         if (contentSpecSource.current() == '(')
         {
@@ -246,18 +247,19 @@ namespace H4
             contentSpecSource.ignoreWS();
             if (contentSpecSource.match(U"#PCDATA"))
             {
-                parseDTDElementMixedContent(contentSpecSource, contentSpec);
+                parseDTDElementMixedContent(contentSpecSource, contentSpecDestination);
             }
             else
             {
                 contentSpecSource.backup(contentSpecSource.position());
-                parseDTDElementChildren(contentSpecSource, contentSpec);
+                parseDTDElementChild(contentSpecSource, contentSpecDestination);
             }
         }
         else
         {
             throw std::runtime_error("DTD Parse Error for content specification.");
         }
+        contentSpec.parsed = contentSpecDestination.getBuffer();
     }
     /// <summary>
     ///
@@ -291,6 +293,11 @@ namespace H4
             // Public external DTD currently not supported
         }
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     XAttribute XML::parseDTDExternalReference(ISource &xmlSource)
     {
         XAttribute result;

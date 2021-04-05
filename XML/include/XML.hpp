@@ -50,6 +50,7 @@ namespace H4
             {
                 return (errorMessage.c_str());
             }
+
         private:
             std::string errorMessage;
         };
@@ -62,12 +63,13 @@ namespace H4
         public:
             DTDSyntaxError(const std::string &description = "")
             {
-                errorMessage = "DTD Syntax Error "+ description;
+                errorMessage = "DTD Syntax Error " + description;
             }
             virtual const char *what() const throw()
             {
                 return (errorMessage.c_str());
             }
+
         private:
             std::string errorMessage;
         };
@@ -85,6 +87,7 @@ namespace H4
             {
                 return (errorMessage.c_str());
             }
+
         private:
             std::string errorMessage;
         };
@@ -141,6 +144,7 @@ namespace H4
             {
                 return (m_UTF8.from_bytes(from));
             }
+
         protected:
             long m_lineNo = 1;
             long m_column = 1;
@@ -154,6 +158,8 @@ namespace H4
         {
         public:
             virtual void add(const std::string &bytes) = 0;
+            virtual void add(const XChar) = 0;
+
         protected:
             std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         };
@@ -208,13 +214,13 @@ namespace H4
         bool validateName(XString attributeName);
         void validateXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);
-        std::string translateDTDContentSpecEntities(XNodeDTD *xNodeDTD,  const XValue &contentSpec);
-        void parseDTDElementChoice(ISource &contentSpecSource, XValue &parsedContentSpec);
-        void parseDTDElementSequence(ISource &contentSpecSource, XValue &ontentSpec);
-        void parseDTDElementChildren(ISource &contentSpecSource, XValue &ContentSpec);
-        void parseDTDElementName(ISource &contentSpecSource, XValue &ContentSpec);
-        void parseDTDElementBracket(ISource &contentSpecSource, XValue &ContentSpec);
-        void parseDTDElementMixedContent(ISource &contentSpecSource, XValue &ContentSpec);
+        std::string translateDTDContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec);
+        void parseDTDElementChoice(ISource &contentSpecSource, IDestination &contentSpec);
+        void parseDTDElementSequence(ISource &contentSpecSource, IDestination &contentSpec);
+        void parseDTDElementChild(ISource &contentSpecSource, IDestination &contentSpec);
+        void parseDTDElementName(ISource &contentSpecSource, IDestination &contentSpec);
+        void parseDTDElementBracket(ISource &contentSpecSource, IDestination &contentSpec);
+        void parseDTDElementMixedContent(ISource &contentSpecSource, IDestination &contentSpec);
         void parseDTDElementContentSpecification(XNodeDTD *xNodeDTD, XValue &contentSpec);
         void parseDTDPostProcessing(XNodeDTD *xNodeDTD);
         void parseDTDExternalContents(XNodeDTD *xNodeDTD);
