@@ -65,7 +65,7 @@ namespace H4
             }
             if (noMatch)
             {
-                throw std::runtime_error("DTD Parse Error: No match found for entity string '" + result + "'.");
+                throw SyntaxError("No match found for entity string '" + result + "'.");
             }
         }
         return (result);
@@ -141,7 +141,7 @@ namespace H4
             parseDTDElementBracket(contentSpecSource, contentSpecDestination);
             if (contentSpecSource.current() != ')')
             {
-                throw std::runtime_error("DTD Parse Error for content specification.");
+                throw SyntaxError("Invalid content region specification.");
             }
             contentSpecDestination.add(")");
             contentSpecSource.next();
@@ -174,7 +174,7 @@ namespace H4
         }
         else
         {
-            throw std::runtime_error("DTD Parse Error for content specification.");
+            throw SyntaxError("Invalid content region specification.");
         }
         contentSpecSource.ignoreWS();
     }
@@ -205,12 +205,12 @@ namespace H4
                 }
                 else
                 {
-                    throw std::runtime_error("DTD Parse Error for content specification.");
+                    throw SyntaxError("Invalid content region specification.");
                 }
             }
             if (contentSpecSource.current() != ')')
             {
-                throw std::runtime_error("DTD Parse Error for content specification.");
+                throw SyntaxError("Invalid content region specification.");
             }
             contentSpecDestination.add(")");
             contentSpecSource.next();
@@ -221,14 +221,14 @@ namespace H4
                 contentSpecDestination.add(contentSpecSource.current());
                 contentSpecSource.next();
             }
-            if (contentSpecSource.more()&&!std::iswspace(contentSpecSource.current()))
+            if (contentSpecSource.more() && !std::iswspace(contentSpecSource.current()))
             {
-                throw std::runtime_error("DTD Parse Error for content specification.");
+                throw SyntaxError("Invalid content region specification.");
             }
         }
         else
         {
-            throw std::runtime_error("DTD Parse Error for content specification.");
+            throw SyntaxError("Invalid content region specification.");
         }
     }
     /// <summary>
@@ -257,7 +257,7 @@ namespace H4
         }
         else
         {
-            throw std::runtime_error("DTD Parse Error for content specification.");
+            throw SyntaxError("Invalid content region specification.");
         }
         contentSpec.parsed = contentSpecDestination.getBuffer();
     }
@@ -272,7 +272,21 @@ namespace H4
         {
             if (element.second.content.parsed.empty())
             {
-                parseDTDElementContentSpecification(xNodeDTD, element.second.content);
+                try
+                {
+                    parseDTDElementContentSpecification(xNodeDTD, element.second.content);
+                }
+                catch (SyntaxError &e)
+                {
+                    if (e.what() == std::string("XML Syntax Error: Invalid content region specification."))
+                    {
+                        throw SyntaxError("Invalid content region specification for element <" + element.second.name + ">.");
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
             }
         }
     }

@@ -473,7 +473,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "This book carefully explains XML-based systems development."
                 "</format>";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "DTD Parse Error for content specification.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Invalid content region specification for element <format>.");
   }
   SECTION("XML with a DTD that contains an illegal mixed content specification (#PCDATA doesnt come first).", "[XML][Parse][DTD]")
   {
@@ -492,7 +492,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "This book carefully explains XML-based systems development."
                 "</format>";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "DTD Parse Error for content specification.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Invalid content region specification for element <format>.");
   }
   SECTION("XML with a DTD that contains an illegal mixed content specification (does not end with '*').", "[XML][Parse][DTD]")
   {
@@ -511,6 +511,6 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "This book carefully explains XML-based systems development."
                 "</format>";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "DTD Parse Error for content specification.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Invalid content region specification for element <format>.");
   }
 }
