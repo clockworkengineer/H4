@@ -48,7 +48,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    std::string XML::translateDTDContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec)
+    std::string XML::parseDTDtranslateContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec)
     {
         std::string result = contentSpec.unparsed;
         while (result.find('%') != std::string::npos)
@@ -75,14 +75,78 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
+    bool XML::parseDTDIsChoiceOrSequence(ISource &contentSpecSource)
+    {
+        bool choice = false;
+        long start = contentSpecSource.position();
+        while (contentSpecSource.more() &&
+               contentSpecSource.current() != '|' &&
+               contentSpecSource.current() != ',')
+        {
+            contentSpecSource.next();
+        }
+        if (contentSpecSource.more() && contentSpecSource.current() == '|')
+        {
+            choice = true;
+        }
+        contentSpecSource.backup(contentSpecSource.position() - start);
+        return (choice);
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::parseDTDElementCP(ISource &contentSpecSource, IDestination &contentSpecDestination)
+    {
+        contentSpecSource.next();
+        contentSpecSource.ignoreWS();
+        if (validNameStartChar(contentSpecSource.current()))
+        {
+            parseDTDElementName(contentSpecSource, contentSpecDestination);
+        }
+        else if (parseDTDIsChoiceOrSequence(contentSpecSource))
+        {
+            parseDTDElementChoice(contentSpecSource, contentSpecDestination);
+        }
+        else
+        {
+            parseDTDElementSequence(contentSpecSource, contentSpecDestination);
+        }
+        if (contentSpecSource.current() == '*' ||
+            contentSpecSource.current() == '+' ||
+            contentSpecSource.current() == '?')
+        {
+            contentSpecDestination.add(contentSpecSource.current());
+            contentSpecSource.next();
+            contentSpecSource.ignoreWS();
+        }
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     void XML::parseDTDElementChoice(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
+        if (contentSpecSource.current() != '(')
+        {
+            throw SyntaxError("Invalid content region specification.");
+        }
+        contentSpecDestination.add("(");
+        parseDTDElementCP(contentSpecSource, contentSpecDestination);
         while (contentSpecSource.more() && contentSpecSource.current() == '|')
         {
             contentSpecDestination.add("|");
-            contentSpecSource.next();
-            parseDTDElementChild(contentSpecSource, contentSpecDestination);
+            parseDTDElementCP(contentSpecSource, contentSpecDestination);
         }
+        if (contentSpecSource.current() != ')')
+        {
+            throw SyntaxError("Invalid content region specification.");
+        }
+        contentSpecDestination.add(")");
+        contentSpecSource.next();
+        contentSpecSource.ignoreWS();
     }
     /// <summary>
     ///
@@ -91,23 +155,23 @@ namespace H4
     /// <returns></returns>
     void XML::parseDTDElementSequence(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
+        if (contentSpecSource.current() != '(')
+        {
+            throw SyntaxError("Invalid content region specification.");
+        }
+        contentSpecDestination.add("(");
+        parseDTDElementCP(contentSpecSource, contentSpecDestination);
         while (contentSpecSource.more() && contentSpecSource.current() == ',')
         {
-            contentSpecSource.next();
-            parseDTDElementChild(contentSpecSource, contentSpecDestination);
+            parseDTDElementCP(contentSpecSource, contentSpecDestination);
         }
-    }
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
-    void XML::parseDTDElementBracket(ISource &contentSpecSource, IDestination &contentSpecDestination)
-    {
-        do
+        if (contentSpecSource.current() != ')')
         {
-            parseDTDElementChild(contentSpecSource, contentSpecDestination);
-        } while (contentSpecSource.more() && contentSpecSource.current() != ')');
+            throw SyntaxError("Invalid content region specification.");
+        }
+        contentSpecDestination.add(")");
+        contentSpecSource.next();
+        contentSpecSource.ignoreWS();
     }
     /// <summary>
     ///
@@ -132,51 +196,32 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementChild(ISource &contentSpecSource, IDestination &contentSpecDestination)
+    void XML::parseDTDElementChildren(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
-        contentSpecSource.ignoreWS();
-        if (contentSpecSource.match(U"("))
+      //  contentSpecSource.ignoreWS();
+        if (contentSpecSource.current() == '(')
         {
-            contentSpecDestination.add("(");
-            parseDTDElementBracket(contentSpecSource, contentSpecDestination);
-            if (contentSpecSource.current() != ')')
+            if (parseDTDIsChoiceOrSequence(contentSpecSource))
             {
-                throw SyntaxError("Invalid content region specification.");
+                parseDTDElementChoice(contentSpecSource, contentSpecDestination);
             }
-            contentSpecDestination.add(")");
-            contentSpecSource.next();
+            else
+            {
+                parseDTDElementSequence(contentSpecSource, contentSpecDestination);
+            }
             if (contentSpecSource.current() == '*' ||
                 contentSpecSource.current() == '+' ||
                 contentSpecSource.current() == '?')
             {
                 contentSpecDestination.add(contentSpecSource.current());
                 contentSpecSource.next();
-            }
-        }
-        else if (contentSpecSource.current() == '|')
-        {
-            parseDTDElementChoice(contentSpecSource, contentSpecDestination);
-        }
-        else if (contentSpecSource.current() == ',')
-        {
-            parseDTDElementSequence(contentSpecSource, contentSpecDestination);
-        }
-        else if (validNameStartChar(contentSpecSource.current()))
-        {
-            parseDTDElementName(contentSpecSource, contentSpecDestination);
-            if (contentSpecSource.current() == '*' ||
-                contentSpecSource.current() == '+' ||
-                contentSpecSource.current() == '?')
-            {
-                contentSpecDestination.add(contentSpecSource.current());
-                contentSpecSource.next();
+                contentSpecSource.ignoreWS();
             }
         }
         else
         {
             throw SyntaxError("Invalid content region specification.");
         }
-        contentSpecSource.ignoreWS();
     }
     /// <summary>
     ///
@@ -238,7 +283,7 @@ namespace H4
     /// <returns></returns>
     void XML::parseDTDElementContentSpecification(XNodeDTD *xNodeDTD, XValue &contentSpec)
     {
-        BufferSource contentSpecSource(translateDTDContentSpecEntities(xNodeDTD, contentSpec));
+        BufferSource contentSpecSource(parseDTDtranslateContentSpecEntities(xNodeDTD, contentSpec));
         BufferDestination contentSpecDestination;
         contentSpecSource.ignoreWS();
         if (contentSpecSource.current() == '(')
@@ -252,7 +297,7 @@ namespace H4
             else
             {
                 contentSpecSource.backup(contentSpecSource.position());
-                parseDTDElementChild(contentSpecSource, contentSpecDestination);
+                parseDTDElementChildren(contentSpecSource, contentSpecDestination);
             }
         }
         else

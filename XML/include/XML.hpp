@@ -199,12 +199,15 @@ namespace H4
         bool validateName(XString attributeName);
         void validateXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);
-        std::string translateDTDContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec);
+        bool isPCDATA(XNodeElement *xNodeElement);
+        bool isEMPTY(XNodeElement *xNodeElement);
+        std::string parseDTDtranslateContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec);
+        bool parseDTDIsChoiceOrSequence(XML::ISource &contentSpecSource);
+        void parseDTDElementCP(ISource &contentSpecSource, IDestination &contentSpec);
         void parseDTDElementChoice(ISource &contentSpecSource, IDestination &contentSpec);
         void parseDTDElementSequence(ISource &contentSpecSource, IDestination &contentSpec);
-        void parseDTDElementChild(ISource &contentSpecSource, IDestination &contentSpec);
+        void parseDTDElementChildren(ISource &contentSpecSource, IDestination &contentSpec);
         void parseDTDElementName(ISource &contentSpecSource, IDestination &contentSpec);
-        void parseDTDElementBracket(ISource &contentSpecSource, IDestination &contentSpec);
         void parseDTDElementMixedContent(ISource &contentSpecSource, IDestination &contentSpec);
         void parseDTDElementContentSpecification(XNodeDTD *xNodeDTD, XValue &contentSpec);
         void parseDTDPostProcessing(XNodeDTD *xNodeDTD);

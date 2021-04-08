@@ -42,7 +42,12 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    bool isPCDATA(XNodeElement *xNodeElement)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    bool XML::isPCDATA(XNodeElement *xNodeElement)
     {
         for (auto &element : xNodeElement->elements)
         {
@@ -54,10 +59,20 @@ namespace H4
         }
         return (!xNodeElement->getContents().empty());
     }
-    bool isEMPTY(XNodeElement *xNodeElement)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    bool XML::isEMPTY(XNodeElement *xNodeElement)
     {
         return (xNodeElement->elements.empty() || xNodeElement->getNodeType() == XNodeType::self);
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     void XML::validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
         if ((dtd == nullptr) || (dtd->elements.empty()))
@@ -84,7 +99,6 @@ namespace H4
         {
             return;
         }
-        std::string str = dtd->elements[xNodeElement->name].content.parsed;
         std::regex match(dtd->elements[xNodeElement->name].content.parsed);
         std::string elements;
         for (auto &element : xNodeElement->elements)
@@ -108,6 +122,11 @@ namespace H4
                                            dtd->elements[xNodeElement->name].content.unparsed + ".");
         }
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     void XML::vadlidateElements(XNodeDTD *dtd, XNode *xNode)
     {
         switch (xNode->getNodeType())
@@ -152,6 +171,11 @@ namespace H4
             throw ValidationError(dtd, "Invalid XNode encountered during validation.");
         }
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     void XML::validateXML(XNode *xNode)
     {
         if (xNode->getNodeType() == XNodeType::prolog)
@@ -161,6 +185,7 @@ namespace H4
                 if (element->getNodeType() == XNodeType::dtd)
                 {
                     vadlidateElements(static_cast<XNodeDTD *>(element.get()), xNode);
+                    break;
                 }
             }
         }

@@ -513,4 +513,39 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Invalid content region specification for element <format>.");
   }
+  SECTION("Parse XML with DTD that cotains a content specification in error (missing ',').", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE note ["
+                "<!ELEMENT note (to,from,heading body)>\n"
+                "<!ELEMENT to (#PCDATA)>\n"
+                "<!ELEMENT from (#PCDATA)>\n"
+                "<!ELEMENT heading (#PCDATA)>\n"
+                "<!ELEMENT body (#PCDATA)>\n"
+                "]>\n"
+                "<note>\n"
+                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
+                "<body>Don't forget me this weekend</body>\n"
+                "</note>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource),   "XML Syntax Error: Invalid content region specification for element <note>.");
+  }
+
+    SECTION("Parse XML with DTD that cotains a content specification in error (missing element name).", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE note ["
+                "<!ELEMENT note (to,from,heading,)>\n"
+                "<!ELEMENT to (#PCDATA)>\n"
+                "<!ELEMENT from (#PCDATA)>\n"
+                "<!ELEMENT heading (#PCDATA)>\n"
+                "<!ELEMENT body (#PCDATA)>\n"
+                "]>\n"
+                "<note>\n"
+                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
+                "<body>Don't forget me this weekend</body>\n"
+                "</note>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource),   "XML Syntax Error: Invalid content region specification for element <note>.");
+  }
 }
