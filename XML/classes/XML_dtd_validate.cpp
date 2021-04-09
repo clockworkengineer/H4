@@ -47,7 +47,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool XML::isPCDATA(XNodeElement *xNodeElement)
+    bool XML::vadlidateIsPCDATA(XNodeElement *xNodeElement)
     {
         for (auto &element : xNodeElement->elements)
         {
@@ -64,7 +64,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool XML::isEMPTY(XNodeElement *xNodeElement)
+    bool XML::validateIsEMPTY(XNodeElement *xNodeElement)
     {
         return (xNodeElement->elements.empty() || xNodeElement->getNodeType() == XNodeType::self);
     }
@@ -73,7 +73,46 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    void XML::validateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    {
+        for (auto &attribute : dtd->elements[xNodeElement->name].attributes)
+        {
+            if (attribute.value.parsed == "#REQUIRED")
+            {
+                if (!isAttributePresent(xNodeElement->attributes, attribute.name))
+                {
+                    throw ValidationError(dtd, "Required attribute '" + attribute.name + "' missing for element <" + xNodeElement->name + ">.");
+                }
+            }
+            else if (attribute.value.parsed == "#IMPLIED")
+            {
+                continue;
+            }
+            else if (attribute.value.parsed.starts_with("#FIXED "))
+            {
+                if (isAttributePresent(xNodeElement->attributes, attribute.name))
+                {
+                    XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
+                    if (attribute.value.parsed.substr(7) != elementAttribute.value.parsed)
+                    {
+                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> attribute '" + attribute.name + "' is '" + elementAttribute.value.parsed + "' instead of '" + attribute.value.parsed.substr(7) + "'.");
+                    }
+                }
+                else
+                 {
+                    XValue value;
+                    value.parsed= value.unparsed = attribute.value.parsed.substr(7);
+                    xNodeElement->attributes.emplace_back(attribute.name, value);
+                }
+            }
+        }
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::validateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
         if ((dtd == nullptr) || (dtd->elements.empty()))
         {
@@ -81,7 +120,7 @@ namespace H4
         }
         if (dtd->elements[xNodeElement->name].content.parsed == "((<#PCDATA>))")
         {
-            if (!isPCDATA(xNodeElement))
+            if (!vadlidateIsPCDATA(xNodeElement))
             {
                 throw ValidationError(dtd, "Element <" + xNodeElement->name + "> does not contain just any parsable data.");
             }
@@ -89,7 +128,7 @@ namespace H4
         }
         if (dtd->elements[xNodeElement->name].content.parsed == "EMPTY")
         {
-            if (!isEMPTY(xNodeElement))
+            if (!validateIsEMPTY(xNodeElement))
             {
                 throw ValidationError(dtd, "Element <" + xNodeElement->name + "> is not empty.");
             }
@@ -118,9 +157,20 @@ namespace H4
         }
         if (!std::regex_match(elements, match))
         {
-            throw ValidationError(dtd, "<" + xNodeElement->name + "> element does not conform to the content specication " +
+            throw ValidationError(dtd, "<" + xNodeElement->name + "> element does not conform to the content specification " +
                                            dtd->elements[xNodeElement->name].content.unparsed + ".");
         }
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    {
+
+        validateContentSpecification(dtd, xNodeElement);
+        validateAttributes(dtd, xNodeElement);
     }
     /// <summary>
     ///

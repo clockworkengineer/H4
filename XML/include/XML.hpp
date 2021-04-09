@@ -188,19 +188,22 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+        void validateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement);
+        void validateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void vadlidateElements(XNodeDTD *dtd, XNode *xNodeRoot);
         void initialiseTables();
         void addElementContent(XNodeElement *xNodeElement, const std::string &content);
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
+        XAttribute getAttribute(std::vector<XAttribute> attributeList, const std::string &attributeName);
         bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
         bool validNameChar(XChar c);
         bool validateName(XString attributeName);
         void validateXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement);
         bool validReservedName(const XString &name);
-        bool isPCDATA(XNodeElement *xNodeElement);
-        bool isEMPTY(XNodeElement *xNodeElement);
+        bool vadlidateIsPCDATA(XNodeElement *xNodeElement);
+        bool validateIsEMPTY(XNodeElement *xNodeElement);
         std::string parseDTDtranslateContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec);
         bool parseDTDIsChoiceOrSequence(XML::ISource &contentSpecSource);
         void parseDTDElementCP(ISource &contentSpecSource, IDestination &contentSpec);

@@ -198,7 +198,6 @@ namespace H4
     /// <returns></returns>
     void XML::parseDTDElementChildren(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
-      //  contentSpecSource.ignoreWS();
         if (contentSpecSource.current() == '(')
         {
             if (parseDTDIsChoiceOrSequence(contentSpecSource))
@@ -231,11 +230,6 @@ namespace H4
     void XML::parseDTDElementMixedContent(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         contentSpecSource.ignoreWS();
-        if (contentSpecSource.current() == ')')
-        {
-            contentSpecDestination.add("((<#PCDATA>))");
-            return;
-        }
         contentSpecDestination.add("((<#PCDATA>)");
         if (contentSpecSource.current() == '|')
         {
@@ -270,6 +264,10 @@ namespace H4
             {
                 throw SyntaxError("Invalid content region specification.");
             }
+        }
+        else if (contentSpecSource.current() == ')')
+        {
+            contentSpecDestination.add(")");
         }
         else
         {
@@ -437,12 +435,14 @@ namespace H4
         }
         else if (xmlSource.match(U"#FIXED"))
         {
+            xmlSource.ignoreWS();
             XValue fixedValue = parseValue(xmlSource);
             value.parsed = "#FIXED " + fixedValue.parsed;
             value.unparsed = "#FIXED " + fixedValue.unparsed;
         }
         else
         {
+            xmlSource.ignoreWS();
             value = parseValue(xmlSource);
         }
         return (value);

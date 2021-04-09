@@ -50,7 +50,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</note>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 9] <note> element does not conform to the content specication (to,from,heading,body).");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 9] <note> element does not conform to the content specification (to,from,heading,body).");
   }
   SECTION("XML with an missing <to> tag which voilates the DTD.", "[XML][DTD][Validate]")
   {
@@ -68,7 +68,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</note>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 9] <note> element does not conform to the content specication (to,from,heading,body).");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 9] <note> element does not conform to the content specification (to,from,heading,body).");
   }
   SECTION("XML with an empty notes tag which voilates the DTD.", "[XML][DTD][Validate]")
   {
@@ -85,7 +85,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</notes>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 10] <notes> element does not conform to the content specication (note)+.");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 10] <notes> element does not conform to the content specification (note)+.");
   }
   SECTION("XML with an empty notes tag which is valid given DTD.", "[XML][DTD][Validate]")
   {
@@ -155,7 +155,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</album>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 8] <album> element does not conform to the content specication ( title, ( songTitle, duration )+ ).");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 8] <album> element does not conform to the content specification ( title, ( songTitle, duration )+ ).");
   }
   SECTION("XML with a DTD and XML that has out of sequence duration tag.", "[XML][DTD][Validate]")
   {
@@ -175,7 +175,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</album>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 8] <album> element does not conform to the content specication ( title, ( songTitle, duration )+ ).");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 8] <album> element does not conform to the content specification ( title, ( songTitle, duration )+ ).");
   }
   SECTION("XML with a DTD that uses '*' (zero or more times) operator and has XML that complies.", "[XML][DTD][Validate]")
   {
@@ -287,7 +287,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</timetable>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 23] <class> element does not conform to the content specication ( number, ( instructor | assistant+ ),( credit | noCredit ) ).");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 23] <class> element does not conform to the content specification ( number, ( instructor | assistant+ ),( credit | noCredit ) ).");
   }
   SECTION("XML with a DTD that uses all of the content specification operators and has valid XML for it.", "[XML][DTD][Validate]")
   {
@@ -348,7 +348,7 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
                 "</donutDelivery>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 24] <donutBox> element does not conform to the content specication ( jelly?, lemon*,( ( creme | sugar )+ | glazed ) ).");
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 24] <donutBox> element does not conform to the content specification ( jelly?, lemon*,( ( creme | sugar )+ | glazed ) ).");
   }
   SECTION("XML with a DTD that specifies elements that are empty.", "[XML][DTD][Validate]")
   {
@@ -420,5 +420,116 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_NOTHROW(xml.validate(xmlObject));
+  }
+}
+TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD][Validate][Attribute]")
+{
+  XML xml;
+  std::string xmlString;
+  SECTION("XML with a DTD that specifies a required attribute that is missing.", "[XML][DTD][Validate][Attribute]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root [\n"
+                "<!ELEMENT root (child1|child2|child3)+ >\n"
+                "<!ELEMENT child1 (#PCDATA)>\n"
+                "<!ELEMENT child2 (#PCDATA)>\n"
+                "<!ELEMENT child3 (#PCDATA)>\n"
+                "<!ATTLIST child2 number CDATA #REQUIRED>\n"
+                "]>\n"
+                "<root>\n"
+                "<child1>contents 1</child1>\n"
+                "<child2>contents 2</child2>\n"
+                "<child3>contents 3</child3>\n"
+                "</root>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 11] Required attribute 'number' missing for element <child2>.");
+  }
+  SECTION("XML with a DTD that specifies a required attribute that is present.", "[XML][DTD][Validate][Attribute]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root [\n"
+                "<!ELEMENT root (child1|child2|child3)+ >\n"
+                "<!ELEMENT child1 (#PCDATA)>\n"
+                "<!ELEMENT child2 (#PCDATA)>\n"
+                "<!ELEMENT child3 (#PCDATA)>\n"
+                "<!ATTLIST child2 number CDATA #REQUIRED>\n"
+                "]>\n"
+                "<root>\n"
+                "<child1>contents 1</child1>\n"
+                "<child2 number=\"900000\">contents 2</child2>\n"
+                "<child3>contents 3</child3>\n"
+                "</root>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_NOTHROW(xml.validate(xmlObject));
+  }
+  SECTION("XML with a DTD that specifies a implied attribute that is present/not present in an element.", "[XML][DTD][Validate][Attribute]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root [\n"
+                "<!ELEMENT root (child1|child2|child3)+ >\n"
+                "<!ELEMENT child1 (#PCDATA)>\n"
+                "<!ELEMENT child2 (#PCDATA)>\n"
+                "<!ELEMENT child3 (#PCDATA)>\n"
+                "<!ATTLIST child2 number CDATA #IMPLIED>\n"
+                "]>\n"
+                "<root>\n"
+                "<child1>contents 1</child1>\n"
+                "<child2 number=\"900000\">contents 2</child2>\n"
+                "<child2>contents 2</child2>\n"
+                "<child3>contents 3</child3>\n"
+                "</root>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_NOTHROW(xml.validate(xmlObject));
+  }
+  SECTION("XML with a DTD that specifies a fixed attribute trying to have it to more than one value.", "[XML][DTD][Validate][Attribute]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root [\n"
+                "<!ELEMENT root (child1|child2|child3)+ >\n"
+                "<!ELEMENT child1 (#PCDATA)>\n"
+                "<!ELEMENT child2 (#PCDATA)>\n"
+                "<!ELEMENT child3 (#PCDATA)>\n"
+                "<!ATTLIST child2 number CDATA #FIXED \"2001\">\n"
+                "]>\n"
+                "<root>\n"
+                "<child1>contents 1</child1>\n"
+                "<child2 number=\"2001\">contents 2</child2>\n"
+                "<child2 number =\"2002\">contents 2</child2>\n"
+                "<child3>contents 3</child3>\n"
+                "</root>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 12] Element <child2> attribute 'number' is '2002' instead of '2001'.");
+  }
+
+  SECTION("XML with a DTD that specifies a fixed element attribute that has not been assigned in the data but should be there for the application. ", "[XML][DTD][Validate][Attribute]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root [\n"
+                "<!ELEMENT root (child1|child2|child3)+ >\n"
+                "<!ELEMENT child1 (#PCDATA)>\n"
+                "<!ELEMENT child2 (#PCDATA)>\n"
+                "<!ELEMENT child3 (#PCDATA)>\n"
+                "<!ATTLIST child2 number CDATA #FIXED \"2001\">\n"
+                "]>\n"
+                "<root>\n"
+                "<child1>contents 1</child1>\n"
+                "<child2 number=\"2001\">contents 2</child2>\n"
+                "<child2>contents 2</child2>\n"
+                "<child3>contents 3</child3>\n"
+                "</root>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_NOTHROW(xml.validate(xmlObject));
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getNodeType() == XNodeType::root);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes[0].value.parsed == "2001");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes[0].value.parsed == "2001");
   }
 }
