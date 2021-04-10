@@ -532,4 +532,32 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes[0].name == "number");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes[0].value.parsed == "2001");
   }
+
+   SECTION("XML with a DTD that specifies an element attribute that has a default value if it is not defined. ", "[XML][DTD][Validate][Attribute]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root [\n"
+                "<!ELEMENT root (child1|child2|child3)+ >\n"
+                "<!ELEMENT child1 (#PCDATA)>\n"
+                "<!ELEMENT child2 (#PCDATA)>\n"
+                "<!ELEMENT child3 (#PCDATA)>\n"
+                "<!ATTLIST child2 number CDATA \"2001\">\n"
+                "]>\n"
+                "<root>\n"
+                "<child1>contents 1</child1>\n"
+                "<child2 number=\"2002\">contents 2</child2>\n"
+                "<child2>contents 2</child2>\n"
+                "<child3>contents 3</child3>\n"
+                "</root>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_NOTHROW(xml.validate(xmlObject));
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getNodeType() == XNodeType::root);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes[0].value.parsed == "2002");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes[0].value.parsed == "2001");
+  }
 }

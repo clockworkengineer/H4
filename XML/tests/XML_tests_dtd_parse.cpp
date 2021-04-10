@@ -528,10 +528,9 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<body>Don't forget me this weekend</body>\n"
                 "</note>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource),   "XML Syntax Error: Invalid content region specification for element <note>.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Invalid content region specification for element <note>.");
   }
-
-    SECTION("Parse XML with DTD that cotains a content specification in error (missing element name).", "[XML][Parse][DTD]")
+  SECTION("Parse XML with DTD that cotains a content specification in error (missing element name).", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE note ["
@@ -546,6 +545,56 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<body>Don't forget me this weekend</body>\n"
                 "</note>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource),   "XML Syntax Error: Invalid content region specification for element <note>.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Invalid content region specification for element <note>.");
+  }
+  SECTION("Parse XML with DTD that cotains a enumeration attribute gender with a default value if 'F'.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE queue ["
+                "<!ELEMENT queue (person)+>\n"
+                "<!ELEMENT person (firstName, lastName, nationality)>\n"
+                "<!ELEMENT firstName (#PCDATA)>\n"
+                "<!ELEMENT lastName (#PCDATA)>\n"
+                "<!ELEMENT nationality (#PCDATA)>\n"
+                "<!ATTLIST person gender ( M | F ) \"F\">\n"
+                "]>\n"
+                "<queue>\n"
+                "<person gender=\"M\"><firstName>Andrew</firstName><lastName>Robinson</lastName></person>\n"
+                "<person><firstName>Jane</firstName><lastName>Smith</lastName></person>\n"
+                "</queue>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements.contains("person") == true);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes[0].name == "gender");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes[0].type == "( M | F )");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes[0].value.parsed == "F");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == "queue");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == XNodeRef<XNodeElement>(xmlObject.prolog[3]).name);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][1]).name == "person");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][1]).attributes[0].name == "gender");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][1]).attributes[0].value.parsed == "M");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).name == "person");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes.size() == 0);
+  }
+  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE queue ["
+                "<!ELEMENT queue (person)+>\n"
+                "<!ELEMENT person (firstName, lastName, nationality)>\n"
+                "<!ELEMENT firstName (#PCDATA)>\n"
+                "<!ELEMENT lastName (#PCDATA)>\n"
+                "<!ELEMENT nationality (#PCDATA)>\n"
+                "<!ATTLIST person gender ( M | ) \"F\">\n"
+                "]>\n"
+                "<queue>\n"
+                "<person gender=\"M\"><firstName>Andrew</firstName><lastName>Robinson</lastName></person>\n"
+                "<person><firstName>Jane</firstName><lastName>Smith</lastName></person>\n"
+                "</queue>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "");
   }
 }

@@ -99,9 +99,18 @@ namespace H4
                     }
                 }
                 else
-                 {
+                {
                     XValue value;
-                    value.parsed= value.unparsed = attribute.value.parsed.substr(7);
+                    value.parsed = value.unparsed = attribute.value.parsed.substr(7);
+                    xNodeElement->attributes.emplace_back(attribute.name, value);
+                }
+            }
+            else
+            {
+                if (!isAttributePresent(xNodeElement->attributes, attribute.name))
+                {
+                    XValue value;
+                    value.parsed = value.unparsed = attribute.value.parsed;
                     xNodeElement->attributes.emplace_back(attribute.name, value);
                 }
             }
