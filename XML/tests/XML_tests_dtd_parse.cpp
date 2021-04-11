@@ -559,8 +559,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ATTLIST person gender ( M | F ) \"F\">\n"
                 "]>\n"
                 "<queue>\n"
-                "<person gender=\"M\"><firstName>Andrew</firstName><lastName>Robinson</lastName></person>\n"
-                "<person><firstName>Jane</firstName><lastName>Smith</lastName></person>\n"
+                "<person gender=\"M\"><firstName>Andrew</firstName><lastName>Robinson</lastName><nationality>english</nationality></person>\n"
+                "<person><firstName>Jane</firstName><lastName>Smith</lastName><nationality>english</nationality></person>\n"
                 "</queue>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
@@ -568,7 +568,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements.contains("person") == true);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes[0].name == "gender");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes[0].type == "( M | F )");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes[0].type == "(M|F)");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes[0].value.parsed == "F");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == "queue");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == XNodeRef<XNodeElement>(xmlObject.prolog[3]).name);
@@ -579,7 +579,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).name == "person");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes.size() == 0);
   }
-  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error.", "[XML][Parse][DTD]")
+  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing enumeration name).", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -591,10 +591,46 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ATTLIST person gender ( M | ) \"F\">\n"
                 "]>\n"
                 "<queue>\n"
-                "<person gender=\"M\"><firstName>Andrew</firstName><lastName>Robinson</lastName></person>\n"
-                "<person><firstName>Jane</firstName><lastName>Smith</lastName></person>\n"
+                "<person gender=\"M\"><firstName>Andrew</firstName><lastName>Robinson</lastName><nationality>english</nationality></person>\n"
+                "<person><firstName>Jane</firstName><lastName>Smith</lastName><nationality>english</nationality></person>\n"
                 "</queue>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 7 Column: 36] Invalid name '' encountered.");
+  }
+  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing end bracket).", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE queue ["
+                "<!ELEMENT queue (person)+>\n"
+                "<!ELEMENT person (firstName, lastName, nationality)>\n"
+                "<!ELEMENT firstName (#PCDATA)>\n"
+                "<!ELEMENT lastName (#PCDATA)>\n"
+                "<!ELEMENT nationality (#PCDATA)>\n"
+                "<!ATTLIST person gender ( M | F  \"F\">\n"
+                "]>\n"
+                "<queue>\n"
+                "<person gender=\"M\"><firstName>Andrew</firstName><lastName>Robinson</lastName><nationality>english</nationality></person>\n"
+                "<person><firstName>Jane</firstName><lastName>Smith</lastName><nationality>english</nationality></person>\n"
+                "</queue>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 7 Column: 39] Invalid attribute type specified.");
+  }
+  SECTION("xParse XML with DTD that cotains a enumeration with a default value not in enumeration.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE queue ["
+                "<!ELEMENT queue (person)+>\n"
+                "<!ELEMENT person (firstName, lastName, nationality)>\n"
+                "<!ELEMENT firstName (#PCDATA)>\n"
+                "<!ELEMENT lastName (#PCDATA)>\n"
+                "<!ELEMENT nationality (#PCDATA)>\n"
+                "<!ATTLIST person gender ( M | F ) \"D\">\n"
+                "]>\n"
+                "<queue>\n"
+                "<person gender=\"M\"><firstName>Andrew</firstName><lastName>Robinson</lastName><nationality>english</nationality></person>\n"
+                "<person><firstName>Jane</firstName><lastName>Smith</lastName><nationality>english</nationality></person>\n"
+                "</queue>\n";
+    BufferSource xmlSource(xmlString);
+     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Default value 'D' for enumeration attribute 'gender' is invalid.");
   }
 }

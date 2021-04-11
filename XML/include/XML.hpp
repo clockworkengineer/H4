@@ -204,7 +204,8 @@ namespace H4
         bool validReservedName(const XString &name);
         bool vadlidateIsPCDATA(XNodeElement *xNodeElement);
         bool validateIsEMPTY(XNodeElement *xNodeElement);
-        std::string parseDTDtranslateContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec);
+        std::string parseDTDTranslateContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec);
+        std::string parseDTDAttributeEnumerationType(ISource &xmlSource);
         bool parseDTDIsChoiceOrSequence(XML::ISource &contentSpecSource);
         void parseDTDElementCP(ISource &contentSpecSource, IDestination &contentSpec);
         void parseDTDElementChoice(ISource &contentSpecSource, IDestination &contentSpec);

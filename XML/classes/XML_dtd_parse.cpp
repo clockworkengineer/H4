@@ -21,6 +21,7 @@
 #include <vector>
 #include <cstring>
 #include <algorithm>
+#include <sstream>
 // =========
 // NAMESPACE
 // =========
@@ -43,12 +44,51 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+
+    std::vector<std::string> split(std::string strToSplit, char delimeter)
+    {
+        std::stringstream ss(strToSplit);
+        std::string item;
+        std::vector<std::string> splittedStrings;
+        while (std::getline(ss, item, delimeter))
+        {
+            splittedStrings.push_back(item);
+        }
+        return splittedStrings;
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns></returns>
+    std::string XML::parseDTDAttributeEnumerationType(ISource &xmlSource)
+    {
+        std::string attributeType(1, xmlSource.current());
+        xmlSource.next();
+        xmlSource.ignoreWS();
+        attributeType += parseName(xmlSource);
+        while (xmlSource.more() && xmlSource.current() == '|')
+        {
+            attributeType += xmlSource.current();
+            xmlSource.next();
+            xmlSource.ignoreWS();
+            attributeType += parseName(xmlSource);
+        }
+        if (xmlSource.current() != ')')
+        {
+            throw SyntaxError(xmlSource, "Invalid attribute type specified.");
+        }
+        attributeType += xmlSource.current();
+        xmlSource.next();
+        xmlSource.ignoreWS();
+        return (attributeType);
+    }
     /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    std::string XML::parseDTDtranslateContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec)
+    std::string XML::parseDTDTranslateContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec)
     {
         std::string result = contentSpec.unparsed;
         while (result.find('%') != std::string::npos)
@@ -281,7 +321,7 @@ namespace H4
     /// <returns></returns>
     void XML::parseDTDElementContentSpecification(XNodeDTD *xNodeDTD, XValue &contentSpec)
     {
-        BufferSource contentSpecSource(parseDTDtranslateContentSpecEntities(xNodeDTD, contentSpec));
+        BufferSource contentSpecSource(parseDTDTranslateContentSpecEntities(xNodeDTD, contentSpec));
         BufferDestination contentSpecDestination;
         contentSpecSource.ignoreWS();
         if (contentSpecSource.current() == '(')
@@ -328,6 +368,25 @@ namespace H4
                     else
                     {
                         throw;
+                    }
+                }
+            }
+            if (!element.second.attributes.empty())
+            {
+                for (auto &attribute : element.second.attributes)
+                {
+                    if (attribute.type[0] == '(')
+                    {
+                         bool defaultValid=false;
+                         std::vector<std::string> options = split(attribute.type.substr(1,attribute.type.size()-2), '|');
+                         for (auto &option : options) {
+                             if (option==attribute.value.parsed) {
+                                 defaultValid=true;
+                             }
+                         }
+                         if (!defaultValid) {
+                             throw SyntaxError( "Default value '"+attribute.value.parsed+"' for enumeration attribute '"+attribute.name+"' is invalid.");
+                         }
                     }
                 }
             }
@@ -386,33 +445,20 @@ namespace H4
     /// <returns>Attribute type as string (UTF-8 encoded).</returns>
     std::string XML::parseDTDAttributeType(ISource &xmlSource)
     {
-        XString type;
+        std::string attributeType;
         for (auto attrType : XML::m_dtdAttrListTypes)
         {
             if (xmlSource.match(attrType))
             {
-                type = attrType;
+                xmlSource.ignoreWS();
+                return (xmlSource.to_bytes(attrType));
             }
         }
-        if (type.empty())
+        if (xmlSource.current() == '(')
         {
-            if (xmlSource.current() == '(')
-            {
-                while (xmlSource.more() && xmlSource.current() != ')')
-                {
-                    type += xmlSource.current();
-                    xmlSource.next();
-                }
-                type += xmlSource.current();
-                xmlSource.next();
-            }
-            else
-            {
-                throw SyntaxError(xmlSource, "Invalid attribute type specified.");
-            }
+            return (parseDTDAttributeEnumerationType(xmlSource));
         }
-        xmlSource.ignoreWS();
-        return (xmlSource.to_bytes(type));
+        throw SyntaxError(xmlSource, "Invalid attribute type specified.");
     }
     /// <summary>
     /// Parse XML DTD attribute value.
