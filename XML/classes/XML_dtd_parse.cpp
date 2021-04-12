@@ -44,8 +44,7 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-
-    std::vector<std::string> split(std::string strToSplit, char delimeter)
+    std::vector<std::string> XML::split(std::string strToSplit, char delimeter)
     {
         std::stringstream ss(strToSplit);
         std::string item;
@@ -377,16 +376,22 @@ namespace H4
                 {
                     if (attribute.type[0] == '(')
                     {
-                         bool defaultValid=false;
-                         std::vector<std::string> options = split(attribute.type.substr(1,attribute.type.size()-2), '|');
-                         for (auto &option : options) {
-                             if (option==attribute.value.parsed) {
-                                 defaultValid=true;
-                             }
-                         }
-                         if (!defaultValid) {
-                             throw SyntaxError( "Default value '"+attribute.value.parsed+"' for enumeration attribute '"+attribute.name+"' is invalid.");
-                         }
+                        std::set<std::string> options;
+                        for (auto &option : split(attribute.type.substr(1, attribute.type.size() - 2), '|'))
+                        {
+                            if (!options.contains(option))
+                            {
+                                options.insert(option);
+                            }
+                            else
+                            {
+                                throw SyntaxError("Enumerator value '" + option + "' for attribute '" + attribute.name + "' occurs more than once in its definition.");
+                            }
+                        }
+                        if (!options.contains(attribute.value.parsed))
+                        {
+                            throw SyntaxError("Default value '" + attribute.value.parsed + "' for enumeration attribute '" + attribute.name + "' is invalid.");
+                        }
                     }
                 }
             }

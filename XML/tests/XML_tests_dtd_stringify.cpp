@@ -82,16 +82,21 @@ TEST_CASE("Stringify XML with DTD both internal and external", "[XML][Stringify]
     {
         checkStringify(xml, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                             "<!DOCTYPE TVSCHEDULE [\n"
-                            "<!ELEMENT TVSCHEDULE (CHANNEL+)><!ELEMENT CHANNEL (BANNER,DAY+)>\n"
-                            "<!ELEMENT BANNER (#PCDATA)><!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>\n"
-                            "<!ELEMENT HOLIDAY (#PCDATA)><!ELEMENT DATE (#PCDATA)>\n"
+                            "<!ELEMENT TVSCHEDULE (CHANNEL+)>\n"
+                            "<!ELEMENT CHANNEL (BANNER,DAY+)>\n"
+                            "<!ELEMENT BANNER (#PCDATA)>\n"
+                            "<!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>\n"
+                            "<!ELEMENT HOLIDAY (#PCDATA)>\n"
+                            "<!ELEMENT DATE (#PCDATA)>\n"
                             "<!ELEMENT PROGRAMSLOT (TIME,TITLE,DESCRIPTION?)>\n"
                             "<!ELEMENT TIME (#PCDATA)>\n"
                             "<!ELEMENT TITLE (#PCDATA)>\n"
                             "<!ELEMENT DESCRIPTION (#PCDATA)>\n"
                             "<!ATTLIST TVSCHEDULE NAME CDATA #REQUIRED>\n"
-                            "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED><!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>\n"
-                            "<!ATTLIST TITLE RATING CDATA #IMPLIED><!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>\n"
+                            "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED>\n"
+                            "<!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>\n"
+                            "<!ATTLIST TITLE RATING CDATA #IMPLIED>\n"
+                            "<!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>\n"
                             "<TVSCHEDULE></TVSCHEDULE>\n");
     }
     SECTION("Stringify XML with internal DTD with parameter entities to parse.", "[XML][Stringify][DTD]")

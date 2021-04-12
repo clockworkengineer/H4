@@ -156,15 +156,19 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!DOCTYPE TVSCHEDULE [\n"
                 "<!ELEMENT TVSCHEDULE (CHANNEL+)>\n"
                 "<!ELEMENT CHANNEL (BANNER,DAY+)>\n"
-                "<!ELEMENT BANNER (#PCDATA)><!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>\n"
-                "<!ELEMENT HOLIDAY (#PCDATA)><!ELEMENT DATE (#PCDATA)>\n"
+                "<!ELEMENT BANNER (#PCDATA)>\n"
+                "<!ELEMENT DAY (DATE,(HOLIDAY|PROGRAMSLOT+)+)>\n"
+                "<!ELEMENT HOLIDAY (#PCDATA)>\n"
+                "<!ELEMENT DATE (#PCDATA)>\n"
                 "<!ELEMENT PROGRAMSLOT (TIME,TITLE,DESCRIPTION?)>\n"
                 "<!ELEMENT TIME (#PCDATA)>\n"
                 "<!ELEMENT TITLE (#PCDATA)>\n"
                 "<!ELEMENT DESCRIPTION (#PCDATA)>\n"
                 "<!ATTLIST TVSCHEDULE NAME CDATA #REQUIRED>\n"
-                "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED><!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>\n"
-                "<!ATTLIST TITLE RATING CDATA #IMPLIED><!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>\n"
+                "<!ATTLIST CHANNEL CHAN CDATA #REQUIRED>\n"
+                "<!ATTLIST PROGRAMSLOT VTR CDATA #IMPLIED>\n"
+                "<!ATTLIST TITLE RATING CDATA #IMPLIED>\n"
+                "<!ATTLIST TITLE LANGUAGE CDATA #IMPLIED>]>\n"
                 "<TVSCHEDULE></TVSCHEDULE>\n";
     BufferSource xmlSource(xmlString);
     REQUIRE_NOTHROW(xml.parse(xmlSource));
@@ -235,11 +239,13 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<!ATTLIST PRODUCT NAME CDATA #IMPLIED CATEGORY (HandTool|Table|Shop-Professional) \"HandTool\""
                 "PARTNUM CDATA #IMPLIED PLANT (Pittsburgh|Milwaukee|Chicago) \"Chicago\" INVENTORY (InStock|Backordered|Discontinued)"
                 " \"InStock\">\n"
-                "<!ELEMENT SPECIFICATIONS (#PCDATA)><!ATTLIST SPECIFICATIONS WEIGHT CDATA #IMPLIED POWER CDATA #IMPLIED>\n"
+                "<!ELEMENT SPECIFICATIONS (#PCDATA)>\n"
+                "<!ATTLIST SPECIFICATIONS WEIGHT CDATA #IMPLIED POWER CDATA #IMPLIED>\n"
                 "<!ELEMENT OPTIONS (#PCDATA)>\n"
                 "<!ATTLIST OPTIONS FINISH (Metal|Polished|Matte) \"Matte\" ADAPTER (Included|Optional|NotApplicable)"
                 " \"Included\" CASE (HardShell|Soft|NotApplicable) \"HardShell\">\n"
-                "<!ELEMENT PRICE (#PCDATA)><!ATTLIST PRICE MSRP CDATA #IMPLIED"
+                "<!ELEMENT PRICE (#PCDATA)>\n"
+                "<!ATTLIST PRICE MSRP CDATA #IMPLIED"
                 "WHOLESALE CDATA #IMPLIED STREET CDATA #IMPLIED SHIPPING CDATA #IMPLIED>\n"
                 "<!ELEMENT NOTES (#PCDATA)> ]>\n"
                 "<CATALOG> </CATALOG>\n";
@@ -615,7 +621,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 7 Column: 39] Invalid attribute type specified.");
   }
-  SECTION("xParse XML with DTD that cotains a enumeration with a default value not in enumeration.", "[XML][Parse][DTD]")
+  SECTION("Parse XML with DTD that contains a enumeration with a default value not in enumeration.", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -631,6 +637,24 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<person><firstName>Jane</firstName><lastName>Smith</lastName><nationality>english</nationality></person>\n"
                 "</queue>\n";
     BufferSource xmlSource(xmlString);
-     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Default value 'D' for enumeration attribute 'gender' is invalid.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Default value 'D' for enumeration attribute 'gender' is invalid.");
+  }
+  SECTION("Parse XML with DTD that contains a enumeration with not all values unique.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE queue ["
+                "<!ELEMENT queue (person)+>\n"
+                "<!ELEMENT person (firstName, lastName, nationality)>\n"
+                "<!ELEMENT firstName (#PCDATA)>\n"
+                "<!ELEMENT lastName (#PCDATA)>\n"
+                "<!ELEMENT nationality (#PCDATA)>\n"
+                "<!ATTLIST person gender ( M | F | F) \"M\">\n"
+                "]>\n"
+                "<queue>\n"
+                "<person gender=\"M\"><firstName>Andrew</firstName><lastName>Robinson</lastName><nationality>english</nationality></person>\n"
+                "<person><firstName>Jane</firstName><lastName>Smith</lastName><nationality>english</nationality></person>\n"
+                "</queue>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Enumerator value 'F' for attribute 'gender' occurs more than once in its definition.");
   }
 }

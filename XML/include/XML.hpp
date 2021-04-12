@@ -188,6 +188,8 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
+
+        std::vector<std::string> split(std::string strToSplit, char delimeter);
         void validateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void validateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);

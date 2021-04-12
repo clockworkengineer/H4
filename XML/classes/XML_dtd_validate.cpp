@@ -77,6 +77,25 @@ namespace H4
     {
         for (auto &attribute : dtd->elements[xNodeElement->name].attributes)
         {
+            if (attribute.type == "CDATA")
+            {
+            }
+            else if (attribute.type[0] == '(')
+            {
+                std::set<std::string> options;
+                for (auto &option : split(attribute.type.substr(1, attribute.type.size() - 2), '|'))
+                {
+                    options.insert(option);
+                }
+                if (isAttributePresent(xNodeElement->attributes, attribute.name))
+                {
+                    XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
+                    if (!options.contains(elementAttribute.value.parsed))
+                    {
+                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> attribute '"+attribute.name +"' contains invalid enumeration value '"+elementAttribute.value.parsed+"'.");
+                    }
+                }
+            }
             if (attribute.value.parsed == "#REQUIRED")
             {
                 if (!isAttributePresent(xNodeElement->attributes, attribute.name))
@@ -177,7 +196,6 @@ namespace H4
     /// <returns></returns>
     void XML::validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
-
         validateContentSpecification(dtd, xNodeElement);
         validateAttributes(dtd, xNodeElement);
     }
