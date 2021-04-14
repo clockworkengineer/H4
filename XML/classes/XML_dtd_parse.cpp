@@ -372,7 +372,7 @@ namespace H4
             }
             if (!element.second.attributes.empty())
             {
-                bool idAttributePresent=false;
+                bool idAttributePresent = false;
                 for (auto &attribute : element.second.attributes)
                 {
                     if (attribute.type[0] == '(')
@@ -393,11 +393,14 @@ namespace H4
                         {
                             throw SyntaxError("Default value '" + attribute.value.parsed + "' for enumeration attribute '" + attribute.name + "' is invalid.");
                         }
-                    } else if (attribute.type=="ID") {
-                        if (idAttributePresent) {
-                            throw SyntaxError("Element <"+element.second.name+"> has more than one ID attribute.");
+                    }
+                    else if (attribute.type == "ID")
+                    {
+                        if (idAttributePresent)
+                        {
+                            throw SyntaxError("Element <" + element.second.name + "> has more than one ID attribute.");
                         }
-                        idAttributePresent=true;
+                        idAttributePresent = true;
                     }
                 }
             }
@@ -519,6 +522,10 @@ namespace H4
             xDTDAttribute.name = parseName(xmlSource);
             xDTDAttribute.type = parseDTDAttributeType(xmlSource);
             xDTDAttribute.value = parseDTDAttributeValue(xmlSource);
+            if (xDTDAttribute.type == "ID" && xDTDAttribute.value.parsed.starts_with("#FIXED "))
+            {
+                throw SyntaxError(xmlSource, "Attribute '" + xDTDAttribute.name + "' may not be of type ID and FIXED.");
+            }
             xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
             xmlSource.ignoreWS();
         }

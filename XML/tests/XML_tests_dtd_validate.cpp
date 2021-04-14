@@ -649,7 +649,6 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
                 "</collection>\n";
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
-    //REQUIRE_NOTHROW(xml.validate(xmlObject));
     REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 11] Element <item> ID attribute 'itemID' has a value that does not start with a letter, '_' or ':'.");
   }
 }

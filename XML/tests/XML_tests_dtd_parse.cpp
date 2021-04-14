@@ -676,4 +676,23 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Element <item> has more than one ID attribute.");
   }
+    SECTION("Parse XML with DTD that specifies an ID element to be fixed.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE collection ["
+                "<!ELEMENT collection (item)+>\n"
+                "<!ELEMENT item (#PCDATA)>\n"
+                "<!ATTLIST item itemID1 ID #FIXED \"i1000\">\n"
+                "]>\n"
+                "<collection>\n"
+                "<item itemID1=\"i001\">item descripton</item>\n"
+                "<item itemID1=\"i002\">item descripton</item>\n"
+                "<item itemID1=\"i003\">item descripton</item>\n"
+                "<item itemID1=\"i004\">item descripton</item>\n"
+                "<item itemID1=\"i005\">item descripton</item>\n"
+                "</collection>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 48] Attribute 'itemID1' may not be of type ID and FIXED.");
+  }
+
 }
