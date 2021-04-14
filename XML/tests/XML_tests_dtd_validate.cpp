@@ -612,4 +612,44 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 11] Element <person> attribute 'gender' contains invalid enumeration value 'B'.");
   }
+  SECTION("Validate XML with DTD that specifies the use of an ID attribute type that has a duplicate value.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE collection ["
+                "<!ELEMENT collection (item)+>\n"
+                "<!ELEMENT item (#PCDATA)>\n"
+                "<!ATTLIST item itemID ID #REQUIRED >\n"
+                "]>\n"
+                "<collection>\n"
+                "<item itemID=\"i001\">item descripton</item>\n"
+                "<item itemID=\"i002\">item descripton</item>\n"
+                "<item itemID=\"i003\">item descripton</item>\n"
+                "<item itemID=\"i004\">item descripton</item>\n"
+                "<item itemID=\"i001\">item descripton</item>\n"
+                "</collection>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 11] Element <item> ID attribute 'itemID' is not unique.");
+  }
+  SECTION("Validate XML that has an element with an ID attribute value that does not start with a letter, '_' or ':'.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE collection ["
+                "<!ELEMENT collection (item)+>\n"
+                "<!ELEMENT item (#PCDATA)>\n"
+                "<!ATTLIST item itemID ID #REQUIRED >\n"
+                "]>\n"
+                "<collection>\n"
+                "<item itemID=\"i001\">item descripton</item>\n"
+                "<item itemID=\"i002\">item descripton</item>\n"
+                "<item itemID=\"i003\">item descripton</item>\n"
+                "<item itemID=\"i004\">item descripton</item>\n"
+                "<item itemID=\"005\">item descripton</item>\n"
+                "<item itemID=\"i006\">item descripton</item>\n"
+                "</collection>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    //REQUIRE_NOTHROW(xml.validate(xmlObject));
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 11] Element <item> ID attribute 'itemID' has a value that does not start with a letter, '_' or ':'.");
+  }
 }

@@ -48,6 +48,7 @@ namespace H4
         std::string name;
         std::string type;
         XValue value;
+        std::set<std::string> assignedValues;
     };
     //
     // XML DTD element definition

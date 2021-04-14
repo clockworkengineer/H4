@@ -372,6 +372,7 @@ namespace H4
             }
             if (!element.second.attributes.empty())
             {
+                bool idAttributePresent=false;
                 for (auto &attribute : element.second.attributes)
                 {
                     if (attribute.type[0] == '(')
@@ -392,6 +393,11 @@ namespace H4
                         {
                             throw SyntaxError("Default value '" + attribute.value.parsed + "' for enumeration attribute '" + attribute.name + "' is invalid.");
                         }
+                    } else if (attribute.type=="ID") {
+                        if (idAttributePresent) {
+                            throw SyntaxError("Element <"+element.second.name+"> has more than one ID attribute.");
+                        }
+                        idAttributePresent=true;
                     }
                 }
             }

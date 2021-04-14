@@ -657,4 +657,23 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Enumerator value 'F' for attribute 'gender' occurs more than once in its definition.");
   }
+  SECTION("Parse XML with DTD that specifies the use of an two different ID attributes for an element.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE collection ["
+                "<!ELEMENT collection (item)+>\n"
+                "<!ELEMENT item (#PCDATA)>\n"
+                "<!ATTLIST item itemID1 ID #REQUIRED >\n"
+                "<!ATTLIST item itemID2 ID #REQUIRED >\n"
+                "]>\n"
+                "<collection>\n"
+                "<item itemID1=\"i001\" itemID2=\"id001\">item descripton</item>\n"
+                "<item itemID1=\"i002\" itemID2=\"id002\">item descripton</item>\n"
+                "<item itemID1=\"i003\" itemID2=\"id003\">item descripton</item>\n"
+                "<item itemID1=\"i004\" itemID2=\"id004\">item descripton</item>\n"
+                "<item itemID1=\"i005\" itemID2=\"id005\">item descripton</item>\n"
+                "</collection>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Element <item> has more than one ID attribute.");
+  }
 }

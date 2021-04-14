@@ -77,8 +77,49 @@ namespace H4
     {
         for (auto &attribute : dtd->elements[xNodeElement->name].attributes)
         {
+            // Validate a elements attribute type which can be one of the following.
+            //
+            // CDATA	    The value is character data
+            // (en1|en2|..)	The value must be one from an enumerated list
+            // ID	        The value is a unique id
+            // IDREF        The value is the id of another element
+            // IDREFS       The value is a list of other ids
+            // NMTOKEN      The value is a valid XML name
+            // NMTOKENS	    The value is a list of valid XML names
+            // ENTIT        The value is an entity
+            // ENTITIES	    The value is a list of entities
+            // NOTATION	    The value is a name of a notation
+            // xml:         The value is a predefined xml value
+            //
+            // AT PRESENT ONLY ENUMERATION DEALT WITH.
             if (attribute.type == "CDATA")
             {
+                if (isAttributePresent(xNodeElement->attributes, attribute.name))
+                {
+                    XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
+                    if (elementAttribute.value.parsed.empty()) // No character data present.
+                    {
+                        //throw ValidationError(dtd, "");
+                    }
+                }
+            }
+            else if (attribute.type == "ID")
+            {
+                if (isAttributePresent(xNodeElement->attributes, attribute.name))
+                {
+                    XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
+                    if (elementAttribute.value.parsed[0] != '_' &&
+                        !std::isalpha(elementAttribute.value.parsed[0]) &&
+                        elementAttribute.value.parsed[0] != ':')
+                    {
+                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> ID attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
+                    }
+                    if (attribute.assignedValues.contains(elementAttribute.value.parsed))
+                    {
+                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> ID attribute '" + elementAttribute.name + "' is not unique.");
+                    }
+                    attribute.assignedValues.insert(elementAttribute.value.parsed);
+                }
             }
             else if (attribute.type[0] == '(')
             {
@@ -92,10 +133,15 @@ namespace H4
                     XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
                     if (!options.contains(elementAttribute.value.parsed))
                     {
-                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> attribute '"+attribute.name +"' contains invalid enumeration value '"+elementAttribute.value.parsed+"'.");
+                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> attribute '" + attribute.name + "' contains invalid enumeration value '" + elementAttribute.value.parsed + "'.");
                     }
                 }
             }
+            // Validate attribute value which can be:
+            // value	    The default value of the attribute
+            // #REQUIRED    The attribute is required
+            // #IMPLIED	    The attribute is optional
+            // #FIXED value	The attribute value is fixed
             if (attribute.value.parsed == "#REQUIRED")
             {
                 if (!isAttributePresent(xNodeElement->attributes, attribute.name))
