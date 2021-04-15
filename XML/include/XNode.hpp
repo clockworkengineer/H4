@@ -48,7 +48,6 @@ namespace H4
         std::string name;
         std::string type;
         XValue value;
-        std::set<std::string> assignedValues;
     };
     //
     // XML DTD element definition
@@ -97,7 +96,6 @@ namespace H4
         }
         XNode &operator[](int index);
         XNode &operator[](const std::string &name);
-
     private:
         XNodeType nodeType;
     };
@@ -210,6 +208,8 @@ namespace H4
         std::unordered_map<std::string, XAttribute> notations;
         std::unordered_map<std::string, XDTDElement> elements;
         std::unordered_map<std::string, std::string> entityMapping;
+        std::set<std::string> assignedIDValues;
+        std::set<std::string> assignedIDREFValues;
         std::string unparsed;
         long lineNumber = 1;
     };

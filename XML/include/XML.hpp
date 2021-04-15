@@ -251,7 +251,7 @@ namespace H4
         // PRIVATE VARIABLES
         // =================
         static XAttribute m_defaultAtributes[3];
-        static std::set<XString> m_dtdAttrListTypes;
+        static std::vector<XString> m_dtdAttrListTypes;
         std::unordered_map<XString, XString> m_entityMapping;
     };
     //

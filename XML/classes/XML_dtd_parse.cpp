@@ -37,7 +37,7 @@ namespace H4
     // PRIVATE STATIC VARIABLES
     // ========================
     // DTD attribute list type tokens
-    std::set<XString> XML::m_dtdAttrListTypes;
+    std::vector<XString> XML::m_dtdAttrListTypes;
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================

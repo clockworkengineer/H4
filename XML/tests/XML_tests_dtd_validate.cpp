@@ -651,4 +651,28 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 11] Element <item> ID attribute 'itemID' has a value that does not start with a letter, '_' or ':'.");
   }
+  SECTION("Validate XML that has a missing ID referenced  by an IDREF.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE collection ["
+                "<!ELEMENT collection (item|itemOnLoan)+>\n"
+                "<!ELEMENT item (#PCDATA)>\n"
+                "<!ELEMENT itemOnLoan (#PCDATA)>\n"
+                "<!ATTLIST item itemID ID #REQUIRED >\n"
+                "<!ATTLIST itemOnLoan itemLoanedID IDREF #IMPLIED >\n"
+                "]>\n"
+                "<collection>\n"
+                "<item itemID=\"i001\">item descripton</item>\n"
+                "<item itemID=\"i002\">item descripton</item>\n"
+                "<item itemID=\"i003\">item descripton</item>\n"
+                "<item itemID=\"i004\">item descripton</item>\n"
+                "<item itemID=\"i005\">item descripton</item>\n"
+                "<item itemID=\"i006\">item descripton</item>\n"
+                "<itemOnLoan itemLoanedID=\"i006\">reason for loan</itemOnLoan>\n"
+                "<itemOnLoan itemLoanedID=\"i010\">reason for loan</itemOnLoan>\n"
+                "</collection>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE_THROWS_WITH(xml.validate(xmlObject), "XML Validation Error [Line: 18] IDREF attribute 'i010' does not reference any element with the ID.");
+  }
 }

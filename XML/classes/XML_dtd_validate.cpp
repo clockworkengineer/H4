@@ -114,11 +114,25 @@ namespace H4
                     {
                         throw ValidationError(dtd, "Element <" + xNodeElement->name + "> ID attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
                     }
-                    if (attribute.assignedValues.contains(elementAttribute.value.parsed))
+                    if (dtd->assignedIDValues.contains(elementAttribute.value.parsed))
                     {
                         throw ValidationError(dtd, "Element <" + xNodeElement->name + "> ID attribute '" + elementAttribute.name + "' is not unique.");
                     }
-                    attribute.assignedValues.insert(elementAttribute.value.parsed);
+                    dtd->assignedIDValues.insert(elementAttribute.value.parsed);
+                }
+            }
+            else if (attribute.type == "IDREF")
+            {
+                if (isAttributePresent(xNodeElement->attributes, attribute.name))
+                {
+                    XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
+                    if (elementAttribute.value.parsed[0] != '_' &&
+                        !std::isalpha(elementAttribute.value.parsed[0]) &&
+                        elementAttribute.value.parsed[0] != ':')
+                    {
+                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> IDREF attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
+                    }
+                    dtd->assignedIDREFValues.insert(elementAttribute.value.parsed);
                 }
             }
             else if (attribute.type[0] == '(')
@@ -303,12 +317,24 @@ namespace H4
     {
         if (xNode->getNodeType() == XNodeType::prolog)
         {
+            XNodeDTD *dtd;
             for (auto &element : XNodeRef<XNodeElement>(*xNode).elements)
             {
                 if (element->getNodeType() == XNodeType::dtd)
                 {
-                    vadlidateElements(static_cast<XNodeDTD *>(element.get()), xNode);
+                    dtd = static_cast<XNodeDTD *>(element.get());
                     break;
+                }
+            }
+            if (dtd != nullptr)
+            {
+                vadlidateElements(dtd, xNode);
+                for (auto &idref : dtd->assignedIDREFValues)
+                {
+                    if (!dtd->assignedIDValues.contains(idref))
+                    {
+                        throw ValidationError(dtd, "IDREF attribute '"+idref+"' does not reference any element with the ID.");
+                    }
                 }
             }
         }

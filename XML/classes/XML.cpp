@@ -58,16 +58,16 @@ namespace H4
         m_entityMapping[U"&lt;"] = U"<";
         m_entityMapping[U"&gt;"] = U">";
         // DTD attribute list type tokens
-        XML::m_dtdAttrListTypes.insert(
-            {U"CDATA",
-             U"IDREF",
-             U"IDREFS",
-             U"NMTOKEN",
-             U"NMTOKENS",
-             U"ENTITY",
-             U"ENTITIES",
-             U"NOTATION",
-             U"ID"});
+        // Make sure longer possible matches are first
+        XML::m_dtdAttrListTypes.push_back(U"CDATA");
+        XML::m_dtdAttrListTypes.push_back(U"IDREFS");
+        XML::m_dtdAttrListTypes.push_back(U"IDREF");
+        XML::m_dtdAttrListTypes.push_back(U"ID");
+        XML::m_dtdAttrListTypes.push_back(U"NMTOKENS");
+        XML::m_dtdAttrListTypes.push_back(U"NMTOKEN");
+        XML::m_dtdAttrListTypes.push_back(U"ENTITIES");
+        XML::m_dtdAttrListTypes.push_back(U"ENTITY");
+        XML::m_dtdAttrListTypes.push_back(U"NOTATION");
     }
     // ==============
     // PUBLIC METHODS

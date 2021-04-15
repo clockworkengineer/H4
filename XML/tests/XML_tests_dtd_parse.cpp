@@ -692,7 +692,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<item itemID1=\"i005\">item descripton</item>\n"
                 "</collection>\n";
     BufferSource xmlSource(xmlString);
-    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 48] Attribute 'itemID1' may not be of type ID and FIXED.");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 52] Attribute 'itemID1' may not be of type ID and FIXED.");
   }
 
 }
