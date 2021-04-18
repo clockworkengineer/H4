@@ -52,11 +52,11 @@ namespace H4
     void XML::initialiseTables()
     {
         // Default entity mappings
-        m_entityMapping[U"&amp;"] = U"&";
-        m_entityMapping[U"&quot;"] = U"\"";
-        m_entityMapping[U"&apos;"] = U"\'";
-        m_entityMapping[U"&lt;"] = U"<";
-        m_entityMapping[U"&gt;"] = U">";
+        m_entityMapping[U"&amp;"] = "&";
+        m_entityMapping[U"&quot;"] = "\"";
+        m_entityMapping[U"&apos;"] = "\'";
+        m_entityMapping[U"&lt;"] = "<";
+        m_entityMapping[U"&gt;"] = ">";
         // DTD attribute list type tokens
         // Make sure longer possible matches are first
         XML::m_dtdAttrListTypes.push_back(U"CDATA");

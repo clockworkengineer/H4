@@ -93,14 +93,14 @@ namespace H4
     XAttribute XML::getAttribute(std::vector<XAttribute> attributeList, const std::string &attributeName)
     {
         return (*std::find_if(attributeList.rbegin(), attributeList.rend(),
-                             [&attributeName](const XAttribute &attr) { return (attr.name == attributeName); }));
+                              [&attributeName](const XAttribute &attr) { return (attr.name == attributeName); }));
     }
     /// <summary>
     /// Parse a character reference returning its value.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Character reference value.</returns>
-    long XML::parseCharacterReference(ISource &xmlSource, XString reference)
+    XChar XML::parseCharacterReference(ISource &xmlSource, XString reference)
     {
         char *end;
         long result = 10;
@@ -112,6 +112,10 @@ namespace H4
         result = std::strtol(xmlSource.to_bytes(reference).c_str(), &end, result);
         if (*end == '\0')
         {
+            if (!validChar(result))
+            {
+                throw SyntaxError(xmlSource, "Character reference invalid character.");
+            }
             return (result);
         }
         throw SyntaxError(xmlSource, "Cannot convert character reference.");
@@ -125,7 +129,7 @@ namespace H4
     {
         XValue entityReference;
         XString unparsedEntityReference = U"&";
-        XString parsedEntityReference;
+        std::string parsedEntityReference;
         xmlSource.next();
         while (xmlSource.more() && xmlSource.current() != ';')
         {
@@ -136,7 +140,7 @@ namespace H4
         xmlSource.next();
         if (unparsedEntityReference[1] == '#')
         {
-            parsedEntityReference = XString(1, parseCharacterReference(xmlSource, unparsedEntityReference.substr(2, unparsedEntityReference.size() - 3)));
+            parsedEntityReference = xmlSource.to_bytes(parseCharacterReference(xmlSource, unparsedEntityReference.substr(2, unparsedEntityReference.size() - 3)));
         }
         else if (m_entityMapping.count(unparsedEntityReference) > 0)
         {
@@ -146,15 +150,8 @@ namespace H4
         {
             throw SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
         }
-        for (auto ch : parsedEntityReference)
-        {
-            if (!validChar(ch))
-            {
-                throw SyntaxError(xmlSource, "Invalid character value encountered.");
-            }
-        }
         entityReference.unparsed = xmlSource.to_bytes(unparsedEntityReference);
-        entityReference.parsed = xmlSource.to_bytes(parsedEntityReference);
+        entityReference.parsed = parsedEntityReference;
         return (entityReference);
     }
     /// <summary>
