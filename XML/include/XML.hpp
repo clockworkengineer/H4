@@ -222,7 +222,7 @@ namespace H4
         void parseDTDNotation(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTDEntity(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTDElement(ISource &xmlSource, XNodeDTD *xNodeElement);
-        XAttribute parseDTDExternalReference(ISource &xmlSource);
+        XExternalReference parseDTDExternalReference(ISource &xmlSource);
         std::string parseDTDAttributeType(ISource &xmlSource);
         XValue parseDTDAttributeValue(ISource &xmlSource);
         void parseDTDComment(ISource &source, XNodeDTD *xNodeDTD);
@@ -252,7 +252,7 @@ namespace H4
         // =================
         static XAttribute m_defaultAtributes[3];
         static std::vector<XString> m_dtdAttrListTypes;
-        std::unordered_map<std::string, std::string> m_entityMapping;
+        std::unordered_map<std::string, XEntityMapping> m_entityMapping;
     };
     //
     // Shortcuts

@@ -141,7 +141,7 @@ namespace H4
         }
         else if (m_entityMapping.count(entityReference.unparsed) > 0)
         {
-            entityReference.parsed = m_entityMapping[entityReference.unparsed];
+            entityReference.parsed = m_entityMapping[entityReference.unparsed].internal;
         }
         else
         {

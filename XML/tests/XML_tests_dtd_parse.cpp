@@ -132,8 +132,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name);
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.value.parsed == "./testData/note.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.systemID == "./testData/note.dtd");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["note"].name == "note");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["note"].content.unparsed == "(to,from,heading,body)");
   }
@@ -147,8 +147,9 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name);
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.name == "PUBLIC");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.value.parsed == "-//W3C//DTD XHTML 1.0 Transitional//EN, http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.type == "PUBLIC");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.systemID == "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).external.publicID == "-//W3C//DTD XHTML 1.0 Transitional//EN");
   }
   SECTION("XML with internal DTD with attributes to parse ", "[XML][Parse][DTD]")
   {
@@ -305,9 +306,9 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>(xmlObject.prolog[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).name == XNodeRef<XNodeDTD>(xmlObject.prolog[2]).name);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).name == "REPORT");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["&asg;"] == "dummy test");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%contact;"] == "phone");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%area;"] == "name, street, pincode, city");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["&asg;"].internal == "dummy test");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%contact;"].internal == "phone");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%area;"].internal == "name, street, pincode, city");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements.size() == 5);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["residence"].name == "residence");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["residence"].content.unparsed == "(%area;, %contact;)");
@@ -344,15 +345,12 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>(xmlObject.prolog[0]).getNodeType() == XNodeType::dtd);
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].value.parsed == "GIF");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].value.unparsed == "GIF");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].value.parsed == "JPG");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].value.unparsed == "JPG");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].name == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].value.parsed == "BMP");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].value.unparsed == "BMP");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].systemID == "GIF");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].systemID == "JPG");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].systemID == "BMP");
   }
   SECTION("XML with internal DTD containing comments.", "[XML][Parse][DTD]")
   {
@@ -676,7 +674,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Element <item> has more than one ID attribute.");
   }
-    SECTION("Parse XML with DTD that specifies an ID element to be fixed.", "[XML][Valid][DTD]")
+  SECTION("Parse XML with DTD that specifies an ID element to be fixed.", "[XML][Valid][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE collection ["
@@ -694,5 +692,4 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 52] Attribute 'itemID1' may not be of type ID and FIXED.");
   }
-
 }

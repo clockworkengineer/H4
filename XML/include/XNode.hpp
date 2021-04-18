@@ -41,6 +41,25 @@ namespace H4
         XValue value;
     };
     //
+    // XML External reference
+    //
+    struct XExternalReference
+    {
+    public:
+        std::string type;
+        std::string systemID;
+        std::string publicID;
+    };
+        //
+    // XML Entity mapping
+    //
+    struct XEntityMapping
+    {
+    public:
+        std::string internal;
+        XExternalReference external;
+    };
+    //
     // XML DTD attribute definition
     //
     struct XDTDAttribute
@@ -204,10 +223,10 @@ namespace H4
         {
         }
         std::string name;
-        XAttribute external;
-        std::unordered_map<std::string, XAttribute> notations;
+        XExternalReference external;
+        std::unordered_map<std::string, XExternalReference> notations;
         std::unordered_map<std::string, XDTDElement> elements;
-        std::unordered_map<std::string, std::string> entityMapping;
+        std::unordered_map<std::string, XEntityMapping> entityMapping;
         std::set<std::string> assignedIDValues;
         std::set<std::string> assignedIDREFValues;
         std::string unparsed;

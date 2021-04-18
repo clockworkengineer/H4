@@ -98,7 +98,7 @@ namespace H4
                 size_t pos = result.find(entity.first);
                 if (pos != std::string::npos)
                 {
-                    result.replace(pos, entity.first.length(), entity.second);
+                    result.replace(pos, entity.first.length(), entity.second.internal);
                     noMatch = false;
                 }
             }
@@ -413,12 +413,12 @@ namespace H4
     /// <returns></returns>
     void XML::parseDTDExternalContents(XNodeDTD *xNodeDTD)
     {
-        if (xNodeDTD->external.name == "SYSTEM")
+        if (xNodeDTD->external.type == "SYSTEM")
         {
-            FileSource dtdFile(xNodeDTD->external.value.parsed);
+            FileSource dtdFile(xNodeDTD->external.systemID);
             parseDTDInternal(dtdFile, xNodeDTD);
         }
-        else if (xNodeDTD->external.name == "PUBLIC")
+        else if (xNodeDTD->external.type == "PUBLIC")
         {
             // Public external DTD currently not supported
         }
@@ -428,23 +428,21 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    XAttribute XML::parseDTDExternalReference(ISource &xmlSource)
+    XExternalReference XML::parseDTDExternalReference(ISource &xmlSource)
     {
-        XAttribute result;
+        XExternalReference result;
         if (xmlSource.match(U"SYSTEM"))
         {
             xmlSource.ignoreWS();
-            result.name = "SYSTEM";
-            result.value = parseValue(xmlSource);
+            result.type = "SYSTEM";
+            result.systemID = parseValue(xmlSource).parsed;
         }
         else if (xmlSource.match(U"PUBLIC"))
         {
             xmlSource.ignoreWS();
-            XValue publicValue = parseValue(xmlSource);
-            XValue systemValue = parseValue(xmlSource);
-            result.name = "PUBLIC";
-            result.value.parsed = publicValue.parsed + ", " + systemValue.parsed;
-            result.value.unparsed = publicValue.unparsed + " " + systemValue.unparsed;
+            result.type = "PUBLIC";
+            result.publicID = parseValue(xmlSource).parsed;
+            result.systemID = parseValue(xmlSource).parsed;
         }
         else
         {
@@ -560,8 +558,8 @@ namespace H4
         }
         entityName += parseName(xmlSource) + ";";
         XValue entityValue = parseValue(xmlSource);
-        m_entityMapping[entityName] = entityValue.parsed;
-        xNodeDTD->entityMapping[entityName] = entityValue.parsed;
+        m_entityMapping[entityName].internal = entityValue.parsed;
+        xNodeDTD->entityMapping[entityName].internal = entityValue.parsed;
     }
     /// <summary>
     /// Parse an XML DTD element.
