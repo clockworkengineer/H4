@@ -87,28 +87,28 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    std::string XML::parseDTDTranslateContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec)
-    {
-        std::string result = contentSpec.unparsed;
-        while (result.find('%') != std::string::npos)
-        {
-            bool noMatch = true;
-            for (auto entity : xNodeDTD->entityMapping)
-            {
-                size_t pos = result.find(entity.first);
-                if (pos != std::string::npos)
-                {
-                    result.replace(pos, entity.first.length(), entity.second.internal);
-                    noMatch = false;
-                }
-            }
-            if (noMatch)
-            {
-                throw SyntaxError("No match found for entity string '" + result + "'.");
-            }
-        }
-        return (result);
-    }
+    // std::string XML::parseDTDTranslateContentSpecEntities(XNodeDTD */*xNodeDTD*/, const XValue &contentSpec)
+    // {
+    //     std::string result = contentSpec.unparsed;
+    //     while (result.find('%') != std::string::npos)
+    //     {
+    //         bool noMatch = true;
+    //         for (auto entity : xNodeDTD->entityMapping)
+    //         {
+    //             size_t pos = result.find(entity.first);
+    //             if (pos != std::string::npos)
+    //             {
+    //                 result.replace(pos, entity.first.length(), entity.second.internal);
+    //                 noMatch = false;
+    //             }
+    //         }
+    //         if (noMatch)
+    //         {
+    //             throw SyntaxError("No match found for entity string '" + result + "'.");
+    //         }
+    //     }
+    //     return (result);
+    // }
     /// <summary>
     ///
     /// </summary>
@@ -318,9 +318,10 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementContentSpecification(XNodeDTD *xNodeDTD, XValue &contentSpec)
+    void XML::parseDTDElementContentSpecification(XNodeDTD * /*xNodeDTD*/, XValue &contentSpec)
     {
-        BufferSource contentSpecSource(parseDTDTranslateContentSpecEntities(xNodeDTD, contentSpec));
+        //        BufferSource contentSpecSource(parseDTDTranslateContentSpecEntities(xNodeDTD, contentSpec));
+        BufferSource contentSpecSource(contentSpec.unparsed);
         BufferDestination contentSpecDestination;
         contentSpecSource.ignoreWS();
         if (contentSpecSource.current() == '(')
@@ -557,9 +558,22 @@ namespace H4
             xmlSource.ignoreWS();
         }
         entityName += parseName(xmlSource) + ";";
-        XValue entityValue = parseValue(xmlSource);
-        m_entityMapping[entityName].internal = entityValue.parsed;
-        xNodeDTD->entityMapping[entityName].internal = entityValue.parsed;
+
+        if (xmlSource.current() == '\'' || xmlSource.current() == '"')
+        {
+            XValue entityValue = parseValue(xmlSource);
+            m_entityMapping[entityName].internal = entityValue.parsed;
+            xNodeDTD->entityMapping[entityName].internal = entityValue.parsed;
+        }
+        else
+        {
+            m_entityMapping[entityName].external = parseDTDExternalReference(xmlSource);
+            if (xmlSource.match(U"NDATA"))
+            {
+                xmlSource.ignoreWS();
+                m_entityMapping[entityName].notation = parseName(xmlSource);
+            }
+        }
     }
     /// <summary>
     /// Parse an XML DTD element.

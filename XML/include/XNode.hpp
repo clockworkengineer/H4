@@ -58,6 +58,7 @@ namespace H4
     public:
         std::string internal;
         XExternalReference external;
+        std::string notation;
     };
     //
     // XML DTD attribute definition
