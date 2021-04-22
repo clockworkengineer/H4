@@ -206,7 +206,7 @@ namespace H4
         bool validReservedName(const XString &name);
         bool vadlidateIsPCDATA(XNodeElement *xNodeElement);
         bool validateIsEMPTY(XNodeElement *xNodeElement);
-        // std::string parseDTDTranslateContentSpecEntities(XNodeDTD *xNodeDTD, const XValue &contentSpec);
+        std::string parseDTDTranslateParameterEntities(XNodeDTD *xNodeDTD, const std::string &parameterEntities);
         std::string parseDTDAttributeEnumerationType(ISource &xmlSource);
         bool parseDTDIsChoiceOrSequence(XML::ISource &contentSpecSource);
         void parseDTDElementCP(ISource &contentSpecSource, IDestination &contentSpec);
@@ -226,6 +226,7 @@ namespace H4
         std::string parseDTDAttributeType(ISource &xmlSource);
         XValue parseDTDAttributeValue(ISource &xmlSource);
         void parseDTDComment(ISource &source, XNodeDTD *xNodeDTD);
+        void parseDTDParameterEntity(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTDExternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTDInternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void parseDTD(ISource &xmlSource, XNodeElement *XNodeElement);

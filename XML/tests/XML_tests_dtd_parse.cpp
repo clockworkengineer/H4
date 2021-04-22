@@ -275,13 +275,32 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["NOTES"].name == "NOTES");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["NOTES"].content.unparsed == "(#PCDATA)");
   }
-  //   SECTION("XML with internal DTD with parameter entities to parse.", "[XML][Parse][DTD]")
-  // {
-  //   xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report.dtd\">\n"
-  //               "<REPORT></REPORT>\n";
-  //   BufferSource xmlSource(xmlString);
-  //   REQUIRE_NOTHROW(xml.parse(xmlSource));
-  // }
+  SECTION("XML with internal DTD with parameter entities to parse  (internal cannot appear within tags).", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT [\n"
+                "<!ENTITY % empty_report \"<!ELEMENT REPORT EMPTY>\">"
+                "%empty_report;\n"
+                "]>\n"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
+  }
+  SECTION("XML with internal DTD with parameter entities to parse and check values (internal cannot appear within tags).", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT [\n"
+                "<!ENTITY % empty_report \"<!ELEMENT REPORT EMPTY>\">"
+                "%empty_report;\n"
+                "]>\n"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).name == XNodeRef<XNodeDTD>(xmlObject.prolog[2]).name);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).name == "REPORT");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%empty_report;"].internal == "<!ELEMENT REPORT EMPTY>");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["REPORT"].name == "REPORT");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["REPORT"].attributes.size() == 0);
+  }
   // SECTION("XML with external DTD with parameter entities to parse.", "[XML][Parse][DTD]")
   // {
   //   xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report.dtd\">\n"
@@ -668,7 +687,6 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Element <item> has more than one ID attribute.");
   }
-
   // SECTION("Parse XML with DTD that contains all forms of entity type.", "[XML][Valid][DTD]")
   // {
   //   xmlString = "<?xml version=\"1.0\" standalone=\"no\" ?>\n"

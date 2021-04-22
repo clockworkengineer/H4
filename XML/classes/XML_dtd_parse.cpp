@@ -87,28 +87,28 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    // std::string XML::parseDTDTranslateContentSpecEntities(XNodeDTD */*xNodeDTD*/, const XValue &contentSpec)
-    // {
-    //     std::string result = contentSpec.unparsed;
-    //     while (result.find('%') != std::string::npos)
-    //     {
-    //         bool noMatch = true;
-    //         for (auto entity : xNodeDTD->entityMapping)
-    //         {
-    //             size_t pos = result.find(entity.first);
-    //             if (pos != std::string::npos)
-    //             {
-    //                 result.replace(pos, entity.first.length(), entity.second.internal);
-    //                 noMatch = false;
-    //             }
-    //         }
-    //         if (noMatch)
-    //         {
-    //             throw SyntaxError("No match found for entity string '" + result + "'.");
-    //         }
-    //     }
-    //     return (result);
-    // }
+    std::string XML::parseDTDTranslateParameterEntities(XNodeDTD *xNodeDTD, const std::string &parameterEntities)
+    {
+        std::string result = parameterEntities;
+        while (result.find('%') != std::string::npos)
+        {
+            bool noMatch = true;
+            for (auto entity : xNodeDTD->entityMapping)
+            {
+                size_t pos = result.find(entity.first);
+                if (pos != std::string::npos)
+                {
+                    result.replace(pos, entity.first.length(), entity.second.internal);
+                    noMatch = false;
+                }
+            }
+            if (noMatch)
+            {
+                throw SyntaxError("No match found for entity string '" + result + "'.");
+            }
+        }
+        return (result);
+    }
     /// <summary>
     ///
     /// </summary>
@@ -558,7 +558,6 @@ namespace H4
             xmlSource.ignoreWS();
         }
         entityName += parseName(xmlSource) + ";";
-
         if (xmlSource.current() == '\'' || xmlSource.current() == '"')
         {
             XValue entityValue = parseValue(xmlSource);
@@ -638,6 +637,25 @@ namespace H4
         }
     }
     /// <summary>
+    /// Parse XML parameter in DTD.
+    /// </summary>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns></returns>
+    void XML::parseDTDParameterEntity(ISource &xmlSource, XNodeDTD *xNodeDTD)
+    {
+        std::string parameterEntity = "%";
+        while (xmlSource.more() && xmlSource.current() != ';')
+        {
+            parameterEntity += xmlSource.to_bytes(xmlSource.current());
+            xmlSource.next();
+        }
+        parameterEntity += xmlSource.to_bytes(xmlSource.current());
+        BufferSource entitySource(parseDTDTranslateParameterEntities(xNodeDTD, parameterEntity));
+        parseDTDInternal(entitySource, xNodeDTD);
+        xmlSource.next();
+        xmlSource.ignoreWS();
+    }
+    /// <summary>
     /// Parse internally defined XML DTD.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
@@ -665,6 +683,11 @@ namespace H4
             else if (xmlSource.match(U"<--"))
             {
                 parseDTDComment(xmlSource, xNodeDTD);
+            }
+            else if (xmlSource.match(U"%"))
+            {
+                parseDTDParameterEntity(xmlSource, xNodeDTD);
+                continue;
             }
             else
             {
