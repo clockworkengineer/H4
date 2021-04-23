@@ -89,6 +89,22 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][6]).name == "footer");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][6]).getContents() == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
+  SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 1)", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                "<!DOCTYPE note [\n"
+                "<!ENTITY example \"<p>An ampersand (&#38;#38;) may be escaped numerically (&#38;#38;#38;) or with a general entity (&amp;amp;).</p>\">]>\n"
+                "<note>\n"
+                "&example;"
+                "</note>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
+        REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).entityMapping["&example;"].internal=="");
+    // REQUIRE(XNodeRef<XNode>(xmlObject.prolog[3]).getNodeType() == XNodeType::root);
+    // REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).name == "note");
+    // REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getContents() == "");
+  }
   SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\n"
@@ -299,7 +315,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).name == "REPORT");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%empty_report;"].internal == "<!ELEMENT REPORT EMPTY>");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["REPORT"].name == "REPORT");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["REPORT"].attributes.size() == 0);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["REPORT"].content.parsed == "EMPTY");
   }
   // SECTION("XML with external DTD with parameter entities to parse.", "[XML][Parse][DTD]")
   // {
