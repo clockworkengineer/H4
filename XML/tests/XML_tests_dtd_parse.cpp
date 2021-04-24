@@ -100,7 +100,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
-        REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).entityMapping["&example;"].internal=="");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).entityMapping["&example;"].internal == "<p>An ampersand (&#38;) may be escaped numerically (&#38;#38;) or with a general entity (&amp;amp;).</p>");
     // REQUIRE(XNodeRef<XNode>(xmlObject.prolog[3]).getNodeType() == XNodeType::root);
     // REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).name == "note");
     // REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getContents() == "");

@@ -166,6 +166,7 @@ namespace H4
         else if (validChar(xmlSource.current()))
         {
             character.parsed = xmlSource.to_bytes(xmlSource.current());
+            character.unparsed = xmlSource.to_bytes(xmlSource.current());
             xmlSource.next();
         }
         else
@@ -190,15 +191,8 @@ namespace H4
             while (xmlSource.more() && xmlSource.current() != quote)
             {
                 XValue character = parseCharacter(xmlSource);
-                if (character.unparsed == "")
-                {
-                    value.unparsed += character.parsed;
-                }
-                else
-                {
-                    value.unparsed += character.unparsed;
-                }
                 value.parsed += character.parsed;
+                value.unparsed += character.unparsed;
             }
             xmlSource.next();
             xmlSource.ignoreWS();
@@ -365,7 +359,7 @@ namespace H4
     void XML::parseDefault(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         XValue entityReference = parseCharacter(xmlSource);
-        if (entityReference.unparsed != "")
+        if (entityReference.unparsed.starts_with("&"))
         {
             XNodeEntityReference xNodeEntityReference(entityReference);
             if (!xNodeElement->elements.empty())
