@@ -232,7 +232,7 @@ namespace H4
         void parseDTD(ISource &xmlSource, XNodeElement *XNodeElement);
         std::string parseName(ISource &xmlSource);
         std::string parseCharacterReference(ISource &xmlSource, std::string reference);
-        XValue parseValue(ISource &xmlSource);
+        XValue parseValue(ISource &xmlSource,  bool translateEntity=true);
         XValue parseCharacter(ISource &source);
         XValue parseReferenceOrEntity(ISource &source);
         void parseDefault(ISource &xmlSource, XNodeElement *xNodeElement);

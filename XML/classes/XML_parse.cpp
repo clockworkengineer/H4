@@ -166,7 +166,7 @@ namespace H4
         else if (validChar(xmlSource.current()))
         {
             character.parsed = xmlSource.to_bytes(xmlSource.current());
-            character.unparsed = xmlSource.to_bytes(xmlSource.current());
+            character.unparsed = character.parsed;
             xmlSource.next();
         }
         else
@@ -181,7 +181,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>String value.</returns>
-    XValue XML::parseValue(ISource &xmlSource)
+    XValue XML::parseValue(ISource &xmlSource, bool translateEntity)
     {
         if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
         {
@@ -191,7 +191,16 @@ namespace H4
             while (xmlSource.more() && xmlSource.current() != quote)
             {
                 XValue character = parseCharacter(xmlSource);
-                value.parsed += character.parsed;
+                if (translateEntity ||
+                    character.unparsed.starts_with("&#") ||
+                    character.unparsed.starts_with("&x"))
+                {
+                    value.parsed += character.parsed;
+                }
+                else
+                {
+                    value.parsed += character.unparsed;
+                }
                 value.unparsed += character.unparsed;
             }
             xmlSource.next();

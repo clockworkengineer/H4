@@ -560,7 +560,7 @@ namespace H4
         entityName += parseName(xmlSource) + ";";
         if (xmlSource.current() == '\'' || xmlSource.current() == '"')
         {
-            XValue entityValue = parseValue(xmlSource);
+            XValue entityValue = parseValue(xmlSource, false);
             m_entityMapping[entityName].internal = entityValue.parsed;
             xNodeDTD->entityMapping[entityName].internal = entityValue.parsed;
         }
