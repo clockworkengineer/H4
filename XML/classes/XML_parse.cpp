@@ -368,9 +368,21 @@ namespace H4
     void XML::parseDefault(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         XValue entityReference = parseCharacter(xmlSource);
-        if (entityReference.unparsed.starts_with("&"))
+        if (entityReference.unparsed.starts_with("&") && entityReference.unparsed.ends_with(";"))
         {
             XNodeEntityReference xNodeEntityReference(entityReference);
+            if ((entityReference.parsed != "&") &&
+                (entityReference.parsed != "\'") &&
+                (entityReference.parsed != "\"") &&
+                (entityReference.parsed != ">") &&
+                (entityReference.parsed != "<"))
+            {
+                XNodeElement entityElement;
+                BufferSource entitySource(entityReference.parsed);
+                parseElementContents(entitySource, &entityElement);
+                xNodeEntityReference.elements = std::move(entityElement.elements);
+                // res = entityElement.getContents();
+            }
             if (!xNodeElement->elements.empty())
             {
                 if (xNodeElement->elements.back()->getNodeType() == XNodeType::content)

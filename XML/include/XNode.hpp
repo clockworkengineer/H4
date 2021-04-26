@@ -50,7 +50,7 @@ namespace H4
         std::string systemID;
         std::string publicID;
     };
-        //
+    //
     // XML Entity mapping
     //
     struct XEntityMapping
@@ -116,6 +116,7 @@ namespace H4
         }
         XNode &operator[](int index);
         XNode &operator[](const std::string &name);
+
     private:
         XNodeType nodeType;
     };
@@ -134,14 +135,14 @@ namespace H4
     //
     // EntityReference XNode
     //
-    struct XNodeEntityReference : XNode
-    {
-    public:
-        XNodeEntityReference(const XValue &value, XNodeType nodeType = XNodeType::entity) : XNode(nodeType), value(value)
-        {
-        }
-        XValue value;
-    };
+    // struct XNodeEntityReference : XNode
+    // {
+    // public:
+    //     XNodeEntityReference(const XValue &value, XNodeType nodeType = XNodeType::entity) : XNode(nodeType), value(value)
+    //     {
+    //     }
+    //     XValue value;
+    // };
     //
     // CDATA XNode
     //
@@ -152,6 +153,38 @@ namespace H4
         {
         }
         std::string cdata;
+    };
+    //
+    // EntityReference XNode
+    //
+    struct XNodeEntityReference : XNode
+    {
+    public:
+        XNodeEntityReference(const XValue &value, XNodeType nodeType = XNodeType::entity) : XNode(nodeType), value(value)
+        {
+        }
+        XValue value;
+        std::vector<std::unique_ptr<XNode>> elements;
+        std::string getContents()
+        {
+            std::string result;
+            for (auto &node : elements)
+            {
+                if (node.get()->getNodeType() == XNodeType::content)
+                {
+                    result += static_cast<XNodeContent *>(node.get())->content;
+                }
+                else if (node.get()->getNodeType() == XNodeType::entity)
+                {
+                    result += static_cast<XNodeEntityReference *>(node.get())->getContents();
+                }
+                else if (node.get()->getNodeType() == XNodeType::cdata)
+                {
+                    result += static_cast<XNodeCDATA *>(node.get())->cdata;
+                }
+            }
+            return (result);
+        }
     };
     //
     // Element XNode
@@ -251,6 +284,13 @@ namespace H4
             if ((index >= 0) && (index < ((int)XNodeRef<XNodeElement>(*this).elements.size())))
             {
                 return (*((XNodeRef<XNodeElement>(*this).elements[index].get())));
+            }
+        }
+        else if (nodeType == XNodeType::entity)
+        {
+            if ((index >= 0) && (index < ((int)XNodeRef<XNodeEntityReference>(*this).elements.size())))
+            {
+                return (*((XNodeRef<XNodeEntityReference>(*this).elements[index].get())));
             }
         }
         throw std::runtime_error("Invalid index used to access array.");
