@@ -214,7 +214,11 @@ namespace H4
                 }
                 else if (node.get()->getNodeType() == XNodeType::entity)
                 {
-                    result += static_cast<XNodeEntityReference *>(node.get())->value.parsed;
+                    if (!static_cast<XNodeEntityReference *>(node.get())->elements.empty()) {
+                        result += static_cast<XNodeEntityReference *>(node.get())->getContents();
+                    } else {
+                        result += static_cast<XNodeEntityReference *>(node.get())->value.parsed;
+                    }
                 }
                 else if (node.get()->getNodeType() == XNodeType::cdata)
                 {

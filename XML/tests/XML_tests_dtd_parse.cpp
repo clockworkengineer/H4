@@ -99,7 +99,97 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).entityMapping["&example;"].internal == "<p>An ampersand (&#38;) may be escaped numerically (&#38;#38;) or with a general entity (&amp;amp;).</p>");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][0][0]).getContents()=="An ampersand (&) may be escaped numerically (&#38;) or with a general entity (&amp;).");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][0][0]).getContents() == "An ampersand (&) may be escaped numerically (&#38;) or with a general entity (&amp;).");
+  }
+  SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 2)", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version='1.0'?>\n"
+                "<!DOCTYPE test [\n"
+                "<!ELEMENT test (#PCDATA) >\n"
+                "<!ENTITY % xx '&#37;zz;'>\n"
+                "<!ENTITY % zz '&#60;!ENTITY tricky \"error-prone\" >' >\n"
+                "%xx;\n"
+                "]>\n"
+                "<test>This sample shows a &tricky; method.</test>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).entityMapping["%xx;"].internal == "%zz;");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).entityMapping["%zz;"].internal == "<!ENTITY tricky \"error-prone\" >");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).name == "test");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getContents() == "This sample shows a error-prone method.");
+  }
+  SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 3)", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version='1.0'?>\n"
+                "<!DOCTYPE foo [\n"
+                "<!ENTITY x \"&lt;\">\n"
+                "]>\n"
+                "<foo attr=\"&x;\"/>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).entityMapping["&x;"].internal == "&lt;");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].name == "attr");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].value.unparsed == "&x;");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].value.parsed == "&lt;");
+  }
+  // This should throw an error as & ' " < >  not allowed to be assigned to attribute directly (NEED TO FIX)
+  // SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 4)", "[XML][Parse][DTD]")
+  // {
+  //   xmlString = "<?xml version='1.0'?>\n"
+  //               "<!DOCTYPE foo [\n"
+  //               "<!ENTITY x \"&#60;\">\n"
+  //               "]>\n"
+  //               "<foo attr=\"&x;\"/>\n";
+  //   BufferSource xmlSource(xmlString);
+  //   XMLObject xmlObject = xml.parse(xmlSource);
+  //   REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
+  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).entityMapping["&x;"].internal == "<");
+  //   REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes.size() == 1);
+  //   REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].name == "attr");
+  //   REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].value.parsed == "<");
+  //   REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].value.unparsed == "<");
+  // }
+  SECTION("XML with DTD with entity used within an entity.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version='1.0'?>\n"
+                "<!DOCTYPE author [\n"
+                "<!ELEMENT author (#PCDATA)>\n"
+                "<!ENTITY email \"josmith@theworldaccordingtojosmith.com\">\n"
+                "<!--the following use of a general entity is legal \n"
+                "if it is used in the XML document-->\n"
+                "<!ENTITY js \"Jo Smith &email;\">\n"
+                "]>\n"
+                "<author>&js;</author>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).name == "author");
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[3][0]).getNodeType() == XNodeType::entity);
+    REQUIRE(XNodeRef<XNodeEntityReference>(xmlObject.prolog[3][0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
+  }
+    SECTION("XML with DTD with entity used within an entity with recucsrion.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version='1.0'?>\n"
+                "<!DOCTYPE author [\n"
+                "<!ELEMENT author (#PCDATA)>\n"
+                "<!ENTITY email \"josmith@theworldaccordingtojosmith.com\">\n"
+                // "<!--the two entity"
+                // " statements are infinitely recursive-->\n"
+                "<!ENTITY email \"user@user.com &js;\">\n"
+                "<!ENTITY js \"Jo Smith &email;\">\n"
+                "]>\n"
+                "<author>&js;</author>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
+    // REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).name == "author");
+    // REQUIRE(XNodeRef<XNode>(xmlObject.prolog[3][0]).getNodeType() == XNodeType::entity);
+    // REQUIRE(XNodeRef<XNodeEntityReference>(xmlObject.prolog[3][0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
+    // REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
   }
   SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
   {
@@ -381,15 +471,15 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE note ["
-                "<-- root element is note that contains to, from, heading and body elements -->\n"
+                "<!-- root element is note that contains to, from, heading and body elements -->\n"
                 "<!ELEMENT note (to,from,heading,body)>\n"
-                "<-- Note to field -->\n"
+                "<!-- Note to field -->\n"
                 "<!ELEMENT to (#PCDATA)>\n"
-                "<-- Note from field -->\n"
+                "<!-- Note from field -->\n"
                 "<!ELEMENT from (#PCDATA)>\n"
-                "<-- Note heading field -->\n"
+                "<!-- Note heading field -->\n"
                 "<!ELEMENT heading (#PCDATA)>\n"
-                "<-- Note boy field -->\n"
+                "<!-- Note boy field -->\n"
                 "<!ELEMENT body (#PCDATA)>\n"
                 "]>\n"
                 "<note>\n"

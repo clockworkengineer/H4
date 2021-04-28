@@ -680,7 +680,7 @@ namespace H4
             {
                 parseDTDNotation(xmlSource, xNodeDTD);
             }
-            else if (xmlSource.match(U"<--"))
+            else if (xmlSource.match(U"<!--"))
             {
                 parseDTDComment(xmlSource, xNodeDTD);
             }

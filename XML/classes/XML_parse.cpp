@@ -133,6 +133,10 @@ namespace H4
             entityReference.unparsed += xmlSource.to_bytes(xmlSource.current());
             xmlSource.next();
         }
+        if (xmlSource.current()!=';')
+        {
+            throw SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
+        }
         entityReference.unparsed += ';';
         xmlSource.next();
         if (entityReference.unparsed[1] == '#')
@@ -143,10 +147,10 @@ namespace H4
         {
             entityReference.parsed = m_entityMapping[entityReference.unparsed].internal;
         }
-        else
-        {
-            throw SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
-        }
+        // else
+        // {
+        //     throw SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
+        // }
         return (entityReference);
     }
     /// <summary>
@@ -379,9 +383,12 @@ namespace H4
             {
                 XNodeElement entityElement;
                 BufferSource entitySource(entityReference.parsed);
-                parseElementContents(entitySource, &entityElement);
+                while (entitySource.more())
+                {
+                    parseElementContents(entitySource, &entityElement);
+                }
                 xNodeEntityReference.elements = std::move(entityElement.elements);
-                // res = entityElement.getContents();
+
             }
             if (!xNodeElement->elements.empty())
             {
