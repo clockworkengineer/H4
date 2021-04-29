@@ -189,6 +189,7 @@ namespace H4
         // PRIVATE METHODS
         // ===============
 
+        void checkForEntityRecursion(XNodeDTD *xNodeDTD, const std::string &entityName, std::set<std::string> names = {});
         std::vector<std::string> split(std::string strToSplit, char delimeter);
         void validateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void validateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement);

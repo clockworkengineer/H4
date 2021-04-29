@@ -171,25 +171,20 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeEntityReference>(xmlObject.prolog[3][0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
   }
-    SECTION("XML with DTD with entity used within an entity with recucsrion.", "[XML][Parse][DTD]")
+    SECTION("XML with DTD with entity used within an entity with recursion.", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE author [\n"
                 "<!ELEMENT author (#PCDATA)>\n"
                 "<!ENTITY email \"josmith@theworldaccordingtojosmith.com\">\n"
-                // "<!--the two entity"
-                // " statements are infinitely recursive-->\n"
+                "<!--the two entity"
+                " statements are infinitely recursive-->\n"
                 "<!ENTITY email \"user@user.com &js;\">\n"
                 "<!ENTITY js \"Jo Smith &email;\">\n"
                 "]>\n"
                 "<author>&js;</author>\n";
     BufferSource xmlSource(xmlString);
-    XMLObject xmlObject = xml.parse(xmlSource);
-    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
-    // REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).name == "author");
-    // REQUIRE(XNodeRef<XNode>(xmlObject.prolog[3][0]).getNodeType() == XNodeType::entity);
-    // REQUIRE(XNodeRef<XNodeEntityReference>(xmlObject.prolog[3][0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
-    // REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Entity '&js;' contains recursive definition which is not allowed.");
   }
   SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
   {

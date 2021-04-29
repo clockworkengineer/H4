@@ -55,6 +55,38 @@ namespace H4
         }
         return splittedStrings;
     }
+    void XML::checkForEntityRecursion(XNodeDTD *xNodeDTD, const std::string &entityName, std::set<std::string> names)
+    {
+        BufferSource entitySource(entityName);
+        while (entitySource.more())
+        {
+            if ((entitySource.current() == '&') || (entitySource.current() == '%'))
+            {
+                std::string name = entitySource.to_bytes(entitySource.current());
+                entitySource.next();
+                while (entitySource.more() && entitySource.current() != ';')
+                {
+                    name += entitySource.current();
+                    entitySource.next();
+                }
+                if (name[1] != '#')
+                {
+                    name += entitySource.current();
+                    if (!xNodeDTD->entityMapping[name].internal.empty())
+                    {
+                        if (names.contains(name))
+                        {
+                            throw SyntaxError("Entity '" + name + "' contains recursive definition which is not allowed.");
+                        }
+                        names.emplace(name);
+                        checkForEntityRecursion(xNodeDTD, xNodeDTD->entityMapping[name].internal, names);
+                        names.erase(name);
+                    }
+                }
+            }
+            entitySource.next();
+        }
+    }
     /// <summary>
     ///
     /// </summary>
@@ -320,7 +352,6 @@ namespace H4
     /// <returns></returns>
     void XML::parseDTDElementContentSpecification(XNodeDTD * /*xNodeDTD*/, XValue &contentSpec)
     {
-        //        BufferSource contentSpecSource(parseDTDTranslateContentSpecEntities(xNodeDTD, contentSpec));
         BufferSource contentSpecSource(contentSpec.unparsed);
         BufferDestination contentSpecDestination;
         contentSpecSource.ignoreWS();
@@ -405,6 +436,11 @@ namespace H4
                     }
                 }
             }
+        }
+        for (auto &entityName : xNodeDTD->entityMapping)
+        {
+            std::set<std::string> names{entityName.first};
+            checkForEntityRecursion(xNodeDTD, entityName.first);
         }
     }
     /// <summary>
