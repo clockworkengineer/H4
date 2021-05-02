@@ -79,7 +79,7 @@ namespace H4
     /// <returns>XMLObject that represents the parsed XML.</returns>
     XMLObject XML::parse(ISource &xmlSource)
     {
-        return (parseXML(xmlSource));
+        return (xmlParse(xmlSource));
     }
     /// <summary>
     ///

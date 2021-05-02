@@ -24,6 +24,7 @@ set (XML_SOURCES
     ./classes/XML_dtd_validate.cpp
     ./classes/XML_validation.cpp
     ./classes/XML_stringify.cpp
+    ./classes/XML_utility.cpp
 )
 
 set (XML_INCLUDES

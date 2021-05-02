@@ -199,7 +199,7 @@ namespace H4
         bool dtdVadlidateIsPCDATA(XNodeElement *xNodeElement);
         bool dtdValidateIsEMPTY(XNodeElement *xNodeElement);
         void initialiseTables();
-        void addElementContent(XNodeElement *xNodeElement, const std::string &content);
+        void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
         XAttribute getAttribute(std::vector<XAttribute> attributeList, const std::string &attributeName);
         bool validChar(XChar ch);
@@ -232,23 +232,23 @@ namespace H4
         void dtdParseExternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void dtdParseInternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void dtdParse(ISource &xmlSource, XNodeElement *XNodeElement);
-        std::string parseName(ISource &xmlSource);
-        std::string parseCharacterReference(ISource &xmlSource, std::string reference);
-        XValue parseValue(ISource &xmlSource, bool translateEntity = true);
-        XValue parseCharacter(ISource &source);
-        XValue parseReferenceOrEntity(ISource &source);
-        void parseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseAttributes(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseComment(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseCDATA(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parsePI(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
-        void parseElement(ISource &xmlSource, XNodeElement *XNodeElement);
-        void parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
+        std::string xmlParseName(ISource &xmlSource);
+        std::string xmlParseCharacterReference(ISource &xmlSource, std::string reference);
+        XValue xmlParseValue(ISource &xmlSource, bool translateEntity = true);
+        XValue xmlParseCharacter(ISource &source);
+        XValue xmlParseReferenceOrEntity(ISource &source);
+        void xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
+        void xmlParseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
+        void xmlParseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);
+        void xmlParseAttributes(ISource &xmlSource, XNodeElement *xNodeElement);
+        void xmlParseComment(ISource &xmlSource, XNodeElement *xNodeElement);
+        void xmlParseCDATA(ISource &xmlSource, XNodeElement *xNodeElement);
+        void xmlParsePI(ISource &xmlSource, XNodeElement *xNodeElement);
+        void xmlParseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
+        void xmlParseElement(ISource &xmlSource, XNodeElement *XNodeElement);
+        void xmlParseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
         void dtdValidateXML(XNode *xNodeRoot);
-        XMLObject parseXML(ISource &xmlSource);
+        XMLObject xmlParse(ISource &xmlSource);
         void stringifyXML(XNode *xNodeRoot, IDestination &xmlDestination);
         // =================
         // PRIVATE VARIABLES
