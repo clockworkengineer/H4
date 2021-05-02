@@ -62,25 +62,26 @@ namespace H4
         {
             if ((entitySource.current() == '&') || (entitySource.current() == '%'))
             {
-                std::string name = entitySource.to_bytes(entitySource.current());
+                std::string mappedEntityName = entitySource.to_bytes(entitySource.current());
                 entitySource.next();
                 while (entitySource.more() && entitySource.current() != ';')
                 {
-                    name += entitySource.current();
+                    mappedEntityName += entitySource.current();
                     entitySource.next();
                 }
-                if (name[1] != '#')
+                if (mappedEntityName[1] != '#')
                 {
-                    name += entitySource.current();
-                    if (!xNodeDTD->entityMapping[name].internal.empty())
+                    mappedEntityName += entitySource.current();
+                    if (names.contains(mappedEntityName))
                     {
-                        if (names.contains(name))
-                        {
-                            throw SyntaxError("Entity '" + name + "' contains recursive definition which is not allowed.");
-                        }
-                        names.emplace(name);
-                        checkForEntityRecursion(xNodeDTD, xNodeDTD->entityMapping[name].internal, names);
-                        names.erase(name);
+                        throw SyntaxError("Entity '" + mappedEntityName + "' contains recursive definition which is not allowed.");
+                    }
+                    if (!xNodeDTD->entityMapping[mappedEntityName].internal.empty())
+                    {
+
+                        names.emplace(mappedEntityName);
+                        checkForEntityRecursion(xNodeDTD, xNodeDTD->entityMapping[mappedEntityName].internal, names);
+                        names.erase(mappedEntityName);
                     }
                 }
             }
@@ -88,11 +89,20 @@ namespace H4
         }
     }
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::dtdParseParameterENTITIES(XNodeDTD */*xNodeDTD*/, ISource &/*dtdSource*/)
+    {
+
+    }
+    /// <summary>
     ///
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    std::string XML::parseDTDAttributeEnumerationType(ISource &xmlSource)
+    std::string XML::dtdParseAttributeEnumerationType(ISource &xmlSource)
     {
         std::string attributeType(1, xmlSource.current());
         xmlSource.next();
@@ -119,7 +129,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    std::string XML::parseDTDTranslateParameterEntities(XNodeDTD *xNodeDTD, const std::string &parameterEntities)
+    std::string XML::dtdParseTranslateParameterEntities(XNodeDTD *xNodeDTD, const std::string &parameterEntities)
     {
         std::string result = parameterEntities;
         while (result.find('%') != std::string::npos)
@@ -146,7 +156,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool XML::parseDTDIsChoiceOrSequence(ISource &contentSpecSource)
+    bool XML::dtdParseIsChoiceOrSequence(ISource &contentSpecSource)
     {
         bool choice = false;
         long start = contentSpecSource.position();
@@ -168,21 +178,21 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementCP(ISource &contentSpecSource, IDestination &contentSpecDestination)
+    void XML::dtdParseElementCP(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         contentSpecSource.next();
         contentSpecSource.ignoreWS();
         if (validNameStartChar(contentSpecSource.current()))
         {
-            parseDTDElementName(contentSpecSource, contentSpecDestination);
+            dtdParseElementName(contentSpecSource, contentSpecDestination);
         }
-        else if (parseDTDIsChoiceOrSequence(contentSpecSource))
+        else if (dtdParseIsChoiceOrSequence(contentSpecSource))
         {
-            parseDTDElementChoice(contentSpecSource, contentSpecDestination);
+            dtdParseElementChoice(contentSpecSource, contentSpecDestination);
         }
         else
         {
-            parseDTDElementSequence(contentSpecSource, contentSpecDestination);
+            dtdParseElementSequence(contentSpecSource, contentSpecDestination);
         }
         if (contentSpecSource.current() == '*' ||
             contentSpecSource.current() == '+' ||
@@ -198,18 +208,18 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementChoice(ISource &contentSpecSource, IDestination &contentSpecDestination)
+    void XML::dtdParseElementChoice(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         if (contentSpecSource.current() != '(')
         {
             throw SyntaxError("Invalid content region specification.");
         }
         contentSpecDestination.add("(");
-        parseDTDElementCP(contentSpecSource, contentSpecDestination);
+        dtdParseElementCP(contentSpecSource, contentSpecDestination);
         while (contentSpecSource.more() && contentSpecSource.current() == '|')
         {
             contentSpecDestination.add("|");
-            parseDTDElementCP(contentSpecSource, contentSpecDestination);
+            dtdParseElementCP(contentSpecSource, contentSpecDestination);
         }
         if (contentSpecSource.current() != ')')
         {
@@ -224,17 +234,17 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementSequence(ISource &contentSpecSource, IDestination &contentSpecDestination)
+    void XML::dtdParseElementSequence(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         if (contentSpecSource.current() != '(')
         {
             throw SyntaxError("Invalid content region specification.");
         }
         contentSpecDestination.add("(");
-        parseDTDElementCP(contentSpecSource, contentSpecDestination);
+        dtdParseElementCP(contentSpecSource, contentSpecDestination);
         while (contentSpecSource.more() && contentSpecSource.current() == ',')
         {
-            parseDTDElementCP(contentSpecSource, contentSpecDestination);
+            dtdParseElementCP(contentSpecSource, contentSpecDestination);
         }
         if (contentSpecSource.current() != ')')
         {
@@ -249,7 +259,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementName(ISource &contentSpecSource, IDestination &contentSpecDestination)
+    void XML::dtdParseElementName(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         contentSpecDestination.add("(<");
         contentSpecDestination.add(contentSpecSource.current());
@@ -267,17 +277,17 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementChildren(ISource &contentSpecSource, IDestination &contentSpecDestination)
+    void XML::dtdParseElementChildren(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         if (contentSpecSource.current() == '(')
         {
-            if (parseDTDIsChoiceOrSequence(contentSpecSource))
+            if (dtdParseIsChoiceOrSequence(contentSpecSource))
             {
-                parseDTDElementChoice(contentSpecSource, contentSpecDestination);
+                dtdParseElementChoice(contentSpecSource, contentSpecDestination);
             }
             else
             {
-                parseDTDElementSequence(contentSpecSource, contentSpecDestination);
+                dtdParseElementSequence(contentSpecSource, contentSpecDestination);
             }
             if (contentSpecSource.current() == '*' ||
                 contentSpecSource.current() == '+' ||
@@ -298,7 +308,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementMixedContent(ISource &contentSpecSource, IDestination &contentSpecDestination)
+    void XML::dtdParseElementMixedContent(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         contentSpecSource.ignoreWS();
         contentSpecDestination.add("((<#PCDATA>)");
@@ -311,7 +321,7 @@ namespace H4
                 contentSpecSource.ignoreWS();
                 if (validNameStartChar(contentSpecSource.current()))
                 {
-                    parseDTDElementName(contentSpecSource, contentSpecDestination);
+                    dtdParseElementName(contentSpecSource, contentSpecDestination);
                 }
                 else
                 {
@@ -350,7 +360,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDElementContentSpecification(XNodeDTD * /*xNodeDTD*/, XValue &contentSpec)
+    void XML::dtdParseElementContentSpecification(XNodeDTD * /*xNodeDTD*/, XValue &contentSpec)
     {
         BufferSource contentSpecSource(contentSpec.unparsed);
         BufferDestination contentSpecDestination;
@@ -361,12 +371,12 @@ namespace H4
             contentSpecSource.ignoreWS();
             if (contentSpecSource.match(U"#PCDATA"))
             {
-                parseDTDElementMixedContent(contentSpecSource, contentSpecDestination);
+                dtdParseElementMixedContent(contentSpecSource, contentSpecDestination);
             }
             else
             {
                 contentSpecSource.backup(contentSpecSource.position());
-                parseDTDElementChildren(contentSpecSource, contentSpecDestination);
+                dtdParseElementChildren(contentSpecSource, contentSpecDestination);
             }
         }
         else
@@ -380,7 +390,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDPostProcessing(XNodeDTD *xNodeDTD)
+    void XML::dtdParsePostProcessing(XNodeDTD *xNodeDTD)
     {
         for (auto &element : xNodeDTD->elements)
         {
@@ -388,7 +398,7 @@ namespace H4
             {
                 try
                 {
-                    parseDTDElementContentSpecification(xNodeDTD, element.second.content);
+                    dtdParseElementContentSpecification(xNodeDTD, element.second.content);
                 }
                 catch (SyntaxError &e)
                 {
@@ -448,12 +458,15 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseDTDExternalContents(XNodeDTD *xNodeDTD)
+    void XML::dtdParseExternalContents(XNodeDTD *xNodeDTD)
     {
         if (xNodeDTD->external.type == "SYSTEM")
         {
             FileSource dtdFile(xNodeDTD->external.systemID);
-            parseDTDInternal(dtdFile, xNodeDTD);
+            dtdParseInternal(dtdFile, xNodeDTD);
+            // dtdParseParameterENTITIES
+            // dtdParseTranslateENTITIES
+            // dtdParseInternal
         }
         else if (xNodeDTD->external.type == "PUBLIC")
         {
@@ -465,7 +478,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    XExternalReference XML::parseDTDExternalReference(ISource &xmlSource)
+    XExternalReference XML::dtdParseExternalReference(ISource &xmlSource)
     {
         XExternalReference result;
         if (xmlSource.match(U"SYSTEM"))
@@ -492,7 +505,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Attribute type as string (UTF-8 encoded).</returns>
-    std::string XML::parseDTDAttributeType(ISource &xmlSource)
+    std::string XML::dtdParseAttributeType(ISource &xmlSource)
     {
         std::string attributeType;
         for (auto attrType : XML::m_dtdAttrListTypes)
@@ -505,7 +518,7 @@ namespace H4
         }
         if (xmlSource.current() == '(')
         {
-            return (parseDTDAttributeEnumerationType(xmlSource));
+            return (dtdParseAttributeEnumerationType(xmlSource));
         }
         throw SyntaxError(xmlSource, "Invalid attribute type specified.");
     }
@@ -515,7 +528,7 @@ namespace H4
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Attribute value as string (UTF-8 encoded).</returns>
     /// <returns></returns>
-    XValue XML::parseDTDAttributeValue(ISource &xmlSource)
+    XValue XML::dtdParseAttributeValue(ISource &xmlSource)
     {
         XValue value;
         if (xmlSource.match(U"#REQUIRED"))
@@ -547,7 +560,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseDTDAttributeList(ISource &xmlSource, XNodeDTD *xNodeDTD)
+    void XML::dtdParseAttributeList(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
         xmlSource.ignoreWS();
         std::string elementName = parseName(xmlSource);
@@ -555,8 +568,8 @@ namespace H4
         {
             XDTDAttribute xDTDAttribute;
             xDTDAttribute.name = parseName(xmlSource);
-            xDTDAttribute.type = parseDTDAttributeType(xmlSource);
-            xDTDAttribute.value = parseDTDAttributeValue(xmlSource);
+            xDTDAttribute.type = dtdParseAttributeType(xmlSource);
+            xDTDAttribute.value = dtdParseAttributeValue(xmlSource);
             if (xDTDAttribute.type == "ID" && xDTDAttribute.value.parsed.starts_with("#FIXED "))
             {
                 throw SyntaxError(xmlSource, "Attribute '" + xDTDAttribute.name + "' may not be of type ID and FIXED.");
@@ -570,12 +583,12 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseDTDNotation(ISource &xmlSource, XNodeDTD *xNodeDTD)
+    void XML::dtdParseNotation(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
         xmlSource.ignoreWS();
         XAttribute notation;
         std::string name = parseName(xmlSource);
-        xNodeDTD->notations[name] = parseDTDExternalReference(xmlSource);
+        xNodeDTD->notations[name] = dtdParseExternalReference(xmlSource);
         xmlSource.ignoreWS();
     }
     /// <summary>
@@ -583,7 +596,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseDTDEntity(ISource &xmlSource, XNodeDTD *xNodeDTD)
+    void XML::dtdParseEntity(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
         std::string entityName = "&";
         xmlSource.ignoreWS();
@@ -602,7 +615,7 @@ namespace H4
         }
         else
         {
-            m_entityMapping[entityName].external = parseDTDExternalReference(xmlSource);
+            m_entityMapping[entityName].external = dtdParseExternalReference(xmlSource);
             if (xmlSource.match(U"NDATA"))
             {
                 xmlSource.ignoreWS();
@@ -615,7 +628,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseDTDElement(ISource &xmlSource, XNodeDTD *xNodeDTD)
+    void XML::dtdParseElement(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
         xmlSource.ignoreWS();
         std::string elementName = parseName(xmlSource);
@@ -649,10 +662,10 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseDTDExternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
+    void XML::dtdParseExternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
-        xNodeDTD->external = parseDTDExternalReference(xmlSource);
-        parseDTDExternalContents(xNodeDTD);
+        xNodeDTD->external = dtdParseExternalReference(xmlSource);
+        dtdParseExternalContents(xNodeDTD);
         if (xmlSource.current() != '>')
         {
             throw SyntaxError(xmlSource, "Missing '>' terminator.");
@@ -665,7 +678,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseDTDComment(ISource &xmlSource, XNodeDTD * /*xNodeDTD*/)
+    void XML::dtdParseComment(ISource &xmlSource, XNodeDTD * /*xNodeDTD*/)
     {
         while (xmlSource.more() && !xmlSource.match(U"--"))
         {
@@ -677,7 +690,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseDTDParameterEntity(ISource &xmlSource, XNodeDTD *xNodeDTD)
+    void XML::dtdParseParameterEntity(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
         std::string parameterEntity = "%";
         while (xmlSource.more() && xmlSource.current() != ';')
@@ -686,8 +699,8 @@ namespace H4
             xmlSource.next();
         }
         parameterEntity += xmlSource.to_bytes(xmlSource.current());
-        BufferSource entitySource(parseDTDTranslateParameterEntities(xNodeDTD, parameterEntity));
-        parseDTDInternal(entitySource, xNodeDTD);
+        BufferSource entitySource(dtdParseTranslateParameterEntities(xNodeDTD, parameterEntity));
+        dtdParseInternal(entitySource, xNodeDTD);
         xmlSource.next();
         xmlSource.ignoreWS();
     }
@@ -696,33 +709,33 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseDTDInternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
+    void XML::dtdParseInternal(ISource &xmlSource, XNodeDTD *xNodeDTD)
     {
         while (xmlSource.more() && !xmlSource.match(U"]>"))
         {
             if (xmlSource.match(U"<!ENTITY"))
             {
-                parseDTDEntity(xmlSource, xNodeDTD);
+                dtdParseEntity(xmlSource, xNodeDTD);
             }
             else if (xmlSource.match(U"<!ELEMENT"))
             {
-                parseDTDElement(xmlSource, xNodeDTD);
+                dtdParseElement(xmlSource, xNodeDTD);
             }
             else if (xmlSource.match(U"<!ATTLIST"))
             {
-                parseDTDAttributeList(xmlSource, xNodeDTD);
+                dtdParseAttributeList(xmlSource, xNodeDTD);
             }
             else if (xmlSource.match(U"<!NOTATION"))
             {
-                parseDTDNotation(xmlSource, xNodeDTD);
+                dtdParseNotation(xmlSource, xNodeDTD);
             }
             else if (xmlSource.match(U"<!--"))
             {
-                parseDTDComment(xmlSource, xNodeDTD);
+                dtdParseComment(xmlSource, xNodeDTD);
             }
             else if (xmlSource.match(U"%"))
             {
-                parseDTDParameterEntity(xmlSource, xNodeDTD);
+                dtdParseParameterEntity(xmlSource, xNodeDTD);
                 continue;
             }
             else
@@ -742,7 +755,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseDTD(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::dtdParse(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         // We take the easy option for allowing a DTD to be stringifyed
         // and keeping the correct order for its components by storing it
@@ -755,11 +768,11 @@ namespace H4
         {
             xmlSource.next();
             xmlSource.ignoreWS();
-            parseDTDInternal(xmlSource, &xNodeDTD);
+            dtdParseInternal(xmlSource, &xNodeDTD);
         }
         else
         {
-            parseDTDExternal(xmlSource, &xNodeDTD);
+            dtdParseExternal(xmlSource, &xNodeDTD);
         }
         // Save away unparsed form
         xNodeDTD.unparsed = "<!DOCTYPE" + xmlSource.getRange(start, xmlSource.position());
@@ -770,7 +783,7 @@ namespace H4
                 xNodeDTD.lineNumber++;
             }
         }
-        parseDTDPostProcessing(&xNodeDTD);
+        dtdParsePostProcessing(&xNodeDTD);
         xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
     }
 } // namespace H4

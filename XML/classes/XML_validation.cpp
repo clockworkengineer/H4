@@ -110,7 +110,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    bool XML::validateName(XString name)
+    bool XML::validName(XString name)
     {
         if (name.empty())
         {
@@ -140,7 +140,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>true when declaration valid.</returns>
-    void XML::validateXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::validXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         // Syntax error if no version present
         if (!isAttributePresent(xNodeElement->attributes, "version"))

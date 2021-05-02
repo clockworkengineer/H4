@@ -88,7 +88,7 @@ namespace H4
     /// <returns></returns>
     void XML::validate(XMLObject &xmlObject)
     {
-        validateXML(&xmlObject.prolog);
+        dtdValidateXML(&xmlObject.prolog);
     }
     /// <summary>
     /// Create XML text for an XMLObject.

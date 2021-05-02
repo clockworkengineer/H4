@@ -398,13 +398,13 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["REPORT"].name == "REPORT");
     REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["REPORT"].content.parsed == "EMPTY");
   }
-  // SECTION("XML with external DTD with parameter entities to parse.", "[XML][Parse][DTD]")
-  // {
-  //   xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report.dtd\">\n"
-  //               "<REPORT></REPORT>\n";
-  //   BufferSource xmlSource(xmlString);
-  //   REQUIRE_NOTHROW(xml.parse(xmlSource));
-  // }
+  SECTION("XML with external DTD with parameter entities to parse.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report.dtd\">\n"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_NOTHROW(xml.parse(xmlSource));
+  }
   // SWITCHED  OFF UNTIL PARAMETER ENTITIES HANDLED CORRECTLY
   //
   // SECTION("XML with external DTD with both types of entities to parse an check values", "[XML][Parse][DTD]")

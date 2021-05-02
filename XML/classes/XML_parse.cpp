@@ -227,7 +227,7 @@ namespace H4
             xmlSource.next();
         }
         xmlSource.ignoreWS();
-        if (!validateName(name))
+        if (!validName(name))
         {
             throw SyntaxError(xmlSource, "Invalid name '" + xmlSource.to_bytes(name) + "' encountered.");
         }
@@ -483,7 +483,7 @@ namespace H4
             {
                 throw SyntaxError(xmlSource, "Declaration end tag not found.");
             }
-            validateXMLDeclaration(xmlSource, xNodeProlog);
+            validXMLDeclaration(xmlSource, xNodeProlog);
         }
         while (xmlSource.more())
         {
@@ -497,7 +497,7 @@ namespace H4
             }
             else if (xmlSource.match(U"<!DOCTYPE"))
             {
-                parseDTD(xmlSource, xNodeProlog);
+                dtdParse(xmlSource, xNodeProlog);
             }
             else if (xmlSource.current() == '<')
             {
