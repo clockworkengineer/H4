@@ -108,7 +108,7 @@ namespace H4
         XValue entityReference;
         while (xmlSource.more() && xmlSource.current() != ';')
         {
-            entityReference.unparsed += xmlSource.to_bytes(xmlSource.current());
+            entityReference.unparsed += xmlSource.current_to_bytes();
             xmlSource.next();
         }
         if (xmlSource.current()!=';')
@@ -143,7 +143,7 @@ namespace H4
         }
         else if (validChar(xmlSource.current()))
         {
-            character.parsed = xmlSource.to_bytes(xmlSource.current());
+            character.parsed = xmlSource.current_to_bytes();
             character.unparsed = character.parsed;
             xmlSource.next();
         }
@@ -227,7 +227,7 @@ namespace H4
         XNodeComment xNodeComment;
         while (xmlSource.more() && !xmlSource.match(U"--"))
         {
-            xNodeComment.comment += xmlSource.to_bytes(xmlSource.current());
+            xNodeComment.comment += xmlSource.current_to_bytes();
             xmlSource.next();
         }
         if (!xmlSource.match(U">"))
@@ -248,7 +248,7 @@ namespace H4
         xNodePI.name = xmlParseName(xmlSource);
         while (xmlSource.more() && !xmlSource.match(U"?>"))
         {
-            xNodePI.parameters += xmlSource.to_bytes(xmlSource.current());
+            xNodePI.parameters += xmlSource.current_to_bytes();
             xmlSource.next();
         }
         xNodeElement->elements.emplace_back(std::make_unique<XNodePI>(xNodePI));
@@ -268,7 +268,7 @@ namespace H4
             {
                 throw SyntaxError(xmlSource, "Nesting of CDATA sections is not allowed.");
             }
-            xNodeCDATA.cdata += xmlSource.to_bytes(xmlSource.current());
+            xNodeCDATA.cdata += xmlSource.current_to_bytes();
             xmlSource.next();
         }
         if (!xNodeElement->elements.empty())

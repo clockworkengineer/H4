@@ -51,7 +51,7 @@ namespace H4
         {
             if ((entitySource.current() == '&') || (entitySource.current() == '%'))
             {
-                std::string mappedEntityName = entitySource.to_bytes(entitySource.current());
+                std::string mappedEntityName = entitySource.current_to_bytes();
                 entitySource.next();
                 while (entitySource.more() && entitySource.current() != ';')
                 {
@@ -78,18 +78,166 @@ namespace H4
         }
     }
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::dtdParseParameterENTITIES(XNodeDTD */*xNodeDTD*/, ISource &/*dtdSource*/)
+    void XML::dtdParseTranslateParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource)
     {
 
+        while (dtdSource.more())
+        {
+            std::string translated;
+            if (dtdSource.match(U"<!ENTITY"))
+            {
+                dtdSource.ignoreWS();
+                while (dtdSource.more() && dtdSource.current() != '>')
+                {
+                    dtdSource.next();
+                }
+                dtdSource.next();
+                dtdSource.ignoreWS();
+            }
+            else if (dtdSource.match(U"<!ELEMENT"))
+            {
+                dtdSource.ignoreWS();
+                while (dtdSource.more() && dtdSource.current() != '>')
+                {
+                    translated += dtdSource.current_to_bytes();
+                    dtdSource.next();
+                }
+                translated += dtdSource.current_to_bytes();
+                dtdSource.next();
+                dtdSource.ignoreWS();
+                translated = dtdParseTranslateParameterEntities(xNodeDTD, translated);
+                BufferSource dtdTranslatedSource(translated);
+                dtdParseElement(dtdTranslatedSource, xNodeDTD);
+            }
+            else if (dtdSource.match(U"<!ATTLIST"))
+            {
+                dtdSource.ignoreWS();
+                while (dtdSource.more() && dtdSource.current() != '>')
+                {
+                    translated += dtdSource.current_to_bytes();
+                    dtdSource.next();
+                }
+                translated += dtdSource.current_to_bytes();
+                dtdSource.next();
+                dtdSource.ignoreWS();
+                translated = dtdParseTranslateParameterEntities(xNodeDTD, translated);
+                BufferSource dtdTranslatedSource(translated);
+                dtdParseAttributeList(dtdTranslatedSource, xNodeDTD);
+            }
+            else if (dtdSource.match(U"<!NOTATION"))
+            {
+                dtdSource.ignoreWS();
+                while (dtdSource.more() && dtdSource.current() != '>')
+                {
+                    translated += dtdSource.current_to_bytes();
+                    dtdSource.next();
+                }
+                translated += dtdSource.current_to_bytes();
+                dtdSource.next();
+                dtdSource.ignoreWS();
+                translated = dtdParseTranslateParameterEntities(xNodeDTD, translated);
+                BufferSource dtdTranslatedSource(translated);
+                dtdParseNotation(dtdTranslatedSource, xNodeDTD);
+            }
+            else if (dtdSource.match(U"<!--"))
+            {
+                dtdSource.ignoreWS();
+                while (dtdSource.more() && dtdSource.current() != '>')
+                {
+                    dtdSource.next();
+                }
+                dtdSource.next();
+                dtdSource.ignoreWS();
+            }
+            else if (dtdSource.match(U"%"))
+            {
+                dtdParseParameterEntity(dtdSource, xNodeDTD);
+                continue;
+            }
+            else
+            {
+                throw SyntaxError(dtdSource, "Invalid DTD tag.");
+            }
+        }
     }
     /// <summary>
     ///
     /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void XML::dtdParseParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource)
+    {
+        while (dtdSource.more())
+        {
+            if (dtdSource.match(U"<!ENTITY"))
+            {
+                dtdParseEntity(dtdSource, xNodeDTD);
+                while (dtdSource.more() && dtdSource.current() != '>')
+                {
+                    dtdSource.next();
+                }
+                dtdSource.next();
+                dtdSource.ignoreWS();
+            }
+            else if (dtdSource.match(U"<!ELEMENT"))
+            {
+                dtdSource.ignoreWS();
+                while (dtdSource.more() && dtdSource.current() != '>')
+                {
+                    dtdSource.next();
+                }
+                dtdSource.next();
+                dtdSource.ignoreWS();
+            }
+            else if (dtdSource.match(U"<!ATTLIST"))
+            {
+                dtdSource.ignoreWS();
+                while (dtdSource.more() && dtdSource.current() != '>')
+                {
+                    dtdSource.next();
+                }
+                dtdSource.next();
+                dtdSource.ignoreWS();
+            }
+            else if (dtdSource.match(U"<!NOTATION"))
+            {
+                dtdSource.ignoreWS();
+                while (dtdSource.more() && dtdSource.current() != '>')
+                {
+                    dtdSource.next();
+                }
+                dtdSource.next();
+                dtdSource.ignoreWS();
+            }
+            else if (dtdSource.match(U"<!--"))
+            {
+                dtdSource.ignoreWS();
+                while (dtdSource.more() && dtdSource.current() != '>')
+                {
+                    dtdSource.next();
+                }
+                dtdSource.next();
+                dtdSource.ignoreWS();
+            }
+            else if (dtdSource.match(U"%"))
+            {
+                dtdParseParameterEntity(dtdSource, xNodeDTD);
+                continue;
+            }
+            else
+            {
+                throw SyntaxError(dtdSource, "Invalid DTD tag.");
+            }
+        }
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dtdSource">XML source stream.</param>
     /// <returns></returns>
     std::string XML::dtdParseAttributeEnumerationType(ISource &xmlSource)
     {
@@ -452,10 +600,9 @@ namespace H4
         if (xNodeDTD->external.type == "SYSTEM")
         {
             FileSource dtdFile(xNodeDTD->external.systemID);
-            dtdParseInternal(dtdFile, xNodeDTD);
-            // dtdParseParameterENTITIES
-            // dtdParseTranslateENTITIES
-            // dtdParseInternal
+            dtdParseParameterENTITIES(xNodeDTD, dtdFile);
+            FileSource dtdFilePass2(xNodeDTD->external.systemID);
+            dtdParseTranslateParameterENTITIES(xNodeDTD, dtdFilePass2);
         }
         else if (xNodeDTD->external.type == "PUBLIC")
         {
@@ -684,10 +831,10 @@ namespace H4
         std::string parameterEntity = "%";
         while (xmlSource.more() && xmlSource.current() != ';')
         {
-            parameterEntity += xmlSource.to_bytes(xmlSource.current());
+            parameterEntity += xmlSource.current_to_bytes();
             xmlSource.next();
         }
-        parameterEntity += xmlSource.to_bytes(xmlSource.current());
+        parameterEntity += xmlSource.current_to_bytes();
         BufferSource entitySource(dtdParseTranslateParameterEntities(xNodeDTD, parameterEntity));
         dtdParseInternal(entitySource, xNodeDTD);
         xmlSource.next();

@@ -117,6 +117,10 @@ namespace H4
             {
                 return (m_column);
             }
+            std::string current_to_bytes()
+            {
+                return (m_UTF8.to_bytes(current()));
+            }
             std::string to_bytes(const XString &from)
             {
                 return (m_UTF8.to_bytes(from));
@@ -192,6 +196,7 @@ namespace H4
         void checkForEntityRecursion(XNodeDTD *xNodeDTD, const std::string &entityName, std::set<std::string> names = {});
         std::vector<std::string> split(std::string strToSplit, char delimeter);
         void dtdParseParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource);
+        void dtdParseTranslateParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource);
         void dtdValidateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void dtdValidateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void dtdValidateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
