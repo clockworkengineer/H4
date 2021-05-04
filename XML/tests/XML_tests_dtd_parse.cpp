@@ -171,7 +171,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeEntityReference>(xmlObject.prolog[3][0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
   }
-    SECTION("XML with DTD with entity used within an entity with recursion.", "[XML][Parse][DTD]")
+  SECTION("XML with DTD with entity used within an entity with recursion.", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE author [\n"
@@ -407,61 +407,43 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
   }
   // SWITCHED  OFF UNTIL PARAMETER ENTITIES HANDLED CORRECTLY
   //
-  // SECTION("XML with external DTD with both types of entities to parse an check values", "[XML][Parse][DTD]")
-  // {
-  //   xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report.dtd\">"
-  //               "<REPORT></REPORT>\n";
-  //   BufferSource xmlSource(xmlString);
-  //   XMLObject xmlObject = xml.parse(xmlSource);
-  //   REQUIRE(XNodeRef<XNode>(xmlObject.prolog[0]).getNodeType() == XNodeType::dtd);
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).name == XNodeRef<XNodeDTD>(xmlObject.prolog[2]).name);
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).name == "REPORT");
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["&asg;"].internal == "dummy test");
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%contact;"].internal == "phone");
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%area;"].internal == "name, street, pincode, city");
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements.size() == 5);
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["residence"].name == "residence");
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["residence"].content.unparsed == "(%area;, %contact;)");
-  // }
-  // SECTION("XML with internal DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
-  // {
-  //   xmlString = "<!DOCTYPE REPORT [\n"
-  //               "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
-  //               "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\n"
-  //               "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\n"
-  //               "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\n"
-  //               "<!ELEMENT TITLE %TEXT;>\n"
-  //               "<!ELEMENT PARA %TEXT;>\n"
-  //               "<!ELEMENT LIST (ITEM)+>\n"
-  //               "<!ELEMENT ITEM (%BLOCK;)>\n"
-  //               "<!ELEMENT CODE (#PCDATA)>\n"
-  //               "<!ELEMENT KEYWORD (#PCDATA)>\n"
-  //               "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\n"
-  //               "<!ELEMENT GRAPHIC EMPTY>\n"
-  //               "<!ATTLIST REPORT security (high | medium | low ) \"low\">\n"
-  //               "<!ATTLIST CODE type CDATA #IMPLIED>\n"
-  //               "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\n"
-  //               "<!ENTITY xml \"Extensible Markup Language\">\n"
-  //               "<!ENTITY sgml \"Standard Generalized Markup Language\">\n"
-  //               "<!ENTITY pxa \"Professional XML Authoring\">\n"
-  //               "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\n"
-  //               "<!ENTITY % BLOCK \"(PARA|LIST)+\">\n"
-  //               "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\n"
-  //               "<!NOTATION GIF SYSTEM \"GIF\">\n"
-  //               "<!NOTATION JPG SYSTEM \"JPG\">\n"
-  //               "<!NOTATION BMP SYSTEM \"BMP\">\n"
-  //               "]>\n"
-  //               "<REPORT> </REPORT>\n";
-  //   BufferSource xmlSource(xmlString);
-  //   XMLObject xmlObject = xml.parse(xmlSource);
-  //   REQUIRE(XNodeRef<XNode>(xmlObject.prolog[0]).getNodeType() == XNodeType::dtd);
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].type == "SYSTEM");
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].systemID == "GIF");
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].type == "SYSTEM");
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].systemID == "JPG");
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].type == "SYSTEM");
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].systemID == "BMP");
-  // }
+  SECTION("XML with external DTD with both types of entities to parse an check values", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report01.dtd\">"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).name == XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).name == "REPORT");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%contact;"].internal == "phone");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).entityMapping["%area;"].internal == "name, street, pincode, city");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements.size() == 5);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["REPORT"].name == "REPORT");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["REPORT"].content.unparsed == "(residence|apartment|office|shop)*");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["residence"].name == "residence");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["residence"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["apartment"].name == "apartment");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["apartment"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["office"].name == "office");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["office"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["shop"].name == "shop");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).elements["shop"].content.unparsed == "(name, street, pincode, city, phone)");
+  }
+  SECTION("XML with external DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report02.dtd\">"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["GIF"].systemID == "GIF");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["JPG"].systemID == "JPG");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[0]).notations["BMP"].systemID == "BMP");
+  }
   SECTION("XML with internal DTD containing comments.", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
@@ -524,52 +506,30 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 15 Column: 2] Missing '>' terminator.");
   }
-  // SECTION("XML with internal DTD with missing terminating '>' on !ENTITY", "[XML][Parse][DTD]")
-  // {
-  //   xmlString = "<!DOCTYPE REPORT [\n"
-  //               "<!ELEMENT REPORT (residence|apartment|office|shop)*>\n"
-  //               "<!ELEMENT residence (%area;, %contact;)>\n"
-  //               "<!ELEMENT apartment (%area;, %contact;)>\n"
-  //               "<!ELEMENT office (%area;, %contact;)>\n"
-  //               "<!ELEMENT shop (%area;, %contact;)>\n"
-  //               "<!ENTITY % area \"name, street, pincode, city\"\n"
-  //               "<!ENTITY % contact \"phone\"> ]>\n"
-  //               "<REPORT></REPORT>\n";
-  //   BufferSource xmlSource(xmlString);
-  //   REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 8 Column: 2] Missing '>' terminator.");
-  // }
-  // SECTION("XML with internal DTD with missing terminating '>' on !NOTATION", "[XML][Parse][DTD]")
-  // {
-  //   xmlString = "<!DOCTYPE REPORT [\n"
-  //               "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
-  //               "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\n"
-  //               "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\n"
-  //               "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\n"
-  //               "<!ELEMENT TITLE %TEXT;>\n"
-  //               "<!ELEMENT PARA %TEXT;>\n"
-  //               "<!ELEMENT LIST (ITEM)+>\n"
-  //               "<!ELEMENT ITEM (%BLOCK;)>\n"
-  //               "<!ELEMENT CODE (#PCDATA)>\n"
-  //               "<!ELEMENT KEYWORD (#PCDATA)>\n"
-  //               "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\n"
-  //               "<!ELEMENT GRAPHIC EMPTY>\n"
-  //               "<!ATTLIST REPORT security (high | medium | low ) \"low\">\n"
-  //               "<!ATTLIST CODE type CDATA #IMPLIED>\n"
-  //               "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\n"
-  //               "<!ENTITY xml \"Extensible Markup Language\">\n"
-  //               "<!ENTITY sgml \"Standard Generalized Markup Language\">\n"
-  //               "<!ENTITY pxa \"Professional XML Authoring\">\n"
-  //               "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\n"
-  //               "<!ENTITY % BLOCK \"(PARA|LIST)+\">\n"
-  //               "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\n"
-  //               "<!NOTATION GIF SYSTEM \"\"\n"
-  //               "<!NOTATION JPG SYSTEM \"\">\n"
-  //               "<!NOTATION BMP SYSTEM \"\">\n"
-  //               "]>\n"
-  //               "<REPORT> </REPORT>\n";
-  //   BufferSource xmlSource(xmlString);
-  //   REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 24 Column: 2] Missing '>' terminator.");
-  // }
+  SECTION("XML with internal DTD with missing terminating '>' on !ENTITY", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT [\n"
+                "<!ELEMENT REPORT (paragraph)*>\n"
+                "<!ELEMENT paragraph (#PCDATA)>\n"
+                "<!ENTITY contact \"0893-456334534\" ]>\n"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 4 Column: 36] Missing '>' terminator.");
+  }
+  SECTION("XML with internal DTD with missing terminating '>' on !NOTATION", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT [\n"
+                "<!ELEMENT REPORT (paragraph)*>\n"
+                "<!ELEMENT paragraph (#PCDATA)>\n"
+                "<!ENTITY contact \"0893-456334534\">\n"
+                "<!NOTATION GIF SYSTEM \"\"\n"
+                "<!NOTATION JPG SYSTEM \"\">\n"
+                "<!NOTATION BMP SYSTEM \"\">\n"
+                "]>\n"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 6 Column: 2] Missing '>' terminator.");
+  }
   SECTION("XML with a DTD that contains an illegal mixed content specification (uses ',').", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"

@@ -16,7 +16,7 @@
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
-//
+// 
 // C++ STL
 //
 #include <vector>
