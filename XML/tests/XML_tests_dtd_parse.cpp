@@ -744,25 +744,4 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Element <item> has more than one ID attribute.");
   }
-  // SECTION("Parse XML with DTD that contains all forms of entity type.", "[XML][Valid][DTD]")
-  // {
-  //   xmlString = "<?xml version=\"1.0\" standalone=\"no\" ?>\n"
-  //               "<!DOCTYPE dtd_sample[\n"
-  //               "<!ELEMENT file_info>\n"
-  //               "<!ATTLIST file_info name CDATA #REQUIRED>\n"
-  //               "<!ENTITY xml \"eXtensible Markup Language\">\n"
-  //               "<!ENTITY attlist_def SYSTEM \"./testData/longtext.txt\">\n"
-  //               "<!ENTITY % lists \"(ol | ul)\">\n"
-  //               "<!ENTITY % dtd_chunk SYSTEM \"./testData/chunk.dtd\">\n"
-  //               "<!ENTITY file_pic SYSTEM \"file.jpg\" NDATA jpg>\n"
-  //               "<!NOTATION jpg SYSTEM \"image/jpeg\">\n"
-  //               "%dtd_chunk;\n"
-  //               "<!ELEMENT icon EMPTY>\n"
-  //               "<!ATTLIST icon source ENTITY #REQUIRED>\n"
-  //               "<!ATTLIST icon list_type &lists;>\n"
-  //               "]>;\n";
-  //   BufferSource xmlSource(xmlString);
-  //   REQUIRE_THROWS_WITH(xml.parse(xmlSource), "");
-  //   // REQUIRE_NOTHROW(xml.parse(xmlSource));
-  // }
 }

@@ -1,3 +1,0 @@
-<definition>ATTLIST(attribute list) Declares a list of XML attributes. These attributes are qualified by name, data type, implied default values, and the name of any elements that permit their use.
-
-</definition>

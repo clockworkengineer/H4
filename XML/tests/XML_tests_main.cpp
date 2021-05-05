@@ -177,72 +177,72 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
     REQUIRE(xmlSource.current() == static_cast<XChar>(EOF)); // eof
   }
   std::string xmlString;
-  // SECTION("Check that FileSource is  performing CRLF to LF conversion on windows format data correctly.", "[XML][Parse][FileSource]")
-  // {
-  //   xmlString = "\r\r\n<!DOCTYPE REPORT [\r\n"
-  //               "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
-  //               "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
-  //               "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
-  //               "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\r\n"
-  //               "<!ELEMENT TITLE %TEXT;>\r\n"
-  //               "<!ELEMENT PARA %TEXT;>\r\n"
-  //               "<!ELEMENT LIST (ITEM)+>\r\n"
-  //               "<!ELEMENT ITEM (%BLOCK;)>\r\n"
-  //               "<!ELEMENT CODE (#PCDATA)>\r\n"
-  //               "<!ELEMENT KEYWORD (#PCDATA)>\r\n"
-  //               "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\r\n"
-  //               "<!ELEMENT GRAPHIC EMPTY>\r\n"
-  //               "<!ATTLIST REPORT security (high | medium | low ) \"low\">\r\n"
-  //               "<!ATTLIST CODE type CDATA #IMPLIED>\r\n"
-  //               "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\r\n"
-  //               "<!ENTITY xml \"Extensible Markup Language\">\r\n"
-  //               "<!ENTITY sgml \"Standard Generalized Markup Language\">\r\n"
-  //               "<!ENTITY pxa \"Professional XML Authoring\">\r\n"
-  //               "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\r\n"
-  //               "<!ENTITY % BLOCK \"(PARA|LIST)+\">\r\n"
-  //               "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\r\n"
-  //               "<!NOTATION GIF SYSTEM \"\">\r\n"
-  //               "<!NOTATION JPG SYSTEM \"\">\r\n"
-  //               "<!NOTATION BMP SYSTEM \"\">\r\n"
-  //               "]>\r\n"
-  //               "<REPORT>\r\r </REPORT>\r\n";
-  //   writeXMLToFileUTF8(kGeneratedXMLFile, xmlString);
-  //   FileSource xmlSource(kGeneratedXMLFile);
-  //   verifyCRLFCount(xmlSource, 28, 3);
-  // }
-  // SECTION("Check that FileSource is  performing CRLF to LF conversion on linux format data correctly.", "[XML][Parse][FileSource]")
-  // {
-  //   xmlString = "\r \n<!DOCTYPE REPORT [\n"
-  //               "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
-  //               "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\n"
-  //               "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\n"
-  //               "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\n"
-  //               "<!ELEMENT TITLE %TEXT;>\n"
-  //               "<!ELEMENT PARA %TEXT;>\n"
-  //               "<!ELEMENT LIST (ITEM)+>\n"
-  //               "<!ELEMENT ITEM (%BLOCK;)>\n"
-  //               "<!ELEMENT CODE (#PCDATA)>\n"
-  //               "<!ELEMENT KEYWORD (#PCDATA)>\n"
-  //               "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\n"
-  //               "<!ELEMENT GRAPHIC EMPTY>\n"
-  //               "<!ATTLIST REPORT security (high | medium | low ) \"low\">\n"
-  //               "<!ATTLIST CODE type CDATA #IMPLIED>\n"
-  //               "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\n"
-  //               "<!ENTITY xml \"Extensible Markup Language\">\n"
-  //               "<!ENTITY sgml \"Standard Generalized Markup Language\">\n"
-  //               "<!ENTITY pxa \"Professional XML Authoring\">\n"
-  //               "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\n"
-  //               "<!ENTITY % BLOCK \"(PARA|LIST)+\">\n"
-  //               "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\n"
-  //               "<!NOTATION GIF SYSTEM \"\">\n"
-  //               "<!NOTATION JPG SYSTEM \"\">\n"
-  //               "<!NOTATION BMP SYSTEM \"\">\n"
-  //               "]>\n"
-  //               "<REPORT>\r\r </REPORT>\n";
-  //   writeXMLToFileUTF8(kGeneratedXMLFile, xmlString);
-  //   FileSource xmlSource(kGeneratedXMLFile);
-  //   verifyCRLFCount(xmlSource, 28, 3);
-  // }
+  SECTION("Check that FileSource is  performing CRLF to LF conversion on windows format data correctly.", "[XML][Parse][FileSource]")
+  {
+    xmlString = "\r\r\n<!DOCTYPE REPORT [\r\n"
+                "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
+                "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
+                "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
+                "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\r\n"
+                "<!ELEMENT TITLE %TEXT;>\r\n"
+                "<!ELEMENT PARA %TEXT;>\r\n"
+                "<!ELEMENT LIST (ITEM)+>\r\n"
+                "<!ELEMENT ITEM (%BLOCK;)>\r\n"
+                "<!ELEMENT CODE (#PCDATA)>\r\n"
+                "<!ELEMENT KEYWORD (#PCDATA)>\r\n"
+                "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\r\n"
+                "<!ELEMENT GRAPHIC EMPTY>\r\n"
+                "<!ATTLIST REPORT security (high | medium | low ) \"low\">\r\n"
+                "<!ATTLIST CODE type CDATA #IMPLIED>\r\n"
+                "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\r\n"
+                "<!ENTITY xml \"Extensible Markup Language\">\r\n"
+                "<!ENTITY sgml \"Standard Generalized Markup Language\">\r\n"
+                "<!ENTITY pxa \"Professional XML Authoring\">\r\n"
+                "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\r\n"
+                "<!ENTITY % BLOCK \"(PARA|LIST)+\">\r\n"
+                "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\r\n"
+                "<!NOTATION GIF SYSTEM \"\">\r\n"
+                "<!NOTATION JPG SYSTEM \"\">\r\n"
+                "<!NOTATION BMP SYSTEM \"\">\r\n"
+                "]>\r\n"
+                "<REPORT>\r\r </REPORT>\r\n";
+    writeXMLToFileUTF8(kGeneratedXMLFile, xmlString);
+    FileSource xmlSource(kGeneratedXMLFile);
+    verifyCRLFCount(xmlSource, 28, 3);
+  }
+  SECTION("Check that FileSource is  performing CRLF to LF conversion on linux format data correctly.", "[XML][Parse][FileSource]")
+  {
+    xmlString = "\r \n<!DOCTYPE REPORT [\n"
+                "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
+                "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\n"
+                "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\n"
+                "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\n"
+                "<!ELEMENT TITLE %TEXT;>\n"
+                "<!ELEMENT PARA %TEXT;>\n"
+                "<!ELEMENT LIST (ITEM)+>\n"
+                "<!ELEMENT ITEM (%BLOCK;)>\n"
+                "<!ELEMENT CODE (#PCDATA)>\n"
+                "<!ELEMENT KEYWORD (#PCDATA)>\n"
+                "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\n"
+                "<!ELEMENT GRAPHIC EMPTY>\n"
+                "<!ATTLIST REPORT security (high | medium | low ) \"low\">\n"
+                "<!ATTLIST CODE type CDATA #IMPLIED>\n"
+                "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\n"
+                "<!ENTITY xml \"Extensible Markup Language\">\n"
+                "<!ENTITY sgml \"Standard Generalized Markup Language\">\n"
+                "<!ENTITY pxa \"Professional XML Authoring\">\n"
+                "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\n"
+                "<!ENTITY % BLOCK \"(PARA|LIST)+\">\n"
+                "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\n"
+                "<!NOTATION GIF SYSTEM \"\">\n"
+                "<!NOTATION JPG SYSTEM \"\">\n"
+                "<!NOTATION BMP SYSTEM \"\">\n"
+                "]>\n"
+                "<REPORT>\r\r </REPORT>\n";
+    writeXMLToFileUTF8(kGeneratedXMLFile, xmlString);
+    FileSource xmlSource(kGeneratedXMLFile);
+    verifyCRLFCount(xmlSource, 28, 3);
+  }
   SECTION("Check that FileSource is ignoring whitespace corectly.", "[XML][Parse][FileSource]")
   {
     xmlString = "<root>   Test\t\t\t\r\r\r\r\r\r\r\f\n       Test       Test   \r\r\r\r</root>";
@@ -359,70 +359,70 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE(xmlSource.current() == static_cast<XChar>(EOF)); // eof
   }
   std::string xmlString;
-  // SECTION("Check that BufferSource is  performing CRLF to LF conversion on windows format data correctly.", "[XML][Parse][BufferSource]")
-  // {
-  //   xmlString = "\r\r\n<!DOCTYPE REPORT [\r\n"
-  //               "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
-  //               "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
-  //               "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
-  //               "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\r\n"
-  //               "<!ELEMENT TITLE %TEXT;>\r\n"
-  //               "<!ELEMENT PARA %TEXT;>\r\n"
-  //               "<!ELEMENT LIST (ITEM)+>\r\n"
-  //               "<!ELEMENT ITEM (%BLOCK;)>\r\n"
-  //               "<!ELEMENT CODE (#PCDATA)>\r\n"
-  //               "<!ELEMENT KEYWORD (#PCDATA)>\r\n"
-  //               "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\r\n"
-  //               "<!ELEMENT GRAPHIC EMPTY>\r\n"
-  //               "<!ATTLIST REPORT security (high | medium | low ) \"low\">\r\n"
-  //               "<!ATTLIST CODE type CDATA #IMPLIED>\r\n"
-  //               "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\r\n"
-  //               "<!ENTITY xml \"Extensible Markup Language\">\r\n"
-  //               "<!ENTITY sgml \"Standard Generalized Markup Language\">\r\n"
-  //               "<!ENTITY pxa \"Professional XML Authoring\">\r\n"
-  //               "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\r\n"
-  //               "<!ENTITY % BLOCK \"(PARA|LIST)+\">\r\n"
-  //               "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\r\n"
-  //               "<!NOTATION GIF SYSTEM \"\">\r\n"
-  //               "<!NOTATION JPG SYSTEM \"\">\r\n"
-  //               "<!NOTATION BMP SYSTEM \"\">\r\n"
-  //               "]>\r\n"
-  //               "<REPORT>\r\r </REPORT>\r\n";
-  //   BufferSource xmlSource(xmlString);
-  //   verifyCRLFCount(xmlSource, 28, 3);
-  // }
-  // SECTION("Check that BufferSource is  performing CRLF to LF conversion on linux format data correctly.", "[XML][Parse][BufferSource]")
-  // {
-  //   xmlString = "\r \n<!DOCTYPE REPORT [\n"
-  //               "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
-  //               "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\n"
-  //               "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\n"
-  //               "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\n"
-  //               "<!ELEMENT TITLE %TEXT;>\n"
-  //               "<!ELEMENT PARA %TEXT;>\n"
-  //               "<!ELEMENT LIST (ITEM)+>\n"
-  //               "<!ELEMENT ITEM (%BLOCK;)>\n"
-  //               "<!ELEMENT CODE (#PCDATA)>\n"
-  //               "<!ELEMENT KEYWORD (#PCDATA)>\n"
-  //               "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\n"
-  //               "<!ELEMENT GRAPHIC EMPTY>\n"
-  //               "<!ATTLIST REPORT security (high | medium | low ) \"low\">\n"
-  //               "<!ATTLIST CODE type CDATA #IMPLIED>\n"
-  //               "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\n"
-  //               "<!ENTITY xml \"Extensible Markup Language\">\n"
-  //               "<!ENTITY sgml \"Standard Generalized Markup Language\">\n"
-  //               "<!ENTITY pxa \"Professional XML Authoring\">\n"
-  //               "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\n"
-  //               "<!ENTITY % BLOCK \"(PARA|LIST)+\">\n"
-  //               "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\n"
-  //               "<!NOTATION GIF SYSTEM \"\">\n"
-  //               "<!NOTATION JPG SYSTEM \"\">\n"
-  //               "<!NOTATION BMP SYSTEM \"\">\n"
-  //               "]>\n"
-  //               "<REPORT>\r\r </REPORT>\n";
-  //   BufferSource xmlSource(xmlString);
-  //   verifyCRLFCount(xmlSource, 28, 3);
-  // }
+  SECTION("Check that BufferSource is  performing CRLF to LF conversion on windows format data correctly.", "[XML][Parse][BufferSource]")
+  {
+    xmlString = "\r\r\n<!DOCTYPE REPORT [\r\n"
+                "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
+                "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
+                "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
+                "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\r\n"
+                "<!ELEMENT TITLE %TEXT;>\r\n"
+                "<!ELEMENT PARA %TEXT;>\r\n"
+                "<!ELEMENT LIST (ITEM)+>\r\n"
+                "<!ELEMENT ITEM (%BLOCK;)>\r\n"
+                "<!ELEMENT CODE (#PCDATA)>\r\n"
+                "<!ELEMENT KEYWORD (#PCDATA)>\r\n"
+                "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\r\n"
+                "<!ELEMENT GRAPHIC EMPTY>\r\n"
+                "<!ATTLIST REPORT security (high | medium | low ) \"low\">\r\n"
+                "<!ATTLIST CODE type CDATA #IMPLIED>\r\n"
+                "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\r\n"
+                "<!ENTITY xml \"Extensible Markup Language\">\r\n"
+                "<!ENTITY sgml \"Standard Generalized Markup Language\">\r\n"
+                "<!ENTITY pxa \"Professional XML Authoring\">\r\n"
+                "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\r\n"
+                "<!ENTITY % BLOCK \"(PARA|LIST)+\">\r\n"
+                "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\r\n"
+                "<!NOTATION GIF SYSTEM \"\">\r\n"
+                "<!NOTATION JPG SYSTEM \"\">\r\n"
+                "<!NOTATION BMP SYSTEM \"\">\r\n"
+                "]>\r\n"
+                "<REPORT>\r\r </REPORT>\r\n";
+    BufferSource xmlSource(xmlString);
+    verifyCRLFCount(xmlSource, 28, 3);
+  }
+  SECTION("Check that BufferSource is  performing CRLF to LF conversion on linux format data correctly.", "[XML][Parse][BufferSource]")
+  {
+    xmlString = "\r \n<!DOCTYPE REPORT [\n"
+                "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\n"
+                "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\n"
+                "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\n"
+                "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\n"
+                "<!ELEMENT TITLE %TEXT;>\n"
+                "<!ELEMENT PARA %TEXT;>\n"
+                "<!ELEMENT LIST (ITEM)+>\n"
+                "<!ELEMENT ITEM (%BLOCK;)>\n"
+                "<!ELEMENT CODE (#PCDATA)>\n"
+                "<!ELEMENT KEYWORD (#PCDATA)>\n"
+                "<!ELEMENT EXAMPLE (TITLE?,%BLOCK;)>\n"
+                "<!ELEMENT GRAPHIC EMPTY>\n"
+                "<!ATTLIST REPORT security (high | medium | low ) \"low\">\n"
+                "<!ATTLIST CODE type CDATA #IMPLIED>\n"
+                "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\n"
+                "<!ENTITY xml \"Extensible Markup Language\">\n"
+                "<!ENTITY sgml \"Standard Generalized Markup Language\">\n"
+                "<!ENTITY pxa \"Professional XML Authoring\">\n"
+                "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\n"
+                "<!ENTITY % BLOCK \"(PARA|LIST)+\">\n"
+                "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\n"
+                "<!NOTATION GIF SYSTEM \"\">\n"
+                "<!NOTATION JPG SYSTEM \"\">\n"
+                "<!NOTATION BMP SYSTEM \"\">\n"
+                "]>\n"
+                "<REPORT>\r\r </REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    verifyCRLFCount(xmlSource, 28, 3);
+  }
   SECTION("Check that BufferSource is ignoring whitespace corectly.", "[XML][Parse][BufferSource]")
   {
     xmlString = "<root>   Test\t\t\t\r\r\r\r\r\r\r\f\n       Test       Test   \r\r\r\r</root>";
