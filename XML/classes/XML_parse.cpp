@@ -16,12 +16,13 @@
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
-// 
+//
 // C++ STL
 //
 #include <vector>
 #include <cstring>
 #include <algorithm>
+#include <filesystem>
 // =========
 // NAMESPACE
 // =========
@@ -111,7 +112,7 @@ namespace H4
             entityReference.unparsed += xmlSource.current_to_bytes();
             xmlSource.next();
         }
-        if (xmlSource.current()!=';')
+        if (xmlSource.current() != ';')
         {
             throw SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
         }
@@ -123,7 +124,26 @@ namespace H4
         }
         else if (m_entityMapping.count(entityReference.unparsed) > 0)
         {
-            entityReference.parsed = m_entityMapping[entityReference.unparsed].internal;
+            if (!m_entityMapping[entityReference.unparsed].internal.empty())
+            {
+                entityReference.parsed = m_entityMapping[entityReference.unparsed].internal;
+            }
+            else
+            {
+                if (std::filesystem::exists(m_entityMapping[entityReference.unparsed].external.systemID))
+                {
+                    FileSource entitySource(m_entityMapping[entityReference.unparsed].external.systemID);
+                    while (entitySource.more())
+                    {
+                        entityReference.parsed += entitySource.current_to_bytes();
+                        entitySource.next();
+                    }
+                }
+                else
+                {
+                    throw SyntaxError("Entity '" + entityReference.unparsed + "' source file '" + m_entityMapping[entityReference.unparsed].external.systemID + "' does not exist.");
+                }
+            }
         }
         return (entityReference);
     }
@@ -362,7 +382,6 @@ namespace H4
                     xmlParseElementContents(entitySource, &entityElement);
                 }
                 xNodeEntityReference.elements = std::move(entityElement.elements);
-
             }
             if (!xNodeElement->elements.empty())
             {

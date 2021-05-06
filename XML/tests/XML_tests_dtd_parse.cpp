@@ -136,22 +136,22 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].value.parsed == "&lt;");
   }
   // This should throw an error as & ' " < >  not allowed to be assigned to attribute directly (NEED TO FIX)
-  // SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 4)", "[XML][Parse][DTD]")
-  // {
-  //   xmlString = "<?xml version='1.0'?>\n"
-  //               "<!DOCTYPE foo [\n"
-  //               "<!ENTITY x \"&#60;\">\n"
-  //               "]>\n"
-  //               "<foo attr=\"&x;\"/>\n";
-  //   BufferSource xmlSource(xmlString);
-  //   XMLObject xmlObject = xml.parse(xmlSource);
-  //   REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
-  //   REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).entityMapping["&x;"].internal == "<");
-  //   REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes.size() == 1);
-  //   REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].name == "attr");
-  //   REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].value.parsed == "<");
-  //   REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].value.unparsed == "<");
-  // }
+  SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 4)", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version='1.0'?>\n"
+                "<!DOCTYPE foo [\n"
+                "<!ENTITY x \"&#60;\">\n"
+                "]>\n"
+                "<foo attr=\"&x;\"/>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).entityMapping["&x;"].internal == "<");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].name == "attr");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].value.unparsed == "&x;");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).attributes[0].value.parsed == "<");
+  }
   SECTION("XML with DTD with entity used within an entity.", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version='1.0'?>\n"
@@ -185,6 +185,32 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<author>&js;</author>\n";
     BufferSource xmlSource(xmlString);
     REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Entity '&js;' contains recursive definition which is not allowed.");
+  }
+  SECTION("XML with DTD with entity that is defined externally (file user.txt).", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version='1.0'?>\n"
+                "<!DOCTYPE foo [\n"
+                "<!ELEMENT foo ANY>\n"
+                "<!ENTITY name SYSTEM \"./testData/name.txt\">\n"
+                "]>\n"
+                "<foo>Hello &name;</foo>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).name == "foo");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getContents() == "Hello John Joe Doe");
+  }
+  SECTION("XML with DTD with entity that is defined externally (file that does not exist).", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version='1.0'?>\n"
+                "<!DOCTYPE foo [\n"
+                "<!ELEMENT foo ANY>\n"
+                "<!ENTITY name SYSTEM \"./testData/unknown.txt\">\n"
+                "]>\n"
+                "<foo>Hello &name;</foo>\n";
+    BufferSource xmlSource(xmlString);
+    REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error: Entity '&name;' source file './testData/unknown.txt' does not exist.");
   }
   SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
   {

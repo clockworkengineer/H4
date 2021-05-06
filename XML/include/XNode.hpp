@@ -133,17 +133,6 @@ namespace H4
         bool isWhiteSpace = true;
     };
     //
-    // EntityReference XNode
-    //
-    // struct XNodeEntityReference : XNode
-    // {
-    // public:
-    //     XNodeEntityReference(const XValue &value, XNodeType nodeType = XNodeType::entity) : XNode(nodeType), value(value)
-    //     {
-    //     }
-    //     XValue value;
-    // };
-    //
     // CDATA XNode
     //
     struct XNodeCDATA : XNode

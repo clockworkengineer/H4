@@ -67,7 +67,6 @@ namespace H4
                     }
                     if (!xNodeDTD->entityMapping[mappedEntityName].internal.empty())
                     {
-
                         names.emplace(mappedEntityName);
                         checkForEntityRecursion(xNodeDTD, xNodeDTD->entityMapping[mappedEntityName].internal, names);
                         names.erase(mappedEntityName);
@@ -84,7 +83,6 @@ namespace H4
     /// <returns></returns>
     void XML::dtdParseTranslateParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource)
     {
-
         while (dtdSource.more())
         {
             std::string translated;
