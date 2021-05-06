@@ -20,6 +20,7 @@ enable_testing()
 set (XML_SOURCES
     ./classes/XML.cpp
     ./classes/XML_parse.cpp
+    ./classes/XML_entity_reference.cpp
     ./classes/XML_dtd_parse.cpp
     ./classes/XML_dtd_validate.cpp
     ./classes/XML_validation.cpp

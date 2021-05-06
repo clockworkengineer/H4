@@ -1,7 +1,7 @@
 //
 // Class: XML
 //
-// Description: XML parser code. All parsing of characrters takes place having
+// Description: XML parser code. All parsing of characters takes place having
 // converted the characters to UTF-32 to make the process easier.
 //
 // Dependencies:   C20++ - Language standard features used.
@@ -73,79 +73,6 @@ namespace H4
             }
         }
         XNodeRef<XNodeContent>(*xNodeElement->elements.back()).content += content;
-    }
-    /// <summary>
-    /// Parse a character reference returning its value.
-    /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
-    /// <returns>Character reference value.</returns>
-    std::string XML::xmlParseCharacterReference(ISource &xmlSource, std::string reference)
-    {
-        char *end;
-        long result = 10;
-        if (reference[0] == 'x')
-        {
-            reference = reference.substr(1);
-            result = 16;
-        }
-        result = std::strtol(reference.c_str(), &end, result);
-        if (*end == '\0')
-        {
-            if (!validChar(result))
-            {
-                throw SyntaxError(xmlSource, "Character reference invalid character.");
-            }
-            return (xmlSource.to_bytes(result));
-        }
-        throw SyntaxError(xmlSource, "Cannot convert character reference.");
-    }
-    /// <summary>
-    /// Parse XML string value representing a character reference or entity.
-    /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
-    /// <returns>Value for reference or enity.</returns>
-    XValue XML::xmlParseReferenceOrEntity(ISource &xmlSource)
-    {
-        XValue entityReference;
-        while (xmlSource.more() && xmlSource.current() != ';')
-        {
-            entityReference.unparsed += xmlSource.current_to_bytes();
-            xmlSource.next();
-        }
-        if (xmlSource.current() != ';')
-        {
-            throw SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
-        }
-        entityReference.unparsed += ';';
-        xmlSource.next();
-        if (entityReference.unparsed[1] == '#')
-        {
-            entityReference.parsed = xmlParseCharacterReference(xmlSource, entityReference.unparsed.substr(2, entityReference.unparsed.size() - 3));
-        }
-        else if (m_entityMapping.count(entityReference.unparsed) > 0)
-        {
-            if (!m_entityMapping[entityReference.unparsed].internal.empty())
-            {
-                entityReference.parsed = m_entityMapping[entityReference.unparsed].internal;
-            }
-            else
-            {
-                if (std::filesystem::exists(m_entityMapping[entityReference.unparsed].external.systemID))
-                {
-                    FileSource entitySource(m_entityMapping[entityReference.unparsed].external.systemID);
-                    while (entitySource.more())
-                    {
-                        entityReference.parsed += entitySource.current_to_bytes();
-                        entitySource.next();
-                    }
-                }
-                else
-                {
-                    throw SyntaxError("Entity '" + entityReference.unparsed + "' source file '" + m_entityMapping[entityReference.unparsed].external.systemID + "' does not exist.");
-                }
-            }
-        }
-        return (entityReference);
     }
     /// <summary>
     /// Parse character value which can be either be a plain character
@@ -366,40 +293,14 @@ namespace H4
     void XML::xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         XValue entityReference = xmlParseCharacter(xmlSource);
-        if (entityReference.unparsed.starts_with("&") && entityReference.unparsed.ends_with(";"))
-        {
-            XNodeEntityReference xNodeEntityReference(entityReference);
-            if ((entityReference.parsed != "&") &&
-                (entityReference.parsed != "\'") &&
-                (entityReference.parsed != "\"") &&
-                (entityReference.parsed != ">") &&
-                (entityReference.parsed != "<"))
-            {
-                XNodeElement entityElement;
-                BufferSource entitySource(entityReference.parsed);
-                while (entitySource.more())
-                {
-                    xmlParseElementContents(entitySource, &entityElement);
-                }
-                xNodeEntityReference.elements = std::move(entityElement.elements);
-            }
-            if (!xNodeElement->elements.empty())
-            {
-                if (xNodeElement->elements.back()->getNodeType() == XNodeType::content)
-                {
-                    XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace = false;
-                }
-            }
-            xNodeElement->elements.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
-        }
-        else
+        if (!xmlEntityMappingParse(xNodeElement, entityReference))
         {
             xmlParseAddElementContent(xNodeElement, entityReference.parsed);
         }
     }
     /// <summary>
-    /// Parse element content area generating any XNodes and adding them to the list
-    /// of the current XNodeElement.
+    /// Parse element content area generating any XNodes and adding them 
+    /// to the list of the current XNodeElement.
     /// </summary>
     /// <param name="xmlSource">XMl source stream.</param>
     /// <returns></returns>
@@ -461,7 +362,10 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse XML prolog and create the necessary XNodeElements for it.
+    /// Parse XML prolog and create the necessary XNodeElements for it. Valid
+    /// parts of the prolog include delaration (first line if present), 
+    /// processing instructions, comments, whitespace content and XML 
+    /// document Type Definition (DTD).
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
@@ -509,7 +413,7 @@ namespace H4
         }
     }
     /// <summary>
-    /// Start parsing XML source stream.
+    /// Parse XML source stream.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
