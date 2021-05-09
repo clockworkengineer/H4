@@ -137,16 +137,16 @@ namespace H4
                 {
                     xmlParseElementContents(entitySource, &entityElement);
                 }
-                xNodeEntityReference.elements = std::move(entityElement.elements);
+                xNodeEntityReference.children = std::move(entityElement.children);
             }
-            if (!xNodeElement->elements.empty())
+            if (!xNodeElement->children.empty())
             {
-                if (xNodeElement->elements.back()->getNodeType() == XNodeType::content)
+                if (xNodeElement->children.back()->getNodeType() == XNodeType::content)
                 {
-                    XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace = false;
+                    XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
                 }
             }
-            xNodeElement->elements.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
+            xNodeElement->children.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
             return (true);
         }
         return (false);

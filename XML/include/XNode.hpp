@@ -114,9 +114,10 @@ namespace H4
         {
             this->nodeType = nodeType;
         }
+        std::string getContents();
         XNode &operator[](int index);
         XNode &operator[](const std::string &name);
-
+        std::vector<std::unique_ptr<XNode>> children;
     private:
         XNodeType nodeType;
     };
@@ -153,27 +154,6 @@ namespace H4
         {
         }
         XValue value;
-        std::vector<std::unique_ptr<XNode>> elements;
-        std::string getContents()
-        {
-            std::string result;
-            for (auto &node : elements)
-            {
-                if (node.get()->getNodeType() == XNodeType::content)
-                {
-                    result += static_cast<XNodeContent *>(node.get())->content;
-                }
-                else if (node.get()->getNodeType() == XNodeType::entity)
-                {
-                    result += static_cast<XNodeEntityReference *>(node.get())->getContents();
-                }
-                else if (node.get()->getNodeType() == XNodeType::cdata)
-                {
-                    result += static_cast<XNodeCDATA *>(node.get())->cdata;
-                }
-            }
-            return (result);
-        }
     };
     //
     // Element XNode
@@ -191,31 +171,6 @@ namespace H4
         std::string name;
         std::vector<XAttribute> attributes;
         std::vector<XAttribute> namespaces;
-        std::vector<std::unique_ptr<XNode>> elements;
-        std::string getContents()
-        {
-            std::string result;
-            for (auto &node : elements)
-            {
-                if (node.get()->getNodeType() == XNodeType::content)
-                {
-                    result += static_cast<XNodeContent *>(node.get())->content;
-                }
-                else if (node.get()->getNodeType() == XNodeType::entity)
-                {
-                    if (!static_cast<XNodeEntityReference *>(node.get())->elements.empty()) {
-                        result += static_cast<XNodeEntityReference *>(node.get())->getContents();
-                    } else {
-                        result += static_cast<XNodeEntityReference *>(node.get())->value.parsed;
-                    }
-                }
-                else if (node.get()->getNodeType() == XNodeType::cdata)
-                {
-                    result += static_cast<XNodeCDATA *>(node.get())->cdata;
-                }
-            }
-            return (result);
-        }
     };
     //
     // Comment XNode
@@ -272,19 +227,9 @@ namespace H4
     //
     inline XNode &XNode::operator[](int index) // Array
     {
-        if (nodeType <= XNodeType::element)
+        if ((index >= 0) && (index < ((int)XNodeRef<XNode>(*this).children.size())))
         {
-            if ((index >= 0) && (index < ((int)XNodeRef<XNodeElement>(*this).elements.size())))
-            {
-                return (*((XNodeRef<XNodeElement>(*this).elements[index].get())));
-            }
-        }
-        else if (nodeType == XNodeType::entity)
-        {
-            if ((index >= 0) && (index < ((int)XNodeRef<XNodeEntityReference>(*this).elements.size())))
-            {
-                return (*((XNodeRef<XNodeEntityReference>(*this).elements[index].get())));
-            }
+            return (*((XNodeRef<XNode>(*this).children[index].get())));
         }
         throw std::runtime_error("Invalid index used to access array.");
     }
@@ -295,7 +240,7 @@ namespace H4
     {
         if (nodeType <= XNodeType::element)
         {
-            for (auto &element : XNodeRef<XNodeElement>(*this).elements)
+            for (auto &element : XNodeRef<XNodeElement>(*this).children)
             {
                 if (XNodeRef<XNodeElement>(*element).name == name)
                 {
@@ -304,6 +249,36 @@ namespace H4
             }
         }
         throw std::runtime_error("Invalid index used to access array.");
+    }
+    //
+    // XNode get contents
+    //
+    inline std::string XNode::getContents()
+    {
+        std::string result;
+        for (auto &node : children)
+        {
+            if (node.get()->getNodeType() == XNodeType::content)
+            {
+                result += static_cast<XNodeContent *>(node.get())->content;
+            }
+            else if (node.get()->getNodeType() == XNodeType::entity)
+            {
+                if (!static_cast<XNodeEntityReference *>(node.get())->children.empty())
+                {
+                    result += static_cast<XNodeEntityReference *>(node.get())->getContents();
+                }
+                else
+                {
+                    result += static_cast<XNodeEntityReference *>(node.get())->value.parsed;
+                }
+            }
+            else if (node.get()->getNodeType() == XNodeType::cdata)
+            {
+                result += static_cast<XNodeCDATA *>(node.get())->cdata;
+            }
+        }
+        return (result);
     }
 } // namespace H4
 #endif /* XNODE_HPP */

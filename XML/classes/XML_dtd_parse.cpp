@@ -920,6 +920,6 @@ namespace H4
             }
         }
         dtdParsePostProcessing(&xNodeDTD);
-        xNodeElement->elements.emplace_back(std::make_unique<XNodeDTD>(xNodeDTD));
+        xNodeElement->children.emplace_back(std::make_unique<XNodeDTD>(std::move(xNodeDTD)));
     }
 } // namespace H4

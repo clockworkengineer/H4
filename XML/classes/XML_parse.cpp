@@ -46,33 +46,33 @@ namespace H4
     void XML::xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content)
     {
         // Make sure there is a content node to recieve characters
-        if (xNodeElement->elements.empty() ||
-            xNodeElement->elements.back()->getNodeType() != XNodeType::content)
+        if (xNodeElement->children.empty() ||
+            xNodeElement->children.back()->getNodeType() != XNodeType::content)
         {
             bool isWWhitespace = true;
-            if (!xNodeElement->elements.empty())
+            if (!xNodeElement->children.empty())
             {
-                if ((xNodeElement->elements.back()->getNodeType() == XNodeType::cdata) ||
-                    (xNodeElement->elements.back()->getNodeType() == XNodeType::entity))
+                if ((xNodeElement->children.back()->getNodeType() == XNodeType::cdata) ||
+                    (xNodeElement->children.back()->getNodeType() == XNodeType::entity))
                 {
                     isWWhitespace = false;
                 }
             }
-            xNodeElement->elements.emplace_back(std::make_unique<XNodeContent>());
-            XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace = isWWhitespace;
+            xNodeElement->children.emplace_back(std::make_unique<XNodeContent>());
+            XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = isWWhitespace;
         }
-        if (XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace)
+        if (XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace)
         {
             for (auto ch : content)
             {
                 if (!std::iswspace(ch))
                 {
-                    XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace = false;
+                    XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
                     break;
                 }
             }
         }
-        XNodeRef<XNodeContent>(*xNodeElement->elements.back()).content += content;
+        XNodeRef<XNodeContent>(*xNodeElement->children.back()).content += content;
     }
     /// <summary>
     /// Parse character value which can be either be a plain character
@@ -181,7 +181,7 @@ namespace H4
         {
             throw SyntaxError(xmlSource, "Missing closing '>' for comment line.");
         }
-        xNodeElement->elements.emplace_back(std::make_unique<XNodeComment>(xNodeComment));
+       xNodeElement->children.emplace_back(std::make_unique<XNodeComment>(std::move(xNodeComment)));
     }
     /// <summary>
     /// Parse a XML process instruction, create an XNode for it and add it to
@@ -198,7 +198,7 @@ namespace H4
             xNodePI.parameters += xmlSource.current_to_bytes();
             xmlSource.next();
         }
-        xNodeElement->elements.emplace_back(std::make_unique<XNodePI>(xNodePI));
+        xNodeElement->children.emplace_back(std::make_unique<XNodePI>(std::move(xNodePI)));
     }
     /// <summary>
     /// Parse an XML CDATA section create an XNode for it and add it to
@@ -218,14 +218,14 @@ namespace H4
             xNodeCDATA.cdata += xmlSource.current_to_bytes();
             xmlSource.next();
         }
-        if (!xNodeElement->elements.empty())
+        if (!xNodeElement->children.empty())
         {
-            if (xNodeElement->elements.back()->getNodeType() == XNodeType::content)
+            if (xNodeElement->children.back()->getNodeType() == XNodeType::content)
             {
-                XNodeRef<XNodeContent>(*xNodeElement->elements.back()).isWhiteSpace = false;
+                XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
             }
         }
-        xNodeElement->elements.emplace_back(std::make_unique<XNodeCDATA>(xNodeCDATA));
+        xNodeElement->children.emplace_back(std::make_unique<XNodeCDATA>(std::move(xNodeCDATA)));
     }
     /// <summary>
     /// Parse list of attributes (name/value pairs) that exist in a tag and add them to
@@ -283,7 +283,7 @@ namespace H4
                 throw SyntaxError(xmlSource, "Namespace used but not defined.");
             }
         }
-        xNodeElement->elements.push_back(std::make_unique<XNodeElement>(std::move(xNodeChildElement)));
+        xNodeElement->children.push_back(std::make_unique<XNodeElement>(std::move(xNodeChildElement)));
     }
     /// <summary>
     /// Parse any element content that is found.
@@ -423,8 +423,8 @@ namespace H4
         xmlParseProlog(xmlSource, &xObject.prolog);
         if (xmlSource.match(U"<"))
         {
-            xObject.prolog.elements.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
-            xmlParseElement(xmlSource, static_cast<XNodeElement *>(xObject.prolog.elements.back().get()));
+            xObject.prolog.children.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
+            xmlParseElement(xmlSource, static_cast<XNodeElement *>(xObject.prolog.children.back().get()));
             while (xmlSource.more())
             {
                 if (xmlSource.match(U"<!--"))

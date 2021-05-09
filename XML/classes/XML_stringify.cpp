@@ -58,7 +58,7 @@ namespace H4
             xmlDestination.add("<?xml version=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[0].value.unparsed + "\"" +
                                " encoding=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[1].value.unparsed + "\"" +
                                " standalone=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[2].value.unparsed + "\"?>");
-            for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
+            for (auto &element : XNodeRef<XNodeElement>((*xNode)).children)
             {
                 stringifyXML(element.get(), xmlDestination);
             }
@@ -75,7 +75,7 @@ namespace H4
                 xmlDestination.add(" " + attr.name+"=\"" + attr.value.unparsed + "\"");
             }
             xmlDestination.add(">");
-            for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
+            for (auto &element : XNodeRef<XNodeElement>((*xNode)).children)
             {
                 stringifyXML(element.get(), xmlDestination);
             }

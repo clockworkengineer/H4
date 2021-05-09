@@ -49,7 +49,7 @@ namespace H4
     /// <returns></returns>
     bool XML::dtdVadlidateIsPCDATA(XNodeElement *xNodeElement)
     {
-        for (auto &element : xNodeElement->elements)
+        for (auto &element : xNodeElement->children)
         {
             if ((XNodeRef<XNode>(*element).getNodeType() == XNodeType::element) ||
                 (XNodeRef<XNode>(*element).getNodeType() == XNodeType::self))
@@ -66,7 +66,7 @@ namespace H4
     /// <returns></returns>
     bool XML::dtdValidateIsEMPTY(XNodeElement *xNodeElement)
     {
-        return (xNodeElement->elements.empty() || xNodeElement->getNodeType() == XNodeType::self);
+        return (xNodeElement->children.empty() || xNodeElement->getNodeType() == XNodeType::self);
     }
     /// <summary>
     ///
@@ -228,7 +228,7 @@ namespace H4
         }
         std::regex match(dtd->elements[xNodeElement->name].content.parsed);
         std::string elements;
-        for (auto &element : xNodeElement->elements)
+        for (auto &element : xNodeElement->children)
         {
             if ((XNodeRef<XNode>(*element).getNodeType() == XNodeType::element) ||
                 (XNodeRef<XNode>(*element).getNodeType() == XNodeType::self))
@@ -269,7 +269,7 @@ namespace H4
         switch (xNode->getNodeType())
         {
         case XNodeType::prolog:
-            for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
+            for (auto &element : XNodeRef<XNodeElement>((*xNode)).children)
             {
                 dtdVadlidateElements(dtd, element.get());
             }
@@ -281,7 +281,7 @@ namespace H4
             }
         case XNodeType::element:
             dtdValidateElement(dtd, static_cast<XNodeElement *>(xNode));
-            for (auto &element : XNodeRef<XNodeElement>((*xNode)).elements)
+            for (auto &element : XNodeRef<XNodeElement>((*xNode)).children)
             {
                 dtdVadlidateElements(dtd, element.get());
             }
@@ -318,7 +318,7 @@ namespace H4
         if (xNode->getNodeType() == XNodeType::prolog)
         {
             XNodeDTD *dtd;
-            for (auto &element : XNodeRef<XNodeElement>(*xNode).elements)
+            for (auto &element : XNodeRef<XNodeElement>(*xNode).children)
             {
                 if (element->getNodeType() == XNodeType::dtd)
                 {

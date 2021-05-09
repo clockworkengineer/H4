@@ -215,7 +215,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).children.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).name == "contact-info");
   }
   SECTION("Empty root element <AddressBook> ", "[XML][Parse][Root]")
@@ -227,7 +227,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).children.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).name == "AddressBook");
   }
   SECTION("Root element <AddressBook> and one child <Address> with contents ", "[XML][Parse][Root]")
@@ -242,7 +242,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).children.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1][1]).name == "Address");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1][1]).getContents() == "    This is some contents    ");
   }
@@ -266,7 +266,7 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).elements.size() == 7);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).children.size() == 7);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1][1]).name == "Address");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1][1]).getContents() == "\n    This is some contents 1   ");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1][3]).name == "Address");
@@ -310,7 +310,7 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).children.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).attributes[0].name == "number");
@@ -326,7 +326,7 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[0].value.parsed == "1.0");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).elements.size() == 3);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).children.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).attributes.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).attributes[0].name == "number");
@@ -392,7 +392,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[1].value.parsed == "UTF-8");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog).attributes[2].value.parsed == "no");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).elements.size() == 13);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1]).children.size() == 13);
     REQUIRE(XNodeRef<XNodeComment>(xmlObject.prolog[1][1]).comment == "Address one ");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1][3]).name == "Address");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[1][3]).getContents() == "    This is some contents 1   ");
