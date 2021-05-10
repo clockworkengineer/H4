@@ -523,13 +523,13 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_NOTHROW(xml.validate(xmlObject));
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getNodeType() == XNodeType::root);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes[0].name == "number");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes[0].value.parsed == "2001");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes[0].name == "number");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes[0].value.parsed == "2001");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0]).getNodeType() == XNodeType::root);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][1]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][1]).attributes[0].value.parsed == "2001");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][2]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][2]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][2]).attributes[0].value.parsed == "2001");
   }
   SECTION("XML with a DTD that specifies an element attribute that has a default value if it is not defined. ", "[XML][DTD][Validate][Attribute]")
   {
@@ -550,13 +550,13 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_NOTHROW(xml.validate(xmlObject));
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3]).getNodeType() == XNodeType::root);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes[0].name == "number");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes[0].value.parsed == "2002");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes[0].name == "number");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][5]).attributes[0].value.parsed == "2001");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0]).getNodeType() == XNodeType::root);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][1]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][1]).attributes[0].value.parsed == "2002");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][2]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][2]).attributes[0].name == "number");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][2]).attributes[0].value.parsed == "2001");
   }
   SECTION("Validate XML with DTD that cotains a enumeration attribute gender with a default value if 'F'.", "[XML][Valid][DTD]")
   {
@@ -576,22 +576,22 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     BufferSource xmlSource(xmlString);
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE_NOTHROW(xml.validate(xmlObject));
-    REQUIRE(XNodeRef<XNode>(xmlObject.prolog[1]).getNodeType() == XNodeType::dtd);
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements.contains("person") == true);
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes[0].name == "gender");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes[0].type == "(M|F)");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).elements["person"].attributes[0].value.parsed == "F");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == "queue");
-    REQUIRE(XNodeRef<XNodeDTD>(xmlObject.prolog[1]).name == XNodeRef<XNodeElement>(xmlObject.prolog[3]).name);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][1]).name == "person");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][1]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][1]).attributes[0].name == "gender");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][1]).attributes[0].value.parsed == "M");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).name == "person");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes[0].name == "gender");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[3][3]).attributes[0].value.parsed == "F");
+    REQUIRE(XNodeRef<XNode>(*xmlObject.prolog.children[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>(*xmlObject.prolog.children[1]).elements.contains("person") == true);
+    REQUIRE(XNodeRef<XNodeDTD>(*xmlObject.prolog.children[1]).elements["person"].attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeDTD>(*xmlObject.prolog.children[1]).elements["person"].attributes[0].name == "gender");
+    REQUIRE(XNodeRef<XNodeDTD>(*xmlObject.prolog.children[1]).elements["person"].attributes[0].type == "(M|F)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xmlObject.prolog.children[1]).elements["person"].attributes[0].value.parsed == "F");
+    REQUIRE(XNodeRef<XNodeDTD>(*xmlObject.prolog.children[1]).name == "queue");
+    REQUIRE(XNodeRef<XNodeDTD>(*xmlObject.prolog.children[1]).name == XNodeRef<XNodeElement>(xmlObject.prolog[0]).name);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][0]).name == "person");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][0]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][0]).attributes[0].name == "gender");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][0]).attributes[0].value.parsed == "M");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][1]).name == "person");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][1]).attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][1]).attributes[0].name == "gender");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][1]).attributes[0].value.parsed == "F");
   }
   SECTION("Validate XML with DTD that cotains a enumeration attribute gender that is not valid.", "[XML][Valid][DTD]")
   {

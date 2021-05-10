@@ -118,6 +118,7 @@ namespace H4
         XNode &operator[](int index);
         XNode &operator[](const std::string &name);
         std::vector<std::unique_ptr<XNode>> children;
+
     private:
         XNodeType nodeType;
     };
@@ -168,6 +169,8 @@ namespace H4
         {
             this->name = name;
         }
+        XNodeElement &operator[](int index);
+        XNodeElement &operator[](const std::string &name);
         std::string name;
         std::vector<XAttribute> attributes;
         std::vector<XAttribute> namespaces;
@@ -222,6 +225,11 @@ namespace H4
     {
         return (static_cast<T &>(xNode));
     }
+    // template <typename T>
+    // T &XNodeRef(std::unique_ptr<XNode> &xNode)
+    // {
+    //     return (static_cast<T &>(*xNode.get()));
+    // }
     //
     // XNode index access
     //
@@ -245,6 +253,45 @@ namespace H4
                 if (XNodeRef<XNodeElement>(*element).name == name)
                 {
                     return (*element);
+                }
+            }
+        }
+        throw std::runtime_error("Invalid index used to access array.");
+    }
+    //
+    // XNodeElement index access
+    //
+    inline XNodeElement &XNodeElement::operator[](int index) // Array
+    {
+        int number = 0;
+        if ((index >= 0) && (index < ((int)XNodeRef<XNodeElement>(*this).children.size())))
+        {
+            for (auto &child : XNodeRef<XNode>(*this).children)
+            {
+                if (XNodeRef<XNode>(*child).getNodeType() <= XNodeType::element)
+                {
+                    if (number == index)
+                    {
+                        return (XNodeRef<XNodeElement>(*child));
+                    }
+                    number++;
+                }
+            }
+        }
+        throw std::runtime_error("Invalid index used to access array.");
+    }
+    //
+    // XNodeElement name access
+    //
+    inline XNodeElement &XNodeElement::operator[](const std::string &name) // Array
+    {
+        if (getNodeType() <= XNodeType::element)
+        {
+            for (auto &element : XNodeRef<XNodeElement>(*this).children)
+            {
+                if (XNodeRef<XNodeElement>(*element).name == name)
+                {
+                    return (XNodeRef<XNodeElement>(*element));
                 }
             }
         }
