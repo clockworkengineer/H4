@@ -122,14 +122,11 @@ namespace H4
     /// <returns></returns>
     bool XML::xmlEntityMappingParse(XNodeElement *xNodeElement, XValue &entityReference)
     {
-        if (entityReference.unparsed.starts_with("&") && entityReference.unparsed.ends_with(";"))
+        if (entityReference.unparsed.starts_with("&") &&
+            entityReference.unparsed.ends_with(";"))
         {
             XNodeEntityReference xNodeEntityReference(entityReference);
-            if ((entityReference.parsed != "&") &&
-                (entityReference.parsed != "\'") &&
-                (entityReference.parsed != "\"") &&
-                (entityReference.parsed != ">") &&
-                (entityReference.parsed != "<"))
+            if (entityReference.unparsed[1] != '#')
             {
                 XNodeElement entityElement;
                 BufferSource entitySource(entityReference.parsed);
@@ -138,12 +135,12 @@ namespace H4
                     xmlParseElementContents(entitySource, &entityElement);
                 }
                 xNodeEntityReference.children = std::move(entityElement.children);
-            }
-            if (!xNodeElement->children.empty())
-            {
-                if (xNodeElement->children.back()->getNodeType() == XNodeType::content)
+                if (!xNodeElement->children.empty())
                 {
-                    XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
+                    if (xNodeElement->children.back()->getNodeType() == XNodeType::content)
+                    {
+                        XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
+                    }
                 }
             }
             xNodeElement->children.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));

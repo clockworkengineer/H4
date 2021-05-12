@@ -52,10 +52,10 @@ namespace H4
     void XML::initialiseTables()
     {
         // Default entity mappings
-        m_entityMapping["&amp;"].internal = "&";
+        m_entityMapping["&amp;"].internal = "&#x26;";
         m_entityMapping["&quot;"].internal = "\"";
         m_entityMapping["&apos;"].internal = "\'";
-        m_entityMapping["&lt;"].internal = "<";
+        m_entityMapping["&lt;"].internal = "&#x3C;";
         m_entityMapping["&gt;"].internal = ">";
         // DTD attribute list type tokens
         // Make sure longer possible matches are first

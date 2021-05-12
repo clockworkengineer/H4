@@ -89,18 +89,19 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][4]).name == "footer");
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][4]).getContents() == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
-  // SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 1)", "[XML][Parse][DTD]")
-  // {
-  //   xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-  //               "<!DOCTYPE note [\n"
-  //               "<!ENTITY example \"<p>An ampersand (&#38;#38;) may be escaped numerically (&#38;#38;#38;) or with a general entity (&amp;amp;).</p>\">]>\n"
-  //               "<note>&example;</note>\n";
-  //   BufferSource xmlSource(xmlString);
-  //   XMLObject xmlObject = xml.parse(xmlSource);
-  //   REQUIRE(XNodeRef<XNode>(*xmlObject.prolog.children[1]).getNodeType() == XNodeType::dtd);
-  //   REQUIRE(XNodeRef<XNodeDTD>(*xmlObject.prolog.children[1]).entityMapping["&example;"].internal == "<p>An ampersand (&#38;) may be escaped numerically (&#38;#38;) or with a general entity (&amp;amp;).</p>");
-  //   REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0]).getContents() == "An ampersand (&) may be escaped numerically (&#38;) or with a general entity (&amp;).");
-  // }
+  SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 1)", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                "<!DOCTYPE note [\n"
+                "<!ENTITY example \"<p>An ampersand (&#38;#38;) may be escaped numerically (&#38;#38;#38;) or with a general entity (&amp;amp;).</p>\">]>\n"
+                "<note>&example;</note>\n";
+    BufferSource xmlSource(xmlString);
+    XMLObject xmlObject = xml.parse(xmlSource);
+    REQUIRE(XNodeRef<XNode>(*xmlObject.prolog.children[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XNodeRef<XNodeDTD>(*xmlObject.prolog.children[1]).entityMapping["&example;"].internal == "<p>An ampersand (&#38;) may be escaped numerically (&#38;#38;) or with a general entity (&amp;amp;).</p>");
+    //REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][0]).name == "p"); 
+    //REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0][0]).getContents() == "An ampersand (&) may be escaped numerically (&#38;) or with a general entity (&amp;).");
+  }
   SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 2)", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version='1.0'?>\n"

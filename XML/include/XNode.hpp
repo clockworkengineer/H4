@@ -225,11 +225,6 @@ namespace H4
     {
         return (static_cast<T &>(xNode));
     }
-    // template <typename T>
-    // T &XNodeRef(std::unique_ptr<XNode> &xNode)
-    // {
-    //     return (static_cast<T &>(*xNode.get()));
-    // }
     //
     // XNode index access
     //
@@ -305,24 +300,24 @@ namespace H4
         std::string result;
         for (auto &node : children)
         {
-            if (node.get()->getNodeType() == XNodeType::content)
+            if (node->getNodeType() == XNodeType::content)
             {
-                result += static_cast<XNodeContent *>(node.get())->content;
+                result += XNodeRef<XNodeContent>(*node).content;
             }
-            else if (node.get()->getNodeType() == XNodeType::entity)
+            else if (node->getNodeType() == XNodeType::entity)
             {
-                if (!static_cast<XNodeEntityReference *>(node.get())->children.empty())
+                if (!XNodeRef<XNodeEntityReference>(*node).children.empty())
                 {
-                    result += static_cast<XNodeEntityReference *>(node.get())->getContents();
+                    result += XNodeRef<XNodeEntityReference>(*node).getContents();
                 }
                 else
                 {
-                    result += static_cast<XNodeEntityReference *>(node.get())->value.parsed;
+                    result += XNodeRef<XNodeEntityReference>(*node).value.parsed;
                 }
             }
-            else if (node.get()->getNodeType() == XNodeType::cdata)
+            else if (node->getNodeType() == XNodeType::cdata)
             {
-                result += static_cast<XNodeCDATA *>(node.get())->cdata;
+                result += XNodeRef<XNodeCDATA>(*node).cdata;
             }
         }
         return (result);
