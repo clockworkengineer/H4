@@ -533,7 +533,7 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     XMLObject xmlObject = xml.parse(xmlSource);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0]).attributes.size() == 1);
     REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0]).attributes[0].name == "attr1");
-    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0]).attributes[0].value.parsed == " &\"'>< ");
+    REQUIRE(XNodeRef<XNodeElement>(xmlObject.prolog[0]).attributes[0].value.parsed == " &#x26;\"\'>&#x3C; ");
   }
   SECTION("Parse references &#x00A5;&#163 in attribute value", "[XML][Parse][Entities]")
   {
