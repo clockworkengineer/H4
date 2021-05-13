@@ -77,18 +77,18 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XMLsource stream.</param>
     /// <returns>XMLObject that represents the parsed XML.</returns>
-    XMLObject XML::parse(ISource &xmlSource)
+    void XML::parse()
     {
-        return (xmlParse(xmlSource));
+        xmlParse();
     }
     /// <summary>
     ///
     /// </summary>
     /// <param name="xmlObject">XML object to validate.</param>
     /// <returns></returns>
-    void XML::validate(XMLObject &xmlObject)
+    void XML::validate()
     {
-        dtdValidateXML(&xmlObject.prolog);
+        dtdValidateXML(&prolog);
     }
     /// <summary>
     /// Create XML text for an XMLObject.
@@ -96,8 +96,8 @@ namespace H4
     /// <param name="xmlObject">XML object to create text for.</param>
     /// <param name="xmlDestination">XML destination stream.</param>
     /// <returns>XML text for XMLObject.</returns>
-    void XML::stringify(XMLObject &xmlObject, IDestination &xmlDestination)
+    void XML::stringify(IDestination &xmlDestination)
     {
-        stringifyXML(&xmlObject.prolog, xmlDestination);
+        stringifyXML(&prolog, xmlDestination);
     }
 } // namespace H4

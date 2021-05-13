@@ -417,23 +417,23 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    XMLObject XML::xmlParse(ISource &xmlSource)
+    void XML::xmlParse()
     {
-        XMLObject xObject;
-        xmlParseProlog(xmlSource, &xObject.prolog);
+        // XMLObject xObject;
+        xmlParseProlog(xmlSource, &prolog);
         if (xmlSource.match(U"<"))
         {
-            xObject.prolog.children.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
-            xmlParseElement(xmlSource, static_cast<XNodeElement *>(xObject.prolog.children.back().get()));
+            prolog.children.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
+            xmlParseElement(xmlSource, static_cast<XNodeElement *>(prolog.children.back().get()));
             while (xmlSource.more())
             {
                 if (xmlSource.match(U"<!--"))
                 {
-                    xmlParseComment(xmlSource, (&xObject.prolog));
+                    xmlParseComment(xmlSource, (&prolog));
                 }
                 else if (std::iswspace(xmlSource.current()))
                 {
-                    xmlParseAddElementContent(&xObject.prolog, std::string(1, xmlSource.current()));
+                    xmlParseAddElementContent(&prolog, std::string(1, xmlSource.current()));
                     xmlSource.next();
                 }
                 else
@@ -446,6 +446,5 @@ namespace H4
         {
             throw SyntaxError(xmlSource, "Missing root element.");
         }
-        return (xObject);
     }
 } // namespace H4

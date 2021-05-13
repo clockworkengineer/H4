@@ -155,18 +155,18 @@ namespace H4
         //
         // XObject
         //
-        struct XMLObject
-        {
-            XMLObject()
-            {
-                prolog.setNodeType(XNodeType::prolog);
-            }
-            XNodeElement prolog;
-        };
+        // struct XMLObject
+        // {
+        //     XMLObject()
+        //     {
+        //         prolog.setNodeType(XNodeType::prolog);
+        //     }
+        //     // XNodeElement prolog;
+        // };
         // ============
         // CONSTRUCTORS
         // ============
-        XML()
+        XML(ISource &xmlSource) : xmlSource(xmlSource)
         {
             initialiseTables();
         }
@@ -176,12 +176,15 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        XMLObject parse(ISource &xmlSource);
-        void stringify(XMLObject &xmlObject, IDestination &xmlDestination);
-        void validate(XMLObject &xmlObject);
+        void parse();
+        void stringify(IDestination &xmlDestination);
+        void validate();
         // ================
         // PUBLIC VARIABLES
         // ================
+        std::unordered_map<std::string, XEntityMapping> m_entityMapping;
+        XNodeElement prolog;
+        ISource &xmlSource;
     private:
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
@@ -254,18 +257,18 @@ namespace H4
         void xmlParseElement(ISource &xmlSource, XNodeElement *XNodeElement);
         void xmlParseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
         void dtdValidateXML(XNode *xNodeRoot);
-        XMLObject xmlParse(ISource &xmlSource);
+        void xmlParse();
         void stringifyXML(XNode *xNodeRoot, IDestination &xmlDestination);
         // =================
         // PRIVATE VARIABLES
         // =================
         static XAttribute m_defaultAtributes[3];
         static std::vector<XString> m_dtdAttrListTypes;
-        std::unordered_map<std::string, XEntityMapping> m_entityMapping;
+        // std::unordered_map<std::string, XEntityMapping> m_entityMapping;
     };
     //
     // Shortcuts
     //
-    using XMLObject = XML::XMLObject;
+    // using XMLObject = XML::XMLObject;
 } // namespace H4
 #endif /* XML_HPP */
