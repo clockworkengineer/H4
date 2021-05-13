@@ -45,10 +45,10 @@ namespace H4
             {
                 errorMessage = "XML Syntax Error: " + description;
             }
-            SyntaxError(ISource &source, const std::string &description = "")
+            SyntaxError(ISource &xmlSource, const std::string &description = "")
             {
-                errorMessage = "XML Syntax Error [Line: " + std::to_string(source.getLineNo()) +
-                               " Column: " + std::to_string(source.getColumnNo()) + "] " + description;
+                errorMessage = "XML Syntax Error [Line: " + std::to_string(xmlSource.getLineNo()) +
+                               " Column: " + std::to_string(xmlSource.getColumnNo()) + "] " + description;
             }
             virtual const char *what() const throw()
             {
@@ -232,7 +232,7 @@ namespace H4
         XExternalReference dtdParseExternalReference(ISource &xmlSource);
         std::string dtdParseAttributeType(ISource &xmlSource);
         XValue dtdParseAttributeValue(ISource &xmlSource);
-        void dtdParseComment(ISource &source, XNodeDTD *xNodeDTD);
+        void dtdParseComment(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void dtdParseParameterEntity(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void dtdParseExternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void dtdParseInternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
@@ -241,8 +241,8 @@ namespace H4
         std::string xmlParseName(ISource &xmlSource);
         std::string xmlParseCharacterReference(ISource &xmlSource, std::string reference);
         XValue xmlParseValue(ISource &xmlSource, bool translateEntity = true);
-        XValue xmlParseCharacter(ISource &source);
-        XValue xmlParseReferenceOrEntity(ISource &source);
+        XValue xmlParseCharacter(ISource &xmlSource);
+        XValue xmlParseReferenceOrEntity(ISource &xmlSource);
         void xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
         void xmlParseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
         void xmlParseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);
