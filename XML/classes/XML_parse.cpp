@@ -371,6 +371,7 @@ namespace H4
     /// <returns></returns>
     void XML::xmlParseProlog(ISource &xmlSource, XNodeElement *xNodeProlog)
     {
+        xNodeProlog->setNodeType(XNodeType::prolog);
         xmlSource.ignoreWS();
         if (xmlSource.match(U"<?xml"))
         {
@@ -415,36 +416,34 @@ namespace H4
     /// <summary>
     /// Parse XML source stream.
     /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::xmlParse()
     {
-        // XMLObject xObject;
-        xmlParseProlog(xmlSource, &prolog);
-        if (xmlSource.match(U"<"))
+        xmlParseProlog(m_xmlSource, &m_prolog);
+        if (m_xmlSource.match(U"<"))
         {
-            prolog.children.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
-            xmlParseElement(xmlSource, static_cast<XNodeElement *>(prolog.children.back().get()));
-            while (xmlSource.more())
+            m_prolog.children.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
+            xmlParseElement(m_xmlSource, static_cast<XNodeElement *>(m_prolog.children.back().get()));
+            while (m_xmlSource.more())
             {
-                if (xmlSource.match(U"<!--"))
+                if (m_xmlSource.match(U"<!--"))
                 {
-                    xmlParseComment(xmlSource, (&prolog));
+                    xmlParseComment(m_xmlSource, (&m_prolog));
                 }
-                else if (std::iswspace(xmlSource.current()))
+                else if (std::iswspace(m_xmlSource.current()))
                 {
-                    xmlParseAddElementContent(&prolog, std::string(1, xmlSource.current()));
-                    xmlSource.next();
+                    xmlParseAddElementContent(&m_prolog, std::string(1, m_xmlSource.current()));
+                    m_xmlSource.next();
                 }
                 else
                 {
-                    throw SyntaxError(xmlSource, "Extra content at the end of document.");
+                    throw SyntaxError(m_xmlSource, "Extra content at the end of document.");
                 }
             }
         }
         else
         {
-            throw SyntaxError(xmlSource, "Missing root element.");
+            throw SyntaxError(m_xmlSource, "Missing root element.");
         }
     }
 } // namespace H4

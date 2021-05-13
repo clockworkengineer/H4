@@ -313,12 +313,12 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::dtdValidateXML(XNode *xNode)
+    void XML::dtdValidateXML()
     {
-        if (xNode->getNodeType() == XNodeType::prolog)
+        if (m_prolog.getNodeType() == XNodeType::prolog)
         {
             XNodeDTD *dtd;
-            for (auto &element : XNodeRef<XNodeElement>(*xNode).children)
+            for (auto &element : m_prolog.children)
             {
                 if (element->getNodeType() == XNodeType::dtd)
                 {
@@ -328,7 +328,7 @@ namespace H4
             }
             if (dtd != nullptr)
             {
-                dtdVadlidateElements(dtd, xNode);
+                dtdVadlidateElements(dtd, &m_prolog);
                 for (auto &idref : dtd->assignedIDREFValues)
                 {
                     if (!dtd->assignedIDValues.contains(idref))

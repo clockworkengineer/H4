@@ -48,7 +48,7 @@ namespace H4
     /// </summary>
     /// <param name="xNodeRoot">XML XNode root to convert into XML.</param>
     /// <returns></returns>
-    void XML::stringifyXML(XNode *xNode, IDestination &xmlDestination)
+    void XML::stringifyElements(XNode *xNode, IDestination &xmlDestination)
     {
         switch (xNode->getNodeType())
         {
@@ -60,7 +60,7 @@ namespace H4
                                " standalone=\"" + XNodeRef<XNodeElement>((*xNode)).attributes[2].value.unparsed + "\"?>");
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).children)
             {
-                stringifyXML(element.get(), xmlDestination);
+                stringifyElements(element.get(), xmlDestination);
             }
             break;
         }
@@ -72,12 +72,12 @@ namespace H4
             xmlDestination.add("<" + xNodeElement->name);
             for (auto attr : xNodeElement->attributes)
             {
-                xmlDestination.add(" " + attr.name+"=\"" + attr.value.unparsed + "\"");
+                xmlDestination.add(" " + attr.name + "=\"" + attr.value.unparsed + "\"");
             }
             xmlDestination.add(">");
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).children)
             {
-                stringifyXML(element.get(), xmlDestination);
+                stringifyElements(element.get(), xmlDestination);
             }
             xmlDestination.add("</" + xNodeElement->name + ">");
             break;
@@ -89,7 +89,7 @@ namespace H4
             xmlDestination.add("<" + xNodeElement->name);
             for (auto attr : xNodeElement->attributes)
             {
-                xmlDestination.add(" " + attr.name+"=\"" + attr.value.unparsed + "\"");
+                xmlDestination.add(" " + attr.name + "=\"" + attr.value.unparsed + "\"");
             }
             xmlDestination.add("/>");
             break;
@@ -139,5 +139,15 @@ namespace H4
         default:
             throw std::runtime_error("Invalid XNode encountered during stringify.");
         }
+    }
+    /// <summary>
+    /// Recursively parse XNode root passed in to produce XML output on an XML
+    /// destination stream in UTF-8 encoding.
+    /// </summary>
+    /// <param name="xNodeRoot">XML XNode root to convert into XML.</param>
+    /// <returns></returns>
+    void XML::stringifyXML(IDestination &xmlDestination)
+    {
+        stringifyElements(&m_prolog, xmlDestination);
     }
 } // namespace H4

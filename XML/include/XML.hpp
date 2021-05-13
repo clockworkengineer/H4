@@ -152,21 +152,10 @@ namespace H4
         protected:
             std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
         };
-        //
-        // XObject
-        //
-        // struct XMLObject
-        // {
-        //     XMLObject()
-        //     {
-        //         prolog.setNodeType(XNodeType::prolog);
-        //     }
-        //     // XNodeElement prolog;
-        // };
         // ============
         // CONSTRUCTORS
         // ============
-        XML(ISource &xmlSource) : xmlSource(xmlSource)
+        XML(ISource &xmlSource) : m_xmlSource(xmlSource)
         {
             initialiseTables();
         }
@@ -182,9 +171,8 @@ namespace H4
         // ================
         // PUBLIC VARIABLES
         // ================
-        std::unordered_map<std::string, XEntityMapping> m_entityMapping;
-        XNodeElement prolog;
-        ISource &xmlSource;
+        XNodeElement m_prolog;
+
     private:
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
@@ -195,7 +183,7 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-
+        void stringifyElements(XNode *xNode, IDestination &xmlDestination);
         void checkForEntityRecursion(XNodeDTD *xNodeDTD, const std::string &entityName, std::set<std::string> names = {});
         std::vector<std::string> split(std::string strToSplit, char delimeter);
         void dtdParseParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource);
@@ -256,19 +244,16 @@ namespace H4
         void xmlParseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
         void xmlParseElement(ISource &xmlSource, XNodeElement *XNodeElement);
         void xmlParseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
-        void dtdValidateXML(XNode *xNodeRoot);
+        void dtdValidateXML();
         void xmlParse();
-        void stringifyXML(XNode *xNodeRoot, IDestination &xmlDestination);
+        void stringifyXML(IDestination &xmlDestination);
         // =================
         // PRIVATE VARIABLES
         // =================
         static XAttribute m_defaultAtributes[3];
         static std::vector<XString> m_dtdAttrListTypes;
-        // std::unordered_map<std::string, XEntityMapping> m_entityMapping;
+        std::unordered_map<std::string, XEntityMapping> m_entityMapping;
+        ISource &m_xmlSource;
     };
-    //
-    // Shortcuts
-    //
-    // using XMLObject = XML::XMLObject;
 } // namespace H4
 #endif /* XML_HPP */
