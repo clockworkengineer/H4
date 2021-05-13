@@ -495,39 +495,25 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     xmlSource.backup(1);
     REQUIRE(xmlSource.current() == '>');
   }
-  // SECTION("Check that BufferSource is reporting correct line/column number in an error.", "[XML][Parse][BufferSource]")
-  // {
-  //   xmlString = "\r\n<!DOCTYPE REPORT [\r\n"
-  //               "<!ELEMENT REPORT (TITLE,(SECTION|SHORTSECT)+)>\r\n"
-  //               "<!ELEMENT SECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
-  //               "<!ELEMENT SUBSECTION (TITLE,%BODY;,SUBSECTION*)>\r\n"
-  //               "<!ELEMENT SHORTSECT (TITLE,%BODY;)>\r\n"
-  //               "<!ELEMENT TITLE %TEXT;>\r\n"
-  //               "<!ELEMENT PARA %TEXT;>\r\n"
-  //               "<!ELEMENT LIST (ITEM)+>\r\n"
-  //               "<!ELEMENT ITEM (%BLOCK;)>\r\n"
-  //               "<!ELEMENT CODE (#PCDATA)>\r\n"
-  //               "<!ELEMENT KEYWORD (#PCDATA)>\r\n"
-  //               "<!ELEMEN EXAMPLE (TITLE?,%BLOCK;)>\r\n"
-  //               "<!ELEMENT GRAPHIC EMPTY>\r\n"
-  //               "<!ATTLIST REPORT security (high | medium | low ) \"low\">\r\n"
-  //               "<!ATTLIST CODE type CDATA #IMPLIED>\r\n"
-  //               "<!ATTLIST GRAPHIC file ENTITY #REQUIRED>\r\n"
-  //               "<!ENTITY xml \"Extensible Markup Language\">\r\n"
-  //               "<!ENTITY sgml \"Standard Generalized Markup Language\">\r\n"
-  //               "<!ENTITY pxa \"Professional XML Authoring\">\r\n"
-  //               "<!ENTITY % TEXT \"(#PCDATA|CODE|KEYWORD|QUOTATION)*\">\r\n"
-  //               "<!ENTITY % BLOCK \"(PARA|LIST)+\">\r\n"
-  //               "<!ENTITY % BODY \"(%BLOCK;|EXAMPLE|NOTE)+\">\r\n"
-  //               "<!NOTATION GIF SYSTEM \"\">\r\n"
-  //               "<!NOTATION JPG SYSTEM \"\">\r\n"
-  //               "<!NOTATION BMP SYSTEM \"\">\r\n"
-  //               "]>\r\n"
-  //               "<REPORT> </REPORT>\r\n";
-  //   BufferSource xmlSource(xmlString);
-  //   XML xml;
-  //   REQUIRE_THROWS_WITH(xml.parse(xmlSource), "XML Syntax Error [Line: 12 Column: 18] Invalid DTD tag.");
-  // }
+  SECTION("Check that BufferSource is reporting correct line/column number in an error.", "[XML][Parse][BufferSource]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE queue ["
+                "<!ELEMENT queue (person)+>\n"
+                "<!ELEMENT person (firstName, lastName, nationality)>\n"
+                "<!ELEMENT firstName (#PCDATA)>\n"
+                "<!ELEMENT lastName (#PCDATA)>\n"
+                "<!ELEMENT nationality (#PCDATA)\n"
+                "<!ATTLIST person gender ( M | F | F) \"M\">\n"
+                "]>\n"
+                "<queue>\n"
+                "<person gender=\"M\"><firstName>Andrew</firstName><lastName>Robinson</lastName><nationality>english</nationality></person>\n"
+                "<person><firstName>Jane</firstName><lastName>Smith</lastName><nationality>english</nationality></person>\n"
+                "</queue>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 7 Column: 2] Missing '>' terminator.");
+  }
   SECTION("Check that BufferSource position() and getRange works correctly.", "[XML][Parse][BufferSource]")
   {
     xmlString = "<root>Match1    Match2 2hctam        MMAATTCCHHHH4 &</root>";

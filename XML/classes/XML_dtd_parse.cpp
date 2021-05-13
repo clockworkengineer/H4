@@ -65,10 +65,10 @@ namespace H4
                     {
                         throw SyntaxError("Entity '" + mappedEntityName + "' contains recursive definition which is not allowed.");
                     }
-                    if (!xNodeDTD->entityMapping[mappedEntityName].internal.empty())
+                    if (!m_entityMapping[mappedEntityName].internal.empty())
                     {
                         names.emplace(mappedEntityName);
-                        checkForEntityRecursion(xNodeDTD, xNodeDTD->entityMapping[mappedEntityName].internal, names);
+                        checkForEntityRecursion(xNodeDTD, m_entityMapping[mappedEntityName].internal, names);
                         names.erase(mappedEntityName);
                     }
                 }
@@ -264,13 +264,13 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    std::string XML::dtdParseTranslateParameterEntities(XNodeDTD *xNodeDTD, const std::string &parameterEntities)
+    std::string XML::dtdParseTranslateParameterEntities(XNodeDTD */*xNodeDTD*/, const std::string &parameterEntities)
     {
         std::string result = parameterEntities;
         while (result.find('%') != std::string::npos)
         {
             bool noMatch = true;
-            for (auto entity : xNodeDTD->entityMapping)
+            for (auto entity : m_entityMapping)
             {
                 size_t pos = result.find(entity.first);
                 if (pos != std::string::npos)
@@ -582,7 +582,7 @@ namespace H4
                 }
             }
         }
-        for (auto &entityName : xNodeDTD->entityMapping)
+        for (auto &entityName : m_entityMapping)
         {
             std::set<std::string> names{entityName.first};
             checkForEntityRecursion(xNodeDTD, entityName.first);
@@ -730,7 +730,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::dtdParseEntity(ISource &xmlSource, XNodeDTD *xNodeDTD)
+    void XML::dtdParseEntity(ISource &xmlSource, XNodeDTD */*xNodeDTD*/)
     {
         std::string entityName = "&";
         xmlSource.ignoreWS();
@@ -745,7 +745,7 @@ namespace H4
         {
             XValue entityValue = xmlParseValue(xmlSource, false);
             m_entityMapping[entityName].internal = entityValue.parsed;
-            xNodeDTD->entityMapping[entityName].internal = entityValue.parsed;
+          //  xNodeDTD->entityMapping[entityName].internal = entityValue.parsed;
         }
         else
         {

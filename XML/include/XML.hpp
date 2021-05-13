@@ -172,7 +172,7 @@ namespace H4
         // PUBLIC VARIABLES
         // ================
         XNodeElement m_prolog;
-
+        std::unordered_map<std::string, XEntityMapping> m_entityMapping;
     private:
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
@@ -252,7 +252,6 @@ namespace H4
         // =================
         static XAttribute m_defaultAtributes[3];
         static std::vector<XString> m_dtdAttrListTypes;
-        std::unordered_map<std::string, XEntityMapping> m_entityMapping;
         ISource &m_xmlSource;
     };
 } // namespace H4
