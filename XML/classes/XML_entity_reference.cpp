@@ -130,17 +130,28 @@ namespace H4
             {
                 XNodeElement entityElement;
                 BufferSource entitySource(entityReference.parsed);
-                while (entitySource.more())
+                if (entityReference.parsed.find("<") == std::string::npos)
                 {
-                    xmlParseElementContents(entitySource, &entityElement);
-                }
-                xNodeEntityReference.children = std::move(entityElement.children);
-                if (!xNodeElement->children.empty())
-                {
-                    if (xNodeElement->children.back()->getNodeType() == XNodeType::content)
+                    while (entitySource.more())
                     {
-                        XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
+                        xmlParseElementContents(entitySource, &entityElement);
                     }
+                    xNodeEntityReference.children = std::move(entityElement.children);
+                    if (!xNodeElement->children.empty())
+                    {
+                        if (xNodeElement->children.back()->getNodeType() == XNodeType::content)
+                        {
+                            XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
+                        }
+                    }
+                }
+                else
+                {
+                    while (entitySource.more())
+                    {
+                        xmlParseElementContents(entitySource, xNodeElement);
+                    }
+                    return (true);
                 }
             }
             xNodeElement->children.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
