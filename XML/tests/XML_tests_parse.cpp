@@ -858,21 +858,21 @@ TEST_CASE("Make sure whitespace is whitespace.", "[XML][Access][ByName]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource); 
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"][0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>(xml.m_prolog["AddressBook"][0]).isWhiteSpace == true);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"][1][0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>(xml.m_prolog["AddressBook"][1][0]).isWhiteSpace == false);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"][2][0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>(xml.m_prolog["AddressBook"][2][0]).isWhiteSpace == true);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"][3][0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>(xml.m_prolog["AddressBook"][3][0]).isWhiteSpace == false);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"][3][1]).getNodeType() == XNodeType::entity);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"][3][2]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>(xml.m_prolog["AddressBook"][3][2]).isWhiteSpace == false);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"][4][0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>(xml.m_prolog["AddressBook"][4][0]).isWhiteSpace == false);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"][4][1]).getNodeType() == XNodeType::cdata);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"][4][2]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>(xml.m_prolog["AddressBook"][4][2]).isWhiteSpace == false);
+    REQUIRE(XNodeRef<XNodeElement>(*xml.m_prolog["AddressBook"].children[0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>(*xml.m_prolog["AddressBook"].children[0]).isWhiteSpace == true);
+    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[1])[0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[1])[0]).isWhiteSpace == false);
+    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[2])[0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[2])[0]).isWhiteSpace == true);
+    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[3])[0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[3])[0]).isWhiteSpace == false);
+    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[3])[1]).getNodeType() == XNodeType::entity);
+    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[3])[2]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[3])[2]).isWhiteSpace == false);
+    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[4])[0]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[4])[0]).isWhiteSpace == false);
+    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[4])[1]).getNodeType() == XNodeType::cdata);
+    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[4])[2]).getNodeType() == XNodeType::content);
+    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[4])[2]).isWhiteSpace == false);
   }
 }
