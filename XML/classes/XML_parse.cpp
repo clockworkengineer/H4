@@ -247,6 +247,9 @@ namespace H4
             }
             xmlSource.ignoreWS();
             XValue attributeValue = xmlParseValue(xmlSource);
+            if (!validAttributeValue(attributeValue)) {
+                 throw SyntaxError(xmlSource, "Attribute value contains inavlid character '<' or '&'.");
+            }
             if (!isAttributePresent(xNodeElement->attributes, attributeName))
             {
                 xNodeElement->attributes.emplace_back(attributeName, attributeValue);

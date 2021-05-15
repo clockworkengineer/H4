@@ -173,6 +173,7 @@ namespace H4
         // ================
         XNodeElement m_prolog;
         std::unordered_map<std::string, XEntityMapping> m_entityMapping;
+
     private:
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
@@ -198,6 +199,7 @@ namespace H4
         void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
         bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
         XAttribute getAttribute(std::vector<XAttribute> attributeList, const std::string &attributeName);
+        bool validAttributeValue(XValue &value);
         bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
         bool validNameChar(XChar c);
