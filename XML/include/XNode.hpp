@@ -169,6 +169,18 @@ namespace H4
         {
             this->name = name;
         }
+        bool isAttributePresent(const std::string &name)
+        {
+            return (std::find_if(attributes.rbegin(), attributes.rend(),
+                                 [&name](const XAttribute &attr)
+                                 { return (attr.name == name); }) != attributes.rend());
+        }
+        bool isNameSpacePresent(const std::string &name)
+        {
+            return (std::find_if(namespaces.rbegin(), namespaces.rend(),
+                                 [&name](const XAttribute &attr)
+                                 { return (attr.name == name); }) != namespaces.rend());
+        }
         XNodeElement &operator[](int index);
         XNodeElement &operator[](const std::string &name);
         std::string name;
@@ -211,7 +223,6 @@ namespace H4
         XExternalReference external;
         std::unordered_map<std::string, XExternalReference> notations;
         std::unordered_map<std::string, XDTDElement> elements;
-      //  std::unordered_map<std::string, XEntityMapping> entityMapping;
         std::set<std::string> assignedIDValues;
         std::set<std::string> assignedIDREFValues;
         std::string unparsed;

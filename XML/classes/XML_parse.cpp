@@ -250,7 +250,7 @@ namespace H4
             if (!validAttributeValue(attributeValue)) {
                  throw SyntaxError(xmlSource, "Attribute value contains inavlid character '<' or '&'.");
             }
-            if (!isAttributePresent(xNodeElement->attributes, attributeName))
+            if (!xNodeElement->isAttributePresent(attributeName))
             {
                 xNodeElement->attributes.emplace_back(attributeName, attributeValue);
             }
@@ -280,8 +280,7 @@ namespace H4
         xmlParseElement(xmlSource, &xNodeChildElement);
         if (auto pos = xNodeChildElement.name.find(':'); pos != std::string::npos)
         {
-            if (!isAttributePresent(xNodeChildElement.namespaces,
-                                    xNodeChildElement.name.substr(0, pos)))
+            if (!xNodeChildElement.isNameSpacePresent(xNodeChildElement.name.substr(0, pos)))
             {
                 throw SyntaxError(xmlSource, "Namespace used but not defined.");
             }

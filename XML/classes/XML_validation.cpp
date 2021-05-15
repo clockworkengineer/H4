@@ -143,7 +143,7 @@ namespace H4
     void XML::validXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         // Syntax error if no version present
-        if (!isAttributePresent(xNodeElement->attributes, "version"))
+        if (!xNodeElement->isAttributePresent("version"))
         {
             throw SyntaxError(xmlSource, "Version missing from declaration.");
         }

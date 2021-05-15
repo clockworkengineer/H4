@@ -54,17 +54,6 @@ namespace H4
         return splittedStrings;
     }
     /// <summary>
-    /// Check whether a attribute exists in list of attributes.
-    /// </summary>
-    /// <param name="attributeList">Vector of attribute name/value pairs.</param>
-    /// <param name="attributeName">Attribute name to check for in list.</param>
-    /// <returns>true if attribute name is in list.</returns>
-    bool XML::isAttributePresent(std::vector<XAttribute> attributeList, const std::string &attributeName)
-    {
-        return (std::find_if(attributeList.rbegin(), attributeList.rend(),
-                             [&attributeName](const XAttribute &attr) { return (attr.name == attributeName); }) != attributeList.rend());
-    }
-    /// <summary>
     /// Return attribute value if it is present in list.
     /// </summary>
     /// <param name="attributeList">Vector of attribute name/value pairs.</param>

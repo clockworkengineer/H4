@@ -94,7 +94,7 @@ namespace H4
             // AT PRESENT ONLY ENUMERATION DEALT WITH.
             if (attribute.type == "CDATA")
             {
-                if (isAttributePresent(xNodeElement->attributes, attribute.name))
+                if (xNodeElement->isAttributePresent(attribute.name))
                 {
                     XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
                     if (elementAttribute.value.parsed.empty()) // No character data present.
@@ -105,7 +105,7 @@ namespace H4
             }
             else if (attribute.type == "ID")
             {
-                if (isAttributePresent(xNodeElement->attributes, attribute.name))
+                if (xNodeElement->isAttributePresent(attribute.name))
                 {
                     XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
                     if (elementAttribute.value.parsed[0] != '_' &&
@@ -123,7 +123,7 @@ namespace H4
             }
             else if (attribute.type == "IDREF")
             {
-                if (isAttributePresent(xNodeElement->attributes, attribute.name))
+                if (xNodeElement->isAttributePresent(attribute.name))
                 {
                     XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
                     if (elementAttribute.value.parsed[0] != '_' &&
@@ -142,7 +142,7 @@ namespace H4
                 {
                     options.insert(option);
                 }
-                if (isAttributePresent(xNodeElement->attributes, attribute.name))
+                if (xNodeElement->isAttributePresent(attribute.name))
                 {
                     XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
                     if (!options.contains(elementAttribute.value.parsed))
@@ -158,7 +158,7 @@ namespace H4
             // #FIXED value	The attribute value is fixed
             if (attribute.value.parsed == "#REQUIRED")
             {
-                if (!isAttributePresent(xNodeElement->attributes, attribute.name))
+                if (!xNodeElement->isAttributePresent(attribute.name))
                 {
                     throw ValidationError(dtd, "Required attribute '" + attribute.name + "' missing for element <" + xNodeElement->name + ">.");
                 }
@@ -169,7 +169,7 @@ namespace H4
             }
             else if (attribute.value.parsed.starts_with("#FIXED "))
             {
-                if (isAttributePresent(xNodeElement->attributes, attribute.name))
+                if (xNodeElement->isAttributePresent(attribute.name))
                 {
                     XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
                     if (attribute.value.parsed.substr(7) != elementAttribute.value.parsed)
@@ -186,7 +186,7 @@ namespace H4
             }
             else
             {
-                if (!isAttributePresent(xNodeElement->attributes, attribute.name))
+                if (!xNodeElement->isAttributePresent(attribute.name))
                 {
                     XValue value;
                     value.parsed = value.unparsed = attribute.value.parsed;

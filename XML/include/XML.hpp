@@ -197,7 +197,6 @@ namespace H4
         bool dtdValidateIsEMPTY(XNodeElement *xNodeElement);
         void initialiseTables();
         void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
-        bool isAttributePresent(std::vector<XAttribute> attributes, const std::string &name);
         XAttribute getAttribute(std::vector<XAttribute> attributeList, const std::string &attributeName);
         bool validAttributeValue(XValue &value);
         bool validChar(XChar ch);
