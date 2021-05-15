@@ -196,8 +196,6 @@ namespace H4
         bool dtdVadlidateIsPCDATA(XNodeElement *xNodeElement);
         bool dtdValidateIsEMPTY(XNodeElement *xNodeElement);
         void initialiseTables();
-        void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
-        XAttribute getAttribute(std::vector<XAttribute> attributeList, const std::string &attributeName);
         bool validAttributeValue(XValue &value);
         bool validChar(XChar ch);
         bool validNameStartChar(XChar c);
@@ -229,6 +227,7 @@ namespace H4
         void dtdParseExternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void dtdParseInternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void dtdParse(ISource &xmlSource, XNodeElement *XNodeElement);
+        void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
         bool xmlEntityMappingParse(XNodeElement *xNodeElement, XValue &entityReference);
         std::string xmlParseName(ISource &xmlSource);
         std::string xmlParseCharacterReference(ISource &xmlSource, std::string reference);

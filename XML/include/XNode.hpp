@@ -181,11 +181,21 @@ namespace H4
                                  [&name](const XAttribute &attr)
                                  { return (attr.name == name); }) != namespaces.rend());
         }
+        void addAttribute(const std::string &name, const XValue &value)
+        {
+            attributes.emplace_back(name, value);
+        }
+        XAttribute getAttribute(const std::string &name)
+        {
+            return (*std::find_if(attributes.rbegin(), attributes.rend(),
+                                  [&name](const XAttribute &attr)
+                                  { return (attr.name == name); }));
+        }
         XNodeElement &operator[](int index);
         XNodeElement &operator[](const std::string &name);
         std::string name;
-        std::vector<XAttribute> attributes;
         std::vector<XAttribute> namespaces;
+        std::vector<XAttribute> attributes;
     };
     //
     // Comment XNode

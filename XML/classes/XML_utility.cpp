@@ -53,15 +53,4 @@ namespace H4
         }
         return splittedStrings;
     }
-    /// <summary>
-    /// Return attribute value if it is present in list.
-    /// </summary>
-    /// <param name="attributeList">Vector of attribute name/value pairs.</param>
-    /// <param name="attributeName">Attribute name to get in list.</param>
-    /// <returns>attribute value if attribute name is in list.</returns>
-    XAttribute XML::getAttribute(std::vector<XAttribute> attributeList, const std::string &attributeName)
-    {
-        return (*std::find_if(attributeList.rbegin(), attributeList.rend(),
-                              [&attributeName](const XAttribute &attr) { return (attr.name == attributeName); }));
-    }
 } // namespace H4

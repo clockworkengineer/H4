@@ -252,7 +252,7 @@ namespace H4
             }
             if (!xNodeElement->isAttributePresent(attributeName))
             {
-                xNodeElement->attributes.emplace_back(attributeName, attributeValue);
+                xNodeElement->addAttribute(attributeName, attributeValue);
             }
             else
             {

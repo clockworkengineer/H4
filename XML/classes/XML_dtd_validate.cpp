@@ -96,7 +96,7 @@ namespace H4
             {
                 if (xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
+                    XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (elementAttribute.value.parsed.empty()) // No character data present.
                     {
                         //throw ValidationError(dtd, "");
@@ -107,7 +107,7 @@ namespace H4
             {
                 if (xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
+                    XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (elementAttribute.value.parsed[0] != '_' &&
                         !std::isalpha(elementAttribute.value.parsed[0]) &&
                         elementAttribute.value.parsed[0] != ':')
@@ -125,7 +125,7 @@ namespace H4
             {
                 if (xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
+                    XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (elementAttribute.value.parsed[0] != '_' &&
                         !std::isalpha(elementAttribute.value.parsed[0]) &&
                         elementAttribute.value.parsed[0] != ':')
@@ -144,7 +144,7 @@ namespace H4
                 }
                 if (xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
+                    XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (!options.contains(elementAttribute.value.parsed))
                     {
                         throw ValidationError(dtd, "Element <" + xNodeElement->name + "> attribute '" + attribute.name + "' contains invalid enumeration value '" + elementAttribute.value.parsed + "'.");
@@ -171,7 +171,7 @@ namespace H4
             {
                 if (xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XAttribute elementAttribute = getAttribute(xNodeElement->attributes, attribute.name);
+                    XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (attribute.value.parsed.substr(7) != elementAttribute.value.parsed)
                     {
                         throw ValidationError(dtd, "Element <" + xNodeElement->name + "> attribute '" + attribute.name + "' is '" + elementAttribute.value.parsed + "' instead of '" + attribute.value.parsed.substr(7) + "'.");
@@ -181,7 +181,7 @@ namespace H4
                 {
                     XValue value;
                     value.parsed = value.unparsed = attribute.value.parsed.substr(7);
-                    xNodeElement->attributes.emplace_back(attribute.name, value);
+                    xNodeElement->addAttribute(attribute.name, value);
                 }
             }
             else
@@ -190,7 +190,7 @@ namespace H4
                 {
                     XValue value;
                     value.parsed = value.unparsed = attribute.value.parsed;
-                    xNodeElement->attributes.emplace_back(attribute.name, value);
+                    xNodeElement->addAttribute(attribute.name, value);
                 }
             }
         }
