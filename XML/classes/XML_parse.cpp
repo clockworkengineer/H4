@@ -117,8 +117,7 @@ namespace H4
             {
                 XValue character = xmlParseCharacter(xmlSource);
                 if (translateEntity ||
-                    character.unparsed.starts_with("&#") ||
-                    character.unparsed.starts_with("&x"))
+                    character.unparsed.starts_with("&#"))
                 {
                     value.parsed += character.parsed;
                 }
@@ -248,7 +247,7 @@ namespace H4
             xmlSource.ignoreWS();
             XValue attributeValue = xmlParseValue(xmlSource);
             if (!validAttributeValue(attributeValue)) {
-                 throw SyntaxError(xmlSource, "Attribute value contains inavlid character '<' or '&'.");
+                 throw SyntaxError(xmlSource, "Attribute value contains invalid character '<', '\"', ''', '>' or '&'.");
             }
             if (!xNodeElement->isAttributePresent(attributeName))
             {
@@ -259,7 +258,7 @@ namespace H4
                 throw SyntaxError(xmlSource, "Attribute defined more than once within start tag.");
             }
         }
-        for (auto attribute : xNodeElement->attributes)
+        for (auto attribute : xNodeElement->getAttributeList())
         {
             if (attribute.name.starts_with("xmlns"))
             {

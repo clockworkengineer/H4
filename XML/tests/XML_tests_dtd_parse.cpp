@@ -153,7 +153,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<foo attr=\"&x;\"/>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 5 Column: 20] Attribute value contains inavlid character '<' or '&'.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 5 Column: 20] Attribute value contains invalid character '<', '\"', ''', '>' or '&'.");
     // REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     // REQUIRE(xml.m_entityMapping["&x;"].internal == "<");
     // REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes.size() == 1);

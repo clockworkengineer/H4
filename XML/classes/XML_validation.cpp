@@ -152,7 +152,7 @@ namespace H4
         long currentAttribute = 0;
         for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
         {
-            if ((currentAttribute < (int)xNodeElement->attributes.size()) &&
+            if ((currentAttribute < (int)xNodeElement->getAttributeList().size()) &&
                 (xNodeElement->attributes[currentAttribute].name == XML::m_defaultAtributes[attrIndex].name))
             {
                 validatedAttributes.push_back(xNodeElement->attributes[currentAttribute]);
@@ -164,7 +164,7 @@ namespace H4
             }
         }
         // Order not version, encoding, standalone == syntax error
-        if (currentAttribute != (long)xNodeElement->attributes.size())
+        if (currentAttribute != (long)xNodeElement->getAttributeList().size())
         {
             throw SyntaxError(xmlSource, "Incorrect order for version, encoding and standalone attributes.");
         }
