@@ -90,8 +90,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     xml.parse();
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNode>(xml.m_prolog[0]).getNodeType() == XNodeType::root);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][4]).name == "footer");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][4]).getContents() == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
+    REQUIRE(xml.m_prolog[0][4].name == "footer");
+    REQUIRE(xml.m_prolog[0][4].getContents() == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
   SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 1)", "[XML][Parse][DTD]")
   {
@@ -104,8 +104,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     xml.parse();
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(xml.m_entityMapping["&example;"].internal == "<p>An ampersand (&#38;) may be escaped numerically (&#38;#38;) or with a general entity (&amp;amp;).</p>");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).name == "p");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).getContents() == "An ampersand (&) may be escaped numerically (&#38;) or with a general entity (&amp;).");
+    REQUIRE(xml.m_prolog[0][0].name == "p");
+    REQUIRE(xml.m_prolog[0][0].getContents() == "An ampersand (&) may be escaped numerically (&#38;) or with a general entity (&amp;).");
   }
   SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 2)", "[XML][Parse][DTD]")
   {
@@ -123,8 +123,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(xml.m_entityMapping["%xx;"].internal == "%zz;");
     REQUIRE(xml.m_entityMapping["%zz;"].internal == "<!ENTITY tricky \"error-prone\" >");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "test");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).getContents() == "This sample shows a error-prone method.");
+    REQUIRE(xml.m_prolog[0].name == "test");
+    REQUIRE(xml.m_prolog[0].getContents() == "This sample shows a error-prone method.");
   }
   SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 3)", "[XML][Parse][DTD]")
   {
@@ -178,10 +178,10 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     xml.parse();
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(xml.m_entityMapping["&js;"].internal == "Jo Smith &email;");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "author");
+    REQUIRE(xml.m_prolog[0].name == "author");
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog[0].children[0]).getNodeType() == XNodeType::entity);
     REQUIRE(XNodeRef<XNodeEntityReference>(*xml.m_prolog[0].children[0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
+    REQUIRE(xml.m_prolog[0].getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
   }
   SECTION("XML with DTD with entity used within an entity with recursion.", "[XML][Parse][DTD]")
   {
@@ -227,8 +227,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     xml.parse();
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == XNodeRef<XNodeDTD>(xml.m_prolog[0]).name);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "foo");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).getContents() == "Hello John Joe Doe");
+    REQUIRE(xml.m_prolog[0].name == "foo");
+    REQUIRE(xml.m_prolog[0].getContents() == "Hello John Joe Doe");
   }
   SECTION("XML with DTD with entity that is defined externally (file that does not exist).", "[XML][Parse][DTD]")
   {
@@ -723,13 +723,13 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).elements["person"].attributes[0].value.parsed == "F");
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == "queue");
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).name == "person");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).getAttributeList().size() == 1);
+    REQUIRE(xml.m_prolog[0][0].name == "person");
+    REQUIRE(xml.m_prolog[0][0].getAttributeList().size() == 1);
     XAttribute attribute = xml.m_prolog[0][0].getAttribute("gender");
     REQUIRE(attribute.name == "gender");
     REQUIRE(attribute.value.parsed == "M");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][1]).name == "person");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][1]).getAttributeList().size() == 0);
+    REQUIRE(xml.m_prolog[0][1].name == "person");
+    REQUIRE(xml.m_prolog[0][1].getAttributeList().size() == 0);
   }
   SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing enumeration name).", "[XML][Parse][DTD]")
   {
