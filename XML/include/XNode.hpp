@@ -191,13 +191,20 @@ namespace H4
                                   [&name](const XAttribute &attr)
                                   { return (attr.name == name); }));
         }
-        const std::vector<XAttribute> &getAttributeList() {
-            return(attributes);
+        const std::vector<XAttribute> &getAttributeList()
+        {
+            return (attributes);
+        }
+        void clearAttributes()
+        {
+            attributes.clear();
         }
         XNodeElement &operator[](int index);
         XNodeElement &operator[](const std::string &name);
         std::string name;
         std::vector<XAttribute> namespaces;
+
+    private:
         std::vector<XAttribute> attributes;
     };
     //

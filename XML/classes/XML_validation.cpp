@@ -140,22 +140,29 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>true when declaration valid.</returns>
-    void XML::validXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::validXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeProlog)
     {
         // Syntax error if no version present
-        if (!xNodeElement->isAttributePresent("version"))
+        if (!xNodeProlog->isAttributePresent("version"))
         {
             throw SyntaxError(xmlSource, "Version missing from declaration.");
         }
+        // Save declaration attributes to be validated and clear tem from prolog element
+        std::vector<XAttribute> prologAttributes;
+        for (auto attribute : xNodeProlog->getAttributeList())
+        {
+            prologAttributes.push_back(attribute);
+        }
+        xNodeProlog->clearAttributes();
         // Fill in gaps with default if missing attributes
         std::vector<XAttribute> validatedAttributes;
         long currentAttribute = 0;
         for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
         {
-            if ((currentAttribute < (int)xNodeElement->getAttributeList().size()) &&
-                (xNodeElement->attributes[currentAttribute].name == XML::m_defaultAtributes[attrIndex].name))
+            if ((currentAttribute < (int)prologAttributes.size()) &&
+                (prologAttributes[currentAttribute].name == XML::m_defaultAtributes[attrIndex].name))
             {
-                validatedAttributes.push_back(xNodeElement->attributes[currentAttribute]);
+                validatedAttributes.push_back(prologAttributes[currentAttribute]);
                 currentAttribute++;
             }
             else
@@ -164,7 +171,7 @@ namespace H4
             }
         }
         // Order not version, encoding, standalone == syntax error
-        if (currentAttribute != (long)xNodeElement->getAttributeList().size())
+        if (currentAttribute != (long)prologAttributes.size())
         {
             throw SyntaxError(xmlSource, "Incorrect order for version, encoding and standalone attributes.");
         }
@@ -188,7 +195,11 @@ namespace H4
         {
             throw SyntaxError(xmlSource, "Invalid standalone value of '" + validatedAttributes[2].value.parsed + "'.");
         }
-        xNodeElement->attributes = validatedAttributes;
+        // Set validated prolog attributes
+        for (auto &attribute : validatedAttributes)
+        {
+            xNodeProlog->addAttribute(attribute.name, attribute.value);
+        }
     }
     /// <summary>
     ///
@@ -204,8 +215,8 @@ namespace H4
             {
                 xmlParseReferenceOrEntity(valueSoure);
             }
-            else if ((valueSoure.current() == '<')||
-                     (valueSoure.current() == '"')||
+            else if ((valueSoure.current() == '<') ||
+                     (valueSoure.current() == '"') ||
                      (valueSoure.current() == '\''))
             {
                 return (false);
