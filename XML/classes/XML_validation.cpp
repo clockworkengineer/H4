@@ -205,7 +205,6 @@ namespace H4
                 xmlParseReferenceOrEntity(valueSoure);
             }
             else if ((valueSoure.current() == '<')||
-                     (valueSoure.current() == '>')||
                      (valueSoure.current() == '"')||
                      (valueSoure.current() == '\''))
             {

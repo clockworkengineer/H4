@@ -24,9 +24,9 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[2].value.parsed == "no");
+    REQUIRE(xml.m_prolog.getAttribute("version").value.parsed == "1.0");
+    REQUIRE(xml.m_prolog.getAttribute("encoding").value.parsed == "UTF-8");
+    REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "no");
   }
   SECTION("Parse XML declaration with unsupported version. ", "[XML][Parse][Declaration]")
   {
@@ -67,9 +67,9 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[1].value.parsed == "UTF-16");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[2].value.parsed == "yes");
+    REQUIRE(xml.m_prolog.getAttribute("version").value.parsed == "1.0");
+    REQUIRE(xml.m_prolog.getAttribute("encoding").value.parsed == "UTF-16");
+    REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "yes");
   }
   SECTION("Parse version 1.0 encoding == UTF-8 standalone == yes XML declaration. ", "[XML][Parse][Declaration]")
   {
@@ -78,9 +78,9 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[2].value.parsed == "yes");
+    REQUIRE(xml.m_prolog.getAttribute("version").value.parsed == "1.0");
+    REQUIRE(xml.m_prolog.getAttribute("encoding").value.parsed == "UTF-8");
+    REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "yes");
   }
   SECTION("Check declaration contains at least version attribute.", "[XML][Parse][Declaration]")
   {
@@ -235,9 +235,9 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[2].value.parsed == "no");
+    REQUIRE(xml.m_prolog.getAttribute("version").value.parsed == "1.0");
+    REQUIRE(xml.m_prolog.getAttribute("encoding").value.parsed == "UTF-8");
+    REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "no");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).children.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "contact-info");
   }
@@ -248,9 +248,9 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[2].value.parsed == "no");
+    REQUIRE(xml.m_prolog.getAttribute("version").value.parsed == "1.0");
+    REQUIRE(xml.m_prolog.getAttribute("encoding").value.parsed == "UTF-8");
+    REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "no");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).children.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "AddressBook");
   }
@@ -263,9 +263,9 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[2].value.parsed == "no");
+    REQUIRE(xml.m_prolog.getAttribute("version").value.parsed == "1.0");
+    REQUIRE(xml.m_prolog.getAttribute("encoding").value.parsed == "UTF-8");
+    REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "no");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).children.size() == 3);
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).name == "Address");
@@ -288,9 +288,9 @@ TEST_CASE("Use XML object to parse declaration, root element and check parsed in
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[2].value.parsed == "no");
+    REQUIRE(xml.m_prolog.getAttribute("version").value.parsed == "1.0");
+    REQUIRE(xml.m_prolog.getAttribute("encoding").value.parsed == "UTF-8");
+    REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "no");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).children.size() == 7);
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).name == "Address");
@@ -334,14 +334,13 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[2].value.parsed == "no");
+    REQUIRE(xml.m_prolog.getAttribute("version").value.parsed == "1.0");
+    REQUIRE(xml.m_prolog.getAttribute("encoding").value.parsed == "UTF-8");
+    REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "no");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).children.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].name == "number");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].value.parsed == "15");
+    REQUIRE(xml.m_prolog[0].name == "AddressBook");
+    REQUIRE(xml.m_prolog[0].getAttributeList().size() == 1);
+    REQUIRE(xml.m_prolog[0].getAttribute("number").value.parsed == "15");
   }
   SECTION("Root attribute with 3 attached attributes number, away, flat", "[XML][Parse][[Attributes]")
   {
@@ -351,18 +350,15 @@ TEST_CASE("Parse XML elements with attached attributes", "[XML][Parse][Attribute
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[2].value.parsed == "no");
+    REQUIRE(xml.m_prolog.getAttribute("version").value.parsed == "1.0");
+    REQUIRE(xml.m_prolog.getAttribute("encoding").value.parsed == "UTF-8");
+    REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "no");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).children.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes.size() == 3);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].name == "number");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].value.parsed == "15");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[1].name == "away");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[1].value.parsed == "yes");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[2].name == "flat");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[2].value.parsed == "no");
+    REQUIRE(xml.m_prolog[0].name == "AddressBook");
+    REQUIRE(xml.m_prolog[0].getAttributeList().size() == 3);
+    REQUIRE(xml.m_prolog[0].getAttribute("number").value.parsed == "15");
+    REQUIRE(xml.m_prolog[0].getAttribute("away").value.parsed == "yes");
+    REQUIRE(xml.m_prolog[0].getAttribute("flat").value.parsed == "no");
   }
   SECTION("Empty elements with attributes are allowed.", "[XML][Parse][[Attributes]")
   {
@@ -420,9 +416,9 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[0].value.parsed == "1.0");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[1].value.parsed == "UTF-8");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog).attributes[2].value.parsed == "no");
+    REQUIRE(xml.m_prolog.getAttribute("version").value.parsed == "1.0");
+    REQUIRE(xml.m_prolog.getAttribute("encoding").value.parsed == "UTF-8");
+    REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "no");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "AddressBook");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).children.size() == 13);
     REQUIRE(XNodeRef<XNodeComment>(*xml.m_prolog[0].children[1]).comment == "Address one ");
@@ -512,11 +508,10 @@ TEST_CASE("Parse XML with Unicode character in element names, attributes, commen
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).name == "俄语");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].name == "լեզու");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].value.parsed == "ռուսերեն");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).getContents() == "данные");
+    REQUIRE(xml.m_prolog[0].name == "俄语");
+    REQUIRE(xml.m_prolog[0].getAttributeList().size() == 1);
+    REQUIRE(xml.m_prolog[0].getAttribute("լեզու").value.parsed == "ռուսերեն");
+    REQUIRE(xml.m_prolog[0].getContents() == "данные");
   }
 }
 TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][Entities]")
@@ -575,9 +570,8 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].name == "attr1");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].value.parsed == " &#x26;&#x22;&#x27;&#x3E;&#x3C; ");
+    REQUIRE(xml.m_prolog[0].getAttributeList().size() == 1);
+    REQUIRE(xml.m_prolog[0].getAttribute("attr1").value.parsed == " &#x26;&#x22;&#x27;&#x3E;&#x3C; ");
   }
   SECTION("Parse references &#x00A5;&#163 in attribute value", "[XML][Parse][Entities]")
   {
@@ -586,9 +580,8 @@ TEST_CASE("Check the pasring of character entities/reference.", "[XML][Parse][En
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].name == "attr1");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].value.parsed == " ¥£ ");
+    REQUIRE(xml.m_prolog[0].getAttributeList().size() == 1);
+    REQUIRE(xml.m_prolog[0].getAttribute("attr1").value.parsed == " ¥£ ");
   }
 }
 TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Parse][PI]")

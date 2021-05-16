@@ -138,10 +138,11 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     xml.parse();
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(xml.m_entityMapping["&x;"].internal == "&lt;");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].name == "attr");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].value.unparsed == "&x;");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].value.parsed == "&lt;");
+    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).getAttributeList().size() == 1);
+    XAttribute attribute = xml.m_prolog[0].getAttribute("attr");
+    REQUIRE(attribute.name == "attr");
+    REQUIRE(attribute.value.unparsed == "&x;");
+    REQUIRE(attribute.value.parsed == "&lt;");
   }
   // This should throw an error as & ' " < >  not allowed to be assigned to attribute directly (NEED TO FIX)
   SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 4)", "[XML][Parse][DTD]")
@@ -153,7 +154,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
                 "<foo attr=\"&x;\"/>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 5 Column: 20] Attribute value contains invalid character '<', '\"', ''', '>' or '&'.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 5 Column: 20] Attribute value contains invalid character '<', '\"', ''' or '&'.");
     // REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     // REQUIRE(xml.m_entityMapping["&x;"].internal == "<");
     // REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes.size() == 1);
@@ -723,11 +724,12 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == "queue");
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).name == "person");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).attributes[0].name == "gender");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).attributes[0].value.parsed == "M");
+    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][0]).getAttributeList().size() == 1);
+    XAttribute attribute = xml.m_prolog[0][0].getAttribute("gender");
+    REQUIRE(attribute.name == "gender");
+    REQUIRE(attribute.value.parsed == "M");
     REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][1]).name == "person");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][1]).attributes.size() == 0);
+    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0][1]).getAttributeList().size() == 0);
   }
   SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing enumeration name).", "[XML][Parse][DTD]")
   {
