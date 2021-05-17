@@ -180,7 +180,7 @@ namespace H4
         {
             throw SyntaxError(xmlSource, "Missing closing '>' for comment line.");
         }
-       xNodeElement->children.emplace_back(std::make_unique<XNodeComment>(std::move(xNodeComment)));
+        xNodeElement->children.emplace_back(std::make_unique<XNodeComment>(std::move(xNodeComment)));
     }
     /// <summary>
     /// Parse a XML process instruction, create an XNode for it and add it to
@@ -246,8 +246,9 @@ namespace H4
             }
             xmlSource.ignoreWS();
             XValue attributeValue = xmlParseValue(xmlSource);
-            if (!validAttributeValue(attributeValue)) {
-                 throw SyntaxError(xmlSource, "Attribute value contains invalid character '<', '\"', ''' or '&'.");
+            if (!validAttributeValue(attributeValue))
+            {
+                throw SyntaxError(xmlSource, "Attribute value contains invalid character '<', '\"', ''' or '&'.");
             }
             if (!xNodeElement->isAttributePresent(attributeName))
             {
@@ -275,7 +276,8 @@ namespace H4
     void XML::xmlParseChildElement(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         XNodeElement xNodeChildElement;
-        for (auto &ns : xNodeElement->getNameSpaceList()) {
+        for (auto &ns : xNodeElement->getNameSpaceList())
+        {
             xNodeChildElement.addNameSpace(ns.name, ns.value);
         }
         xmlParseElement(xmlSource, &xNodeChildElement);
@@ -296,13 +298,17 @@ namespace H4
     void XML::xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         XValue entityReference = xmlParseCharacter(xmlSource);
-        if (!xmlEntityMappingParse(xNodeElement, entityReference))
+        if (entityReference.unparsed.starts_with("&") && entityReference.unparsed.ends_with(";"))
+        {
+            xmlParseEntityMappingContents(xNodeElement, entityReference);
+        }
+        else
         {
             xmlParseAddElementContent(xNodeElement, entityReference.parsed);
         }
     }
     /// <summary>
-    /// Parse element content area generating any XNodes and adding them 
+    /// Parse element content area generating any XNodes and adding them
     /// to the list of the current XNodeElement.
     /// </summary>
     /// <param name="xmlSource">XMl source stream.</param>
@@ -366,8 +372,8 @@ namespace H4
     }
     /// <summary>
     /// Parse XML prolog and create the necessary XNodeElements for it. Valid
-    /// parts of the prolog include delaration (first line if present), 
-    /// processing instructions, comments, whitespace content and XML 
+    /// parts of the prolog include delaration (first line if present),
+    /// processing instructions, comments, whitespace content and XML
     /// document Type Definition (DTD).
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>

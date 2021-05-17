@@ -228,7 +228,7 @@ namespace H4
         void dtdParseInternal(ISource &xmlSource, XNodeDTD *xNodeDTD);
         void dtdParse(ISource &xmlSource, XNodeElement *XNodeElement);
         void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
-        bool xmlEntityMappingParse(XNodeElement *xNodeElement, XValue &entityReference);
+        void xmlParseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference);
         std::string xmlParseName(ISource &xmlSource);
         std::string xmlParseCharacterReference(ISource &xmlSource, std::string reference);
         XValue xmlParseValue(ISource &xmlSource, bool translateEntity = true);
