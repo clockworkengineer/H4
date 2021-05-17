@@ -175,12 +175,6 @@ namespace H4
                                  [&name](const XAttribute &attr)
                                  { return (attr.name == name); }) != attributes.rend());
         }
-        bool isNameSpacePresent(const std::string &name)
-        {
-            return (std::find_if(namespaces.rbegin(), namespaces.rend(),
-                                 [&name](const XAttribute &attr)
-                                 { return (attr.name == name); }) != namespaces.rend());
-        }
         void addAttribute(const std::string &name, const XValue &value)
         {
             attributes.emplace_back(name, value);
@@ -199,12 +193,36 @@ namespace H4
         {
             attributes.clear();
         }
+        bool isNameSpacePresent(const std::string &name)
+        {
+            return (std::find_if(namespaces.rbegin(), namespaces.rend(),
+                                 [&name](const XAttribute &attr)
+                                 { return (attr.name == name); }) != namespaces.rend());
+        }
+        void addNameSpace(const std::string &name, const XValue &value)
+        {
+            namespaces.emplace_back(name, value);
+        }
+        XAttribute getNameSpace(const std::string &name)
+        {
+            return (*std::find_if(namespaces.rbegin(), namespaces.rend(),
+                                  [&name](const XAttribute &ns)
+                                  { return (ns.name == name); }));
+        }
+        const std::vector<XAttribute> &getNameSpaceList()
+        {
+            return (namespaces);
+        }
+        void clearNameSpaces()
+        {
+            namespaces.clear();
+        }
         XNodeElement &operator[](int index);
         XNodeElement &operator[](const std::string &name);
         std::string name;
-        std::vector<XAttribute> namespaces;
 
     private:
+        std::vector<XAttribute> namespaces;
         std::vector<XAttribute> attributes;
     };
     //

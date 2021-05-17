@@ -724,13 +724,11 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
     XML xml(xmlSource);
     xml.parse();
     REQUIRE(xml.m_prolog[0][0].name == "h:table");
-    REQUIRE(xml.m_prolog[0][0].namespaces.size() == 1);
-    REQUIRE(xml.m_prolog[0][0].namespaces[0].name == "h");
-    REQUIRE(xml.m_prolog[0][0].namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
-    REQUIRE(xml.m_prolog[0][1].namespaces.size() == 1);
+    REQUIRE(xml.m_prolog[0][0].getNameSpaceList().size() == 1);
+    REQUIRE(xml.m_prolog[0][0].getNameSpace("h").value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(xml.m_prolog[0][1].getNameSpaceList().size() == 1);
     REQUIRE(xml.m_prolog[0][1].name == "f:table");
-    REQUIRE(xml.m_prolog[0][1].namespaces[0].name == "f");
-    REQUIRE(xml.m_prolog[0][1].namespaces[0].value.parsed == "https://www.w3schools.com/furniture");
+    REQUIRE(xml.m_prolog[0][1].getNameSpace("f").value.parsed == "https://www.w3schools.com/furniture");
   }
   SECTION("A root document and two namespaces defined in the root element.", "[XML][Parse][Namespace]")
   {
@@ -751,17 +749,13 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
     XML xml(xmlSource);
     xml.parse();
     REQUIRE(xml.m_prolog[0][0].name == "h:table");
-    REQUIRE(xml.m_prolog[0][0].namespaces.size() == 2);
-    REQUIRE(xml.m_prolog[0][0].namespaces[0].name == "h");
-    REQUIRE(xml.m_prolog[0][0].namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
-    REQUIRE(xml.m_prolog[0][0].namespaces[1].name == "f");
-    REQUIRE(xml.m_prolog[0][0].namespaces[1].value.parsed == "https://www.w3schools.com/furniture");
+    REQUIRE(xml.m_prolog[0][0].getNameSpaceList().size() == 2);
+    REQUIRE(xml.m_prolog[0][0].getNameSpace("h").value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(xml.m_prolog[0][0].getNameSpace("f").value.parsed == "https://www.w3schools.com/furniture");
     REQUIRE(xml.m_prolog[0][1].name == "f:table");
-    REQUIRE(xml.m_prolog[0][1].namespaces.size() == 2);
-    REQUIRE(xml.m_prolog[0][1].namespaces[0].name == "h");
-    REQUIRE(xml.m_prolog[0][1].namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
-    REQUIRE(xml.m_prolog[0][1].namespaces[1].name == "f");
-    REQUIRE(xml.m_prolog[0][1].namespaces[1].value.parsed == "https://www.w3schools.com/furniture");
+    REQUIRE(xml.m_prolog[0][1].getNameSpaceList().size() == 2);
+    REQUIRE(xml.m_prolog[0][1].getNameSpace("h").value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(xml.m_prolog[0][1].getNameSpace("f").value.parsed == "https://www.w3schools.com/furniture");
   }
   SECTION("A root document and two namespaces defined in the root element and non-existant namespace g for one of tables.", "[XML][Parse][Namespace]")
   {
@@ -780,9 +774,8 @@ TEST_CASE("Parse XML with defined namespaces.", "[XML][Parse][Namespace]")
     XML xml(xmlSource);
     xml.parse();
     REQUIRE(xml.m_prolog[0][0].name == "tr");
-    REQUIRE(xml.m_prolog[0][0].namespaces.size() == 1);
-    REQUIRE(xml.m_prolog[0][0].namespaces[0].name == ":");
-    REQUIRE(xml.m_prolog[0][0].namespaces[0].value.parsed == "http://www.w3.org/TR/html4/");
+    REQUIRE(xml.m_prolog[0][0].getNameSpaceList().size() == 1);
+    REQUIRE(xml.m_prolog[0][0].getNameSpace(":").value.parsed == "http://www.w3.org/TR/html4/");
   }
   SECTION("A root document and two namespaces (the same name) defined in the root element.", "[XML][Parse][Namespace]")
   {

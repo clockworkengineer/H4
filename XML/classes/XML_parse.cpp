@@ -263,7 +263,7 @@ namespace H4
             if (attribute.name.starts_with("xmlns"))
             {
                 attribute.name = (attribute.name.size() > 5) ? attribute.name.substr(6) : ":";
-                xNodeElement->namespaces.emplace_back(attribute);
+                xNodeElement->addNameSpace(attribute.name, attribute.value);
             }
         }
     }
@@ -275,7 +275,9 @@ namespace H4
     void XML::xmlParseChildElement(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         XNodeElement xNodeChildElement;
-        xNodeChildElement.namespaces = xNodeElement->namespaces;
+        for (auto &ns : xNodeElement->getNameSpaceList()) {
+            xNodeChildElement.addNameSpace(ns.name, ns.value);
+        }
         xmlParseElement(xmlSource, &xNodeChildElement);
         if (auto pos = xNodeChildElement.name.find(':'); pos != std::string::npos)
         {
