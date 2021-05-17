@@ -7,7 +7,7 @@ namespace H4
     //
     // Destination classes for stringification.
     //
-    class BufferDestination : public XML::IDestination
+    class BufferDestination : public IDestination
     {
     public:
         BufferDestination()
@@ -31,7 +31,7 @@ namespace H4
     private:
         std::string m_stringifyBuffer;
     };
-    class FileDestination : public XML::IDestination
+    class FileDestination : public IDestination
     {
     public:
         FileDestination(const std::string &desinationFileName)

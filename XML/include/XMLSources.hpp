@@ -7,7 +7,7 @@ namespace H4
     //
     // Source classes for parsers.
     //
-    class BufferSource : public XML::ISource
+    class BufferSource : public ISource
     {
     public:
         BufferSource() {}
@@ -37,15 +37,6 @@ namespace H4
             m_parseBuffer = m_UTF8.from_bytes(sourceBuffer);
             convertCRLFToLF(m_parseBuffer);
         }
-        // BufferSource(const XString &sourceBuffer)
-        // {
-        //     if (sourceBuffer.empty())
-        //     {
-        //         throw std::invalid_argument("Empty source buffer passed to be parsed.");
-        //     }
-        //     m_parseBuffer = sourceBuffer;
-        //     convertCRLFToLF(m_parseBuffer);
-        // }
         XChar current()
         {
             if (more())
@@ -105,10 +96,7 @@ namespace H4
         long m_bufferPosition = 0;
         XString m_parseBuffer;
     };
-    //
-    // Source classes for parsers.
-    //
-    class FileSource : public XML::ISource
+    class FileSource : public ISource
     {
     public:
         FileSource(const std::string &sourceFileName)
@@ -187,4 +175,4 @@ namespace H4
         std::ifstream m_source;
     };
 } // namespace H4
-#endif /* XMLSOURCES_HPP */
+#endif /* ISOURCE_HPP */

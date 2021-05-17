@@ -102,7 +102,7 @@ void writeXMLToFileUTF16(const std::string &xmlFileName, const std::u16string &x
 /// <param name="crFinal">Final number of CR</param>
 /// <param name="lfFinal">FInal number of LF</param>
 /// <returns></returns>
-void verifyCRLFCount(XML::ISource &xmlSource, long lfFinal, long crFinal)
+void verifyCRLFCount(ISource &xmlSource, long lfFinal, long crFinal)
 {
   long crCount = 0;
   long lfCount = 0;
