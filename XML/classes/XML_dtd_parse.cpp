@@ -44,21 +44,6 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    std::string XML::dtdParseName(ISource &xmlSource)
-    {
-        XString name;
-        while (xmlSource.more() && validNameChar(xmlSource.current()))
-        {
-            name += xmlSource.current();
-            xmlSource.next();
-        }
-        xmlSource.ignoreWS();
-        if (!validName(name))
-        {
-            throw SyntaxError(xmlSource, "Invalid name '" + xmlSource.to_bytes(name) + "' encountered.");
-        }
-        return (xmlSource.to_bytes(name));
-    }
     void XML::checkForEntityRecursion(XNodeDTD *xNodeDTD, const std::string &entityName, std::set<std::string> names)
     {
         BufferSource entitySource(entityName);
@@ -257,13 +242,13 @@ namespace H4
         std::string attributeType(1, dtdSource.current());
         dtdSource.next();
         dtdSource.ignoreWS();
-        attributeType += dtdParseName(dtdSource);
+        attributeType += parseName(dtdSource);
         while (dtdSource.more() && dtdSource.current() == '|')
         {
             attributeType += dtdSource.current();
             dtdSource.next();
             dtdSource.ignoreWS();
-            attributeType += dtdParseName(dtdSource);
+            attributeType += parseName(dtdSource);
         }
         if (dtdSource.current() != ')')
         {
@@ -712,11 +697,11 @@ namespace H4
     void XML::dtdParseAttributeList(ISource &dtdSource, XNodeDTD *xNodeDTD)
     {
         dtdSource.ignoreWS();
-        std::string elementName = dtdParseName(dtdSource);
+        std::string elementName = parseName(dtdSource);
         while (dtdSource.more() && validNameStartChar(dtdSource.current()))
         {
             XDTDAttribute xDTDAttribute;
-            xDTDAttribute.name = dtdParseName(dtdSource);
+            xDTDAttribute.name = parseName(dtdSource);
             xDTDAttribute.type = dtdParseAttributeType(dtdSource);
             xDTDAttribute.value = dtdParseAttributeValue(dtdSource);
             if (xDTDAttribute.type == "ID" && xDTDAttribute.value.parsed.starts_with("#FIXED "))
@@ -736,7 +721,7 @@ namespace H4
     {
         dtdSource.ignoreWS();
         XAttribute notation;
-        std::string name = dtdParseName(dtdSource);
+        std::string name = parseName(dtdSource);
         xNodeDTD->notations[name] = dtdParseExternalReference(dtdSource);
         dtdSource.ignoreWS();
     }
@@ -755,7 +740,7 @@ namespace H4
             dtdSource.next();
             dtdSource.ignoreWS();
         }
-        entityName += dtdParseName(dtdSource) + ";";
+        entityName += parseName(dtdSource) + ";";
         if (dtdSource.current() == '\'' || dtdSource.current() == '"')
         {
             XValue entityValue = xmlParseValue(dtdSource, false);
@@ -768,7 +753,7 @@ namespace H4
             if (dtdSource.match(U"NDATA"))
             {
                 dtdSource.ignoreWS();
-                m_entityMapping[entityName].notation = dtdParseName(dtdSource);
+                m_entityMapping[entityName].notation = parseName(dtdSource);
             }
         }
     }
@@ -780,7 +765,7 @@ namespace H4
     void XML::dtdParseElement(ISource &dtdSource, XNodeDTD *xNodeDTD)
     {
         dtdSource.ignoreWS();
-        std::string elementName = dtdParseName(dtdSource);
+        std::string elementName = parseName(dtdSource);
         XValue contentSpecification;
         if (dtdSource.match(U"EMPTY"))
         {
@@ -912,7 +897,7 @@ namespace H4
         XNodeDTD xNodeDTD;
         long start = dtdSource.position();
         dtdSource.ignoreWS();
-        xNodeDTD.name = dtdParseName(dtdSource);
+        xNodeDTD.name = parseName(dtdSource);
         // TODO: External needs to be parsed after any internal that is there as
         // both can be used in an XML file.
         if (dtdSource.current() == '[')

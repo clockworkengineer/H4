@@ -138,21 +138,21 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Valid XML name.</returns>
-    std::string XML::xmlParseName(ISource &xmlSource)
-    {
-        XString name;
-        while (xmlSource.more() && validNameChar(xmlSource.current()))
-        {
-            name += xmlSource.current();
-            xmlSource.next();
-        }
-        xmlSource.ignoreWS();
-        if (!validName(name))
-        {
-            throw SyntaxError(xmlSource, "Invalid name '" + xmlSource.to_bytes(name) + "' encountered.");
-        }
-        return (xmlSource.to_bytes(name));
-    }
+    // std::string XML::parseName(ISource &xmlSource)
+    // {
+    //     XString name;
+    //     while (xmlSource.more() && validNameChar(xmlSource.current()))
+    //     {
+    //         name += xmlSource.current();
+    //         xmlSource.next();
+    //     }
+    //     xmlSource.ignoreWS();
+    //     if (!validName(name))
+    //     {
+    //         throw SyntaxError(xmlSource, "Invalid name '" + xmlSource.to_bytes(name) + "' encountered.");
+    //     }
+    //     return (xmlSource.to_bytes(name));
+    // }
     /// <summary>
     /// Parse a element tag name and set its value in current XNodeElement.
     /// </summary>
@@ -160,7 +160,7 @@ namespace H4
     /// <returns></returns>
     void XML::xmlParseTagName(ISource &xmlSource, XNodeElement *xNodeElement)
     {
-        xNodeElement->name = xmlParseName(xmlSource);
+        xNodeElement->name = parseName(xmlSource);
     }
     /// <summary>
     /// Parse a XML comment, create a XNodeComment for it and add to list
@@ -191,7 +191,7 @@ namespace H4
     void XML::xmlParsePI(ISource &xmlSource, XNodeElement *xNodeElement)
     {
         XNodePI xNodePI;
-        xNodePI.name = xmlParseName(xmlSource);
+        xNodePI.name = parseName(xmlSource);
         while (xmlSource.more() && !xmlSource.match(U"?>"))
         {
             xNodePI.parameters += xmlSource.current_to_bytes();
@@ -239,7 +239,7 @@ namespace H4
                xmlSource.current() != '/' &&
                xmlSource.current() != '>')
         {
-            std::string attributeName = xmlParseName(xmlSource);
+            std::string attributeName = parseName(xmlSource);
             if (!xmlSource.match(U"="))
             {
                 throw SyntaxError(xmlSource, "Missing '=' between attribute name and value.");

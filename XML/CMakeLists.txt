@@ -26,6 +26,7 @@ set (XML_SOURCES
     ./classes/XML_validation.cpp
     ./classes/XML_stringify.cpp
     ./classes/XML_utility.cpp
+    ./classes/XML_core.cpp
 )
 
 set (XML_INCLUDES
@@ -34,6 +35,7 @@ set (XML_INCLUDES
     ./include/XMLSources.hpp
     ./include/XMLDestinations.hpp
     ./include/XNode.hpp
+    ./incldue/XML_core.hpp
 )
 
 # XML library
