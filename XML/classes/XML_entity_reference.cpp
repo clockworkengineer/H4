@@ -43,47 +43,6 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    /// Parse XML string value representing a character reference or entity.
-    /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
-    /// <returns>Value for reference or enity.</returns>
-    XValue XML::xmlParseReferenceOrEntity(ISource &xmlSource)
-    {
-        XValue entityReference;
-        if (xmlSource.match(U"&#"))
-        {
-            entityReference = parseCharacterReference(xmlSource);
-        }
-        else
-        {
-            entityReference = parseEntity(xmlSource);
-            if (m_entityMapping.count(entityReference.unparsed) > 0)
-            {
-                if (!m_entityMapping[entityReference.unparsed].internal.empty())
-                {
-                    entityReference.parsed = m_entityMapping[entityReference.unparsed].internal;
-                }
-                else
-                {
-                    if (std::filesystem::exists(m_entityMapping[entityReference.unparsed].external.systemID))
-                    {
-                        FileSource entitySource(m_entityMapping[entityReference.unparsed].external.systemID);
-                        while (entitySource.more())
-                        {
-                            entityReference.parsed += entitySource.current_to_bytes();
-                            entitySource.next();
-                        }
-                    }
-                    else
-                    {
-                        throw SyntaxError("Entity '" + entityReference.unparsed + "' source file '" + m_entityMapping[entityReference.unparsed].external.systemID + "' does not exist.");
-                    }
-                }
-            }
-        }
-        return (entityReference);
-    }
-    /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
@@ -121,5 +80,34 @@ namespace H4
             }
         }
         xNodeElement->children.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
+    }
+
+    void XML::mapEntityReference(XValue &entityReference)
+    {
+
+        if (m_entityMapping.count(entityReference.unparsed) > 0)
+        {
+            if (!m_entityMapping[entityReference.unparsed].internal.empty())
+            {
+                entityReference.parsed = m_entityMapping[entityReference.unparsed].internal;
+            }
+            else
+            {
+                if (std::filesystem::exists(m_entityMapping[entityReference.unparsed].external.systemID))
+                {
+                    FileSource entitySource(m_entityMapping[entityReference.unparsed].external.systemID);
+                    while (entitySource.more())
+                    {
+                        entityReference.parsed += entitySource.current_to_bytes();
+                        entitySource.next();
+                    }
+                }
+                else
+                {
+                    throw SyntaxError("Entity '" + entityReference.unparsed + "' source file '" + m_entityMapping[entityReference.unparsed].external.systemID + "' does not exist.");
+                }
+            }
+        }
+
     }
 } // namespace H4

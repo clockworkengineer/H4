@@ -84,9 +84,14 @@ namespace H4
     XValue XML::xmlParseCharacter(ISource &xmlSource)
     {
         XValue character;
-        if (xmlSource.current() == '&')
+        if (xmlSource.match(U"&#"))
         {
-            character = xmlParseReferenceOrEntity(xmlSource);
+            character = parseCharacterReference(xmlSource);
+        }
+        else if (xmlSource.current() == '&')
+        {
+            character = parseEntityReference(xmlSource);
+            mapEntityReference(character);
         }
         else if (validChar(xmlSource.current()))
         {

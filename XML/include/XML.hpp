@@ -115,13 +115,7 @@ namespace H4
         std::vector<std::string> split(std::string strToSplit, char delimeter);
         void initialiseTables();
         bool validAttributeValue(XValue &value);
-        // bool validChar(XChar ch);
-        // bool validNameStartChar(XChar c);
-        // bool validNameChar(XChar c);
-        // bool validName(XString attributeName);
         void validXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement);
-        // bool validReservedName(const XString &name);
-        // std::string dtdParseName(ISource &xmlSource);
         void dtdParseParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource);
         void dtdParseTranslateParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource);
         void dtdValidateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement);
@@ -156,11 +150,9 @@ namespace H4
         void dtdParse(ISource &dtdSource, XNodeElement *XNodeElement);
         void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
         void xmlParseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference);
-       // std::string xmlParseName(ISource &xmlSource);
-       // std::string xmlParseCharacterReference(ISource &xmlSource, std::string reference);
+        void mapEntityReference(XValue &entityReference);
         XValue xmlParseValue(ISource &xmlSource, bool translateEntity = true);
         XValue xmlParseCharacter(ISource &xmlSource);
-        XValue xmlParseReferenceOrEntity(ISource &xmlSource);
         void xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
         void xmlParseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
         void xmlParseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);

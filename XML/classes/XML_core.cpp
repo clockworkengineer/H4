@@ -138,7 +138,7 @@ namespace H4
         }
         return (xmlSource.to_bytes(name));
     }
-    XValue parseEntity(ISource &xmlSource)
+    XValue parseEntityReference(ISource &xmlSource)
     {
         XValue entityReference;
         while (xmlSource.more() && xmlSource.current() != ';')
@@ -161,12 +161,11 @@ namespace H4
     /// <returns>Character reference value.</returns>
     XValue parseCharacterReference(ISource &xmlSource)
     {
-
-        XValue entityReference;
-        entityReference.unparsed = "&#";
+        XValue characterRefence;
+        characterRefence.unparsed = "&#";
         while (xmlSource.more() && xmlSource.current() != ';')
         {
-            entityReference.unparsed += xmlSource.current_to_bytes();
+            characterRefence.unparsed += xmlSource.current_to_bytes();
             xmlSource.next();
         }
         if (xmlSource.current() != ';')
@@ -174,8 +173,8 @@ namespace H4
             throw XML::SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
         }
         xmlSource.next();
-        entityReference.unparsed += ';';
-        std::string reference = entityReference.unparsed;
+        characterRefence.unparsed += ';';
+        std::string reference = characterRefence.unparsed;
         char *end;
         long result = 10;
         if (reference[2] == 'x')
@@ -194,9 +193,10 @@ namespace H4
             {
                 throw XML::SyntaxError(xmlSource, "Character reference invalid character.");
             }
-            entityReference.parsed = xmlSource.to_bytes(result);
-            return (entityReference);
+            characterRefence.parsed = xmlSource.to_bytes(result);
+            return (characterRefence);
         }
         throw XML::SyntaxError(xmlSource, "Cannot convert character reference.");
     }
+    
 } // namespace H4

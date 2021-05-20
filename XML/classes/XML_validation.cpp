@@ -122,7 +122,7 @@ namespace H4
         {
             if (valueSoure.current() == '&')
             {
-                xmlParseReferenceOrEntity(valueSoure);
+                parseEntityReference(valueSoure);
             }
             else if ((valueSoure.current() == '<') ||
                      (valueSoure.current() == '"') ||
