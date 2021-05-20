@@ -157,7 +157,7 @@ namespace H4
         void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
         void xmlParseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference);
        // std::string xmlParseName(ISource &xmlSource);
-        std::string xmlParseCharacterReference(ISource &xmlSource, std::string reference);
+       // std::string xmlParseCharacterReference(ISource &xmlSource, std::string reference);
         XValue xmlParseValue(ISource &xmlSource, bool translateEntity = true);
         XValue xmlParseCharacter(ISource &xmlSource);
         XValue xmlParseReferenceOrEntity(ISource &xmlSource);

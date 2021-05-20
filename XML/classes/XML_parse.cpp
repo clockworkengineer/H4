@@ -134,26 +134,6 @@ namespace H4
         throw SyntaxError(xmlSource, "Invalid attribute value.");
     }
     /// <summary>
-    /// Parse an XML name and return it.
-    /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
-    /// <returns>Valid XML name.</returns>
-    // std::string XML::parseName(ISource &xmlSource)
-    // {
-    //     XString name;
-    //     while (xmlSource.more() && validNameChar(xmlSource.current()))
-    //     {
-    //         name += xmlSource.current();
-    //         xmlSource.next();
-    //     }
-    //     xmlSource.ignoreWS();
-    //     if (!validName(name))
-    //     {
-    //         throw SyntaxError(xmlSource, "Invalid name '" + xmlSource.to_bytes(name) + "' encountered.");
-    //     }
-    //     return (xmlSource.to_bytes(name));
-    // }
-    /// <summary>
     /// Parse a element tag name and set its value in current XNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>

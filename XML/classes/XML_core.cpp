@@ -138,4 +138,65 @@ namespace H4
         }
         return (xmlSource.to_bytes(name));
     }
+    XValue parseEntity(ISource &xmlSource)
+    {
+        XValue entityReference;
+        while (xmlSource.more() && xmlSource.current() != ';')
+        {
+            entityReference.unparsed += xmlSource.current_to_bytes();
+            xmlSource.next();
+        }
+        if (xmlSource.current() != ';')
+        {
+            throw XML::SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
+        }
+        entityReference.unparsed += ';';
+        xmlSource.next();
+        return (entityReference);
+    }
+    /// <summary>
+    /// Parse a character reference value (hex/dec) returning its value.
+    /// </summary>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns>Character reference value.</returns>
+    XValue parseCharacterReference(ISource &xmlSource)
+    {
+
+        XValue entityReference;
+        entityReference.unparsed = "&#";
+        while (xmlSource.more() && xmlSource.current() != ';')
+        {
+            entityReference.unparsed += xmlSource.current_to_bytes();
+            xmlSource.next();
+        }
+        if (xmlSource.current() != ';')
+        {
+            throw XML::SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
+        }
+        xmlSource.next();
+        entityReference.unparsed += ';';
+        std::string reference = entityReference.unparsed;
+        char *end;
+        long result = 10;
+        if (reference[2] == 'x')
+        {
+            reference = reference.substr(3, reference.size() - 4);
+            result = 16;
+        }
+        else
+        {
+            reference = reference.substr(2, reference.size() - 3);
+        }
+        result = std::strtol(reference.c_str(), &end, result);
+        if (*end == '\0')
+        {
+            if (!validChar(result))
+            {
+                throw XML::SyntaxError(xmlSource, "Character reference invalid character.");
+            }
+            entityReference.parsed = xmlSource.to_bytes(result);
+            return (entityReference);
+        }
+        throw XML::SyntaxError(xmlSource, "Cannot convert character reference.");
+    }
 } // namespace H4

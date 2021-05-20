@@ -25,6 +25,15 @@ namespace H4
     using XString = std::u32string;
     using XChar = XString::value_type;
     //
+    // XML value
+    //
+    struct XValue
+    {
+    public:
+        std::string unparsed;
+        std::string parsed;
+    };
+    //
     // XML validation
     //
     bool validChar(XChar ch);
@@ -36,7 +45,9 @@ namespace H4
     // XML parsing
     //
     class ISource;
+    XValue parseEntity(ISource &xmlSource);
     std::string parseName(ISource &xmlSource);
+    XValue parseCharacterReference(ISource &xmlSource);
 
 } // namespace H4
 #endif /* XML_CORE_HPP */

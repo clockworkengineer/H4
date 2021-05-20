@@ -20,13 +20,13 @@ namespace H4
     // using XChar = XString::value_type;
     //
     // XML value
-    //
-    struct XValue
-    {
-    public:
-        std::string unparsed;
-        std::string parsed;
-    };
+    // //
+    // struct XValue
+    // {
+    // public:
+    //     std::string unparsed;
+    //     std::string parsed;
+    // };
     //
     // XML Attribute
     //

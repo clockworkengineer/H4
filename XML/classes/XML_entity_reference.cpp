@@ -43,31 +43,6 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    /// Parse a character reference returning its value.
-    /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
-    /// <returns>Character reference value.</returns>
-    std::string XML::xmlParseCharacterReference(ISource &xmlSource, std::string reference)
-    {
-        char *end;
-        long result = 10;
-        if (reference[0] == 'x')
-        {
-            reference = reference.substr(1);
-            result = 16;
-        }
-        result = std::strtol(reference.c_str(), &end, result);
-        if (*end == '\0')
-        {
-            if (!validChar(result))
-            {
-                throw SyntaxError(xmlSource, "Character reference invalid character.");
-            }
-            return (xmlSource.to_bytes(result));
-        }
-        throw SyntaxError(xmlSource, "Cannot convert character reference.");
-    }
-    /// <summary>
     /// Parse XML string value representing a character reference or entity.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
@@ -75,41 +50,34 @@ namespace H4
     XValue XML::xmlParseReferenceOrEntity(ISource &xmlSource)
     {
         XValue entityReference;
-        while (xmlSource.more() && xmlSource.current() != ';')
+        if (xmlSource.match(U"&#"))
         {
-            entityReference.unparsed += xmlSource.current_to_bytes();
-            xmlSource.next();
+            entityReference = parseCharacterReference(xmlSource);
         }
-        if (xmlSource.current() != ';')
+        else
         {
-            throw SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
-        }
-        entityReference.unparsed += ';';
-        xmlSource.next();
-        if (entityReference.unparsed[1] == '#')
-        {
-            entityReference.parsed = xmlParseCharacterReference(xmlSource, entityReference.unparsed.substr(2, entityReference.unparsed.size() - 3));
-        }
-        else if (m_entityMapping.count(entityReference.unparsed) > 0)
-        {
-            if (!m_entityMapping[entityReference.unparsed].internal.empty())
+            entityReference = parseEntity(xmlSource);
+            if (m_entityMapping.count(entityReference.unparsed) > 0)
             {
-                entityReference.parsed = m_entityMapping[entityReference.unparsed].internal;
-            }
-            else
-            {
-                if (std::filesystem::exists(m_entityMapping[entityReference.unparsed].external.systemID))
+                if (!m_entityMapping[entityReference.unparsed].internal.empty())
                 {
-                    FileSource entitySource(m_entityMapping[entityReference.unparsed].external.systemID);
-                    while (entitySource.more())
-                    {
-                        entityReference.parsed += entitySource.current_to_bytes();
-                        entitySource.next();
-                    }
+                    entityReference.parsed = m_entityMapping[entityReference.unparsed].internal;
                 }
                 else
                 {
-                    throw SyntaxError("Entity '" + entityReference.unparsed + "' source file '" + m_entityMapping[entityReference.unparsed].external.systemID + "' does not exist.");
+                    if (std::filesystem::exists(m_entityMapping[entityReference.unparsed].external.systemID))
+                    {
+                        FileSource entitySource(m_entityMapping[entityReference.unparsed].external.systemID);
+                        while (entitySource.more())
+                        {
+                            entityReference.parsed += entitySource.current_to_bytes();
+                            entitySource.next();
+                        }
+                    }
+                    else
+                    {
+                        throw SyntaxError("Entity '" + entityReference.unparsed + "' source file '" + m_entityMapping[entityReference.unparsed].external.systemID + "' does not exist.");
+                    }
                 }
             }
         }
