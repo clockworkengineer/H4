@@ -152,7 +152,7 @@ namespace H4
         void xmlParseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference);
         void mapEntityReference(XValue &entityReference);
         XValue xmlParseValue(ISource &xmlSource, bool translateEntity = true);
-        XValue xmlParseCharacter(ISource &xmlSource);
+        XValue xmlParseCharacter(ISource &xmlSource,  bool translateEntity = true);
         void xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
         void xmlParseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
         void xmlParseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);

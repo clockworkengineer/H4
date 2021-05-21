@@ -81,7 +81,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Character value.</returns>
-    XValue XML::xmlParseCharacter(ISource &xmlSource)
+    XValue XML::xmlParseCharacter(ISource &xmlSource, bool translateEntity)
     {
         XValue character;
         if (xmlSource.match(U"&#"))
@@ -91,7 +91,14 @@ namespace H4
         else if (xmlSource.current() == '&')
         {
             character = parseEntityReference(xmlSource);
-            mapEntityReference(character);
+            if (translateEntity)
+            {
+                mapEntityReference(character);
+            }
+            else
+            {
+                character.parsed = character.unparsed;
+            }
         }
         else if (validChar(xmlSource.current()))
         {
@@ -120,17 +127,7 @@ namespace H4
             xmlSource.next();
             while (xmlSource.more() && xmlSource.current() != quote)
             {
-                XValue character = xmlParseCharacter(xmlSource);
-                if (translateEntity ||
-                    character.unparsed.starts_with("&#"))
-                {
-                    value.parsed += character.parsed;
-                }
-                else
-                {
-                    value.parsed += character.unparsed;
-                }
-                value.unparsed += character.unparsed;
+                value += xmlParseCharacter(xmlSource, translateEntity);
             }
             xmlSource.next();
             xmlSource.ignoreWS();

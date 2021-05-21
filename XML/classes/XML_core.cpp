@@ -123,6 +123,11 @@ namespace H4
         }
         return (true);
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     std::string parseName(ISource &xmlSource)
     {
         XString name;
@@ -138,6 +143,11 @@ namespace H4
         }
         return (xmlSource.to_bytes(name));
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     XValue parseEntityReference(ISource &xmlSource)
     {
         XValue entityReference;
@@ -198,5 +208,4 @@ namespace H4
         }
         throw XML::SyntaxError(xmlSource, "Cannot convert character reference.");
     }
-    
 } // namespace H4

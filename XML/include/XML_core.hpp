@@ -32,6 +32,12 @@ namespace H4
     public:
         std::string unparsed;
         std::string parsed;
+        XValue operator+=(const XValue &rhs)
+        {
+            parsed += rhs.parsed;
+            unparsed += rhs.unparsed;
+            return(*this);
+        }
     };
     //
     // XML validation

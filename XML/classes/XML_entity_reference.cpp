@@ -49,7 +49,6 @@ namespace H4
     /// <returns></returns>
     void XML::xmlParseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference)
     {
-
         XNodeEntityReference xNodeEntityReference(entityReference);
         if (entityReference.unparsed[1] != '#')
         {
@@ -81,10 +80,13 @@ namespace H4
         }
         xNodeElement->children.emplace_back(std::make_unique<XNodeEntityReference>(std::move(xNodeEntityReference)));
     }
-
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     void XML::mapEntityReference(XValue &entityReference)
     {
-
         if (m_entityMapping.count(entityReference.unparsed) > 0)
         {
             if (!m_entityMapping[entityReference.unparsed].internal.empty())
@@ -108,6 +110,5 @@ namespace H4
                 }
             }
         }
-
     }
 } // namespace H4
