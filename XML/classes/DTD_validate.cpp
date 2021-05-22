@@ -47,7 +47,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool DTD::dtdVadlidateIsPCDATA(XNodeElement *xNodeElement)
+    bool DTD::validateIsPCDATA(XNodeElement *xNodeElement)
     {
         for (auto &element : xNodeElement->children)
         {
@@ -64,7 +64,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool DTD::dtdValidateIsEMPTY(XNodeElement *xNodeElement)
+    bool DTD::validateIsEMPTY(XNodeElement *xNodeElement)
     {
         return (xNodeElement->children.empty() || xNodeElement->getNodeType() == XNodeType::self);
     }
@@ -73,7 +73,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::dtdValidateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    void DTD::validateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
         for (auto &attribute : dtd->dtd->elements[xNodeElement->name].attributes)
         {
@@ -200,7 +200,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::dtdValidateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    void DTD::validateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
         if ((dtd == nullptr) || (dtd->dtd->elements.empty()))
         {
@@ -208,7 +208,7 @@ namespace H4
         }
         if (dtd->dtd->elements[xNodeElement->name].content.parsed == "((<#PCDATA>))")
         {
-            if (!dtdVadlidateIsPCDATA(xNodeElement))
+            if (!validateIsPCDATA(xNodeElement))
             {
                 throw ValidationError(dtd, "Element <" + xNodeElement->name + "> does not contain just any parsable data.");
             }
@@ -216,7 +216,7 @@ namespace H4
         }
         if (dtd->dtd->elements[xNodeElement->name].content.parsed == "EMPTY")
         {
-            if (!dtdValidateIsEMPTY(xNodeElement))
+            if (!validateIsEMPTY(xNodeElement))
             {
                 throw ValidationError(dtd, "Element <" + xNodeElement->name + "> is not empty.");
             }
@@ -254,24 +254,24 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::dtdValidateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    void DTD::validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
-        dtdValidateContentSpecification(dtd, xNodeElement);
-        dtdValidateAttributes(dtd, xNodeElement);
+        validateContentSpecification(dtd, xNodeElement);
+        validateAttributes(dtd, xNodeElement);
     }
     /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::dtdVadlidateElements(XNodeDTD *dtd, XNode *xNode)
+    void DTD::validateElements(XNodeDTD *dtd, XNode *xNode)
     {
         switch (xNode->getNodeType())
         {
         case XNodeType::prolog:
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).children)
             {
-                dtdVadlidateElements(dtd, element.get());
+                validateElements(dtd, element.get());
             }
             break;
         case XNodeType::root:
@@ -280,14 +280,14 @@ namespace H4
                 throw ValidationError(dtd, "DOCTYPE name does not match that of root element " + XNodeRef<XNodeElement>((*xNode)).name + " of DTD.");
             }
         case XNodeType::element:
-            dtdValidateElement(dtd, static_cast<XNodeElement *>(xNode));
+            validateElement(dtd, static_cast<XNodeElement *>(xNode));
             for (auto &element : XNodeRef<XNodeElement>((*xNode)).children)
             {
-                dtdVadlidateElements(dtd, element.get());
+                validateElements(dtd, element.get());
             }
             break;
         case XNodeType::self:
-            dtdValidateElement(dtd, static_cast<XNodeElement *>(xNode));
+            validateElement(dtd, static_cast<XNodeElement *>(xNode));
             break;
         case XNodeType::comment:
         case XNodeType::entity:
@@ -328,7 +328,7 @@ namespace H4
             }
             if (dtd != nullptr)
             {
-                dtdVadlidateElements(dtd, &prolog);
+                validateElements(dtd, &prolog);
                 for (auto &idref : dtd->dtd->assignedIDREFValues)
                 {
                     if (!dtd->dtd->assignedIDValues.contains(idref))

@@ -8,7 +8,6 @@
 #include <memory>
 #include <unordered_map>
 #include <set>
-// #include <tuple>
 //
 // XML Core
 //
@@ -88,7 +87,6 @@ namespace H4
         // ============
         XML(ISource &xmlSource) : m_xmlSource(xmlSource)
         {
-            initialiseTables();
         }
         // ==========
         // DESTRUCTOR
@@ -116,22 +114,21 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void stringifyElements(XNode *xNode, IDestination &xmlDestination);
-        void initialiseTables();
         bool validAttributeValue(XValue &value);
         void validXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement);
-        void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
-        void xmlParseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference);
-        void xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
-        void xmlParseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
-        void xmlParseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);
-        void xmlParseAttributes(ISource &xmlSource, XNodeElement *xNodeElement);
-        void xmlParseComment(ISource &xmlSource, XNodeElement *xNodeElement);
-        void xmlParseCDATA(ISource &xmlSource, XNodeElement *xNodeElement);
-        void xmlParsePI(ISource &xmlSource, XNodeElement *xNodeElement);
-        void xmlParseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
-        void xmlParseElement(ISource &xmlSource, XNodeElement *XNodeElement);
-        void xmlParseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
-        void xmlParse();
+        void parseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
+        void parseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference);
+        void parseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseAttributes(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseComment(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseCDATA(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parsePI(ISource &xmlSource, XNodeElement *xNodeElement);
+        void parseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
+        void parseElement(ISource &xmlSource, XNodeElement *XNodeElement);
+        void parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
+        void parseWML();
         void stringifyXML(IDestination &xmlDestination);
         // =================
         // PRIVATE VARIABLES

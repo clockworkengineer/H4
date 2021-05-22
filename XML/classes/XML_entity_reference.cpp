@@ -47,7 +47,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::xmlParseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference)
+    void XML::parseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference)
     {
         XNodeEntityReference xNodeEntityReference(entityReference);
         if (entityReference.unparsed[1] != '#')
@@ -58,7 +58,7 @@ namespace H4
             {
                 while (entitySource.more())
                 {
-                    xmlParseElementContents(entitySource, &entityElement);
+                    parseElementContents(entitySource, &entityElement);
                 }
                 xNodeEntityReference.children = std::move(entityElement.children);
                 if (!xNodeElement->children.empty())
@@ -73,7 +73,7 @@ namespace H4
             {
                 while (entitySource.more())
                 {
-                    xmlParseElementContents(entitySource, xNodeElement);
+                    parseElementContents(entitySource, xNodeElement);
                 }
                 return;
             }
