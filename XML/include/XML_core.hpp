@@ -36,7 +36,7 @@ namespace H4
         {
             parsed += rhs.parsed;
             unparsed += rhs.unparsed;
-            return(*this);
+            return (*this);
         }
     };
     //
@@ -72,6 +72,7 @@ namespace H4
         XExternalReference external;
         std::string notation;
     };
+    using XEntityMappings = std::unordered_map<std::string, XEntityMapping>;
     //
     // XML validation
     //
@@ -87,9 +88,10 @@ namespace H4
     XValue parseEntityReference(ISource &xmlSource);
     std::string parseName(ISource &xmlSource);
     XValue parseCharacterReference(ISource &xmlSource);
+    XValue parseCharacter(ISource &xmlSource, XEntityMappings &entityMapping, bool translateEntity = true);
     //
     // XML entity
     //
-    void mapEntityReference(XValue &entityReference, std::unordered_map<std::string, XEntityMapping> &entityMapping);
+    void mapEntityReference(XValue &entityReference, XEntityMappings &entityMapping);
 } // namespace H4
 #endif /* XML_CORE_HPP */

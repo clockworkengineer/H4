@@ -244,4 +244,42 @@ namespace H4
             }
         }
     }
+    /// <summary>
+    /// Parse character value which can be either be a plain character
+    /// or character reference/entity string that maps to a string of
+    /// characters.
+    /// </summary>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns>Character value.</returns>
+    XValue parseCharacter(ISource &xmlSource, std::unordered_map<std::string, XEntityMapping> &entityMapping, bool translateEntity)
+    {
+        XValue character;
+        if (xmlSource.match(U"&#"))
+        {
+            character = parseCharacterReference(xmlSource);
+        }
+        else if (xmlSource.current() == '&')
+        {
+            character = parseEntityReference(xmlSource);
+            if (translateEntity)
+            {
+                mapEntityReference(character, entityMapping);
+            }
+            else
+            {
+                character.parsed = character.unparsed;
+            }
+        }
+        else if (validChar(xmlSource.current()))
+        {
+            character.parsed = xmlSource.current_to_bytes();
+            character.unparsed = character.parsed;
+            xmlSource.next();
+        }
+        else
+        {
+            throw XML::SyntaxError(xmlSource, "Invalid character value encountered.");
+        }
+        return (character);
+    }
 } // namespace H4

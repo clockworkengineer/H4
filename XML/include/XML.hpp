@@ -98,7 +98,7 @@ namespace H4
         // PUBLIC VARIABLES
         // ================
         XNodeElement m_prolog;
-        std::unordered_map<std::string, XEntityMapping> m_entityMapping;
+        XEntityMappings m_entityMapping;
 
     private:
         // ===========================
@@ -151,7 +151,7 @@ namespace H4
         void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
         void xmlParseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference);
         XValue xmlParseValue(ISource &xmlSource, bool translateEntity = true);
-        XValue xmlParseCharacter(ISource &xmlSource,  bool translateEntity = true);
+        // XValue xmlParseCharacter(ISource &xmlSource,  bool translateEntity = true);
         void xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
         void xmlParseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
         void xmlParseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);

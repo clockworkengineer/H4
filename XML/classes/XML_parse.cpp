@@ -75,44 +75,6 @@ namespace H4
         XNodeRef<XNodeContent>(*xNodeElement->children.back()).content += content;
     }
     /// <summary>
-    /// Parse character value which can be either be a plain character
-    /// or character reference/entity string that maps to a string of
-    /// characters.
-    /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
-    /// <returns>Character value.</returns>
-    XValue XML::xmlParseCharacter(ISource &xmlSource, bool translateEntity)
-    {
-        XValue character;
-        if (xmlSource.match(U"&#"))
-        {
-            character = parseCharacterReference(xmlSource);
-        }
-        else if (xmlSource.current() == '&')
-        {
-            character = parseEntityReference(xmlSource);
-            if (translateEntity)
-            {
-                mapEntityReference(character, m_entityMapping);
-            }
-            else
-            {
-                character.parsed = character.unparsed;
-            }
-        }
-        else if (validChar(xmlSource.current()))
-        {
-            character.parsed = xmlSource.current_to_bytes();
-            character.unparsed = character.parsed;
-            xmlSource.next();
-        }
-        else
-        {
-            throw SyntaxError(xmlSource, "Invalid character value encountered.");
-        }
-        return (character);
-    }
-    /// <summary>
     /// Parse string value from XML source stream and return it. Note: The
     /// string may be encased in either single or double quotes.
     /// </summary>
@@ -127,7 +89,7 @@ namespace H4
             xmlSource.next();
             while (xmlSource.more() && xmlSource.current() != quote)
             {
-                value += xmlParseCharacter(xmlSource, translateEntity);
+                value += parseCharacter(xmlSource, m_entityMapping, translateEntity);
             }
             xmlSource.next();
             xmlSource.ignoreWS();
@@ -279,7 +241,7 @@ namespace H4
     /// <returns></returns>
     void XML::xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement)
     {
-        XValue entityReference = xmlParseCharacter(xmlSource);
+        XValue entityReference = parseCharacter(xmlSource, m_entityMapping);
         if (entityReference.unparsed.starts_with("&") && entityReference.unparsed.ends_with(";"))
         {
             xmlParseEntityMappingContents(xNodeElement, entityReference);
