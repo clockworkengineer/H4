@@ -1,7 +1,7 @@
 //
-// Class: XML
+// Class: DTD
 //
-// Description: XML Document Type Definition parsing.
+// Description: DTD Document Type Definition parsing.
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -12,6 +12,7 @@
 #include "XML.hpp"
 #include "XMLSources.hpp"
 #include "XMLDestinations.hpp"
+#include "DTD.hpp"
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
@@ -47,7 +48,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool XML::dtdVadlidateIsPCDATA(XNodeElement *xNodeElement)
+    bool DTD::dtdVadlidateIsPCDATA(XNodeElement *xNodeElement)
     {
         for (auto &element : xNodeElement->children)
         {
@@ -64,7 +65,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool XML::dtdValidateIsEMPTY(XNodeElement *xNodeElement)
+    bool DTD::dtdValidateIsEMPTY(XNodeElement *xNodeElement)
     {
         return (xNodeElement->children.empty() || xNodeElement->getNodeType() == XNodeType::self);
     }
@@ -73,7 +74,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::dtdValidateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    void DTD::dtdValidateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
         for (auto &attribute : dtd->elements[xNodeElement->name].attributes)
         {
@@ -84,8 +85,8 @@ namespace H4
             // ID	        The value is a unique id
             // IDREF        The value is the id of another element
             // IDREFS       The value is a list of other ids
-            // NMTOKEN      The value is a valid XML name
-            // NMTOKENS	    The value is a list of valid XML names
+            // NMTOKEN      The value is a valid DTD name
+            // NMTOKENS	    The value is a list of valid DTD names
             // ENTIT        The value is an entity
             // ENTITIES	    The value is a list of entities
             // NOTATION	    The value is a name of a notation
@@ -200,7 +201,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::dtdValidateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    void DTD::dtdValidateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
         if ((dtd == nullptr) || (dtd->elements.empty()))
         {
@@ -254,7 +255,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::dtdValidateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    void DTD::dtdValidateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
         dtdValidateContentSpecification(dtd, xNodeElement);
         dtdValidateAttributes(dtd, xNodeElement);
@@ -264,7 +265,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::dtdVadlidateElements(XNodeDTD *dtd, XNode *xNode)
+    void DTD::dtdVadlidateElements(XNodeDTD *dtd, XNode *xNode)
     {
         switch (xNode->getNodeType())
         {
@@ -277,7 +278,7 @@ namespace H4
         case XNodeType::root:
             if (XNodeRef<XNodeElement>((*xNode)).name != dtd->name)
             {
-                throw ValidationError(dtd, "DOCTYPE name does not match that of root element " + XNodeRef<XNodeElement>((*xNode)).name + " of XML.");
+                throw ValidationError(dtd, "DOCTYPE name does not match that of root element " + XNodeRef<XNodeElement>((*xNode)).name + " of DTD.");
             }
         case XNodeType::element:
             dtdValidateElement(dtd, static_cast<XNodeElement *>(xNode));
@@ -313,12 +314,12 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::dtdValidateXML()
+    void DTD::dtdValidateDTD(XNodeElement &prolog)
     {
-        if (m_prolog.getNodeType() == XNodeType::prolog)
+        if (prolog.getNodeType() == XNodeType::prolog)
         {
             XNodeDTD *dtd;
-            for (auto &element : m_prolog.children)
+            for (auto &element : prolog.children)
             {
                 if (element->getNodeType() == XNodeType::dtd)
                 {
@@ -328,7 +329,7 @@ namespace H4
             }
             if (dtd != nullptr)
             {
-                dtdVadlidateElements(dtd, &m_prolog);
+                dtdVadlidateElements(dtd, &prolog);
                 for (auto &idref : dtd->assignedIDREFValues)
                 {
                     if (!dtd->assignedIDValues.contains(idref))

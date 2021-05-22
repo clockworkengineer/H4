@@ -27,6 +27,7 @@ set (XML_SOURCES
     ./classes/XML_stringify.cpp
     ./classes/XML_utility.cpp
     ./classes/XML_core.cpp
+    ./classes/DTD.cpp
 )
 
 set (XML_INCLUDES
@@ -36,6 +37,7 @@ set (XML_INCLUDES
     ./include/XMLDestinations.hpp
     ./include/XNode.hpp
     ./incldue/XML_core.hpp
+    ./include/DTD.cpp
 )
 
 # XML library

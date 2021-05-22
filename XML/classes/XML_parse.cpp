@@ -189,7 +189,7 @@ namespace H4
                 throw SyntaxError(xmlSource, "Missing '=' between attribute name and value.");
             }
             xmlSource.ignoreWS();
-            XValue attributeValue = parseValue(xmlSource, m_entityMapping);
+            XValue attributeValue = parseValue(xmlSource, m_dtd.m_entityMapping);
             if (!validAttributeValue(attributeValue))
             {
                 throw SyntaxError(xmlSource, "Attribute value contains invalid character '<', '\"', ''' or '&'.");
@@ -241,7 +241,7 @@ namespace H4
     /// <returns></returns>
     void XML::xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement)
     {
-        XValue entityReference = parseCharacter(xmlSource, m_entityMapping);
+        XValue entityReference = parseCharacter(xmlSource, m_dtd.m_entityMapping);
         if (entityReference.unparsed.starts_with("&") && entityReference.unparsed.ends_with(";"))
         {
             xmlParseEntityMappingContents(xNodeElement, entityReference);
@@ -348,7 +348,7 @@ namespace H4
             }
             else if (xmlSource.match(U"<!DOCTYPE"))
             {
-                dtdParse(xmlSource, xNodeProlog);
+                m_dtd.parse(xmlSource, xNodeProlog);
             }
             else if (xmlSource.current() == '<')
             {

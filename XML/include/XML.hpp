@@ -22,6 +22,7 @@
 //
 #include "ISource.hpp"
 #include "IDestination.hpp"
+#include "DTD.hpp"
 // =========
 // NAMESPACE
 // =========
@@ -98,7 +99,8 @@ namespace H4
         // PUBLIC VARIABLES
         // ================
         XNodeElement m_prolog;
-        XEntityMappings m_entityMapping;
+       // XEntityMappings m_entityMapping;
+        DTD m_dtd;
 
     private:
         // ===========================
@@ -111,43 +113,43 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void stringifyElements(XNode *xNode, IDestination &xmlDestination);
-        void checkForEntityRecursion(XNodeDTD *xNodeDTD, const std::string &entityName, std::set<std::string> names = {});
-        std::vector<std::string> split(std::string strToSplit, char delimeter);
+        // void checkForEntityRecursion(XNodeDTD *xNodeDTD, const std::string &entityName, std::set<std::string> names = {});
+        // std::vector<std::string> split(std::string strToSplit, char delimeter);
         void initialiseTables();
         bool validAttributeValue(XValue &value);
         void validXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement);
-        void dtdParseParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource);
-        void dtdParseTranslateParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource);
-        void dtdValidateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement);
-        void dtdValidateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement);
-        void dtdValidateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
-        void dtdVadlidateElements(XNodeDTD *dtd, XNode *xNodeRoot);
-        bool dtdVadlidateIsPCDATA(XNodeElement *xNodeElement);
-        bool dtdValidateIsEMPTY(XNodeElement *xNodeElement);
-        std::string dtdParseTranslateParameterEntities(XNodeDTD *xNodeDTD, const std::string &parameterEntities);
-        std::string dtdParseAttributeEnumerationType(ISource &xmlSource);
-        bool dtdParseIsChoiceOrSequence(ISource &contentSpecSource);
-        void dtdParseElementCP(ISource &contentSpecSource, IDestination &contentSpec);
-        void dtdParseElementChoice(ISource &contentSpecSource, IDestination &contentSpec);
-        void dtdParseElementSequence(ISource &contentSpecSource, IDestination &contentSpec);
-        void dtdParseElementChildren(ISource &contentSpecSource, IDestination &contentSpec);
-        void dtdParseElementName(ISource &contentSpecSource, IDestination &contentSpec);
-        void dtdParseElementMixedContent(ISource &contentSpecSource, IDestination &contentSpec);
-        void dtdParseElementContentSpecification(XNodeDTD *xNodeDTD, XValue &contentSpec);
-        void dtdParsePostProcessing(XNodeDTD *xNodeDTD);
-        void dtdParseExternalContents(XNodeDTD *xNodeDTD);
-        void dtdParseAttributeList(ISource &dtdSource, XNodeDTD *xNodeDTD);
-        void dtdParseNotation(ISource &dtdSource, XNodeDTD *xNodeDTD);
-        void dtdParseEntity(ISource &dtdSource, XNodeDTD *xNodeDTD);
-        void dtdParseElement(ISource &dtdSource, XNodeDTD *xNodeElement);
-        XExternalReference dtdParseExternalReference(ISource &dtdSource);
-        std::string dtdParseAttributeType(ISource &dtdSource);
-        XValue dtdParseAttributeValue(ISource &dtdSource);
-        void dtdParseComment(ISource &dtdSource, XNodeDTD *xNodeDTD);
-        void dtdParseParameterEntity(ISource &dtdSource, XNodeDTD *xNodeDTD);
-        void dtdParseExternal(ISource &dtdSource, XNodeDTD *xNodeDTD);
-        void dtdParseInternal(ISource &dtdSource, XNodeDTD *xNodeDTD);
-        void dtdParse(ISource &dtdSource, XNodeElement *XNodeElement);
+        // void dtdParseParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource);
+        // void dtdParseTranslateParameterENTITIES(XNodeDTD *xNodeDTD, ISource &dtdSource);
+        // void dtdValidateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement);
+        // void dtdValidateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement);
+        // void dtdValidateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
+        // void dtdVadlidateElements(XNodeDTD *dtd, XNode *xNodeRoot);
+        // bool dtdVadlidateIsPCDATA(XNodeElement *xNodeElement);
+        // bool dtdValidateIsEMPTY(XNodeElement *xNodeElement);
+        // std::string dtdParseTranslateParameterEntities(XNodeDTD *xNodeDTD, const std::string &parameterEntities);
+        // std::string dtdParseAttributeEnumerationType(ISource &xmlSource);
+        // bool dtdParseIsChoiceOrSequence(ISource &contentSpecSource);
+        // void dtdParseElementCP(ISource &contentSpecSource, IDestination &contentSpec);
+        // void dtdParseElementChoice(ISource &contentSpecSource, IDestination &contentSpec);
+        // void dtdParseElementSequence(ISource &contentSpecSource, IDestination &contentSpec);
+        // void dtdParseElementChildren(ISource &contentSpecSource, IDestination &contentSpec);
+        // void dtdParseElementName(ISource &contentSpecSource, IDestination &contentSpec);
+        // void dtdParseElementMixedContent(ISource &contentSpecSource, IDestination &contentSpec);
+        // void dtdParseElementContentSpecification(XNodeDTD *xNodeDTD, XValue &contentSpec);
+        // void dtdParsePostProcessing(XNodeDTD *xNodeDTD);
+        // void dtdParseExternalContents(XNodeDTD *xNodeDTD);
+        // void dtdParseAttributeList(ISource &dtdSource, XNodeDTD *xNodeDTD);
+        // void dtdParseNotation(ISource &dtdSource, XNodeDTD *xNodeDTD);
+        // void dtdParseEntity(ISource &dtdSource, XNodeDTD *xNodeDTD);
+        // void dtdParseElement(ISource &dtdSource, XNodeDTD *xNodeElement);
+        // XExternalReference dtdParseExternalReference(ISource &dtdSource);
+        // std::string dtdParseAttributeType(ISource &dtdSource);
+        // XValue dtdParseAttributeValue(ISource &dtdSource);
+        // void dtdParseComment(ISource &dtdSource, XNodeDTD *xNodeDTD);
+        // void dtdParseParameterEntity(ISource &dtdSource, XNodeDTD *xNodeDTD);
+        // void dtdParseExternal(ISource &dtdSource, XNodeDTD *xNodeDTD);
+        // void dtdParseInternal(ISource &dtdSource, XNodeDTD *xNodeDTD);
+        // void dtdParse(ISource &dtdSource, XNodeElement *XNodeElement);
         void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
         void xmlParseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference);
         void xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement);

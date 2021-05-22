@@ -52,22 +52,22 @@ namespace H4
     void XML::initialiseTables()
     {
         // Default entity mappings
-        m_entityMapping["&amp;"].internal = "&#x26;";
-        m_entityMapping["&quot;"].internal = "&#x22;";
-        m_entityMapping["&apos;"].internal = "&#x27;";
-        m_entityMapping["&lt;"].internal = "&#x3C;";
-        m_entityMapping["&gt;"].internal = "&#x3E;";
+        // m_entityMapping["&amp;"].internal = "&#x26;";
+        // m_entityMapping["&quot;"].internal = "&#x22;";
+        // m_entityMapping["&apos;"].internal = "&#x27;";
+        // m_entityMapping["&lt;"].internal = "&#x3C;";
+        // m_entityMapping["&gt;"].internal = "&#x3E;";
         // DTD attribute list type tokens
         // Make sure longer possible matches are first
-        XML::m_dtdAttrListTypes.push_back(U"CDATA");
-        XML::m_dtdAttrListTypes.push_back(U"IDREFS");
-        XML::m_dtdAttrListTypes.push_back(U"IDREF");
-        XML::m_dtdAttrListTypes.push_back(U"ID");
-        XML::m_dtdAttrListTypes.push_back(U"NMTOKENS");
-        XML::m_dtdAttrListTypes.push_back(U"NMTOKEN");
-        XML::m_dtdAttrListTypes.push_back(U"ENTITIES");
-        XML::m_dtdAttrListTypes.push_back(U"ENTITY");
-        XML::m_dtdAttrListTypes.push_back(U"NOTATION");
+        // XML::m_dtdAttrListTypes.push_back(U"CDATA");
+        // XML::m_dtdAttrListTypes.push_back(U"IDREFS");
+        // XML::m_dtdAttrListTypes.push_back(U"IDREF");
+        // XML::m_dtdAttrListTypes.push_back(U"ID");
+        // XML::m_dtdAttrListTypes.push_back(U"NMTOKENS");
+        // XML::m_dtdAttrListTypes.push_back(U"NMTOKEN");
+        // XML::m_dtdAttrListTypes.push_back(U"ENTITIES");
+        // XML::m_dtdAttrListTypes.push_back(U"ENTITY");
+        // XML::m_dtdAttrListTypes.push_back(U"NOTATION");
     }
     // ==============
     // PUBLIC METHODS
@@ -85,7 +85,7 @@ namespace H4
     /// <returns></returns>
     void XML::validate()
     {
-        dtdValidateXML();
+        m_dtd.validate(m_prolog);
     }
     /// <summary>
     /// Create XML text from an XML object.

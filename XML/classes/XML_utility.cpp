@@ -42,15 +42,15 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    std::vector<std::string> XML::split(std::string stringToSplit, char delimeter)
-    {
-        std::stringstream ss(stringToSplit);
-        std::string item;
-        std::vector<std::string> splittedStrings;
-        while (std::getline(ss, item, delimeter))
-        {
-            splittedStrings.push_back(item);
-        }
-        return splittedStrings;
-    }
+    // std::vector<std::string> XML::split(std::string stringToSplit, char delimeter)
+    // {
+    //     std::stringstream ss(stringToSplit);
+    //     std::string item;
+    //     std::vector<std::string> splittedStrings;
+    //     while (std::getline(ss, item, delimeter))
+    //     {
+    //         splittedStrings.push_back(item);
+    //     }
+    //     return splittedStrings;
+    // }
 } // namespace H4
