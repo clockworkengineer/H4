@@ -261,18 +261,18 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     xml.parse();
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["address"].name == "address");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["address"].content.unparsed == "(name,company,phone)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["name"].name == "name");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["name"].content.unparsed == "(#PCDATA)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["company"].name == "company");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["company"].content.unparsed == "(#PCDATA)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["phone"].name == "phone");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["phone"].content.unparsed == "(#PCDATA)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["br"].name == "br");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["br"].content.unparsed == "EMPTY");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["footer"].name == "footer");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["footer"].content.unparsed == "ANY");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["address"].name == "address");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["address"].content.unparsed == "(name,company,phone)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["name"].name == "name");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["name"].content.unparsed == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["company"].name == "company");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["company"].content.unparsed == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["phone"].name == "phone");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["phone"].content.unparsed == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["br"].name == "br");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["br"].content.unparsed == "EMPTY");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["footer"].name == "footer");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["footer"].content.unparsed == "ANY");
   }
   SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
   {
@@ -287,10 +287,10 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     xml.parse();
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->external.type == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->external.systemID == "./testData/note.dtd");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["note"].name == "note");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["note"].content.unparsed == "(to,from,heading,body)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_external.type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_external.systemID == "./testData/note.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["note"].name == "note");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["note"].content.unparsed == "(to,from,heading,body)");
   }
   SECTION("XML with external URL DTD to parse and check values", "[XML][Parse][DTD]")
   {
@@ -303,9 +303,9 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     xml.parse();
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->external.type == "PUBLIC");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->external.systemID == "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->external.publicID == "-//W3C//DTD XHTML 1.0 Transitional//EN");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_external.type == "PUBLIC");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_external.systemID == "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_external.publicID == "-//W3C//DTD XHTML 1.0 Transitional//EN");
   }
   SECTION("XML with internal DTD with attributes to parse ", "[XML][Parse][DTD]")
   {
@@ -357,35 +357,35 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == "TVSCHEDULE");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TVSCHEDULE"].name == "TVSCHEDULE");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["CHANNEL"].name == "CHANNEL");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["BANNER"].name == "BANNER");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["DAY"].name == "DAY");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["HOLIDAY"].name == "HOLIDAY");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["DATE"].name == "DATE");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["PROGRAMSLOT"].name == "PROGRAMSLOT");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TIME"].name == "TIME");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TITLE"].name == "TITLE");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["DESCRIPTION"].name == "DESCRIPTION");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TVSCHEDULE"].attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["CHANNEL"].attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["PROGRAMSLOT"].attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TITLE"].attributes.size() == 2);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TVSCHEDULE"].attributes[0].name == "NAME");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["CHANNEL"].attributes[0].name == "CHAN");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["PROGRAMSLOT"].attributes[0].name == "VTR");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TITLE"].attributes[0].name == "RATING");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TITLE"].attributes[1].name == "LANGUAGE");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TVSCHEDULE"].attributes[0].type == "CDATA");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["CHANNEL"].attributes[0].type == "CDATA");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["PROGRAMSLOT"].attributes[0].type == "CDATA");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TITLE"].attributes[0].type == "CDATA");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TITLE"].attributes[1].type == "CDATA");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TVSCHEDULE"].attributes[0].value.parsed == "#REQUIRED");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["CHANNEL"].attributes[0].value.parsed == "#REQUIRED");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["PROGRAMSLOT"].attributes[0].value.parsed == "#IMPLIED");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TITLE"].attributes[0].value.parsed == "#IMPLIED");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["TITLE"].attributes[1].value.parsed == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TVSCHEDULE"].name == "TVSCHEDULE");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["CHANNEL"].name == "CHANNEL");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["BANNER"].name == "BANNER");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["DAY"].name == "DAY");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["HOLIDAY"].name == "HOLIDAY");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["DATE"].name == "DATE");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["PROGRAMSLOT"].name == "PROGRAMSLOT");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TIME"].name == "TIME");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TITLE"].name == "TITLE");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["DESCRIPTION"].name == "DESCRIPTION");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TVSCHEDULE"].attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["CHANNEL"].attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["PROGRAMSLOT"].attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TITLE"].attributes.size() == 2);
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TVSCHEDULE"].attributes[0].name == "NAME");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["CHANNEL"].attributes[0].name == "CHAN");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["PROGRAMSLOT"].attributes[0].name == "VTR");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TITLE"].attributes[0].name == "RATING");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TITLE"].attributes[1].name == "LANGUAGE");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TVSCHEDULE"].attributes[0].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["CHANNEL"].attributes[0].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["PROGRAMSLOT"].attributes[0].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TITLE"].attributes[0].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TITLE"].attributes[1].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TVSCHEDULE"].attributes[0].value.parsed == "#REQUIRED");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["CHANNEL"].attributes[0].value.parsed == "#REQUIRED");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["PROGRAMSLOT"].attributes[0].value.parsed == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TITLE"].attributes[0].value.parsed == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["TITLE"].attributes[1].value.parsed == "#IMPLIED");
   }
   SECTION("XML with internal DTD with elements with multiple attributes to parse and check values", "[XML][Parse][DTD]")
   {
@@ -414,25 +414,25 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[0]).getNodeType() == XNodeType::dtd);
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).name == XNodeRef<XNodeElement>(*xml.m_prolog.children[0]).name);
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).name == "CATALOG");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].name == "PRODUCT");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes.size() == 5);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[0].name == "NAME");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[0].type == "CDATA");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[0].value.parsed == "#IMPLIED");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[1].name == "CATEGORY");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[1].type == "(HandTool|Table|Shop-Professional)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[1].value.parsed == "HandTool");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[2].name == "PARTNUM");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[2].type == "CDATA");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[2].value.parsed == "#IMPLIED");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[3].name == "PLANT");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[3].type == "(Pittsburgh|Milwaukee|Chicago)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[3].value.parsed == "Chicago");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[4].name == "INVENTORY");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[4].type == "(InStock|Backordered|Discontinued)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["PRODUCT"].attributes[4].value.parsed == "InStock");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["NOTES"].name == "NOTES");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["NOTES"].content.unparsed == "(#PCDATA)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].name == "PRODUCT");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes.size() == 5);
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[0].name == "NAME");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[0].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[0].value.parsed == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[1].name == "CATEGORY");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[1].type == "(HandTool|Table|Shop-Professional)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[1].value.parsed == "HandTool");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[2].name == "PARTNUM");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[2].type == "CDATA");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[2].value.parsed == "#IMPLIED");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[3].name == "PLANT");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[3].type == "(Pittsburgh|Milwaukee|Chicago)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[3].value.parsed == "Chicago");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[4].name == "INVENTORY");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[4].type == "(InStock|Backordered|Discontinued)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["PRODUCT"].attributes[4].value.parsed == "InStock");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["NOTES"].name == "NOTES");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["NOTES"].content.unparsed == "(#PCDATA)");
   }
   SECTION("XML with internal DTD with parameter entities to parse  (internal cannot appear within tags).", "[XML][Parse][DTD]")
   {
@@ -459,8 +459,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).name == XNodeRef<XNodeDTD>(xml.m_prolog[0]).name);
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).name == "REPORT");
     REQUIRE(xml.m_dtd.m_entityMapping["%empty_report;"].internal == "<!ELEMENT REPORT EMPTY>");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["REPORT"].name == "REPORT");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["REPORT"].content.parsed == "EMPTY");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["REPORT"].name == "REPORT");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["REPORT"].content.parsed == "EMPTY");
   }
   SECTION("XML with external DTD with parameter entities to parse.", "[XML][Parse][DTD]")
   {
@@ -483,17 +483,17 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).name == "REPORT");
     REQUIRE(xml.m_dtd.m_entityMapping["%contact;"].internal == "phone");
     REQUIRE(xml.m_dtd.m_entityMapping["%area;"].internal == "name, street, pincode, city");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements.size() == 5);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["REPORT"].name == "REPORT");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["REPORT"].content.unparsed == "(residence|apartment|office|shop)*");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["residence"].name == "residence");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["residence"].content.unparsed == "(name, street, pincode, city, phone)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["apartment"].name == "apartment");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["apartment"].content.unparsed == "(name, street, pincode, city, phone)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["office"].name == "office");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["office"].content.unparsed == "(name, street, pincode, city, phone)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["shop"].name == "shop");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->elements["shop"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements.size() == 5);
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["REPORT"].name == "REPORT");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["REPORT"].content.unparsed == "(residence|apartment|office|shop)*");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["residence"].name == "residence");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["residence"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["apartment"].name == "apartment");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["apartment"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["office"].name == "office");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["office"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["shop"].name == "shop");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_elements["shop"].content.unparsed == "(name, street, pincode, city, phone)");
   }
   SECTION("XML with external DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
   {
@@ -503,12 +503,12 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     xml.parse();
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[0]).getNodeType() == XNodeType::dtd);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->notations["GIF"].type == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->notations["GIF"].systemID == "GIF");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->notations["JPG"].type == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->notations["JPG"].systemID == "JPG");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->notations["BMP"].type == "SYSTEM");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->notations["BMP"].systemID == "BMP");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_notations["GIF"].type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_notations["GIF"].systemID == "GIF");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_notations["JPG"].type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_notations["JPG"].systemID == "JPG");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_notations["BMP"].type == "SYSTEM");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[0]).dtd->m_notations["BMP"].systemID == "BMP");
   }
   SECTION("XML with internal DTD containing comments.", "[XML][Parse][DTD]")
   {
@@ -716,11 +716,11 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     xml.parse();
     REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements.contains("person") == true);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["person"].attributes.size() == 1);
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["person"].attributes[0].name == "gender");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["person"].attributes[0].type == "(M|F)");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->elements["person"].attributes[0].value.parsed == "F");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements.contains("person") == true);
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["person"].attributes.size() == 1);
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["person"].attributes[0].name == "gender");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["person"].attributes[0].type == "(M|F)");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["person"].attributes[0].value.parsed == "F");
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == "queue");
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_prolog[0][0].name == "person");

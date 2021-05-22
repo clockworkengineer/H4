@@ -45,7 +45,7 @@ namespace H4
         public:
             ValidationError(XNodeDTD *dtd, const std::string &description = "")
             {
-                errorMessage = "XML Validation Error [Line: " + std::to_string( dtd->dtd->lineNumber) + "] " + description;
+                errorMessage = "XML Validation Error [Line: " + std::to_string(dtd->dtd->m_lineNumber) + "] " + description;
             }
             virtual const char *what() const throw()
             {
@@ -75,14 +75,10 @@ namespace H4
         // PUBLIC VARIABLES
         // ================
         XEntityMappings m_entityMapping;
-        XExternalReference external;
-        std::unordered_map<std::string, XExternalReference> notations;
-        std::unordered_map<std::string, XDTDElement> elements;
-        XEntityMappings entityMapping;
-        std::set<std::string> assignedIDValues;
-        std::set<std::string> assignedIDREFValues;
-        std::string unparsed;
-        long lineNumber = 1;
+        XExternalReference m_external;
+        std::unordered_map<std::string, XExternalReference> m_notations;
+        std::unordered_map<std::string, XDTDElement> m_elements;
+        long m_lineNumber = 1;
 
     private:
         // ===========================
@@ -94,18 +90,18 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        void checkForEntityRecursion( const std::string &entityName, std::set<std::string> names = {});
+        void checkForEntityRecursion(const std::string &entityName, std::set<std::string> names = {});
         std::vector<std::string> split(std::string strToSplit, char delimeter);
         void initialiseTables();
-        void parseParameterENTITIES( ISource &dtdSource);
-        void parseTranslateParameterENTITIES( ISource &dtdSource);
         void validateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void validateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement);
         void validateElements(XNodeDTD *dtd, XNode *xNodeRoot);
         bool validateIsPCDATA(XNodeElement *xNodeElement);
         bool validateIsEMPTY(XNodeElement *xNodeElement);
-        std::string parseTranslateParameterEntities( const std::string &parameterEntities);
+        void parseParameterENTITIES(ISource &dtdSource);
+        void parseTranslateParameterENTITIES(ISource &dtdSource);
+        std::string parseTranslateParameterEntities(const std::string &parameterEntities);
         std::string parseAttributeEnumerationType(ISource &xmlSource);
         bool parseIsChoiceOrSequence(ISource &contentSpecSource);
         void parseElementCP(ISource &contentSpecSource, IDestination &contentSpec);
@@ -114,7 +110,7 @@ namespace H4
         void parseElementChildren(ISource &contentSpecSource, IDestination &contentSpec);
         void parseElementName(ISource &contentSpecSource, IDestination &contentSpec);
         void parseElementMixedContent(ISource &contentSpecSource, IDestination &contentSpec);
-        void parseElementContentSpecification( XValue &contentSpec);
+        void parseElementContentSpecification(XValue &contentSpec);
         void parsePostProcessing();
         void parseExternalContents();
         void parseAttributeList(ISource &dtdSource);
@@ -129,11 +125,14 @@ namespace H4
         void parseExternal(ISource &dtdSource);
         void parseInternal(ISource &dtdSource);
         void parseDTD(ISource &dtdSource, XNodeElement *XNodeElement);
-        void dtdValidateDTD(XNodeElement &prolog);
+        void validateDTD(XNodeElement &prolog);
         // =================
         // PRIVATE VARIABLES
         // =================
         static std::vector<XString> m_dtdAttrListTypes;
+        std::set<std::string> m_assignedIDValues;
+        std::set<std::string> m_assignedIDREFValues;
+        std::string m_unparsed;
     };
 } // namespace H4
 #endif /* DTD_DPP */

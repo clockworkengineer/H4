@@ -75,7 +75,7 @@ namespace H4
     /// </summary>
     void DTD::parse(ISource &dtdSource, XNodeElement *xNodeElement)
     {
-        parseDTD(dtdSource,xNodeElement);
+        parseDTD(dtdSource, xNodeElement);
     }
     /// <summary>
     ///
@@ -83,14 +83,14 @@ namespace H4
     /// <returns></returns>
     void DTD::validate(XNodeElement &prolog)
     {
-        dtdValidateDTD(prolog);
+        validateDTD(prolog);
     }
     /// <summary>
     /// Create DTD text from an DTD object.
     /// </summary>
     /// <param name="xmlDestination">DTD destination stream.</param>
-    void DTD::stringify(IDestination &/*xmlDestination*/)
+    void DTD::stringify(IDestination &xmlDestination)
     {
-        //stringifyDTD(xmlDestination);
+        xmlDestination.add(m_unparsed);
     }
 } // namespace H4
