@@ -347,7 +347,7 @@ namespace H4
     /// Parse XML source stream.
     /// </summary>
     /// <returns></returns>
-    void XML::parseWML()
+    void XML::parseXML()
     {
         parseProlog(m_xmlSource, &m_prolog);
         if (m_xmlSource.match(U"<"))

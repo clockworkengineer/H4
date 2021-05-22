@@ -52,7 +52,7 @@ namespace H4
     /// </summary>
     void XML::parse()
     {
-        parseWML();
+        parseXML();
     }
     /// <summary>
     ///

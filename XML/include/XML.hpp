@@ -128,7 +128,7 @@ namespace H4
         void parseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
         void parseElement(ISource &xmlSource, XNodeElement *XNodeElement);
         void parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
-        void parseWML();
+        void parseXML();
         void stringifyXML(IDestination &xmlDestination);
         // =================
         // PRIVATE VARIABLES
