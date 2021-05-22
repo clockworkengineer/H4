@@ -70,9 +70,9 @@ namespace H4
         struct ValidationError : public std::exception
         {
         public:
-            ValidationError(XNodeDTD *dtd, const std::string &description = "")
+            ValidationError(DTD &dtd, const std::string &description = "")
             {
-                errorMessage = "XML Validation Error [Line: " + std::to_string(dtd->dtd->m_lineNumber) + "] " + description;
+                errorMessage = "XML Validation Error [Line: " + std::to_string(dtd.m_lineNumber) + "] " + description;
             }
             virtual const char *what() const throw()
             {

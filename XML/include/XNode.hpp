@@ -244,7 +244,7 @@ namespace H4
         XNodeDTD(XNodeType nodeType = XNodeType::dtd) : XNode(nodeType)
         {
         }
-        DTD *dtd;
+//DTD *dtd;
     };
     //
     // Convert base XNode reference

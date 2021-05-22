@@ -73,9 +73,9 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    void DTD::validateAttributes(XNodeDTD */*dtd*/, XNodeElement *xNodeElement)
     {
-        for (auto &attribute : dtd->dtd->m_elements[xNodeElement->name].attributes)
+        for (auto &attribute : m_elements[xNodeElement->name].attributes)
         {
             // Validate a elements attribute type which can be one of the following.
             //
@@ -99,7 +99,7 @@ namespace H4
                     XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (elementAttribute.value.parsed.empty()) // No character data present.
                     {
-                        //throw ValidationError(dtd, "");
+                        //throw XML::ValidationError(*this, "");
                     }
                 }
             }
@@ -112,13 +112,13 @@ namespace H4
                         !std::isalpha(elementAttribute.value.parsed[0]) &&
                         elementAttribute.value.parsed[0] != ':')
                     {
-                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> ID attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
+                        throw XML::ValidationError(*this, "Element <" + xNodeElement->name + "> ID attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
                     }
-                    if (dtd->dtd->m_assignedIDValues.contains(elementAttribute.value.parsed))
+                    if (m_assignedIDValues.contains(elementAttribute.value.parsed))
                     {
-                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> ID attribute '" + elementAttribute.name + "' is not unique.");
+                        throw XML::ValidationError(*this, "Element <" + xNodeElement->name + "> ID attribute '" + elementAttribute.name + "' is not unique.");
                     }
-                    dtd->dtd->m_assignedIDValues.insert(elementAttribute.value.parsed);
+                    m_assignedIDValues.insert(elementAttribute.value.parsed);
                 }
             }
             else if (attribute.type == "IDREF")
@@ -130,9 +130,9 @@ namespace H4
                         !std::isalpha(elementAttribute.value.parsed[0]) &&
                         elementAttribute.value.parsed[0] != ':')
                     {
-                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> IDREF attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
+                        throw XML::ValidationError(*this, "Element <" + xNodeElement->name + "> IDREF attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
                     }
-                    dtd->dtd->m_assignedIDREFValues.insert(elementAttribute.value.parsed);
+                    m_assignedIDREFValues.insert(elementAttribute.value.parsed);
                 }
             }
             else if (attribute.type[0] == '(')
@@ -147,7 +147,7 @@ namespace H4
                     XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (!options.contains(elementAttribute.value.parsed))
                     {
-                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> attribute '" + attribute.name + "' contains invalid enumeration value '" + elementAttribute.value.parsed + "'.");
+                        throw XML::ValidationError(*this, "Element <" + xNodeElement->name + "> attribute '" + attribute.name + "' contains invalid enumeration value '" + elementAttribute.value.parsed + "'.");
                     }
                 }
             }
@@ -160,7 +160,7 @@ namespace H4
             {
                 if (!xNodeElement->isAttributePresent(attribute.name))
                 {
-                    throw ValidationError(dtd, "Required attribute '" + attribute.name + "' missing for element <" + xNodeElement->name + ">.");
+                    throw XML::ValidationError(*this, "Required attribute '" + attribute.name + "' missing for element <" + xNodeElement->name + ">.");
                 }
             }
             else if (attribute.value.parsed == "#IMPLIED")
@@ -174,7 +174,7 @@ namespace H4
                     XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (attribute.value.parsed.substr(7) != elementAttribute.value.parsed)
                     {
-                        throw ValidationError(dtd, "Element <" + xNodeElement->name + "> attribute '" + attribute.name + "' is '" + elementAttribute.value.parsed + "' instead of '" + attribute.value.parsed.substr(7) + "'.");
+                        throw XML::ValidationError(*this, "Element <" + xNodeElement->name + "> attribute '" + attribute.name + "' is '" + elementAttribute.value.parsed + "' instead of '" + attribute.value.parsed.substr(7) + "'.");
                     }
                 }
                 else
@@ -202,31 +202,31 @@ namespace H4
     /// <returns></returns>
     void DTD::validateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
-        if ((dtd == nullptr) || (dtd->dtd->m_elements.empty()))
+        if ((dtd == nullptr) || (m_elements.empty()))
         {
             return;
         }
-        if (dtd->dtd->m_elements[xNodeElement->name].content.parsed == "((<#PCDATA>))")
+        if (m_elements[xNodeElement->name].content.parsed == "((<#PCDATA>))")
         {
             if (!validateIsPCDATA(xNodeElement))
             {
-                throw ValidationError(dtd, "Element <" + xNodeElement->name + "> does not contain just any parsable data.");
+                throw XML::ValidationError(*this, "Element <" + xNodeElement->name + "> does not contain just any parsable data.");
             }
             return;
         }
-        if (dtd->dtd->m_elements[xNodeElement->name].content.parsed == "EMPTY")
+        if (m_elements[xNodeElement->name].content.parsed == "EMPTY")
         {
             if (!validateIsEMPTY(xNodeElement))
             {
-                throw ValidationError(dtd, "Element <" + xNodeElement->name + "> is not empty.");
+                throw XML::ValidationError(*this, "Element <" + xNodeElement->name + "> is not empty.");
             }
             return;
         }
-        if (dtd->dtd->m_elements[xNodeElement->name].content.parsed == "ANY")
+        if (m_elements[xNodeElement->name].content.parsed == "ANY")
         {
             return;
         }
-        std::regex match(dtd->dtd->m_elements[xNodeElement->name].content.parsed);
+        std::regex match(m_elements[xNodeElement->name].content.parsed);
         std::string elements;
         for (auto &element : xNodeElement->children)
         {
@@ -245,8 +245,8 @@ namespace H4
         }
         if (!std::regex_match(elements, match))
         {
-            throw ValidationError(dtd, "<" + xNodeElement->name + "> element does not conform to the content specification " +
-                                           dtd->dtd->m_elements[xNodeElement->name].content.unparsed + ".");
+            throw XML::ValidationError(*this, "<" + xNodeElement->name + "> element does not conform to the content specification " +
+                                           m_elements[xNodeElement->name].content.unparsed + ".");
         }
     }
     /// <summary>
@@ -275,9 +275,9 @@ namespace H4
             }
             break;
         case XNodeType::root:
-            if (XNodeRef<XNodeElement>((*xNode)).name != dtd->dtd->name)
+            if (XNodeRef<XNodeElement>((*xNode)).name != m_name)
             {
-                throw ValidationError(dtd, "DOCTYPE name does not match that of root element " + XNodeRef<XNodeElement>((*xNode)).name + " of DTD.");
+                throw XML::ValidationError(*this, "DOCTYPE name does not match that of root element " + XNodeRef<XNodeElement>((*xNode)).name + " of DTD.");
             }
         case XNodeType::element:
             validateElement(dtd, static_cast<XNodeElement *>(xNode));
@@ -300,12 +300,12 @@ namespace H4
             {
                 if (ch == kLineFeed)
                 {
-                    dtd->dtd->m_lineNumber++;
+                    m_lineNumber++;
                 }
             }
             break;
         default:
-            throw ValidationError(dtd, "Invalid XNode encountered during validation.");
+            throw XML::ValidationError(*this, "Invalid XNode encountered during validation.");
         }
     }
     /// <summary>
@@ -329,11 +329,11 @@ namespace H4
             if (dtd != nullptr)
             {
                 validateElements(dtd, &prolog);
-                for (auto &idref : dtd->dtd->m_assignedIDREFValues)
+                for (auto &idref : m_assignedIDREFValues)
                 {
-                    if (!dtd->dtd->m_assignedIDValues.contains(idref))
+                    if (!m_assignedIDValues.contains(idref))
                     {
-                        throw ValidationError(dtd, "IDREF attribute '"+idref+"' does not reference any element with the ID.");
+                        throw XML::ValidationError(*this, "IDREF attribute '"+idref+"' does not reference any element with the ID.");
                     }
                 }
             }

@@ -37,24 +37,6 @@ namespace H4
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
         //
-        //
-        // DTD validation error
-        //
-        struct ValidationError : public std::exception
-        {
-        public:
-            ValidationError(XNodeDTD *dtd, const std::string &description = "")
-            {
-                errorMessage = "XML Validation Error [Line: " + std::to_string(dtd->dtd->m_lineNumber) + "] " + description;
-            }
-            virtual const char *what() const throw()
-            {
-                return (errorMessage.c_str());
-            }
-
-        private:
-            std::string errorMessage;
-        };
         // ============
         // CONSTRUCTORS
         // ============
@@ -74,7 +56,7 @@ namespace H4
         // ================
         // PUBLIC VARIABLES
         // ================
-        std::string name;
+        std::string m_name;
         XEntityMappings m_entityMapping;
         XExternalReference m_external;
         std::unordered_map<std::string, XExternalReference> m_notations;

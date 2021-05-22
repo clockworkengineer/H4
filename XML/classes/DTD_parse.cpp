@@ -906,10 +906,10 @@ namespace H4
         // and keeping the correct order for its components by storing it
         // in its raw unparsed form.
         XNodeDTD xNodeDTD;
-        xNodeDTD.dtd = this;
+     //   xNodeDTD.dtd = this;
         long start = dtdSource.position();
         dtdSource.ignoreWS();
-        xNodeDTD.dtd->name = parseName(dtdSource);
+        m_name = parseName(dtdSource);
         // TODO: External needs to be parsed after any internal that is there as
         // both can be used in an DTD file.
         if (dtdSource.current() == '[')
