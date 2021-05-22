@@ -21,15 +21,15 @@ set (XML_SOURCES
     ./classes/XML.cpp
     ./classes/XML_parse.cpp
     ./classes/XML_entity_reference.cpp
-    ./classes/XML_dtd_parse.cpp
-    ./classes/XML_dtd_validate.cpp
     ./classes/XML_validation.cpp
     ./classes/XML_stringify.cpp
     ./classes/XML_utility.cpp
     ./classes/XML_core.cpp
     ./classes/DTD.cpp
+    ./classes/DTD_parse.cpp
+    ./classes/DTD_validate.cpp
 )
-
+ 
 set (XML_INCLUDES
     XMLConfig.hpp
     ./include/XML.hpp

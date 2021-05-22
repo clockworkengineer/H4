@@ -75,29 +75,6 @@ namespace H4
         XNodeRef<XNodeContent>(*xNodeElement->children.back()).content += content;
     }
     /// <summary>
-    /// Parse string value from XML source stream and return it. Note: The
-    /// string may be encased in either single or double quotes.
-    /// </summary>
-    /// <param name="xmlSource">XML source stream.</param>
-    /// <returns>String value.</returns>
-    // XValue XML::xmlParseValue(ISource &xmlSource, XEntityMappings &entityMapping, bool translateEntity)
-    // {
-    //     if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
-    //     {
-    //         XValue value;
-    //         XChar quote = xmlSource.current();
-    //         xmlSource.next();
-    //         while (xmlSource.more() && xmlSource.current() != quote)
-    //         {
-    //             value += parseCharacter(xmlSource, entityMapping, translateEntity);
-    //         }
-    //         xmlSource.next();
-    //         xmlSource.ignoreWS();
-    //         return (value);
-    //     }
-    //     throw SyntaxError(xmlSource, "Invalid attribute value.");
-    // }
-    /// <summary>
     /// Parse a element tag name and set its value in current XNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>

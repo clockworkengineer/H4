@@ -237,6 +237,7 @@ namespace H4
     //
     // DTD XNode
     //
+    class DTD;
     struct XNodeDTD : XNode
     {
     public:
@@ -244,14 +245,7 @@ namespace H4
         {
         }
         std::string name;
-        XExternalReference external;
-        std::unordered_map<std::string, XExternalReference> notations;
-        std::unordered_map<std::string, XDTDElement> elements;
-        XEntityMappings entityMapping;
-        std::set<std::string> assignedIDValues;
-        std::set<std::string> assignedIDREFValues;
-        std::string unparsed;
-        long lineNumber = 1;
+        DTD *dtd;
     };
     //
     // Convert base XNode reference

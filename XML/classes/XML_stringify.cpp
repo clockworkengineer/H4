@@ -133,7 +133,7 @@ namespace H4
         case XNodeType::dtd:
         {
             XNodeDTD *xNodeDTD = static_cast<XNodeDTD *>(xNode);
-            xmlDestination.add(xNodeDTD->unparsed);
+            xmlDestination.add(xNodeDTD->dtd->unparsed);
             break;
         }
         default:

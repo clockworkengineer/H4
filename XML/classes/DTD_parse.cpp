@@ -539,7 +539,7 @@ namespace H4
     /// <returns></returns>
     void DTD::dtdParsePostProcessing(XNodeDTD *xNodeDTD)
     {
-        for (auto &element : xNodeDTD->elements)
+        for (auto &element : xNodeDTD->dtd->elements)
         {
             if (element.second.content.parsed.empty())
             {
@@ -607,14 +607,14 @@ namespace H4
     /// <returns></returns>
     void DTD::dtdParseExternalContents(XNodeDTD *xNodeDTD)
     {
-        if (xNodeDTD->external.type == "SYSTEM")
+        if (xNodeDTD->dtd->external.type == "SYSTEM")
         {
-            FileSource dtdFile(xNodeDTD->external.systemID);
+            FileSource dtdFile(xNodeDTD->dtd->external.systemID);
             dtdParseParameterENTITIES(xNodeDTD, dtdFile);
-            FileSource dtdFilePass2(xNodeDTD->external.systemID);
+            FileSource dtdFilePass2(xNodeDTD->dtd->external.systemID);
             dtdParseTranslateParameterENTITIES(xNodeDTD, dtdFilePass2);
         }
-        else if (xNodeDTD->external.type == "PUBLIC")
+        else if (xNodeDTD->dtd->external.type == "PUBLIC")
         {
             // Public external DTD currently not supported
         }
@@ -720,7 +720,7 @@ namespace H4
             {
                 throw XML::SyntaxError(dtdSource, "Attribute '" + xDTDAttribute.name + "' may not be of type ID and FIXED.");
             }
-            xNodeDTD->elements[elementName].attributes.emplace_back(xDTDAttribute);
+            xNodeDTD->dtd->elements[elementName].attributes.emplace_back(xDTDAttribute);
             dtdSource.ignoreWS();
         }
     }
@@ -734,7 +734,7 @@ namespace H4
         dtdSource.ignoreWS();
         XAttribute notation;
         std::string name = parseName(dtdSource);
-        xNodeDTD->notations[name] = dtdParseExternalReference(dtdSource);
+        xNodeDTD->dtd->notations[name] = dtdParseExternalReference(dtdSource);
         dtdSource.ignoreWS();
     }
     /// <summary>
@@ -757,7 +757,7 @@ namespace H4
         {
             XValue entityValue = parseValue(dtdSource, m_entityMapping, false);
             m_entityMapping[entityName].internal = entityValue.parsed;
-            xNodeDTD->entityMapping[entityName].internal = entityValue.parsed;
+            xNodeDTD->dtd->entityMapping[entityName].internal = entityValue.parsed;
         }
         else
         {
@@ -800,7 +800,7 @@ namespace H4
             }
         }
         XDTDElement element(elementName, contentSpecification);
-        xNodeDTD->elements.emplace(std::pair(element.name, element));
+        xNodeDTD->dtd->elements.emplace(std::pair(element.name, element));
         dtdSource.ignoreWS();
     }
     /// <summary>
@@ -810,7 +810,7 @@ namespace H4
     /// <returns></returns>
     void DTD::dtdParseExternal(ISource &dtdSource, XNodeDTD *xNodeDTD)
     {
-        xNodeDTD->external = dtdParseExternalReference(dtdSource);
+        xNodeDTD->dtd->external = dtdParseExternalReference(dtdSource);
         dtdParseExternalContents(xNodeDTD);
         if (dtdSource.current() != '>')
         {
@@ -907,6 +907,7 @@ namespace H4
         // and keeping the correct order for its components by storing it
         // in its raw unparsed form.
         XNodeDTD xNodeDTD;
+        xNodeDTD.dtd = this;
         long start = dtdSource.position();
         dtdSource.ignoreWS();
         xNodeDTD.name = parseName(dtdSource);
@@ -923,12 +924,12 @@ namespace H4
             dtdParseExternal(dtdSource, &xNodeDTD);
         }
         // Save away unparsed form
-        xNodeDTD.unparsed = "<!DOCTYPE" + dtdSource.getRange(start, dtdSource.position());
-        for (auto ch : xNodeDTD.unparsed)
+        xNodeDTD.dtd->unparsed = "<!DOCTYPE" + dtdSource.getRange(start, dtdSource.position());
+        for (auto ch : xNodeDTD.dtd->unparsed)
         {
             if (ch == kLineFeed)
             {
-                xNodeDTD.lineNumber++;
+                xNodeDTD.dtd->lineNumber++;
             }
         }
         dtdParsePostProcessing(&xNodeDTD);

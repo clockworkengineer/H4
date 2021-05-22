@@ -12,7 +12,6 @@
 #include "XML.hpp"
 #include "XMLSources.hpp"
 #include "XMLDestinations.hpp"
-#include "DTD.hpp"
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
@@ -76,7 +75,7 @@ namespace H4
     /// <returns></returns>
     void DTD::dtdValidateAttributes(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
-        for (auto &attribute : dtd->elements[xNodeElement->name].attributes)
+        for (auto &attribute : dtd->dtd->elements[xNodeElement->name].attributes)
         {
             // Validate a elements attribute type which can be one of the following.
             //
@@ -115,11 +114,11 @@ namespace H4
                     {
                         throw ValidationError(dtd, "Element <" + xNodeElement->name + "> ID attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
                     }
-                    if (dtd->assignedIDValues.contains(elementAttribute.value.parsed))
+                    if (dtd->dtd->assignedIDValues.contains(elementAttribute.value.parsed))
                     {
                         throw ValidationError(dtd, "Element <" + xNodeElement->name + "> ID attribute '" + elementAttribute.name + "' is not unique.");
                     }
-                    dtd->assignedIDValues.insert(elementAttribute.value.parsed);
+                    dtd->dtd->assignedIDValues.insert(elementAttribute.value.parsed);
                 }
             }
             else if (attribute.type == "IDREF")
@@ -133,7 +132,7 @@ namespace H4
                     {
                         throw ValidationError(dtd, "Element <" + xNodeElement->name + "> IDREF attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
                     }
-                    dtd->assignedIDREFValues.insert(elementAttribute.value.parsed);
+                    dtd->dtd->assignedIDREFValues.insert(elementAttribute.value.parsed);
                 }
             }
             else if (attribute.type[0] == '(')
@@ -203,11 +202,11 @@ namespace H4
     /// <returns></returns>
     void DTD::dtdValidateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement)
     {
-        if ((dtd == nullptr) || (dtd->elements.empty()))
+        if ((dtd == nullptr) || (dtd->dtd->elements.empty()))
         {
             return;
         }
-        if (dtd->elements[xNodeElement->name].content.parsed == "((<#PCDATA>))")
+        if (dtd->dtd->elements[xNodeElement->name].content.parsed == "((<#PCDATA>))")
         {
             if (!dtdVadlidateIsPCDATA(xNodeElement))
             {
@@ -215,7 +214,7 @@ namespace H4
             }
             return;
         }
-        if (dtd->elements[xNodeElement->name].content.parsed == "EMPTY")
+        if (dtd->dtd->elements[xNodeElement->name].content.parsed == "EMPTY")
         {
             if (!dtdValidateIsEMPTY(xNodeElement))
             {
@@ -223,11 +222,11 @@ namespace H4
             }
             return;
         }
-        if (dtd->elements[xNodeElement->name].content.parsed == "ANY")
+        if (dtd->dtd->elements[xNodeElement->name].content.parsed == "ANY")
         {
             return;
         }
-        std::regex match(dtd->elements[xNodeElement->name].content.parsed);
+        std::regex match(dtd->dtd->elements[xNodeElement->name].content.parsed);
         std::string elements;
         for (auto &element : xNodeElement->children)
         {
@@ -247,7 +246,7 @@ namespace H4
         if (!std::regex_match(elements, match))
         {
             throw ValidationError(dtd, "<" + xNodeElement->name + "> element does not conform to the content specification " +
-                                           dtd->elements[xNodeElement->name].content.unparsed + ".");
+                                           dtd->dtd->elements[xNodeElement->name].content.unparsed + ".");
         }
     }
     /// <summary>
@@ -301,7 +300,7 @@ namespace H4
             {
                 if (ch == kLineFeed)
                 {
-                    dtd->lineNumber++;
+                    dtd->dtd->lineNumber++;
                 }
             }
             break;
@@ -330,9 +329,9 @@ namespace H4
             if (dtd != nullptr)
             {
                 dtdVadlidateElements(dtd, &prolog);
-                for (auto &idref : dtd->assignedIDREFValues)
+                for (auto &idref : dtd->dtd->assignedIDREFValues)
                 {
-                    if (!dtd->assignedIDValues.contains(idref))
+                    if (!dtd->dtd->assignedIDValues.contains(idref))
                     {
                         throw ValidationError(dtd, "IDREF attribute '"+idref+"' does not reference any element with the ID.");
                     }
