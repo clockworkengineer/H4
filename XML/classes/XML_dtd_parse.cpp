@@ -619,14 +619,14 @@ namespace H4
         {
             dtdSource.ignoreWS();
             result.type = "SYSTEM";
-            result.systemID = xmlParseValue(dtdSource).parsed;
+            result.systemID = parseValue(dtdSource, m_entityMapping).parsed;
         }
         else if (dtdSource.match(U"PUBLIC"))
         {
             dtdSource.ignoreWS();
             result.type = "PUBLIC";
-            result.publicID = xmlParseValue(dtdSource).parsed;
-            result.systemID = xmlParseValue(dtdSource).parsed;
+            result.publicID = parseValue(dtdSource, m_entityMapping).parsed;
+            result.systemID = parseValue(dtdSource, m_entityMapping).parsed;
         }
         else
         {
@@ -678,14 +678,14 @@ namespace H4
         else if (dtdSource.match(U"#FIXED"))
         {
             dtdSource.ignoreWS();
-            XValue fixedValue = xmlParseValue(dtdSource);
+            XValue fixedValue = parseValue(dtdSource, m_entityMapping);
             value.parsed = "#FIXED " + fixedValue.parsed;
             value.unparsed = "#FIXED " + fixedValue.unparsed;
         }
         else
         {
             dtdSource.ignoreWS();
-            value = xmlParseValue(dtdSource);
+            value = parseValue(dtdSource, m_entityMapping);
         }
         return (value);
     }
@@ -730,7 +730,7 @@ namespace H4
     /// </summary>
     /// <param name="dtdSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::dtdParseEntity(ISource &dtdSource, XNodeDTD * /*xNodeDTD*/)
+    void XML::dtdParseEntity(ISource &dtdSource, XNodeDTD * xNodeDTD)
     {
         std::string entityName = "&";
         dtdSource.ignoreWS();
@@ -743,9 +743,9 @@ namespace H4
         entityName += parseName(dtdSource) + ";";
         if (dtdSource.current() == '\'' || dtdSource.current() == '"')
         {
-            XValue entityValue = xmlParseValue(dtdSource, false);
+            XValue entityValue = parseValue(dtdSource, m_entityMapping, false);
             m_entityMapping[entityName].internal = entityValue.parsed;
-            //  xNodeDTD->entityMapping[entityName].internal = entityValue.parsed;
+            xNodeDTD->entityMapping[entityName].internal = entityValue.parsed;
         }
         else
         {

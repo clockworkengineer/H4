@@ -247,6 +247,7 @@ namespace H4
         XExternalReference external;
         std::unordered_map<std::string, XExternalReference> notations;
         std::unordered_map<std::string, XDTDElement> elements;
+        XEntityMappings entityMapping;
         std::set<std::string> assignedIDValues;
         std::set<std::string> assignedIDREFValues;
         std::string unparsed;

@@ -8,7 +8,7 @@
 #include <memory>
 #include <unordered_map>
 #include <set>
-#include <tuple>
+// #include <tuple>
 //
 // XML Core
 //
@@ -150,8 +150,6 @@ namespace H4
         void dtdParse(ISource &dtdSource, XNodeElement *XNodeElement);
         void xmlParseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
         void xmlParseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference);
-        XValue xmlParseValue(ISource &xmlSource, bool translateEntity = true);
-        // XValue xmlParseCharacter(ISource &xmlSource,  bool translateEntity = true);
         void xmlParseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
         void xmlParseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
         void xmlParseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);

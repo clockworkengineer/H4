@@ -89,6 +89,7 @@ namespace H4
     std::string parseName(ISource &xmlSource);
     XValue parseCharacterReference(ISource &xmlSource);
     XValue parseCharacter(ISource &xmlSource, XEntityMappings &entityMapping, bool translateEntity = true);
+    XValue parseValue(ISource &xmlSource, XEntityMappings &entityMapping, bool translateEntity = true);
     //
     // XML entity
     //

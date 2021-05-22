@@ -80,23 +80,23 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>String value.</returns>
-    XValue XML::xmlParseValue(ISource &xmlSource, bool translateEntity)
-    {
-        if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
-        {
-            XValue value;
-            XChar quote = xmlSource.current();
-            xmlSource.next();
-            while (xmlSource.more() && xmlSource.current() != quote)
-            {
-                value += parseCharacter(xmlSource, m_entityMapping, translateEntity);
-            }
-            xmlSource.next();
-            xmlSource.ignoreWS();
-            return (value);
-        }
-        throw SyntaxError(xmlSource, "Invalid attribute value.");
-    }
+    // XValue XML::xmlParseValue(ISource &xmlSource, XEntityMappings &entityMapping, bool translateEntity)
+    // {
+    //     if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
+    //     {
+    //         XValue value;
+    //         XChar quote = xmlSource.current();
+    //         xmlSource.next();
+    //         while (xmlSource.more() && xmlSource.current() != quote)
+    //         {
+    //             value += parseCharacter(xmlSource, entityMapping, translateEntity);
+    //         }
+    //         xmlSource.next();
+    //         xmlSource.ignoreWS();
+    //         return (value);
+    //     }
+    //     throw SyntaxError(xmlSource, "Invalid attribute value.");
+    // }
     /// <summary>
     /// Parse a element tag name and set its value in current XNodeElement.
     /// </summary>
@@ -189,7 +189,7 @@ namespace H4
                 throw SyntaxError(xmlSource, "Missing '=' between attribute name and value.");
             }
             xmlSource.ignoreWS();
-            XValue attributeValue = xmlParseValue(xmlSource);
+            XValue attributeValue = parseValue(xmlSource, m_entityMapping);
             if (!validAttributeValue(attributeValue))
             {
                 throw SyntaxError(xmlSource, "Attribute value contains invalid character '<', '\"', ''' or '&'.");

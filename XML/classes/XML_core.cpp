@@ -218,7 +218,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void mapEntityReference(XValue &entityReference, std::unordered_map<std::string, XEntityMapping> &entityMapping)
+    void mapEntityReference(XValue &entityReference, XEntityMappings &entityMapping)
     {
         if (entityMapping.count(entityReference.unparsed) > 0)
         {
@@ -281,5 +281,22 @@ namespace H4
             throw XML::SyntaxError(xmlSource, "Invalid character value encountered.");
         }
         return (character);
+    }
+    XValue parseValue(ISource &xmlSource, XEntityMappings &entityMapping, bool translateEntity)
+    {
+        if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
+        {
+            XValue value;
+            XChar quote = xmlSource.current();
+            xmlSource.next();
+            while (xmlSource.more() && xmlSource.current() != quote)
+            {
+                value += parseCharacter(xmlSource, entityMapping, translateEntity);
+            }
+            xmlSource.next();
+            xmlSource.ignoreWS();
+            return (value);
+        }
+        throw XML::SyntaxError(xmlSource, "Invalid attribute value.");
     }
 } // namespace H4
