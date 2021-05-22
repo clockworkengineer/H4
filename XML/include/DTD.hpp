@@ -74,6 +74,7 @@ namespace H4
         // ================
         // PUBLIC VARIABLES
         // ================
+        std::string name;
         XEntityMappings m_entityMapping;
         XExternalReference m_external;
         std::unordered_map<std::string, XExternalReference> m_notations;

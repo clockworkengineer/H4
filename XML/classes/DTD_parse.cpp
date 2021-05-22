@@ -909,7 +909,7 @@ namespace H4
         xNodeDTD.dtd = this;
         long start = dtdSource.position();
         dtdSource.ignoreWS();
-        xNodeDTD.name = parseName(dtdSource);
+        xNodeDTD.dtd->name = parseName(dtdSource);
         // TODO: External needs to be parsed after any internal that is there as
         // both can be used in an DTD file.
         if (dtdSource.current() == '[')

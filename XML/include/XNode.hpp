@@ -244,7 +244,6 @@ namespace H4
         XNodeDTD(XNodeType nodeType = XNodeType::dtd) : XNode(nodeType)
         {
         }
-        std::string name;
         DTD *dtd;
     };
     //

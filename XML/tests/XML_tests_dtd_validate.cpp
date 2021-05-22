@@ -604,8 +604,8 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["person"].attributes[0].name == "gender");
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["person"].attributes[0].type == "(M|F)");
     REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->m_elements["person"].attributes[0].value.parsed == "F");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == "queue");
-    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->name == "queue");
+    REQUIRE(XNodeRef<XNodeDTD>(*xml.m_prolog.children[1]).dtd->name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_prolog[0][0].name == "person");
     REQUIRE(xml.m_prolog[0][0].getAttributeList().size() == 1);
     REQUIRE(xml.m_prolog[0][0].getAttribute("gender").value.parsed == "M");

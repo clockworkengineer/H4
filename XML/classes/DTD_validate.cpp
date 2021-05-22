@@ -275,7 +275,7 @@ namespace H4
             }
             break;
         case XNodeType::root:
-            if (XNodeRef<XNodeElement>((*xNode)).name != dtd->name)
+            if (XNodeRef<XNodeElement>((*xNode)).name != dtd->dtd->name)
             {
                 throw ValidationError(dtd, "DOCTYPE name does not match that of root element " + XNodeRef<XNodeElement>((*xNode)).name + " of DTD.");
             }
