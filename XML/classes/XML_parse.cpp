@@ -22,7 +22,7 @@
 #include <vector>
 #include <cstring>
 #include <algorithm>
-#include <filesystem>
+// #include <filesystem>
 // =========
 // NAMESPACE
 // =========
@@ -93,7 +93,7 @@ namespace H4
             character = parseEntityReference(xmlSource);
             if (translateEntity)
             {
-                mapEntityReference(character);
+                mapEntityReference(character, m_entityMapping);
             }
             else
             {

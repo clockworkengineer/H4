@@ -124,6 +124,10 @@ namespace H4
             {
                 parseEntityReference(valueSoure);
             }
+            else if (valueSoure.match(U"&#"))
+            {
+                parseCharacterReference(valueSoure);
+            }
             else if ((valueSoure.current() == '<') ||
                      (valueSoure.current() == '"') ||
                      (valueSoure.current() == '\''))

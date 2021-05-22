@@ -14,52 +14,38 @@
 namespace H4
 {
     // //
-    // // 32 bit characters internally
+    // // XML Attribute
     // //
-    // using XString = std::u32string;
-    // using XChar = XString::value_type;
-    //
-    // XML value
-    // //
-    // struct XValue
+    // struct XAttribute
     // {
     // public:
-    //     std::string unparsed;
-    //     std::string parsed;
+    //     XAttribute() {}
+    //     XAttribute(const std::string &name, const XValue &value) : name(name), value(value)
+    //     {
+    //     }
+    //     std::string name;
+    //     XValue value;
     // };
-    //
-    // XML Attribute
-    //
-    struct XAttribute
-    {
-    public:
-        XAttribute() {}
-        XAttribute(const std::string &name, const XValue &value) : name(name), value(value)
-        {
-        }
-        std::string name;
-        XValue value;
-    };
-    //
-    // XML External reference
-    //
-    struct XExternalReference
-    {
-    public:
-        std::string type;
-        std::string systemID;
-        std::string publicID;
-    };
-    //
-    // XML Entity mapping
-    //
-    struct XEntityMapping
-    {
-    public:
-        std::string internal;
-        XExternalReference external;
-        std::string notation;
-    };
+    // //
+    // // XML External reference
+    // //
+    // struct XExternalReference
+    // {
+    // public:
+    //     std::string type;
+    //     std::string systemID;
+    //     std::string publicID;
+    // };
+    // //
+    // // XML Entity mapping
+    // //
+    // struct XEntityMapping
+    // {
+    // public:
+    //     std::string internal;
+    //     XExternalReference external;
+    //     std::string notation;
+    // };
     //
     // XML DTD attribute definition
     //

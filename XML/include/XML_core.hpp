@@ -40,6 +40,39 @@ namespace H4
         }
     };
     //
+    // XML Attribute
+    //
+    struct XAttribute
+    {
+    public:
+        XAttribute() {}
+        XAttribute(const std::string &name, const XValue &value) : name(name), value(value)
+        {
+        }
+        std::string name;
+        XValue value;
+    };
+    //
+    // XML External reference
+    //
+    struct XExternalReference
+    {
+    public:
+        std::string type;
+        std::string systemID;
+        std::string publicID;
+    };
+    //
+    // XML Entity mapping
+    //
+    struct XEntityMapping
+    {
+    public:
+        std::string internal;
+        XExternalReference external;
+        std::string notation;
+    };
+    //
     // XML validation
     //
     bool validChar(XChar ch);
@@ -54,6 +87,9 @@ namespace H4
     XValue parseEntityReference(ISource &xmlSource);
     std::string parseName(ISource &xmlSource);
     XValue parseCharacterReference(ISource &xmlSource);
-
+    //
+    // XML entity
+    //
+    void mapEntityReference(XValue &entityReference, std::unordered_map<std::string, XEntityMapping> &entityMapping);
 } // namespace H4
 #endif /* XML_CORE_HPP */

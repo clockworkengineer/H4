@@ -12,6 +12,11 @@
 #include "XML.hpp"
 #include "XMLSources.hpp"
 #include "XMLDestinations.hpp"
+//
+// C++ STL
+//
+#include <vector>
+#include <filesystem>
 // =========
 // NAMESPACE
 // =========
@@ -207,5 +212,36 @@ namespace H4
             return (characterRefence);
         }
         throw XML::SyntaxError(xmlSource, "Cannot convert character reference.");
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void mapEntityReference(XValue &entityReference, std::unordered_map<std::string, XEntityMapping> &entityMapping)
+    {
+        if (entityMapping.count(entityReference.unparsed) > 0)
+        {
+            if (!entityMapping[entityReference.unparsed].internal.empty())
+            {
+                entityReference.parsed = entityMapping[entityReference.unparsed].internal;
+            }
+            else
+            {
+                if (std::filesystem::exists(entityMapping[entityReference.unparsed].external.systemID))
+                {
+                    FileSource entitySource(entityMapping[entityReference.unparsed].external.systemID);
+                    while (entitySource.more())
+                    {
+                        entityReference.parsed += entitySource.current_to_bytes();
+                        entitySource.next();
+                    }
+                }
+                else
+                {
+                    throw XML::SyntaxError("Entity '" + entityReference.unparsed + "' source file '" + entityMapping[entityReference.unparsed].external.systemID + "' does not exist.");
+                }
+            }
+        }
     }
 } // namespace H4
