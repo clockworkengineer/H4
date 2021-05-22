@@ -290,6 +290,10 @@ namespace H4
             // Self closing element tag
             xNodeElement->setNodeType(XNodeType::self);
         }
+        else
+        {
+            throw SyntaxError(xmlSource, "Missing closing tag.");
+        }
     }
     /// <summary>
     /// Parse XML prolog and create the necessary XNodeElements for it. Valid
