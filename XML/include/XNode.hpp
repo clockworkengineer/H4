@@ -13,59 +13,6 @@
 // =========
 namespace H4
 {
-    // //
-    // // XML Attribute
-    // //
-    // struct XAttribute
-    // {
-    // public:
-    //     XAttribute() {}
-    //     XAttribute(const std::string &name, const XValue &value) : name(name), value(value)
-    //     {
-    //     }
-    //     std::string name;
-    //     XValue value;
-    // };
-    // //
-    // // XML External reference
-    // //
-    // struct XExternalReference
-    // {
-    // public:
-    //     std::string type;
-    //     std::string systemID;
-    //     std::string publicID;
-    // };
-    // //
-    // // XML Entity mapping
-    // //
-    // struct XEntityMapping
-    // {
-    // public:
-    //     std::string internal;
-    //     XExternalReference external;
-    //     std::string notation;
-    // };
-    //
-    // XML DTD attribute definition
-    //
-    struct XDTDAttribute
-    {
-        std::string name;
-        std::string type;
-        XValue value;
-    };
-    //
-    // XML DTD element definition
-    //
-    struct XDTDElement
-    {
-        XDTDElement() {}
-        XDTDElement(const std::string &name, const XValue &content) : name(name), content(content) {}
-        std::string name;
-        XValue content;
-        std::vector<XDTDAttribute> attributes;
-    };
     //
     // XML XNode structure
     //
@@ -104,7 +51,6 @@ namespace H4
         XNode &operator[](int index);
         XNode &operator[](const std::string &name);
         std::vector<std::unique_ptr<XNode>> children;
-
     private:
         XNodeType nodeType;
     };
@@ -206,7 +152,6 @@ namespace H4
         XNodeElement &operator[](int index);
         XNodeElement &operator[](const std::string &name);
         std::string name;
-
     private:
         std::vector<XAttribute> namespaces;
         std::vector<XAttribute> attributes;
@@ -237,14 +182,12 @@ namespace H4
     //
     // DTD XNode
     //
-    class DTD;
     struct XNodeDTD : XNode
     {
     public:
         XNodeDTD(XNodeType nodeType = XNodeType::dtd) : XNode(nodeType)
         {
         }
-//DTD *dtd;
     };
     //
     // Convert base XNode reference

@@ -900,13 +900,11 @@ namespace H4
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
-    void DTD::parseDTD(ISource &dtdSource, XNodeElement *xNodeElement)
+    void DTD::parseDTD(ISource &dtdSource)
     {
         // We take the easy option for allowing a DTD to be stringifyed
         // and keeping the correct order for its components by storing it
         // in its raw unparsed form.
-        XNodeDTD xNodeDTD;
-     //   xNodeDTD.dtd = this;
         long start = dtdSource.position();
         dtdSource.ignoreWS();
         m_name = parseName(dtdSource);
@@ -932,6 +930,5 @@ namespace H4
             }
         }
         parsePostProcessing();
-        xNodeElement->children.emplace_back(std::make_unique<XNodeDTD>(std::move(xNodeDTD)));
     }
 } // namespace H4

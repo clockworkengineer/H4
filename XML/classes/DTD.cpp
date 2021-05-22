@@ -73,9 +73,9 @@ namespace H4
     /// <summary>
     /// Parse DTD read from source stream.
     /// </summary>
-    void DTD::parse(ISource &dtdSource, XNodeElement *xNodeElement)
+    void DTD::parse(ISource &dtdSource)
     {
-        parseDTD(dtdSource, xNodeElement);
+        parseDTD(dtdSource);
     }
     /// <summary>
     ///

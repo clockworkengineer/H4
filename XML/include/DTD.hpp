@@ -37,6 +37,26 @@ namespace H4
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
         //
+        //
+        // XML DTD attribute definition
+        //
+        struct XDTDAttribute
+        {
+            std::string name;
+            std::string type;
+            XValue value;
+        };
+        //
+        // XML DTD element definition
+        //
+        struct XDTDElement
+        {
+            XDTDElement() {}
+            XDTDElement(const std::string &name, const XValue &content) : name(name), content(content) {}
+            std::string name;
+            XValue content;
+            std::vector<XDTDAttribute> attributes;
+        };
         // ============
         // CONSTRUCTORS
         // ============
@@ -50,7 +70,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        void parse(ISource &dtdSource, XNodeElement *xNodeElement);
+        void parse(ISource &dtdSource);
         void stringify(IDestination &xmlDestination);
         void validate(XNodeElement &prolog);
         // ================
@@ -62,7 +82,6 @@ namespace H4
         std::unordered_map<std::string, XExternalReference> m_notations;
         std::unordered_map<std::string, XDTDElement> m_elements;
         long m_lineNumber = 1;
-
     private:
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
@@ -107,7 +126,7 @@ namespace H4
         void parseParameterEntity(ISource &dtdSource);
         void parseExternal(ISource &dtdSource);
         void parseInternal(ISource &dtdSource);
-        void parseDTD(ISource &dtdSource, XNodeElement *XNodeElement);
+        void parseDTD(ISource &dtdSource);
         void validateDTD(XNodeElement &prolog);
         // =================
         // PRIVATE VARIABLES

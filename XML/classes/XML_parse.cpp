@@ -325,7 +325,8 @@ namespace H4
             }
             else if (xmlSource.match(U"<!DOCTYPE"))
             {
-                m_dtd.parse(xmlSource, xNodeProlog);
+                m_dtd.parse(xmlSource);
+                xNodeProlog->children.emplace_back(std::make_unique<XNodeDTD>());
             }
             else if (xmlSource.current() == '<')
             {
