@@ -15,7 +15,18 @@ set(TEST_SOURCES
     XML_tests_main.cpp
     XML_tests_ISource.cpp
     XML_tests_IDestination.cpp
-    XML_tests_parse.cpp
+    XML_tests_parse_misc.cpp
+    XML_tests_parse_declaration.cpp
+    XML_tests_parse_tags.cpp
+    XML_tests_parse_root.cpp
+    XML_tests_parse_files.cpp
+    XML_tests_parse_attributes.cpp
+    XML_tests_parse_comments.cpp
+    XML_tests_parse_unicode.cpp
+    XML_tests_parse_entities.cpp
+    XML_tests_parse_pi.cpp
+    XML_tests_parse_cdata.cpp
+    XML_tests_parse_namespace.cpp
     XML_tests_dtd_parse.cpp
     XML_tests_stringify.cpp
     XML_tests_dtd_stringify.cpp
