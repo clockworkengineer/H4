@@ -49,20 +49,20 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>true when declaration valid.</returns>
-    void XML::validXMLDeclaration(ISource &xmlSource, XMLNodeElement *xNodeProlog)
+    void XML::validXMLDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeProlog)
     {
         // Syntax error if no version present
-        if (!xNodeProlog->isAttributePresent("version"))
+        if (!xmlNodeProlog->isAttributePresent("version"))
         {
             throw SyntaxError(xmlSource, "Version missing from declaration.");
         }
         // Save declaration attributes to be validated and clear tem from prolog element
         std::vector<XMLAttribute> prologAttributes;
-        for (auto attribute : xNodeProlog->getAttributeList())
+        for (auto attribute : xmlNodeProlog->getAttributeList())
         {
             prologAttributes.push_back(attribute);
         }
-        xNodeProlog->clearAttributes();
+        xmlNodeProlog->clearAttributes();
         // Fill in gaps with default if missing attributes
         std::vector<XMLAttribute> validatedAttributes;
         long currentAttribute = 0;
@@ -107,7 +107,7 @@ namespace H4
         // Set validated prolog attributes
         for (auto &attribute : validatedAttributes)
         {
-            xNodeProlog->addAttribute(attribute.name, attribute.value);
+            xmlNodeProlog->addAttribute(attribute.name, attribute.value);
         }
     }
     /// <summary>

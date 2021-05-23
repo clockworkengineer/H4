@@ -48,17 +48,17 @@ namespace H4
     /// </summary>
     /// <param name="xNodeRoot">XML XNode root to convert into XML.</param>
     /// <returns></returns>
-    void XML::stringifyElements(XMLNode *xNode, IDestination &xmlDestination)
+    void XML::stringifyElements(XMLNode *xmlNode, IDestination &xmlDestination)
     {
-        switch (xNode->getNodeType())
+        switch (xmlNode->getNodeType())
         {
         // XML prolog
         case XMLNodeType::prolog:
         {
-            xmlDestination.add("<?xml version=\"" + XMLNodeRef<XMLNodeElement>((*xNode)).getAttribute("version").value.unparsed + "\"" +
-                               " encoding=\"" + XMLNodeRef<XMLNodeElement>((*xNode)).getAttribute("encoding").value.unparsed + "\"" +
-                               " standalone=\"" + XMLNodeRef<XMLNodeElement>((*xNode)).getAttribute("standalone").value.unparsed + "\"?>");
-            for (auto &element : XMLNodeRef<XMLNodeElement>((*xNode)).children)
+            xmlDestination.add("<?xml version=\"" + XMLNodeRef<XMLNodeElement>((*xmlNode)).getAttribute("version").value.unparsed + "\"" +
+                               " encoding=\"" + XMLNodeRef<XMLNodeElement>((*xmlNode)).getAttribute("encoding").value.unparsed + "\"" +
+                               " standalone=\"" + XMLNodeRef<XMLNodeElement>((*xmlNode)).getAttribute("standalone").value.unparsed + "\"?>");
+            for (auto &element : XMLNodeRef<XMLNodeElement>((*xmlNode)).children)
             {
                 stringifyElements(element.get(), xmlDestination);
             }
@@ -68,26 +68,26 @@ namespace H4
         case XMLNodeType::root:
         case XMLNodeType::element:
         {
-            XMLNodeElement *xNodeElement = static_cast<XMLNodeElement *>(xNode);
-            xmlDestination.add("<" + xNodeElement->name);
-            for (auto attr : xNodeElement->getAttributeList())
+            XMLNodeElement *xmlNodeElement = static_cast<XMLNodeElement *>(xmlNode);
+            xmlDestination.add("<" + xmlNodeElement->name);
+            for (auto attr : xmlNodeElement->getAttributeList())
             {
                 xmlDestination.add(" " + attr.name + "=\"" + attr.value.unparsed + "\"");
             }
             xmlDestination.add(">");
-            for (auto &element : XMLNodeRef<XMLNodeElement>((*xNode)).children)
+            for (auto &element : XMLNodeRef<XMLNodeElement>((*xmlNode)).children)
             {
                 stringifyElements(element.get(), xmlDestination);
             }
-            xmlDestination.add("</" + xNodeElement->name + ">");
+            xmlDestination.add("</" + xmlNodeElement->name + ">");
             break;
         }
         // Self closing element
         case XMLNodeType::self:
         {
-            XMLNodeElement *xNodeElement = static_cast<XMLNodeElement *>(xNode);
-            xmlDestination.add("<" + xNodeElement->name);
-            for (auto attr : xNodeElement->getAttributeList())
+            XMLNodeElement *xmlNodeElement = static_cast<XMLNodeElement *>(xmlNode);
+            xmlDestination.add("<" + xmlNodeElement->name);
+            for (auto attr : xmlNodeElement->getAttributeList())
             {
                 xmlDestination.add(" " + attr.name + "=\"" + attr.value.unparsed + "\"");
             }
@@ -97,35 +97,35 @@ namespace H4
         // XML comments
         case XMLNodeType::comment:
         {
-            XMLNodeComment *xNodeComment = static_cast<XMLNodeComment *>(xNode);
+            XMLNodeComment *xNodeComment = static_cast<XMLNodeComment *>(xmlNode);
             xmlDestination.add("<!--" + xNodeComment->comment + "-->");
             break;
         }
         // XML element content
         case XMLNodeType::content:
         {
-            XMLNodeContent *xNodeContent = static_cast<XMLNodeContent *>(xNode);
+            XMLNodeContent *xNodeContent = static_cast<XMLNodeContent *>(xmlNode);
             xmlDestination.add(xNodeContent->content);
             break;
         }
         // XML character entity
         case XMLNodeType::entity:
         {
-            XMLNodeEntityReference *xNodeEntity = static_cast<XMLNodeEntityReference *>(xNode);
+            XMLNodeEntityReference *xNodeEntity = static_cast<XMLNodeEntityReference *>(xmlNode);
             xmlDestination.add(xNodeEntity->value.unparsed);
             break;
         }
         // XML processing instruction
         case XMLNodeType::pi:
         {
-            XNodePI *xNodePI = static_cast<XNodePI *>(xNode);
+            XNodePI *xNodePI = static_cast<XNodePI *>(xmlNode);
             xmlDestination.add("<?" + xNodePI->name + " " + xNodePI->parameters + "?>");
             break;
         }
         // XML CDATA section
         case XMLNodeType::cdata:
         {
-            XMLNodeCDATA *xNodeCDATA = static_cast<XMLNodeCDATA *>(xNode);
+            XMLNodeCDATA *xNodeCDATA = static_cast<XMLNodeCDATA *>(xmlNode);
             xmlDestination.add("<![CDATA[" + xNodeCDATA->cdata + "]]>");
             break;
         }

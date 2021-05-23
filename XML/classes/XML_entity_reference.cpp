@@ -47,7 +47,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XML::parseEntityMappingContents(XMLNodeElement *xNodeElement, XMLValue &entityReference)
+    void XML::parseEntityMappingContents(XMLNodeElement *xmlNodeElement, XMLValue &entityReference)
     {
         XMLNodeEntityReference xNodeEntityReference(entityReference);
         if (entityReference.unparsed[1] != '#')
@@ -61,11 +61,11 @@ namespace H4
                     parseElementContents(entitySource, &entityElement);
                 }
                 xNodeEntityReference.children = std::move(entityElement.children);
-                if (!xNodeElement->children.empty())
+                if (!xmlNodeElement->children.empty())
                 {
-                    if (xNodeElement->children.back()->getNodeType() == XMLNodeType::content)
+                    if (xmlNodeElement->children.back()->getNodeType() == XMLNodeType::content)
                     {
-                        XMLNodeRef<XMLNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
+                        XMLNodeRef<XMLNodeContent>(*xmlNodeElement->children.back()).isWhiteSpace = false;
                     }
                 }
             }
@@ -73,11 +73,11 @@ namespace H4
             {
                 while (entitySource.more())
                 {
-                    parseElementContents(entitySource, xNodeElement);
+                    parseElementContents(entitySource, xmlNodeElement);
                 }
                 return;
             }
         }
-        xNodeElement->children.emplace_back(std::make_unique<XMLNodeEntityReference>(std::move(xNodeEntityReference)));
+        xmlNodeElement->children.emplace_back(std::make_unique<XMLNodeEntityReference>(std::move(xNodeEntityReference)));
     }
 } // namespace H4

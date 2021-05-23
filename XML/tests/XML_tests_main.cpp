@@ -174,7 +174,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
       xmlSource.next();
       length++;
     }
-    REQUIRE(length == 8752);                                 // eof
+    REQUIRE(length == 8752);                                   // eof
     REQUIRE(xmlSource.current() == static_cast<XMLChar>(EOF)); // eof
   }
   std::string xmlString;
@@ -356,7 +356,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       xmlSource.next();
       length++;
     }
-    REQUIRE(length == 8752);                                 // eof
+    REQUIRE(length == 8752);                                   // eof
     REQUIRE(xmlSource.current() == static_cast<XMLChar>(EOF)); // eof
   }
   std::string xmlString;

@@ -113,21 +113,21 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        void stringifyElements(XMLNode *xNode, IDestination &xmlDestination);
+        void stringifyElements(XMLNode *xmlNode, IDestination &xmlDestination);
         bool validAttributeValue(XMLValue &value);
-        void validXMLDeclaration(ISource &xmlSource, XMLNodeElement *xNodeElement);
-        void parseAddElementContent(XMLNodeElement *xNodeElement, const std::string &content);
-        void parseEntityMappingContents(XMLNodeElement *xNodeElement, XMLValue &entityReference);
-        void parseDefault(ISource &xmlSource, XMLNodeElement *xNodeElement);
-        void parseTagName(ISource &xmlSource, XMLNodeElement *xNodeElement);
-        void parseChildElement(ISource &xmlSource, XMLNodeElement *xNodeElement);
-        void parseAttributes(ISource &xmlSource, XMLNodeElement *xNodeElement);
-        void parseComment(ISource &xmlSource, XMLNodeElement *xNodeElement);
-        void parseCDATA(ISource &xmlSource, XMLNodeElement *xNodeElement);
-        void parsePI(ISource &xmlSource, XMLNodeElement *xNodeElement);
+        void validXMLDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
+        void parseAddElementContent(XMLNodeElement *xmlNodeElement, const std::string &content);
+        void parseEntityMappingContents(XMLNodeElement *xmlNodeElement, XMLValue &entityReference);
+        void parseDefault(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
+        void parseTagName(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
+        void parseChildElement(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
+        void parseAttributes(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
+        void parseComment(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
+        void parseCDATA(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
+        void parsePI(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
         void parseElementContents(ISource &xmlSource, XMLNodeElement *XNodeElement);
         void parseElement(ISource &xmlSource, XMLNodeElement *XNodeElement);
-        void parseProlog(ISource &xmlSource, XMLNodeElement *xNodeProlog);
+        void parseProlog(ISource &xmlSource, XMLNodeElement *xmlNodeProlog);
         void parseXML();
         void stringifyXML(IDestination &xmlDestination);
         // =================
