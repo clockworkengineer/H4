@@ -250,9 +250,9 @@ TEST_CASE("Stringify ENTITY that contains XML parsable into new structure (ie.ne
                     "<!ENTITY example \"<p>An ampersand (&#38;#38;) may be escaped numerically (&#38;#38;#38;) or with a general entity (&amp;amp;).</p>\">]>\n"
                     "<note>&example;</note>\n";
         std::string expanded = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
-                    "<!DOCTYPE note [\n"
-                    "<!ENTITY example \"<p>An ampersand (&#38;#38;) may be escaped numerically (&#38;#38;#38;) or with a general entity (&amp;amp;).</p>\">]>\n"
-                    "<note><p>An ampersand (&#38;) may be escaped numerically (&#38;#38;) or with a general entity (&amp;amp;).</p></note>\n";
+                               "<!DOCTYPE note [\n"
+                               "<!ENTITY example \"<p>An ampersand (&#38;#38;) may be escaped numerically (&#38;#38;#38;) or with a general entity (&amp;amp;).</p>\">]>\n"
+                               "<note><p>An ampersand (&#38;) may be escaped numerically (&#38;#38;) or with a general entity (&amp;amp;).</p></note>\n";
         BufferSource xmlSource(xmlString);
         XML xml(xmlSource);
         xml.parse();

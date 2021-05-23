@@ -29,4 +29,5 @@ std::u16string readXMLFromFileUTF16(const std::string &xmlFileName);
 void writeXMLToFileUTF8(const std::string &xmlFileName, const std::string &xmlString);
 void writeXMLToFileUTF16(const std::string &xmlFileName, const std::u16string &xmlString, bool be);
 void checkStringify(const std::string &xmlString);
+void verifyCRLFCount(H4::ISource &xmlSource, long lfFinal, long crFinal);
 #endif /* XML_TESTS_HPP */

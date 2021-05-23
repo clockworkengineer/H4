@@ -32,6 +32,8 @@ set (XML_SOURCES
 set (XML_INCLUDES
     XMLConfig.hpp
     ./include/XML.hpp
+    ./include/ISource.hpp
+    ./inclide/IDestination.hpp
     ./include/XMLSources.hpp
     ./include/XMLDestinations.hpp
     ./include/XMLNode.hpp

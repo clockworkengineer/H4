@@ -842,7 +842,7 @@ TEST_CASE("Make sure whitespace is whitespace.", "[XML][Access][ByName]")
                 "</Address>"
                 "</AddressBook>";
     BufferSource xmlSource(xmlString);
-    XML xml(xmlSource); 
+    XML xml(xmlSource);
     xml.parse();
     REQUIRE(XMLNodeRef<XMLNodeElement>(*xml.m_prolog["AddressBook"].children[0]).getNodeType() == XMLNodeType::content);
     REQUIRE(XMLNodeRef<XMLNodeContent>(*xml.m_prolog["AddressBook"].children[0]).isWhiteSpace == true);
