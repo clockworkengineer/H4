@@ -40,7 +40,7 @@ namespace H4
         //
         // XML DTD attribute definition
         //
-        struct XDTDAttribute
+        struct DTDAttribute
         {
             std::string name;
             std::string type;
@@ -49,13 +49,13 @@ namespace H4
         //
         // XML DTD element definition
         //
-        struct XDTDElement
+        struct DTDElement
         {
-            XDTDElement() {}
-            XDTDElement(const std::string &name, const XValue &content) : name(name), content(content) {}
+            DTDElement() {}
+            DTDElement(const std::string &name, const XValue &content) : name(name), content(content) {}
             std::string name;
             XValue content;
-            std::vector<XDTDAttribute> attributes;
+            std::vector<DTDAttribute> attributes;
         };
         // ============
         // CONSTRUCTORS
@@ -80,7 +80,7 @@ namespace H4
         XEntityMappings m_entityMapping;
         XExternalReference m_external;
         std::unordered_map<std::string, XExternalReference> m_notations;
-        std::unordered_map<std::string, XDTDElement> m_elements;
+        std::unordered_map<std::string, DTDElement> m_elements;
         long m_lineNumber = 1;
     private:
         // ===========================

@@ -712,7 +712,7 @@ namespace H4
         std::string elementName = parseName(dtdSource);
         while (dtdSource.more() && validNameStartChar(dtdSource.current()))
         {
-            XDTDAttribute xDTDAttribute;
+            DTDAttribute xDTDAttribute;
             xDTDAttribute.name = parseName(dtdSource);
             xDTDAttribute.type = parseAttributeType(dtdSource);
             xDTDAttribute.value = parseAttributeValue(dtdSource);
@@ -798,7 +798,7 @@ namespace H4
                 dtdSource.next();
             }
         }
-        XDTDElement element(elementName, contentSpecification);
+        DTDElement element(elementName, contentSpecification);
         m_elements.emplace(std::pair(element.name, element));
         dtdSource.ignoreWS();
     }

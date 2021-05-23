@@ -48,6 +48,13 @@ namespace H4
     // PUBLIC METHODS
     // ==============
     /// <summary>
+    /// 
+    /// </summary>
+    XEntityMapping & XML::getEntity(const std::string &entityName)
+    {
+        return(m_dtd.m_entityMapping[entityName]);
+    }
+    /// <summary>
     /// Parse XML read from source stream.
     /// </summary>
     void XML::parse()

@@ -282,6 +282,11 @@ namespace H4
         }
         return (character);
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     XValue parseValue(ISource &xmlSource, XEntityMappings &entityMapping, bool translateEntity)
     {
         if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))

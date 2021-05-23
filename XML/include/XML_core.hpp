@@ -5,11 +5,6 @@
 //
 #include <string>
 //
-// Source/Destination interfaces
-//
-// #include "ISource.hpp"
-// // #include "IDestination.hpp"
-//
 // XML character constants
 //
 #define kCarriageReturn 0x0D

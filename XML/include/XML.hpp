@@ -14,7 +14,7 @@
 #include "XML_core.hpp"
 //
 // XML DTD
-// 
+//
 #include "DTD.hpp"
 //
 // XML XNodes
@@ -25,7 +25,6 @@
 //
 #include "ISource.hpp"
 #include "IDestination.hpp"
-
 // =========
 // NAMESPACE
 // =========
@@ -94,6 +93,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
+        XEntityMapping &getEntity(const std::string &entityName);
         void parse();
         void stringify(IDestination &xmlDestination);
         void validate();
