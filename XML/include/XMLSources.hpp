@@ -37,7 +37,7 @@ namespace H4
             m_parseBuffer = m_UTF8.from_bytes(sourceBuffer);
             convertCRLFToLF(m_parseBuffer);
         }
-        XChar current()
+        XMLChar current()
         {
             if (more())
             {
@@ -84,7 +84,7 @@ namespace H4
         }
 
     private:
-        void convertCRLFToLF(XString &xmlString)
+        void convertCRLFToLF(XMLString &xmlString)
         {
             size_t pos = xmlString.find(U"\x0D\x0A");
             while (pos != std::string::npos)
@@ -94,7 +94,7 @@ namespace H4
             }
         }
         long m_bufferPosition = 0;
-        XString m_parseBuffer;
+        XMLString m_parseBuffer;
     };
     class FileSource : public ISource
     {
@@ -115,7 +115,7 @@ namespace H4
                 }
             }
         }
-        XChar current()
+        XMLChar current()
         {
             return (m_source.peek());
         }
@@ -147,7 +147,7 @@ namespace H4
         }
         void backup(long length)
         {
-            if ((m_source.tellg() - length >= 0) || (current() == (XChar)EOF))
+            if ((m_source.tellg() - length >= 0) || (current() == (XMLChar)EOF))
             {
                 m_source.clear();
                 m_source.seekg(-length, std::ios_base::cur);

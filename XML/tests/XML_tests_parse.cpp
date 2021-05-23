@@ -421,13 +421,13 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE(xml.m_prolog.getAttribute("standalone").value.parsed == "no");
     REQUIRE(xml.m_prolog[0].name == "AddressBook");
     REQUIRE(xml.m_prolog[0].children.size() == 13);
-    REQUIRE(XNodeRef<XNodeComment>(*xml.m_prolog[0].children[1]).comment == "Address one ");
+    REQUIRE(XMLNodeRef<XMLNodeComment>(*xml.m_prolog[0].children[1]).comment == "Address one ");
     REQUIRE(xml.m_prolog[0][0].name == "Address");
     REQUIRE(xml.m_prolog[0][0].getContents() == "    This is some contents 1   ");
-    REQUIRE(XNodeRef<XNodeComment>(*xml.m_prolog[0].children[5]).comment == "Address two ");
+    REQUIRE(XMLNodeRef<XMLNodeComment>(*xml.m_prolog[0].children[5]).comment == "Address two ");
     REQUIRE(xml.m_prolog[0][1].name == "Address");
     REQUIRE(xml.m_prolog[0][1].getContents() == "    This is some contents 2   ");
-    REQUIRE(XNodeRef<XNodeComment>(*xml.m_prolog[0].children[9]).comment == "Address three ");
+    REQUIRE(XMLNodeRef<XMLNodeComment>(*xml.m_prolog[0].children[9]).comment == "Address three ");
     REQUIRE(xml.m_prolog[0][2].name == "Address");
     REQUIRE(xml.m_prolog[0][2].getContents() == "    This is some contents 3   ");
   }
@@ -623,9 +623,9 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::pi);
-    REQUIRE(XNodeRef<XNodePI>(*xml.m_prolog.children[1]).name == "xml-stylesheet");
-    REQUIRE(XNodeRef<XNodePI>(*xml.m_prolog.children[1]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::pi);
+    REQUIRE(XMLNodeRef<XNodePI>(*xml.m_prolog.children[1]).name == "xml-stylesheet");
+    REQUIRE(XMLNodeRef<XNodePI>(*xml.m_prolog.children[1]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
   }
   SECTION("Parse XML containing PI in root section and check values", "[XML][Parse][PI]")
   {
@@ -635,9 +635,9 @@ TEST_CASE("Check the parsing of XML containing program instructions", "[XML][Par
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog[0].children[0]).getNodeType() == XNodeType::pi);
-    REQUIRE(XNodeRef<XNodePI>(*xml.m_prolog[0].children[0]).name == "xml-stylesheet");
-    REQUIRE(XNodeRef<XNodePI>(*xml.m_prolog[0].children[0]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog[0].children[0]).getNodeType() == XMLNodeType::pi);
+    REQUIRE(XMLNodeRef<XNodePI>(*xml.m_prolog[0].children[0]).name == "xml-stylesheet");
+    REQUIRE(XMLNodeRef<XNodePI>(*xml.m_prolog[0].children[0]).parameters == "href=\"tutorialspointstyle.css\" type=\"text/css\"");
   }
 }
 TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
@@ -663,7 +663,7 @@ TEST_CASE("Parse CDATA SECTION", "[XML][Parse][CDATA]")
     XML xml(xmlSource);
     xml.parse();
     REQUIRE(xml.m_prolog[0].getContents() == "\n   <message> Welcome to TutorialsPoint </message>   ");
-    REQUIRE(XNodeRef<XNodeCDATA>(*xml.m_prolog[0].children[1]).cdata == "<message> Welcome to TutorialsPoint </message>");
+    REQUIRE(XMLNodeRef<XMLNodeCDATA>(*xml.m_prolog[0].children[1]).cdata == "<message> Welcome to TutorialsPoint </message>");
   }
   SECTION("Parse XML root containing CDDATA containing nested CDATA ", "[XML][Parse][CDATA]")
   {
@@ -813,9 +813,9 @@ TEST_CASE("Use name for accessing elements", "[XML][Access][ByName]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"]).name == "AddressBook");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"]["Address"]).name == "Address");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog["AddressBook"]["Address"]).getContents() == "Flat A, West Road, Wolverhampton, W1SSX9");
+    REQUIRE(XMLNodeRef<XMLNodeElement>(xml.m_prolog["AddressBook"]).name == "AddressBook");
+    REQUIRE(XMLNodeRef<XMLNodeElement>(xml.m_prolog["AddressBook"]["Address"]).name == "Address");
+    REQUIRE(XMLNodeRef<XMLNodeElement>(xml.m_prolog["AddressBook"]["Address"]).getContents() == "Flat A, West Road, Wolverhampton, W1SSX9");
   }
 }
 TEST_CASE("Make sure whitespace is whitespace.", "[XML][Access][ByName]")
@@ -844,21 +844,21 @@ TEST_CASE("Make sure whitespace is whitespace.", "[XML][Access][ByName]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource); 
     xml.parse();
-    REQUIRE(XNodeRef<XNodeElement>(*xml.m_prolog["AddressBook"].children[0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>(*xml.m_prolog["AddressBook"].children[0]).isWhiteSpace == true);
-    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[1])[0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[1])[0]).isWhiteSpace == false);
-    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[2])[0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[2])[0]).isWhiteSpace == true);
-    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[3])[0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[3])[0]).isWhiteSpace == false);
-    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[3])[1]).getNodeType() == XNodeType::entity);
-    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[3])[2]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[3])[2]).isWhiteSpace == false);
-    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[4])[0]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[4])[0]).isWhiteSpace == false);
-    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[4])[1]).getNodeType() == XNodeType::cdata);
-    REQUIRE(XNodeRef<XNodeElement>((*xml.m_prolog["AddressBook"].children[4])[2]).getNodeType() == XNodeType::content);
-    REQUIRE(XNodeRef<XNodeContent>((*xml.m_prolog["AddressBook"].children[4])[2]).isWhiteSpace == false);
+    REQUIRE(XMLNodeRef<XMLNodeElement>(*xml.m_prolog["AddressBook"].children[0]).getNodeType() == XMLNodeType::content);
+    REQUIRE(XMLNodeRef<XMLNodeContent>(*xml.m_prolog["AddressBook"].children[0]).isWhiteSpace == true);
+    REQUIRE(XMLNodeRef<XMLNodeElement>((*xml.m_prolog["AddressBook"].children[1])[0]).getNodeType() == XMLNodeType::content);
+    REQUIRE(XMLNodeRef<XMLNodeContent>((*xml.m_prolog["AddressBook"].children[1])[0]).isWhiteSpace == false);
+    REQUIRE(XMLNodeRef<XMLNodeElement>((*xml.m_prolog["AddressBook"].children[2])[0]).getNodeType() == XMLNodeType::content);
+    REQUIRE(XMLNodeRef<XMLNodeContent>((*xml.m_prolog["AddressBook"].children[2])[0]).isWhiteSpace == true);
+    REQUIRE(XMLNodeRef<XMLNodeElement>((*xml.m_prolog["AddressBook"].children[3])[0]).getNodeType() == XMLNodeType::content);
+    REQUIRE(XMLNodeRef<XMLNodeContent>((*xml.m_prolog["AddressBook"].children[3])[0]).isWhiteSpace == false);
+    REQUIRE(XMLNodeRef<XMLNodeElement>((*xml.m_prolog["AddressBook"].children[3])[1]).getNodeType() == XMLNodeType::entity);
+    REQUIRE(XMLNodeRef<XMLNodeElement>((*xml.m_prolog["AddressBook"].children[3])[2]).getNodeType() == XMLNodeType::content);
+    REQUIRE(XMLNodeRef<XMLNodeContent>((*xml.m_prolog["AddressBook"].children[3])[2]).isWhiteSpace == false);
+    REQUIRE(XMLNodeRef<XMLNodeElement>((*xml.m_prolog["AddressBook"].children[4])[0]).getNodeType() == XMLNodeType::content);
+    REQUIRE(XMLNodeRef<XMLNodeContent>((*xml.m_prolog["AddressBook"].children[4])[0]).isWhiteSpace == false);
+    REQUIRE(XMLNodeRef<XMLNodeElement>((*xml.m_prolog["AddressBook"].children[4])[1]).getNodeType() == XMLNodeType::cdata);
+    REQUIRE(XMLNodeRef<XMLNodeElement>((*xml.m_prolog["AddressBook"].children[4])[2]).getNodeType() == XMLNodeType::content);
+    REQUIRE(XMLNodeRef<XMLNodeContent>((*xml.m_prolog["AddressBook"].children[4])[2]).isWhiteSpace == false);
   }
 }

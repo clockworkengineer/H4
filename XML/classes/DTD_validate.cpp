@@ -47,12 +47,12 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool DTD::validateIsPCDATA(XNodeElement *xNodeElement)
+    bool DTD::validateIsPCDATA(XMLNodeElement *xNodeElement)
     {
         for (auto &element : xNodeElement->children)
         {
-            if ((XNodeRef<XNode>(*element).getNodeType() == XNodeType::element) ||
-                (XNodeRef<XNode>(*element).getNodeType() == XNodeType::self))
+            if ((XMLNodeRef<XMLNode>(*element).getNodeType() == XMLNodeType::element) ||
+                (XMLNodeRef<XMLNode>(*element).getNodeType() == XMLNodeType::self))
             {
                 return (false);
             }
@@ -64,16 +64,16 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool DTD::validateIsEMPTY(XNodeElement *xNodeElement)
+    bool DTD::validateIsEMPTY(XMLNodeElement *xNodeElement)
     {
-        return (xNodeElement->children.empty() || xNodeElement->getNodeType() == XNodeType::self);
+        return (xNodeElement->children.empty() || xNodeElement->getNodeType() == XMLNodeType::self);
     }
     /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateAttributes(XNodeDTD */*dtd*/, XNodeElement *xNodeElement)
+    void DTD::validateAttributes(XMLNodeDTD */*dtd*/, XMLNodeElement *xNodeElement)
     {
         for (auto &attribute : m_elements[xNodeElement->name].attributes)
         {
@@ -96,7 +96,7 @@ namespace H4
             {
                 if (xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
+                    XMLAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (elementAttribute.value.parsed.empty()) // No character data present.
                     {
                         //throw XML::ValidationError(*this, "");
@@ -107,7 +107,7 @@ namespace H4
             {
                 if (xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
+                    XMLAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (elementAttribute.value.parsed[0] != '_' &&
                         !std::isalpha(elementAttribute.value.parsed[0]) &&
                         elementAttribute.value.parsed[0] != ':')
@@ -125,7 +125,7 @@ namespace H4
             {
                 if (xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
+                    XMLAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (elementAttribute.value.parsed[0] != '_' &&
                         !std::isalpha(elementAttribute.value.parsed[0]) &&
                         elementAttribute.value.parsed[0] != ':')
@@ -144,7 +144,7 @@ namespace H4
                 }
                 if (xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
+                    XMLAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (!options.contains(elementAttribute.value.parsed))
                     {
                         throw XML::ValidationError(*this, "Element <" + xNodeElement->name + "> attribute '" + attribute.name + "' contains invalid enumeration value '" + elementAttribute.value.parsed + "'.");
@@ -171,7 +171,7 @@ namespace H4
             {
                 if (xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
+                    XMLAttribute elementAttribute = xNodeElement->getAttribute(attribute.name);
                     if (attribute.value.parsed.substr(7) != elementAttribute.value.parsed)
                     {
                         throw XML::ValidationError(*this, "Element <" + xNodeElement->name + "> attribute '" + attribute.name + "' is '" + elementAttribute.value.parsed + "' instead of '" + attribute.value.parsed.substr(7) + "'.");
@@ -179,7 +179,7 @@ namespace H4
                 }
                 else
                 {
-                    XValue value;
+                    XMLValue value;
                     value.parsed = value.unparsed = attribute.value.parsed.substr(7);
                     xNodeElement->addAttribute(attribute.name, value);
                 }
@@ -188,7 +188,7 @@ namespace H4
             {
                 if (!xNodeElement->isAttributePresent(attribute.name))
                 {
-                    XValue value;
+                    XMLValue value;
                     value.parsed = value.unparsed = attribute.value.parsed;
                     xNodeElement->addAttribute(attribute.name, value);
                 }
@@ -200,7 +200,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateContentSpecification(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    void DTD::validateContentSpecification(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement)
     {
         if ((dtd == nullptr) || (m_elements.empty()))
         {
@@ -230,14 +230,14 @@ namespace H4
         std::string elements;
         for (auto &element : xNodeElement->children)
         {
-            if ((XNodeRef<XNode>(*element).getNodeType() == XNodeType::element) ||
-                (XNodeRef<XNode>(*element).getNodeType() == XNodeType::self))
+            if ((XMLNodeRef<XMLNode>(*element).getNodeType() == XMLNodeType::element) ||
+                (XMLNodeRef<XMLNode>(*element).getNodeType() == XMLNodeType::self))
             {
-                elements += "<" + XNodeRef<XNodeElement>(*element).name + ">";
+                elements += "<" + XMLNodeRef<XMLNodeElement>(*element).name + ">";
             }
-            else if (XNodeRef<XNode>(*element).getNodeType() == XNodeType::content)
+            else if (XMLNodeRef<XMLNode>(*element).getNodeType() == XMLNodeType::content)
             {
-                if (!XNodeRef<XNodeContent>(*element).isWhiteSpace)
+                if (!XMLNodeRef<XMLNodeContent>(*element).isWhiteSpace)
                 {
                     elements += "<#PCDATA>";
                 }
@@ -254,7 +254,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateElement(XNodeDTD *dtd, XNodeElement *xNodeElement)
+    void DTD::validateElement(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement)
     {
         validateContentSpecification(dtd, xNodeElement);
         validateAttributes(dtd, xNodeElement);
@@ -264,39 +264,39 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateElements(XNodeDTD *dtd, XNode *xNode)
+    void DTD::validateElements(XMLNodeDTD *dtd, XMLNode *xNode)
     {
         switch (xNode->getNodeType())
         {
-        case XNodeType::prolog:
-            for (auto &element : XNodeRef<XNodeElement>((*xNode)).children)
+        case XMLNodeType::prolog:
+            for (auto &element : XMLNodeRef<XMLNodeElement>((*xNode)).children)
             {
                 validateElements(dtd, element.get());
             }
             break;
-        case XNodeType::root:
-            if (XNodeRef<XNodeElement>((*xNode)).name != m_name)
+        case XMLNodeType::root:
+            if (XMLNodeRef<XMLNodeElement>((*xNode)).name != m_name)
             {
-                throw XML::ValidationError(*this, "DOCTYPE name does not match that of root element " + XNodeRef<XNodeElement>((*xNode)).name + " of DTD.");
+                throw XML::ValidationError(*this, "DOCTYPE name does not match that of root element " + XMLNodeRef<XMLNodeElement>((*xNode)).name + " of DTD.");
             }
-        case XNodeType::element:
-            validateElement(dtd, static_cast<XNodeElement *>(xNode));
-            for (auto &element : XNodeRef<XNodeElement>((*xNode)).children)
+        case XMLNodeType::element:
+            validateElement(dtd, static_cast<XMLNodeElement *>(xNode));
+            for (auto &element : XMLNodeRef<XMLNodeElement>((*xNode)).children)
             {
                 validateElements(dtd, element.get());
             }
             break;
-        case XNodeType::self:
-            validateElement(dtd, static_cast<XNodeElement *>(xNode));
+        case XMLNodeType::self:
+            validateElement(dtd, static_cast<XMLNodeElement *>(xNode));
             break;
-        case XNodeType::comment:
-        case XNodeType::entity:
-        case XNodeType::pi:
-        case XNodeType::cdata:
-        case XNodeType::dtd:
+        case XMLNodeType::comment:
+        case XMLNodeType::entity:
+        case XMLNodeType::pi:
+        case XMLNodeType::cdata:
+        case XMLNodeType::dtd:
             break;
-        case XNodeType::content:
-            for (auto &ch : XNodeRef<XNodeContent>((*xNode)).content)
+        case XMLNodeType::content:
+            for (auto &ch : XMLNodeRef<XMLNodeContent>((*xNode)).content)
             {
                 if (ch == kLineFeed)
                 {
@@ -313,16 +313,16 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateDTD(XNodeElement &prolog)
+    void DTD::validateDTD(XMLNodeElement &prolog)
     {
-        if (prolog.getNodeType() == XNodeType::prolog)
+        if (prolog.getNodeType() == XMLNodeType::prolog)
         {
-            XNodeDTD *dtd;
+            XMLNodeDTD *dtd;
             for (auto &element : prolog.children)
             {
-                if (element->getNodeType() == XNodeType::dtd)
+                if (element->getNodeType() == XMLNodeType::dtd)
                 {
-                    dtd = static_cast<XNodeDTD *>(element.get());
+                    dtd = static_cast<XMLNodeDTD *>(element.get());
                     break;
                 }
             }

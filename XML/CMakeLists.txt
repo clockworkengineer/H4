@@ -34,7 +34,7 @@ set (XML_INCLUDES
     ./include/XML.hpp
     ./include/XMLSources.hpp
     ./include/XMLDestinations.hpp
-    ./include/XNode.hpp
+    ./include/XMLNode.hpp
     ./incldue/XML_core.hpp
     ./include/DTD.cpp
 )

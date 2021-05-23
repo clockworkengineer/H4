@@ -50,7 +50,7 @@ namespace H4
     /// <summary>
     /// 
     /// </summary>
-    XEntityMapping & XML::getEntity(const std::string &entityName)
+    XMLEntityMapping & XML::getEntity(const std::string &entityName)
     {
         return(m_dtd.m_entityMapping[entityName]);
     }

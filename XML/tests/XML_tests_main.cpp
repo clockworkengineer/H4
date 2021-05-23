@@ -175,7 +175,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
       length++;
     }
     REQUIRE(length == 8752);                                 // eof
-    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF)); // eof
+    REQUIRE(xmlSource.current() == static_cast<XMLChar>(EOF)); // eof
   }
   std::string xmlString;
   SECTION("Check that FileSource is  performing CRLF to LF conversion on windows format data correctly.", "[XML][Parse][FileSource]")
@@ -249,7 +249,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
     xmlString = "<root>   Test\t\t\t\r\r\r\r\r\r\r\f\n       Test       Test   \r\r\r\r</root>";
     writeXMLToFileUTF8(kGeneratedXMLFile, xmlString);
     FileSource xmlSource(kGeneratedXMLFile);
-    XString xmlResult;
+    XMLString xmlResult;
     while (xmlSource.more())
     {
       xmlSource.ignoreWS();
@@ -257,7 +257,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
       xmlSource.next();
     }
     REQUIRE(xmlResult == U"<root>TestTestTest</root>");
-    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF));
+    REQUIRE(xmlSource.current() == static_cast<XMLChar>(EOF));
   }
   SECTION("Check that FileSource ignoreWS() at end of file does not throw but next() does.", "[XML][Parse][FileSource]")
   {
@@ -297,7 +297,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
     REQUIRE(xmlSource.current() == '&');
     xmlSource.next();
     REQUIRE_FALSE(!xmlSource.match(U"</root>"));
-    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF));
+    REQUIRE(xmlSource.current() == static_cast<XMLChar>(EOF));
     REQUIRE_THROWS_WITH(xmlSource.next(), "Parse buffer empty before parse complete.");
   }
   SECTION("Check that FileSource backup works and doesnt go negative.", "[XML][Parse][FileSource]")
@@ -317,7 +317,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[XML][Parse][FileSou
     {
       xmlSource.next();
     }
-    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF));
+    REQUIRE(xmlSource.current() == static_cast<XMLChar>(EOF));
     xmlSource.backup(1);
     REQUIRE(xmlSource.current() == '>');
   }
@@ -357,7 +357,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       length++;
     }
     REQUIRE(length == 8752);                                 // eof
-    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF)); // eof
+    REQUIRE(xmlSource.current() == static_cast<XMLChar>(EOF)); // eof
   }
   std::string xmlString;
   SECTION("Check that BufferSource is  performing CRLF to LF conversion on windows format data correctly.", "[XML][Parse][BufferSource]")
@@ -428,7 +428,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
   {
     xmlString = "<root>   Test\t\t\t\r\r\r\r\r\r\r\f\n       Test       Test   \r\r\r\r</root>";
     BufferSource xmlSource(xmlString);
-    XString xmlResult;
+    XMLString xmlResult;
     while (xmlSource.more())
     {
       xmlSource.ignoreWS();
@@ -436,7 +436,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
       xmlSource.next();
     }
     REQUIRE(xmlResult == U"<root>TestTestTest</root>");
-    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF));
+    REQUIRE(xmlSource.current() == static_cast<XMLChar>(EOF));
   }
   SECTION("Check that BufefrSource ignoreWS() at end of file does not throw but next() does.", "[XML][Parse][BufferSource]")
   {
@@ -474,7 +474,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     REQUIRE(xmlSource.current() == '&');
     xmlSource.next();
     REQUIRE_FALSE(!xmlSource.match(U"</root>"));
-    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF));
+    REQUIRE(xmlSource.current() == static_cast<XMLChar>(EOF));
     REQUIRE_THROWS_WITH(xmlSource.next(), "Parse buffer empty before parse complete.");
   }
   SECTION("Check that BufferSource backup works and doesnt go negative.", "[XML][Parse][BufferSource]")
@@ -491,7 +491,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
     {
       xmlSource.next();
     }
-    REQUIRE(xmlSource.current() == static_cast<XChar>(EOF));
+    REQUIRE(xmlSource.current() == static_cast<XMLChar>(EOF));
     xmlSource.backup(1);
     REQUIRE(xmlSource.current() == '>');
   }

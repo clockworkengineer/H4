@@ -11,7 +11,7 @@ namespace H4
     class ISource
     {
     public:
-        virtual XChar current() = 0;
+        virtual XMLChar current() = 0;
         virtual void next() = 0;
         virtual bool more() = 0;
         virtual void backup(long length) = 0;
@@ -24,7 +24,7 @@ namespace H4
                 next();
             }
         }
-        bool match(const XString &targetString)
+        bool match(const XMLString &targetString)
         {
             long index = 0;
             while (more() && current() == targetString[index])
@@ -50,15 +50,15 @@ namespace H4
         {
             return (m_UTF8.to_bytes(current()));
         }
-        std::string to_bytes(const XString &from)
+        std::string to_bytes(const XMLString &from)
         {
             return (m_UTF8.to_bytes(from));
         }
-        std::string to_bytes(const XChar &from)
+        std::string to_bytes(const XMLChar &from)
         {
             return (m_UTF8.to_bytes(from));
         }
-        XString from_bytes(const std::string &from)
+        XMLString from_bytes(const std::string &from)
         {
             return (m_UTF8.from_bytes(from));
         }
@@ -67,7 +67,7 @@ namespace H4
         long m_lineNo = 1;
         long m_column = 1;
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
-        std::wstring_convert<std::codecvt_utf8_utf16<XString::value_type>, XString::value_type> m_UTF8;
+        std::wstring_convert<std::codecvt_utf8_utf16<XMLString::value_type>, XMLString::value_type> m_UTF8;
     };
 
 } // namespace H4

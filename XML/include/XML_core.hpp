@@ -17,17 +17,17 @@ namespace H4
     //
     // 32 bit characters internally
     //
-    using XString = std::u32string;
-    using XChar = XString::value_type;
+    using XMLString = std::u32string;
+    using XMLChar = XMLString::value_type;
     //
     // XML value
     //
-    struct XValue
+    struct XMLValue
     {
     public:
         std::string unparsed;
         std::string parsed;
-        XValue operator+=(const XValue &rhs)
+        XMLValue operator+=(const XMLValue &rhs)
         {
             parsed += rhs.parsed;
             unparsed += rhs.unparsed;
@@ -37,20 +37,20 @@ namespace H4
     //
     // XML Attribute
     //
-    struct XAttribute
+    struct XMLAttribute
     {
     public:
-        XAttribute() {}
-        XAttribute(const std::string &name, const XValue &value) : name(name), value(value)
+        XMLAttribute() {}
+        XMLAttribute(const std::string &name, const XMLValue &value) : name(name), value(value)
         {
         }
         std::string name;
-        XValue value;
+        XMLValue value;
     };
     //
     // XML External reference
     //
-    struct XExternalReference
+    struct XMLExternalReference
     {
     public:
         std::string type;
@@ -60,34 +60,34 @@ namespace H4
     //
     // XML Entity mapping
     //
-    struct XEntityMapping
+    struct XMLEntityMapping
     {
     public:
         std::string internal;
-        XExternalReference external;
+        XMLExternalReference external;
         std::string notation;
     };
-    using XEntityMappings = std::unordered_map<std::string, XEntityMapping>;
+    using XMLEntityMappings = std::unordered_map<std::string, XMLEntityMapping>;
     //
     // XML validation
     //
-    bool validChar(XChar ch);
-    bool validNameStartChar(XChar ch);
-    bool validNameChar(XChar ch);
-    bool validReservedName(const XString &name);
-    bool validName(XString name);
+    bool validChar(XMLChar ch);
+    bool validNameStartChar(XMLChar ch);
+    bool validNameChar(XMLChar ch);
+    bool validReservedName(const XMLString &name);
+    bool validName(XMLString name);
     //
     // XML parsing
     //
     class ISource;
-    XValue parseEntityReference(ISource &xmlSource);
+    XMLValue parseEntityReference(ISource &xmlSource);
     std::string parseName(ISource &xmlSource);
-    XValue parseCharacterReference(ISource &xmlSource);
-    XValue parseCharacter(ISource &xmlSource, XEntityMappings &entityMapping, bool translateEntity = true);
-    XValue parseValue(ISource &xmlSource, XEntityMappings &entityMapping, bool translateEntity = true);
+    XMLValue parseCharacterReference(ISource &xmlSource);
+    XMLValue parseCharacter(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity = true);
+    XMLValue parseValue(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity = true);
     //
     // XML entity
     //
-    void mapEntityReference(XValue &entityReference, XEntityMappings &entityMapping);
+    void mapEntityReference(XMLValue &entityReference, XMLEntityMappings &entityMapping);
 } // namespace H4
 #endif /* XML_CORE_HPP */

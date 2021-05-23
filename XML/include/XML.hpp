@@ -19,7 +19,7 @@
 //
 // XML XNodes
 //
-#include "XNode.hpp"
+#include "XMLNode.hpp"
 //
 // Source/Destination interfaces
 //
@@ -93,14 +93,14 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        XEntityMapping &getEntity(const std::string &entityName);
+        XMLEntityMapping &getEntity(const std::string &entityName);
         void parse();
         void stringify(IDestination &xmlDestination);
         void validate();
         // ================
         // PUBLIC VARIABLES
         // ================
-        XNodeElement m_prolog;
+        XMLNodeElement m_prolog;
         DTD m_dtd;
 
     private:
@@ -113,28 +113,28 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        void stringifyElements(XNode *xNode, IDestination &xmlDestination);
-        bool validAttributeValue(XValue &value);
-        void validXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseAddElementContent(XNodeElement *xNodeElement, const std::string &content);
-        void parseEntityMappingContents(XNodeElement *xNodeElement, XValue &entityReference);
-        void parseDefault(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseTagName(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseChildElement(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseAttributes(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseComment(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseCDATA(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parsePI(ISource &xmlSource, XNodeElement *xNodeElement);
-        void parseElementContents(ISource &xmlSource, XNodeElement *XNodeElement);
-        void parseElement(ISource &xmlSource, XNodeElement *XNodeElement);
-        void parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog);
+        void stringifyElements(XMLNode *xNode, IDestination &xmlDestination);
+        bool validAttributeValue(XMLValue &value);
+        void validXMLDeclaration(ISource &xmlSource, XMLNodeElement *xNodeElement);
+        void parseAddElementContent(XMLNodeElement *xNodeElement, const std::string &content);
+        void parseEntityMappingContents(XMLNodeElement *xNodeElement, XMLValue &entityReference);
+        void parseDefault(ISource &xmlSource, XMLNodeElement *xNodeElement);
+        void parseTagName(ISource &xmlSource, XMLNodeElement *xNodeElement);
+        void parseChildElement(ISource &xmlSource, XMLNodeElement *xNodeElement);
+        void parseAttributes(ISource &xmlSource, XMLNodeElement *xNodeElement);
+        void parseComment(ISource &xmlSource, XMLNodeElement *xNodeElement);
+        void parseCDATA(ISource &xmlSource, XMLNodeElement *xNodeElement);
+        void parsePI(ISource &xmlSource, XMLNodeElement *xNodeElement);
+        void parseElementContents(ISource &xmlSource, XMLNodeElement *XNodeElement);
+        void parseElement(ISource &xmlSource, XMLNodeElement *XNodeElement);
+        void parseProlog(ISource &xmlSource, XMLNodeElement *xNodeProlog);
         void parseXML();
         void stringifyXML(IDestination &xmlDestination);
         // =================
         // PRIVATE VARIABLES
         // =================
-        static XAttribute m_defaultAtributes[3];
-        static std::vector<XString> m_dtdAttrListTypes;
+        static XMLAttribute m_defaultAtributes[3];
+        static std::vector<XMLString> m_dtdAttrListTypes;
         ISource &m_xmlSource;
     };
 } // namespace H4

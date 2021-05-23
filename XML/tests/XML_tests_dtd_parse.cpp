@@ -88,8 +88,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
-    REQUIRE(XNodeRef<XNode>(xml.m_prolog[0]).getNodeType() == XNodeType::root);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(XMLNodeRef<XMLNode>(xml.m_prolog[0]).getNodeType() == XMLNodeType::root);
     REQUIRE(xml.m_prolog[0][4].name == "footer");
     REQUIRE(xml.m_prolog[0][4].getContents() == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
@@ -102,7 +102,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.getEntity("&example;").internal == "<p>An ampersand (&#38;) may be escaped numerically (&#38;#38;) or with a general entity (&amp;amp;).</p>");
     REQUIRE(xml.m_prolog[0][0].name == "p");
     REQUIRE(xml.m_prolog[0][0].getContents() == "An ampersand (&) may be escaped numerically (&#38;) or with a general entity (&amp;).");
@@ -120,7 +120,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.getEntity("%xx;").internal == "%zz;");
     REQUIRE(xml.getEntity("%zz;").internal == "<!ENTITY tricky \"error-prone\" >");
     REQUIRE(xml.m_prolog[0].name == "test");
@@ -136,10 +136,10 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.getEntity("&x;").internal == "&lt;");
-    REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).getAttributeList().size() == 1);
-    XAttribute attribute = xml.m_prolog[0].getAttribute("attr");
+    REQUIRE(XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).getAttributeList().size() == 1);
+    XMLAttribute attribute = xml.m_prolog[0].getAttribute("attr");
     REQUIRE(attribute.name == "attr");
     REQUIRE(attribute.value.unparsed == "&x;");
     REQUIRE(attribute.value.parsed == "&lt;");
@@ -176,11 +176,11 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.getEntity("&js;").internal == "Jo Smith &email;");
     REQUIRE(xml.m_prolog[0].name == "author");
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog[0].children[0]).getNodeType() == XNodeType::entity);
-    REQUIRE(XNodeRef<XNodeEntityReference>(*xml.m_prolog[0].children[0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog[0].children[0]).getNodeType() == XMLNodeType::entity);
+    REQUIRE(XMLNodeRef<XMLNodeEntityReference>(*xml.m_prolog[0].children[0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
     REQUIRE(xml.m_prolog[0].getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
   }
   SECTION("XML with DTD with entity used within an entity with recursion.", "[XML][Parse][DTD]")
@@ -211,7 +211,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.getEntity("&email;").internal == "josmith@theworldaccordingtojosmith.com");
   }
   SECTION("XML with DTD with entity that is defined externally (file user.txt).", "[XML][Parse][DTD]")
@@ -225,8 +225,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_prolog[0].name == "foo");
     REQUIRE(xml.m_prolog[0].getContents() == "Hello John Joe Doe");
   }
@@ -259,8 +259,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_dtd.m_elements["address"].name == "address");
     REQUIRE(xml.m_dtd.m_elements["address"].content.unparsed == "(name,company,phone)");
     REQUIRE(xml.m_dtd.m_elements["name"].name == "name");
@@ -285,8 +285,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_dtd.m_external.type == "SYSTEM");
     REQUIRE(xml.m_dtd.m_external.systemID == "./testData/note.dtd");
     REQUIRE(xml.m_dtd.m_elements["note"].name == "note");
@@ -301,8 +301,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_dtd.m_external.type == "PUBLIC");
     REQUIRE(xml.m_dtd.m_external.systemID == "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
     REQUIRE(xml.m_dtd.m_external.publicID == "-//W3C//DTD XHTML 1.0 Transitional//EN");
@@ -354,8 +354,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_dtd.m_name == "TVSCHEDULE");
     REQUIRE(xml.m_dtd.m_elements["TVSCHEDULE"].name == "TVSCHEDULE");
     REQUIRE(xml.m_dtd.m_elements["CHANNEL"].name == "CHANNEL");
@@ -411,8 +411,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[0]).getNodeType() == XNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_dtd.m_name == "CATALOG");
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].name == "PRODUCT");
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes.size() == 5);
@@ -455,8 +455,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[0]).getNodeType() == XNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_dtd.m_name == "REPORT");
     REQUIRE(xml.getEntity("%empty_report;").internal == "<!ELEMENT REPORT EMPTY>");
     REQUIRE(xml.m_dtd.m_elements["REPORT"].name == "REPORT");
@@ -478,8 +478,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[0]).getNodeType() == XNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_dtd.m_name == "REPORT");
     REQUIRE(xml.getEntity("%contact;").internal == "phone");
     REQUIRE(xml.getEntity("%area;").internal == "name, street, pincode, city");
@@ -502,7 +502,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[0]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.m_dtd.m_notations["GIF"].type == "SYSTEM");
     REQUIRE(xml.m_dtd.m_notations["GIF"].systemID == "GIF");
     REQUIRE(xml.m_dtd.m_notations["JPG"].type == "SYSTEM");
@@ -715,17 +715,17 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.m_dtd.m_elements.contains("person") == true);
     REQUIRE(xml.m_dtd.m_elements["person"].attributes.size() == 1);
     REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].name == "gender");
     REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].type == "(M|F)");
     REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].value.parsed == "F");
     REQUIRE(xml.m_dtd.m_name == "queue");
-    REQUIRE(xml.m_dtd.m_name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_prolog[0][0].name == "person");
     REQUIRE(xml.m_prolog[0][0].getAttributeList().size() == 1);
-    XAttribute attribute = xml.m_prolog[0][0].getAttribute("gender");
+    XMLAttribute attribute = xml.m_prolog[0][0].getAttribute("gender");
     REQUIRE(attribute.name == "gender");
     REQUIRE(attribute.value.parsed == "M");
     REQUIRE(xml.m_prolog[0][1].name == "person");

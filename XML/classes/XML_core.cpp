@@ -42,7 +42,7 @@ namespace H4
     /// </summary>
     /// <param name="ch">Character to validate</param>
     /// <returns>true then valid/.</returns>
-    bool validChar(XChar ch)
+    bool validChar(XMLChar ch)
     {
         return ((ch == 0x09) ||
                 (ch == kLineFeed) ||
@@ -56,7 +56,7 @@ namespace H4
     /// </summary>
     /// <param name="ch">Character value to validate.</param>
     /// <returns>true then valid.</returns>
-    bool validNameStartChar(XChar ch)
+    bool validNameStartChar(XMLChar ch)
     {
         return ((ch == ':') ||
                 (ch == '_') ||
@@ -80,7 +80,7 @@ namespace H4
     /// </summary>
     /// <param name="ch">Name to validate.</param>
     /// <returns>true then valid.</returns>
-    bool validNameChar(XChar ch)
+    bool validNameChar(XMLChar ch)
     {
         return (validNameStartChar(ch) ||
                 (ch == '-') ||
@@ -95,7 +95,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    bool validReservedName(const XString &name)
+    bool validReservedName(const XMLString &name)
     {
         return (name.starts_with(U"xmlns") || name.starts_with(U"xml-stylesheet") || name == U"xml");
     }
@@ -104,7 +104,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    bool validName(XString name)
+    bool validName(XMLString name)
     {
         if (name.empty())
         {
@@ -135,7 +135,7 @@ namespace H4
     /// <returns></returns>
     std::string parseName(ISource &xmlSource)
     {
-        XString name;
+        XMLString name;
         while (xmlSource.more() && validNameChar(xmlSource.current()))
         {
             name += xmlSource.current();
@@ -153,9 +153,9 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    XValue parseEntityReference(ISource &xmlSource)
+    XMLValue parseEntityReference(ISource &xmlSource)
     {
-        XValue entityReference;
+        XMLValue entityReference;
         while (xmlSource.more() && xmlSource.current() != ';')
         {
             entityReference.unparsed += xmlSource.current_to_bytes();
@@ -174,9 +174,9 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Character reference value.</returns>
-    XValue parseCharacterReference(ISource &xmlSource)
+    XMLValue parseCharacterReference(ISource &xmlSource)
     {
-        XValue characterRefence;
+        XMLValue characterRefence;
         characterRefence.unparsed = "&#";
         while (xmlSource.more() && xmlSource.current() != ';')
         {
@@ -218,7 +218,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void mapEntityReference(XValue &entityReference, XEntityMappings &entityMapping)
+    void mapEntityReference(XMLValue &entityReference, XMLEntityMappings &entityMapping)
     {
         if (entityMapping.count(entityReference.unparsed) > 0)
         {
@@ -251,9 +251,9 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Character value.</returns>
-    XValue parseCharacter(ISource &xmlSource, std::unordered_map<std::string, XEntityMapping> &entityMapping, bool translateEntity)
+    XMLValue parseCharacter(ISource &xmlSource, std::unordered_map<std::string, XMLEntityMapping> &entityMapping, bool translateEntity)
     {
-        XValue character;
+        XMLValue character;
         if (xmlSource.match(U"&#"))
         {
             character = parseCharacterReference(xmlSource);
@@ -287,12 +287,12 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    XValue parseValue(ISource &xmlSource, XEntityMappings &entityMapping, bool translateEntity)
+    XMLValue parseValue(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity)
     {
         if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
         {
-            XValue value;
-            XChar quote = xmlSource.current();
+            XMLValue value;
+            XMLChar quote = xmlSource.current();
             xmlSource.next();
             while (xmlSource.more() && xmlSource.current() != quote)
             {

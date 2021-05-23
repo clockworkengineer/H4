@@ -38,7 +38,7 @@ namespace H4
     // PRIVATE STATIC VARIABLES
     // ========================
     // DTD attribute list type tokens
-    std::vector<XString> DTD::m_dtdAttrListTypes;
+    std::vector<XMLString> DTD::m_dtdAttrListTypes;
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -507,7 +507,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::parseElementContentSpecification(XValue &contentSpec)
+    void DTD::parseElementContentSpecification(XMLValue &contentSpec)
     {
         BufferSource contentSpecSource(contentSpec.unparsed);
         BufferDestination contentSpecDestination;
@@ -624,9 +624,9 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    XExternalReference DTD::parseExternalReference(ISource &dtdSource)
+    XMLExternalReference DTD::parseExternalReference(ISource &dtdSource)
     {
-        XExternalReference result;
+        XMLExternalReference result;
         if (dtdSource.match(U"SYSTEM"))
         {
             dtdSource.ignoreWS();
@@ -674,9 +674,9 @@ namespace H4
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns>Attribute value as string (UTF-8 encoded).</returns>
     /// <returns></returns>
-    XValue DTD::parseAttributeValue(ISource &dtdSource)
+    XMLValue DTD::parseAttributeValue(ISource &dtdSource)
     {
-        XValue value;
+        XMLValue value;
         if (dtdSource.match(U"#REQUIRED"))
         {
             value.parsed = "#REQUIRED";
@@ -690,7 +690,7 @@ namespace H4
         else if (dtdSource.match(U"#FIXED"))
         {
             dtdSource.ignoreWS();
-            XValue fixedValue = parseValue(dtdSource, m_entityMapping);
+            XMLValue fixedValue = parseValue(dtdSource, m_entityMapping);
             value.parsed = "#FIXED " + fixedValue.parsed;
             value.unparsed = "#FIXED " + fixedValue.unparsed;
         }
@@ -732,7 +732,7 @@ namespace H4
     void DTD::parseNotation(ISource &dtdSource)
     {
         dtdSource.ignoreWS();
-        XAttribute notation;
+        XMLAttribute notation;
         std::string name = parseName(dtdSource);
         m_notations[name] = parseExternalReference(dtdSource);
         dtdSource.ignoreWS();
@@ -755,7 +755,7 @@ namespace H4
         entityName += parseName(dtdSource) + ";";
         if (dtdSource.current() == '\'' || dtdSource.current() == '"')
         {
-            XValue entityValue = parseValue(dtdSource, m_entityMapping, false);
+            XMLValue entityValue = parseValue(dtdSource, m_entityMapping, false);
             m_entityMapping[entityName].internal = entityValue.parsed;
         }
         else
@@ -777,7 +777,7 @@ namespace H4
     {
         dtdSource.ignoreWS();
         std::string elementName = parseName(dtdSource);
-        XValue contentSpecification;
+        XMLValue contentSpecification;
         if (dtdSource.match(U"EMPTY"))
         {
             contentSpecification.unparsed = "EMPTY";

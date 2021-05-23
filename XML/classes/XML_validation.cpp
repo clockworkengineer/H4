@@ -36,7 +36,7 @@ namespace H4
     // PRIVATE STATIC VARIABLES
     // ========================
     // Defaults for XML declaration
-    XAttribute XML::m_defaultAtributes[3] = {{"version", {"1.0", "1.0"}}, {"encoding", {"UTF-8", "UTF-8"}}, {"standalone", {"no", "no"}}};
+    XMLAttribute XML::m_defaultAtributes[3] = {{"version", {"1.0", "1.0"}}, {"encoding", {"UTF-8", "UTF-8"}}, {"standalone", {"no", "no"}}};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -49,7 +49,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>true when declaration valid.</returns>
-    void XML::validXMLDeclaration(ISource &xmlSource, XNodeElement *xNodeProlog)
+    void XML::validXMLDeclaration(ISource &xmlSource, XMLNodeElement *xNodeProlog)
     {
         // Syntax error if no version present
         if (!xNodeProlog->isAttributePresent("version"))
@@ -57,14 +57,14 @@ namespace H4
             throw SyntaxError(xmlSource, "Version missing from declaration.");
         }
         // Save declaration attributes to be validated and clear tem from prolog element
-        std::vector<XAttribute> prologAttributes;
+        std::vector<XMLAttribute> prologAttributes;
         for (auto attribute : xNodeProlog->getAttributeList())
         {
             prologAttributes.push_back(attribute);
         }
         xNodeProlog->clearAttributes();
         // Fill in gaps with default if missing attributes
-        std::vector<XAttribute> validatedAttributes;
+        std::vector<XMLAttribute> validatedAttributes;
         long currentAttribute = 0;
         for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
         {
@@ -115,7 +115,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns>true then valid.</returns>
-    bool XML::validAttributeValue(XValue &value)
+    bool XML::validAttributeValue(XMLValue &value)
     {
         BufferSource valueSoure(value.parsed);
         while (valueSoure.more())

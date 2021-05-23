@@ -547,7 +547,7 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     XML xml(xmlSource);
     xml.parse();
     REQUIRE_NOTHROW(xml.validate());
-    REQUIRE(xml.m_prolog[0].getNodeType() == XNodeType::root);
+    REQUIRE(xml.m_prolog[0].getNodeType() == XMLNodeType::root);
     REQUIRE(xml.m_prolog[0][1].getAttributeList().size() == 1);
     REQUIRE(xml.m_prolog[0][1].getAttribute("number").value.parsed == "2001");
     REQUIRE(xml.m_prolog[0][2].getAttributeList().size() == 1);
@@ -573,7 +573,7 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     XML xml(xmlSource);
     xml.parse();
     REQUIRE_NOTHROW(xml.validate());
-    REQUIRE(xml.m_prolog[0].getNodeType() == XNodeType::root);
+    REQUIRE(xml.m_prolog[0].getNodeType() == XMLNodeType::root);
     REQUIRE(xml.m_prolog[0][1].getAttributeList().size() == 1);
     REQUIRE(xml.m_prolog[0][1].getAttribute("number").value.parsed == "2002");
     REQUIRE(xml.m_prolog[0][2].getAttributeList().size() == 1);
@@ -598,14 +598,14 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     XML xml(xmlSource);
     xml.parse();
     REQUIRE_NOTHROW(xml.validate());
-    REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.m_dtd.m_elements.contains("person") == true);
     REQUIRE(xml.m_dtd.m_elements["person"].attributes.size() == 1);
     REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].name == "gender");
     REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].type == "(M|F)");
     REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].value.parsed == "F");
     REQUIRE(xml.m_dtd.m_name == "queue");
-    REQUIRE(xml.m_dtd.m_name == XNodeRef<XNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_prolog[0][0].name == "person");
     REQUIRE(xml.m_prolog[0][0].getAttributeList().size() == 1);
     REQUIRE(xml.m_prolog[0][0].getAttribute("gender").value.parsed == "M");

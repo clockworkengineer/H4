@@ -43,43 +43,43 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    void XML::parseAddElementContent(XNodeElement *xNodeElement, const std::string &content)
+    void XML::parseAddElementContent(XMLNodeElement *xNodeElement, const std::string &content)
     {
         // Make sure there is a content node to recieve characters
         if (xNodeElement->children.empty() ||
-            xNodeElement->children.back()->getNodeType() != XNodeType::content)
+            xNodeElement->children.back()->getNodeType() != XMLNodeType::content)
         {
             bool isWWhitespace = true;
             if (!xNodeElement->children.empty())
             {
-                if ((xNodeElement->children.back()->getNodeType() == XNodeType::cdata) ||
-                    (xNodeElement->children.back()->getNodeType() == XNodeType::entity))
+                if ((xNodeElement->children.back()->getNodeType() == XMLNodeType::cdata) ||
+                    (xNodeElement->children.back()->getNodeType() == XMLNodeType::entity))
                 {
                     isWWhitespace = false;
                 }
             }
-            xNodeElement->children.emplace_back(std::make_unique<XNodeContent>());
-            XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = isWWhitespace;
+            xNodeElement->children.emplace_back(std::make_unique<XMLNodeContent>());
+            XMLNodeRef<XMLNodeContent>(*xNodeElement->children.back()).isWhiteSpace = isWWhitespace;
         }
-        if (XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace)
+        if (XMLNodeRef<XMLNodeContent>(*xNodeElement->children.back()).isWhiteSpace)
         {
             for (auto ch : content)
             {
                 if (!std::iswspace(ch))
                 {
-                    XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
+                    XMLNodeRef<XMLNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
                     break;
                 }
             }
         }
-        XNodeRef<XNodeContent>(*xNodeElement->children.back()).content += content;
+        XMLNodeRef<XMLNodeContent>(*xNodeElement->children.back()).content += content;
     }
     /// <summary>
     /// Parse a element tag name and set its value in current XNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseTagName(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::parseTagName(ISource &xmlSource, XMLNodeElement *xNodeElement)
     {
         xNodeElement->name = parseName(xmlSource);
     }
@@ -89,9 +89,9 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseComment(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::parseComment(ISource &xmlSource, XMLNodeElement *xNodeElement)
     {
-        XNodeComment xNodeComment;
+        XMLNodeComment xNodeComment;
         while (xmlSource.more() && !xmlSource.match(U"--"))
         {
             xNodeComment.comment += xmlSource.current_to_bytes();
@@ -101,7 +101,7 @@ namespace H4
         {
             throw SyntaxError(xmlSource, "Missing closing '>' for comment line.");
         }
-        xNodeElement->children.emplace_back(std::make_unique<XNodeComment>(std::move(xNodeComment)));
+        xNodeElement->children.emplace_back(std::make_unique<XMLNodeComment>(std::move(xNodeComment)));
     }
     /// <summary>
     /// Parse a XML process instruction, create an XNode for it and add it to
@@ -109,7 +109,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parsePI(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::parsePI(ISource &xmlSource, XMLNodeElement *xNodeElement)
     {
         XNodePI xNodePI;
         xNodePI.name = parseName(xmlSource);
@@ -126,9 +126,9 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseCDATA(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::parseCDATA(ISource &xmlSource, XMLNodeElement *xNodeElement)
     {
-        XNodeCDATA xNodeCDATA;
+        XMLNodeCDATA xNodeCDATA;
         while (xmlSource.more() && !xmlSource.match(U"]]>"))
         {
             if (xmlSource.match(U"<![CDATA["))
@@ -140,12 +140,12 @@ namespace H4
         }
         if (!xNodeElement->children.empty())
         {
-            if (xNodeElement->children.back()->getNodeType() == XNodeType::content)
+            if (xNodeElement->children.back()->getNodeType() == XMLNodeType::content)
             {
-                XNodeRef<XNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
+                XMLNodeRef<XMLNodeContent>(*xNodeElement->children.back()).isWhiteSpace = false;
             }
         }
-        xNodeElement->children.emplace_back(std::make_unique<XNodeCDATA>(std::move(xNodeCDATA)));
+        xNodeElement->children.emplace_back(std::make_unique<XMLNodeCDATA>(std::move(xNodeCDATA)));
     }
     /// <summary>
     /// Parse list of attributes (name/value pairs) that exist in a tag and add them to
@@ -153,7 +153,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseAttributes(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::parseAttributes(ISource &xmlSource, XMLNodeElement *xNodeElement)
     {
         while (xmlSource.more() &&
                xmlSource.current() != '?' &&
@@ -166,7 +166,7 @@ namespace H4
                 throw SyntaxError(xmlSource, "Missing '=' between attribute name and value.");
             }
             xmlSource.ignoreWS();
-            XValue attributeValue = parseValue(xmlSource, m_dtd.m_entityMapping);
+            XMLValue attributeValue = parseValue(xmlSource, m_dtd.m_entityMapping);
             if (!validAttributeValue(attributeValue))
             {
                 throw SyntaxError(xmlSource, "Attribute value contains invalid character '<', '\"', ''' or '&'.");
@@ -194,9 +194,9 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseChildElement(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::parseChildElement(ISource &xmlSource, XMLNodeElement *xNodeElement)
     {
-        XNodeElement xNodeChildElement;
+        XMLNodeElement xNodeChildElement;
         for (auto &ns : xNodeElement->getNameSpaceList())
         {
             xNodeChildElement.addNameSpace(ns.name, ns.value);
@@ -209,16 +209,16 @@ namespace H4
                 throw SyntaxError(xmlSource, "Namespace used but not defined.");
             }
         }
-        xNodeElement->children.push_back(std::make_unique<XNodeElement>(std::move(xNodeChildElement)));
+        xNodeElement->children.push_back(std::make_unique<XMLNodeElement>(std::move(xNodeChildElement)));
     }
     /// <summary>
     /// Parse any element content that is found.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseDefault(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::parseDefault(ISource &xmlSource, XMLNodeElement *xNodeElement)
     {
-        XValue entityReference = parseCharacter(xmlSource, m_dtd.m_entityMapping);
+        XMLValue entityReference = parseCharacter(xmlSource, m_dtd.m_entityMapping);
         if (entityReference.unparsed.starts_with("&") && entityReference.unparsed.ends_with(";"))
         {
             parseEntityMappingContents(xNodeElement, entityReference);
@@ -234,7 +234,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XMl source stream.</param>
     /// <returns></returns>
-    void XML::parseElementContents(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::parseElementContents(ISource &xmlSource, XMLNodeElement *xNodeElement)
     {
         if (xmlSource.match(U"<!--"))
         {
@@ -270,7 +270,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseElement(ISource &xmlSource, XNodeElement *xNodeElement)
+    void XML::parseElement(ISource &xmlSource, XMLNodeElement *xNodeElement)
     {
         parseTagName(xmlSource, xNodeElement);
         parseAttributes(xmlSource, xNodeElement);
@@ -288,7 +288,7 @@ namespace H4
         else if (xmlSource.match(U"/>"))
         {
             // Self closing element tag
-            xNodeElement->setNodeType(XNodeType::self);
+            xNodeElement->setNodeType(XMLNodeType::self);
         }
         else
         {
@@ -303,9 +303,9 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
-    void XML::parseProlog(ISource &xmlSource, XNodeElement *xNodeProlog)
+    void XML::parseProlog(ISource &xmlSource, XMLNodeElement *xNodeProlog)
     {
-        xNodeProlog->setNodeType(XNodeType::prolog);
+        xNodeProlog->setNodeType(XMLNodeType::prolog);
         xmlSource.ignoreWS();
         if (xmlSource.match(U"<?xml"))
         {
@@ -330,7 +330,7 @@ namespace H4
             else if (xmlSource.match(U"<!DOCTYPE"))
             {
                 m_dtd.parse(xmlSource);
-                xNodeProlog->children.emplace_back(std::make_unique<XNodeDTD>());
+                xNodeProlog->children.emplace_back(std::make_unique<XMLNodeDTD>());
             }
             else if (xmlSource.current() == '<')
             {
@@ -357,8 +357,8 @@ namespace H4
         parseProlog(m_xmlSource, &m_prolog);
         if (m_xmlSource.match(U"<"))
         {
-            m_prolog.children.emplace_back(std::make_unique<XNodeElement>(XNodeElement(XNodeType::root)));
-            parseElement(m_xmlSource, static_cast<XNodeElement *>(m_prolog.children.back().get()));
+            m_prolog.children.emplace_back(std::make_unique<XMLNodeElement>(XMLNodeElement(XMLNodeType::root)));
+            parseElement(m_xmlSource, static_cast<XMLNodeElement *>(m_prolog.children.back().get()));
             while (m_xmlSource.more())
             {
                 if (m_xmlSource.match(U"<!--"))

@@ -81,7 +81,7 @@ namespace H4
     ///
     /// </summary>
     /// <returns></returns>
-    void DTD::validate(XNodeElement &prolog)
+    void DTD::validate(XMLNodeElement &prolog)
     {
         validateDTD(prolog);
     }
