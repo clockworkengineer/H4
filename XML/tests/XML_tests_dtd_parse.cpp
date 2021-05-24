@@ -14,7 +14,7 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
+TEST_CASE("Parse XML with DTD both internal/external", "[XML][Parse][DTD]")
 {
   std::string xmlString;
   SECTION("XML with internal DTD", "[XML][Parse][DTD]")
@@ -59,7 +59,50 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("XML with DTD with !ENTITY definitions and uses", "[XML][Parse][DTD]")
+
+  SECTION("XML with external DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report02.dtd\">"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_notations["GIF"].type == "SYSTEM");
+    REQUIRE(xml.m_dtd.m_notations["GIF"].systemID == "GIF");
+    REQUIRE(xml.m_dtd.m_notations["JPG"].type == "SYSTEM");
+    REQUIRE(xml.m_dtd.m_notations["JPG"].systemID == "JPG");
+    REQUIRE(xml.m_dtd.m_notations["BMP"].type == "SYSTEM");
+    REQUIRE(xml.m_dtd.m_notations["BMP"].systemID == "BMP");
+  }
+  SECTION("XML with internal DTD containing comments.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE note ["
+                "<!-- root element is note that contains to, from, heading and body elements -->\n"
+                "<!ELEMENT note (to,from,heading,body)>\n"
+                "<!-- Note to field -->\n"
+                "<!ELEMENT to (#PCDATA)>\n"
+                "<!-- Note from field -->\n"
+                "<!ELEMENT from (#PCDATA)>\n"
+                "<!-- Note heading field -->\n"
+                "<!ELEMENT heading (#PCDATA)>\n"
+                "<!-- Note boy field -->\n"
+                "<!ELEMENT body (#PCDATA)>\n"
+                "]>\n"
+                "<note>\n"
+                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
+                "<body>Don't forget me this weekend</body>\n"
+                "</note>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+  }
+}
+TEST_CASE("Parse XML with internal DTD that contains ENTITY definitions and uses", "[XML][Parse][DTD][Entity]")
+{
+  std::string xmlString;
+  SECTION("XML DTD with entity definitions and uses", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note [\n"
@@ -74,7 +117,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("XML with DTD with !ENTITY internal definitions and uses. Check translation of entity values", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity internal definitions and uses. Check translation of entity values", "[XML][Parse][DTD][Entity]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note [\n"
@@ -93,7 +136,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(xml.m_prolog[0][4].name == "footer");
     REQUIRE(xml.m_prolog[0][4].getContents() == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
-  SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 1)", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity and how it deals with entity character expansion case 1)", "[XML][Parse][DTD][Entity]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note [\n"
@@ -107,7 +150,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(xml.m_prolog[0][0].name == "p");
     REQUIRE(xml.m_prolog[0][0].getContents() == "An ampersand (&) may be escaped numerically (&#38;) or with a general entity (&amp;).");
   }
-  SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 2)", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity and how it deals with entity character expansion case 2)", "[XML][Parse][DTD][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE test [\n"
@@ -126,7 +169,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(xml.m_prolog[0].name == "test");
     REQUIRE(xml.m_prolog[0].getContents() == "This sample shows a error-prone method.");
   }
-  SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 3)", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity and how it deals with entity character expansion case 3)", "[XML][Parse][DTD][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE foo [\n"
@@ -145,7 +188,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(attribute.value.parsed == "&lt;");
   }
   // This should throw an error as & ' " < >  not allowed to be assigned to attribute directly (NEED TO FIX)
-  SECTION("XML with DTD with !ENTITY and how it deals with entity character expansion case 4)", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity and how it deals with entity character expansion case 4)", "[XML][Parse][DTD][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE foo [\n"
@@ -155,14 +198,8 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 5 Column: 21] Attribute value contains invalid character '<', '\"', ''' or '&'.");
-    // REQUIRE(XNodeRef<XNode>(*xml.m_prolog.children[1]).getNodeType() == XNodeType::dtd);
-    // REQUIRE(xml.getEntity("&x;"].internal == "<");
-    // REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes.size() == 1);
-    // REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].name == "attr");
-    // REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].value.unparsed == "&x;");
-    // REQUIRE(XNodeRef<XNodeElement>(xml.m_prolog[0]).attributes[0].value.parsed == "<");
   }
-  SECTION("XML with DTD with entity used within an entity.", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity used within an entity.", "[XML][Parse][DTD][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE author [\n"
@@ -183,7 +220,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XMLNodeRef<XMLNodeEntityReference>(*xml.m_prolog[0].children[0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
     REQUIRE(xml.m_prolog[0].getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
   }
-  SECTION("XML with DTD with entity used within an entity with recursion.", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity used within an entity with recursion.", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE author [\n"
@@ -199,7 +236,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Entity '&js;' contains recursive definition which is not allowed.");
   }
-  SECTION("XML with DTD with entity that contains a character reference that is parsed straight away.", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity that contains a character reference that is parsed straight away.", "[XML][Parse][DTD][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE author [\n"
@@ -214,7 +251,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.getEntity("&email;").internal == "josmith@theworldaccordingtojosmith.com");
   }
-  SECTION("XML with DTD with entity that is defined externally (file user.txt).", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity that is defined externally (file user.txt).", "[XML][Parse][DTD][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE foo [\n"
@@ -230,7 +267,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(xml.m_prolog[0].name == "foo");
     REQUIRE(xml.m_prolog[0].getContents() == "Hello John Joe Doe");
   }
-  SECTION("XML with DTD with entity that is defined externally (file that does not exist).", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity that is defined externally (file that does not exist).", "[XML][Parse][DTD][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE foo [\n"
@@ -242,6 +279,71 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Entity '&name;' source file './testData/unknown.txt' does not exist.");
   }
+  SECTION("XML with internal DTD with parameter entities to parse  (internal cannot appear within tags).", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT [\n"
+                "<!ENTITY % empty_report \"<!ELEMENT REPORT EMPTY>\">"
+                "%empty_report;\n"
+                "]>\n"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+  }
+  SECTION("XML with internal DTD with parameter entities to parse and check values (internal cannot appear within tags).", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT [\n"
+                "<!ENTITY % empty_report \"<!ELEMENT REPORT EMPTY>\">"
+                "%empty_report;\n"
+                "]>\n"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(xml.m_dtd.m_name == "REPORT");
+    REQUIRE(xml.getEntity("%empty_report;").internal == "<!ELEMENT REPORT EMPTY>");
+    REQUIRE(xml.m_dtd.m_elements["REPORT"].name == "REPORT");
+    REQUIRE(xml.m_dtd.m_elements["REPORT"].content.parsed == "EMPTY");
+  }
+  SECTION("XML with external DTD with parameter entities to parse.", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report.dtd\">\n"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+  }
+
+  SECTION("XML with external DTD with both types of entities to parse an check values", "[XML][Parse][DTD]")
+  {
+    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report01.dtd\">"
+                "<REPORT></REPORT>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(xml.m_dtd.m_name == "REPORT");
+    REQUIRE(xml.getEntity("%contact;").internal == "phone");
+    REQUIRE(xml.getEntity("%area;").internal == "name, street, pincode, city");
+    REQUIRE(xml.m_dtd.m_elements.size() == 5);
+    REQUIRE(xml.m_dtd.m_elements["REPORT"].name == "REPORT");
+    REQUIRE(xml.m_dtd.m_elements["REPORT"].content.unparsed == "(residence|apartment|office|shop)*");
+    REQUIRE(xml.m_dtd.m_elements["residence"].name == "residence");
+    REQUIRE(xml.m_dtd.m_elements["residence"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(xml.m_dtd.m_elements["apartment"].name == "apartment");
+    REQUIRE(xml.m_dtd.m_elements["apartment"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(xml.m_dtd.m_elements["office"].name == "office");
+    REQUIRE(xml.m_dtd.m_elements["office"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(xml.m_dtd.m_elements["shop"].name == "shop");
+    REQUIRE(xml.m_dtd.m_elements["shop"].content.unparsed == "(name, street, pincode, city, phone)");
+  }
+}
+TEST_CASE("Parse XML DTD and check values.", "[XML][Parse][DTD]")
+{
+  std::string xmlString;
   SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\n"
@@ -307,6 +409,10 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(xml.m_dtd.m_external.systemID == "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
     REQUIRE(xml.m_dtd.m_external.publicID == "-//W3C//DTD XHTML 1.0 Transitional//EN");
   }
+}
+TEST_CASE("Parse XML DTD with atttributes and check values.", "[XML][Parse][DTD][Attributes]")
+{
+  std::string xmlString;
   SECTION("XML with internal DTD with attributes to parse ", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -434,105 +540,10 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(xml.m_dtd.m_elements["NOTES"].name == "NOTES");
     REQUIRE(xml.m_dtd.m_elements["NOTES"].content.unparsed == "(#PCDATA)");
   }
-  SECTION("XML with internal DTD with parameter entities to parse  (internal cannot appear within tags).", "[XML][Parse][DTD]")
-  {
-    xmlString = "<!DOCTYPE REPORT [\n"
-                "<!ENTITY % empty_report \"<!ELEMENT REPORT EMPTY>\">"
-                "%empty_report;\n"
-                "]>\n"
-                "<REPORT></REPORT>\n";
-    BufferSource xmlSource(xmlString);
-    XML xml(xmlSource);
-    REQUIRE_NOTHROW(xml.parse());
-  }
-  SECTION("XML with internal DTD with parameter entities to parse and check values (internal cannot appear within tags).", "[XML][Parse][DTD]")
-  {
-    xmlString = "<!DOCTYPE REPORT [\n"
-                "<!ENTITY % empty_report \"<!ELEMENT REPORT EMPTY>\">"
-                "%empty_report;\n"
-                "]>\n"
-                "<REPORT></REPORT>\n";
-    BufferSource xmlSource(xmlString);
-    XML xml(xmlSource);
-    xml.parse();
-    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
-    REQUIRE(xml.m_dtd.m_name == "REPORT");
-    REQUIRE(xml.getEntity("%empty_report;").internal == "<!ELEMENT REPORT EMPTY>");
-    REQUIRE(xml.m_dtd.m_elements["REPORT"].name == "REPORT");
-    REQUIRE(xml.m_dtd.m_elements["REPORT"].content.parsed == "EMPTY");
-  }
-  SECTION("XML with external DTD with parameter entities to parse.", "[XML][Parse][DTD]")
-  {
-    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report.dtd\">\n"
-                "<REPORT></REPORT>\n";
-    BufferSource xmlSource(xmlString);
-    XML xml(xmlSource);
-    REQUIRE_NOTHROW(xml.parse());
-  }
-
-  SECTION("XML with external DTD with both types of entities to parse an check values", "[XML][Parse][DTD]")
-  {
-    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report01.dtd\">"
-                "<REPORT></REPORT>\n";
-    BufferSource xmlSource(xmlString);
-    XML xml(xmlSource);
-    xml.parse();
-    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
-    REQUIRE(xml.m_dtd.m_name == "REPORT");
-    REQUIRE(xml.getEntity("%contact;").internal == "phone");
-    REQUIRE(xml.getEntity("%area;").internal == "name, street, pincode, city");
-    REQUIRE(xml.m_dtd.m_elements.size() == 5);
-    REQUIRE(xml.m_dtd.m_elements["REPORT"].name == "REPORT");
-    REQUIRE(xml.m_dtd.m_elements["REPORT"].content.unparsed == "(residence|apartment|office|shop)*");
-    REQUIRE(xml.m_dtd.m_elements["residence"].name == "residence");
-    REQUIRE(xml.m_dtd.m_elements["residence"].content.unparsed == "(name, street, pincode, city, phone)");
-    REQUIRE(xml.m_dtd.m_elements["apartment"].name == "apartment");
-    REQUIRE(xml.m_dtd.m_elements["apartment"].content.unparsed == "(name, street, pincode, city, phone)");
-    REQUIRE(xml.m_dtd.m_elements["office"].name == "office");
-    REQUIRE(xml.m_dtd.m_elements["office"].content.unparsed == "(name, street, pincode, city, phone)");
-    REQUIRE(xml.m_dtd.m_elements["shop"].name == "shop");
-    REQUIRE(xml.m_dtd.m_elements["shop"].content.unparsed == "(name, street, pincode, city, phone)");
-  }
-  SECTION("XML with external DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
-  {
-    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report02.dtd\">"
-                "<REPORT></REPORT>\n";
-    BufferSource xmlSource(xmlString);
-    XML xml(xmlSource);
-    xml.parse();
-    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_notations["GIF"].type == "SYSTEM");
-    REQUIRE(xml.m_dtd.m_notations["GIF"].systemID == "GIF");
-    REQUIRE(xml.m_dtd.m_notations["JPG"].type == "SYSTEM");
-    REQUIRE(xml.m_dtd.m_notations["JPG"].systemID == "JPG");
-    REQUIRE(xml.m_dtd.m_notations["BMP"].type == "SYSTEM");
-    REQUIRE(xml.m_dtd.m_notations["BMP"].systemID == "BMP");
-  }
-  SECTION("XML with internal DTD containing comments.", "[XML][Parse][DTD]")
-  {
-    xmlString = "<?xml version=\"1.0\"?>\n"
-                "<!DOCTYPE note ["
-                "<!-- root element is note that contains to, from, heading and body elements -->\n"
-                "<!ELEMENT note (to,from,heading,body)>\n"
-                "<!-- Note to field -->\n"
-                "<!ELEMENT to (#PCDATA)>\n"
-                "<!-- Note from field -->\n"
-                "<!ELEMENT from (#PCDATA)>\n"
-                "<!-- Note heading field -->\n"
-                "<!ELEMENT heading (#PCDATA)>\n"
-                "<!-- Note boy field -->\n"
-                "<!ELEMENT body (#PCDATA)>\n"
-                "]>\n"
-                "<note>\n"
-                "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
-                "<body>Don't forget me this weekend</body>\n"
-                "</note>\n";
-    BufferSource xmlSource(xmlString);
-    XML xml(xmlSource);
-    REQUIRE_NOTHROW(xml.parse());
-  }
+}
+TEST_CASE("Parse XML DTD with missing terminating '>' on tags.", "[XML][Parse][DTD][Error]")
+{
+  std::string xmlString;
   SECTION("XML with internal DTD with missing terminating '>' on !ELEMENT", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
@@ -551,7 +562,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 4 Column: 2] Missing '>' terminator.");
   }
-  SECTION("XML with internal DTD with missing terminating '>' on !ATTLIST", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with missing terminating '>' on !ATTLIST", "[XML][Parse][DTD][Error]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE TVSCHEDULE [\n"
@@ -575,7 +586,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 15 Column: 2] Missing '>' terminator.");
   }
-  SECTION("XML with internal DTD with missing terminating '>' on !ENTITY", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with missing terminating '>' on !ENTITY", "[XML][Parse][DTD][Error]")
   {
     xmlString = "<!DOCTYPE REPORT [\n"
                 "<!ELEMENT REPORT (paragraph)*>\n"
@@ -586,7 +597,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 4 Column: 36] Missing '>' terminator.");
   }
-  SECTION("XML with internal DTD with missing terminating '>' on !NOTATION", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with missing terminating '>' on !NOTATION", "[XML][Parse][DTD][Error]")
   {
     xmlString = "<!DOCTYPE REPORT [\n"
                 "<!ELEMENT REPORT (paragraph)*>\n"
@@ -601,7 +612,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 6 Column: 2] Missing '>' terminator.");
   }
-  SECTION("XML with a DTD that contains an illegal mixed content specification (uses ',').", "[XML][Parse][DTD]")
+  SECTION("XML with a DTD that contains an illegal mixed content specification (uses ',').", "[XML][Parse][DTD][Error]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!-- Fig. B.5 : mixed.xml-->\n"
@@ -621,6 +632,10 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <format>.");
   }
+}
+TEST_CASE("Parse XML DTD with various element content specification errors.", "[XML][Parse][DTD][Error]")
+{
+  std::string xmlString;
   SECTION("XML with a DTD that contains an illegal mixed content specification (#PCDATA doesnt come first).", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
@@ -641,7 +656,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <format>.");
   }
-  SECTION("XML with a DTD that contains an illegal mixed content specification (does not end with '*').", "[XML][Parse][DTD]")
+  SECTION("XML with a DTD that contains an illegal mixed content specification (does not end with '*').", "[XML][Parse][DTD][Error]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!-- Fig. B.5 : mixed.xml-->\n"
@@ -661,7 +676,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <format>.");
   }
-  SECTION("Parse XML with DTD that cotains a content specification in error (missing ',').", "[XML][Parse][DTD]")
+  SECTION("Parse XML with DTD that cotains a content specification in error (missing ',').", "[XML][Parse][DTD][Error]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE note ["
@@ -679,7 +694,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <note>.");
   }
-  SECTION("Parse XML with DTD that cotains a content specification in error (missing element name).", "[XML][Parse][DTD]")
+  SECTION("Parse XML with DTD that cotains a content specification in error (missing element name).", "[XML][Parse][DTD][Error]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE note ["
@@ -697,7 +712,11 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <note>.");
   }
-  SECTION("Parse XML with DTD that cotains a enumeration attribute gender with a default value if 'F'.", "[XML][Parse][DTD]")
+}
+TEST_CASE("Parse XML DTD that contains enumeration attributes with various errors.", "[XML][Parse][DTD][Error][Attributes]")
+{
+  std::string xmlString;
+  SECTION("Parse XML with DTD that cotains a enumeration attribute gender with a default value if 'F'.", "[XML][Parse][DTD][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -731,7 +750,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     REQUIRE(xml.m_prolog[0][1].name == "person");
     REQUIRE(xml.m_prolog[0][1].getAttributeList().size() == 0);
   }
-  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing enumeration name).", "[XML][Parse][DTD]")
+  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing enumeration name).", "[XML][Parse][DTD][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -750,7 +769,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 7 Column: 36] Invalid name '' encountered.");
   }
-  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing end bracket).", "[XML][Parse][DTD]")
+  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing end bracket).", "[XML][Parse][DTD][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -769,7 +788,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 7 Column: 39] Invalid attribute type specified.");
   }
-  SECTION("Parse XML with DTD that contains a enumeration with a default value not in enumeration.", "[XML][Parse][DTD]")
+  SECTION("Parse XML with DTD that contains a enumeration with a default value not in enumeration.", "[XML][Parse][DTD][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -788,7 +807,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Default value 'D' for enumeration attribute 'gender' is invalid.");
   }
-  SECTION("Parse XML with DTD that contains a enumeration with not all values unique.", "[XML][Parse][DTD]")
+  SECTION("Parse XML with DTD that contains a enumeration with not all values unique.", "[XML][Parse][DTD][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -807,7 +826,7 @@ TEST_CASE("Parse XML with DTD both internal and external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Enumerator value 'F' for attribute 'gender' occurs more than once in its definition.");
   }
-  SECTION("Parse XML with DTD that specifies the use of an two different ID attributes for an element.", "[XML][Valid][DTD]")
+  SECTION("Parse XML with DTD that specifies the use of an two different ID attributes for an element.", "[XML][Parse][DTD][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE collection ["

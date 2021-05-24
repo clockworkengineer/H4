@@ -1,7 +1,7 @@
 //
 // Class: XML
 //
-// Description: Parse XML into an XMLObject (generating an exception
+// Description: Parse XML into an XML Object (generating an exception
 // if it is found not to be wellformed XML) so that it can be manipulated,
 // interrogated and saved back to a text form. For more information on the
 // XML standard check out https://www.w3.org/TR/REC-xml/.

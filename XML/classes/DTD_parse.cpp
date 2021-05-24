@@ -12,7 +12,6 @@
 #include "XML.hpp"
 #include "XMLSources.hpp"
 #include "XMLDestinations.hpp"
-#include "DTD.hpp"
 // ====================
 // CLASS IMPLEMENTATION
 // ====================

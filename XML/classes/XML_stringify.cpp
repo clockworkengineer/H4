@@ -1,7 +1,7 @@
 //
 // Class: XML
 //
-// Description:  Code to take an XMLObject and produce the XML for
+// Description:  Code to take an XML Object and produce the XML for
 // it; currently as UTF-8 encoded text but this may change in future.
 //
 // Dependencies:   C20++ - Language standard features used.

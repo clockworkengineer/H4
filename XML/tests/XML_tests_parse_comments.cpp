@@ -17,7 +17,7 @@ using namespace H4;
 TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
 {
   std::string xmlString;
-  SECTION("A simple single line comment", "[XML][Parse][[Comments]")
+  SECTION("A simple single line comment", "[XML][Parse][Comments]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                 "<!-- A single line comment -->\n"
@@ -26,7 +26,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("Multiple single line comments beifre root tag", "[XML][Parse][[Comments]")
+  SECTION("Multiple single line comments beifre root tag", "[XML][Parse][Comments]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                 "<!-- A single line comment -->\n"
@@ -37,7 +37,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("Multiple comments inside root element and between its children ", "[XML][Parse][[Comments]")
+  SECTION("Multiple comments inside root element and between its children ", "[XML][Parse][Comments]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<AddressBook>\n"
@@ -66,7 +66,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     REQUIRE(xml.m_prolog[0][2].name == "Address");
     REQUIRE(xml.m_prolog[0][2].getContents() == "    This is some contents 3   ");
   }
-  SECTION("A single comment after root element", "[XML][Parse][[Comments]")
+  SECTION("A single comment after root element", "[XML][Parse][Comments]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                 "<root></root>\n"
@@ -75,7 +75,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("A simple multi line comment", "[XML][Parse][[Comments]")
+  SECTION("A simple multi line comment", "[XML][Parse][Comments]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                 "<!-- A single line comment\n"
@@ -87,7 +87,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("A simple comment within element content", "[XML][Parse][[Comments]")
+  SECTION("A simple comment within element content", "[XML][Parse][Comments]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                 "<root>Test<!-- a simple comment -->Test"
@@ -97,7 +97,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     xml.parse();
     REQUIRE(xml.m_prolog[0].getContents() == "TestTest");
   }
-  SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][[Comments]")
+  SECTION("A simple comment within element contents and content remains intact", "[XML][Parse][Comments]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                 "<root>Test  <!-- a simple comment -->  Test"
@@ -107,7 +107,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     xml.parse();
     REQUIRE(xml.m_prolog[0].getContents() == "Test    Test");
   }
-  SECTION("A simple single line comment containing -- is illegal", "[XML][Parse][[Comments]")
+  SECTION("A simple single line comment containing -- is illegal", "[XML][Parse][Comments]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                 "<!-- A single line comment-- --> "
@@ -116,7 +116,7 @@ TEST_CASE("Parse XML elements with comments", "[XML][Parse][Comments]")
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 2 Column: 30] Missing closing '>' for comment line.");
   }
-  SECTION("A simple single line comment ending with -- is illegal", "[XML][Parse][[Comments]")
+  SECTION("A simple single line comment ending with -- is illegal", "[XML][Parse][Comments]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                 "<!-- A single line comment ---> "

@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 set(TEST_EXECUTABLE ${XML_LIBRARY_NAME}_Unit_Tests)
 
 set(TEST_SOURCES
-    XML_tests_main.cpp
+    XML_tests_helper.cpp
     XML_tests_ISource.cpp
     XML_tests_IDestination.cpp
     XML_tests_parse_misc.cpp
