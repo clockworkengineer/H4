@@ -1,8 +1,8 @@
 //
 // Unit Tests: XML
 //
-// Description: BufferDestination and FileDestination structures that implement
-// the IDestination interfaces used in XML parsing.
+// Description: Unit tests for BufferDestination and FileDestination classes 
+// that implement the IDestination interfaces used in XML parsing.
 //
 // ================
 // Test definitions

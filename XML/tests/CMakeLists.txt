@@ -12,25 +12,25 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 set(TEST_EXECUTABLE ${XML_LIBRARY_NAME}_Unit_Tests)
 
 set(TEST_SOURCES
-    XML_tests_helper.cpp
-    XML_tests_ISource.cpp
-    XML_tests_IDestination.cpp
-    XML_tests_parse_misc.cpp
-    XML_tests_parse_declaration.cpp
-    XML_tests_parse_tags.cpp
-    XML_tests_parse_root.cpp
-    XML_tests_parse_files.cpp
-    XML_tests_parse_attributes.cpp
-    XML_tests_parse_comments.cpp
-    XML_tests_parse_unicode.cpp
-    XML_tests_parse_entities.cpp
-    XML_tests_parse_pi.cpp
-    XML_tests_parse_cdata.cpp
-    XML_tests_parse_namespace.cpp
-    XML_tests_dtd_parse.cpp
-    XML_tests_stringify.cpp
-    XML_tests_dtd_stringify.cpp
-    XML_tests_dtd_validate.cpp
+    XML_helper.cpp
+    ISource.cpp
+    IDestination.cpp
+    XML_parse_misc.cpp
+    XML_parse_declaration.cpp
+    XML_parse_tags.cpp
+    XML_parse_root.cpp
+    XML_parse_files.cpp
+    XML_parse_attributes.cpp
+    XML_parse_comments.cpp
+    XML_parse_unicode.cpp
+    XML_parse_entities.cpp
+    XML_parse_pi.cpp
+    XML_parse_cdata.cpp
+    XML_parse_namespace.cpp
+    DTD_parse.cpp
+    XML_stringify.cpp
+    DTD_stringify.cpp
+    DTD_validate.cpp
 )
 
 add_executable(${TEST_EXECUTABLE} ${TEST_SOURCES})

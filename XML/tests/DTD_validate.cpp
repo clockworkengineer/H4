@@ -1,7 +1,7 @@
 //
 // Unit Tests: XML
 //
-// Description:
+// Description: Unit tests for XML DTD validation.
 //
 // ================
 // Test definitions
