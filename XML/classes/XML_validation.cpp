@@ -15,12 +15,6 @@
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
-//
-// C++ STL
-//
-#include <vector>
-#include <cstring>
-#include <algorithm>
 // =========
 // NAMESPACE
 // =========

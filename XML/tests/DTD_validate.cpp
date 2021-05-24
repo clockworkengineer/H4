@@ -443,7 +443,6 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
 }
 TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD][Validate][Attribute]")
 {
-
   std::string xmlString;
   SECTION("XML with a DTD that specifies a required attribute that is missing.", "[XML][DTD][Validate][Attribute]")
   {

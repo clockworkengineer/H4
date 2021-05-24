@@ -3,7 +3,6 @@
 //
 // C++ STL
 //
-#include <string>
 #include <codecvt>
 #include <locale>
 namespace H4

@@ -1,10 +1,6 @@
 #ifndef XML_CORE_HPP
 #define XML_CORE_HPP
 //
-// C++ STL
-//
-#include <string>
-//
 // XML character constants
 //
 #define kCarriageReturn 0x0D

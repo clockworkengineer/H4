@@ -15,7 +15,6 @@
 //
 // C++ STL
 //
-#include <vector>
 #include <filesystem>
 // =========
 // NAMESPACE

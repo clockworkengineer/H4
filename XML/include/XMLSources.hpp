@@ -1,6 +1,8 @@
 #ifndef XMLSOURCES_HPP
 #define XMLSOURCES_HPP
-#include <string>
+//
+// C++ STL
+//
 #include <fstream>
 namespace H4
 {
@@ -82,7 +84,6 @@ namespace H4
         {
             return (m_UTF8.to_bytes(m_parseBuffer.substr(start, end - start)));
         }
-
     private:
         void convertCRLFToLF(XMLString &xmlString)
         {
@@ -170,7 +171,6 @@ namespace H4
             m_source.seekg(currentPosition, std::ios_base::beg);
             return (rangeBuffer);
         }
-
     private:
         std::ifstream m_source;
     };

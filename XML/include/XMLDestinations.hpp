@@ -1,7 +1,5 @@
 #ifndef XMLDESTINATIONS_HPP
 #define XMLDESTINATIONS_HPP
-#include <fstream>
-#include <string>
 namespace H4
 {
     //

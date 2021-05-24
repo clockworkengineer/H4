@@ -17,10 +17,6 @@
 // ====================
 //
 // C++ STL
-//
-#include <vector>
-#include <cstring>
-#include <algorithm>
 #include <regex>
 // =========
 // NAMESPACE

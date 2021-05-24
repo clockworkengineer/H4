@@ -3,7 +3,6 @@
 //
 // C++ STL
 //
-#include <string>
 #include <codecvt>
 #include <locale>
 namespace H4
@@ -62,13 +61,11 @@ namespace H4
         {
             return (m_UTF8.from_bytes(from));
         }
-
     protected:
         long m_lineNo = 1;
         long m_column = 1;
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> m_UTF16;
         std::wstring_convert<std::codecvt_utf8_utf16<XMLString::value_type>, XMLString::value_type> m_UTF8;
     };
-
 } // namespace H4
 #endif /* ISOURCE_HPP */

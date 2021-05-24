@@ -1,15 +1,6 @@
 #ifndef DTD_DPP
 #define DTD_DPP
 //
-// C++ STL
-//
-#include <string>
-#include <stdexcept>
-#include <memory>
-#include <unordered_map>
-#include <set>
-// #include <tuple>
-//
 // DTD Core
 //
 #include "XML_core.hpp"

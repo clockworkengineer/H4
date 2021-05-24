@@ -3,11 +3,7 @@
 //
 // C++ STL
 //
-#include <string>
-#include <map>
 #include <vector>
-#include <list>
-#include <memory>
 // =========
 // NAMESPACE
 // =========
