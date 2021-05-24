@@ -27,8 +27,11 @@ set(TEST_SOURCES
     XML_parse_pi.cpp
     XML_parse_cdata.cpp
     XML_parse_namespace.cpp
-    DTD_parse.cpp
     XML_stringify.cpp
+    DTD_parse.cpp
+    DTD_parse_entity.cpp
+    DTD_parse_attributes.cpp
+    DTD_parse_tags.cpp
     DTD_stringify.cpp
     DTD_validate.cpp
 )

@@ -145,7 +145,6 @@ TEST_CASE("Parse XML with various DTD validation issues.", "[XML][DTD][Validate]
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    ;
     REQUIRE_NOTHROW(xml.validate());
   }
   SECTION("XML with a DTD that does not contain any songs.", "[XML][DTD][Validate]")

@@ -1,7 +1,9 @@
 //
 // Class: DTD
 //
-// Description:
+// Description: Parse XML Data Type Definition (DTD) portion of an XML file so
+// that the XML maybe be validated against it and flagged as well-formed if it passes. 
+// For more information on the XML standard check out https://www.w3.org/TR/REC-xml/.
 //
 // Dependencies:   C20++ - Language standard features used.
 //
