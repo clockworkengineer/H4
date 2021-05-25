@@ -14,7 +14,7 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Parse XML with internal DTD that contains ENTITY definitions and uses", "[XML][Parse][DTD][Entity]")
+TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses", "[XML][Parse][DTD][Entity]")
 {
   std::string xmlString;
   SECTION("XML DTD with entity definitions and uses", "[XML][Parse][DTD]")

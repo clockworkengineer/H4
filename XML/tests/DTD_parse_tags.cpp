@@ -85,24 +85,4 @@ TEST_CASE("Parse XML DTD with missing terminating '>' on tags.", "[XML][Parse][D
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 6 Column: 2] Missing '>' terminator.");
   }
-  SECTION("XML with a DTD that contains an illegal mixed content specification (uses ',').", "[XML][Parse][DTD][Tags][Error]")
-  {
-    xmlString = "<?xml version=\"1.0\"?>\n"
-                "<!-- Fig. B.5 : mixed.xml-->\n"
-                "<!-- Mixed content type elements -->\n"
-                "<!DOCTYPE format [\n"
-                "<!ELEMENT format ( #PCDATA | bold , italic )*>\n"
-                "<!ELEMENT bold ( #PCDATA )>\n"
-                "<!ELEMENT italic ( #PCDATA )>\n"
-                "]>\n"
-                "<format>\n"
-                "Book catalog entry:\n"
-                "<bold>XML</bold>\n"
-                "<italic>XML How to Program</italic>\n"
-                "This book carefully explains XML-based systems development."
-                "</format>";
-    BufferSource xmlSource(xmlString);
-    XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <format>.");
-  }
 }

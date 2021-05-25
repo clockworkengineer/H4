@@ -16,7 +16,6 @@ using namespace H4;
 // ==========
 TEST_CASE("Stringify XML with DTD both internal and external", "[XML][Stringify][DTD]")
 {
-
     SECTION("Stringify XML with internal DTD", "[XML][Stringify][DTD]")
     {
         checkStringify("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
@@ -50,7 +49,7 @@ TEST_CASE("Stringify XML with DTD both internal and external", "[XML][Stringify]
                        "<body>Don't forget me this weekend!</body>\n"
                        "</note>\n");
     }
-    SECTION("Stringify XML with DTD with !ENTITY definitions and uses", "[XML][Stringify][DTD]")
+    SECTION("Stringify XML with DTD with entity definitions and uses", "[XML][Stringify][DTD]")
     {
         checkStringify("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
                        "<!DOCTYPE note [\n"
