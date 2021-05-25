@@ -1,7 +1,7 @@
 //
 // Class: DTD
 //
-// Description: DTD Document Type Definition parsing.
+// Description: Document Type Definition (DTD) XML validation code.
 //
 // Dependencies:   C20++ - Language standard features used.
 //

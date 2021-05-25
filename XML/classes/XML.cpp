@@ -1,10 +1,10 @@
 //
 // Class: XML
 //
-// Description: Parse XML into an XML Object (generating an exception
-// if it is found not to be wellformed XML) so that it can be manipulated,
-// interrogated and saved back to a text form. For more information on the
-// XML standard check out https://www.w3.org/TR/REC-xml/.
+// Description: Parse XML into an internal XML Object (generating an exception
+// if it is found not to be syntactically correct) so that it can be manipulated,
+// interrogated and saved back to a text form (stringify). For more 
+// information on the XML standard check out https://www.w3.org/TR/REC-xml/.
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -42,23 +42,25 @@ namespace H4
     // PUBLIC METHODS
     // ==============
     /// <summary>
-    /// 
+    /// Fetch entity mapping structure.
     /// </summary>
+    /// <param name="entityName">Entity name.</param>
+    /// <returns>Entity structure.</returns>
     XMLEntityMapping & XML::getEntity(const std::string &entityName)
     {
         return(m_dtd.m_entityMapping[entityName]);
     }
     /// <summary>
-    /// Parse XML read from source stream.
+    /// Parse XML read from source stream into internal object.
     /// </summary>
     void XML::parse()
     {
         parseXML();
     }
     /// <summary>
-    ///
+    /// Validate XML against any DTD provided to see whether it is well-formed. If an
+    /// exception is thrown then there is a validation issue and the XML is not wellformed.
     /// </summary>
-    /// <returns></returns>
     void XML::validate()
     {
         m_dtd.validate(m_prolog);

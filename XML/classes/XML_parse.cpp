@@ -2,7 +2,8 @@
 // Class: XML
 //
 // Description: XML parser code. All parsing of characters takes place having
-// converted the characters to UTF-32 to make the process easier.
+// converted the characters to UTF-32 to make the process easier (any data once
+// parsed is stored in UTF-8 strings).
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -37,10 +38,10 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    ///
+    /// Take an entity reference and parse its contents into XML internal description.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="xmlNodeElement">Current XML Element.</param>
+    /// <param name="entityReference">Entity reference to be parsed.</param>
     void XML::parseEntityMappingContents(XMLNodeElement *xmlNodeElement, XMLValue &entityReference)
     {
         XMLNodeEntityReference xNodeEntityReference(entityReference);
@@ -48,6 +49,8 @@ namespace H4
         {
             XMLNodeElement entityElement;
             BufferSource entitySource(entityReference.parsed);
+            // Does contain start tag ?
+            // NO then parse XML into entity elements list.
             if (entityReference.parsed.find("<") == std::string::npos)
             {
                 while (entitySource.more())
@@ -64,6 +67,7 @@ namespace H4
                 }
             }
             else
+            // YES then parse XML into current element list
             {
                 while (entitySource.more())
                 {
@@ -75,9 +79,10 @@ namespace H4
         xmlNodeElement->children.emplace_back(std::make_unique<XMLNodeEntityReference>(std::move(xNodeEntityReference)));
     }
     /// <summary>
-    ///
+    /// Add content node to current XMLNodeElement elements list.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlNodeElement">Current element node.</param>
+    /// <param name="content">Content to add to new content node (XMLNodeCotent).</param>
     /// <returns></returns>
     void XML::parseAddElementContent(XMLNodeElement *xmlNodeElement, const std::string &content)
     {
@@ -111,7 +116,7 @@ namespace H4
         XMLNodeRef<XMLNodeContent>(*xmlNodeElement->children.back()).content += content;
     }
     /// <summary>
-    /// Parse a element tag name and set its value in current XNodeElement.
+    /// Parse a element tag name and set its value in current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
@@ -120,58 +125,58 @@ namespace H4
         xmlNodeElement->name = parseName(xmlSource);
     }
     /// <summary>
-    /// Parse a XML comment, create a XNodeComment for it and add to list
-    /// of elements for the current XNodeElement.
+    /// Parse a XML comment, create a XMLNodeComment for it and add to list
+    /// of elements for the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseComment(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
-        XMLNodeComment xNodeComment;
+        XMLNodeComment xmlNodeComment;
         while (xmlSource.more() && !xmlSource.match(U"--"))
         {
-            xNodeComment.comment += xmlSource.current_to_bytes();
+            xmlNodeComment.comment += xmlSource.current_to_bytes();
             xmlSource.next();
         }
         if (!xmlSource.match(U">"))
         {
             throw SyntaxError(xmlSource, "Missing closing '>' for comment line.");
         }
-        xmlNodeElement->children.emplace_back(std::make_unique<XMLNodeComment>(std::move(xNodeComment)));
+        xmlNodeElement->children.emplace_back(std::make_unique<XMLNodeComment>(std::move(xmlNodeComment)));
     }
     /// <summary>
     /// Parse a XML process instruction, create an XNode for it and add it to
-    /// the list of elements under the current XNodeElement.
+    /// the list of elements under the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parsePI(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
-        XNodePI xNodePI;
-        xNodePI.name = parseName(xmlSource);
+        XMLNodePI xmlNodePI;
+        xmlNodePI.name = parseName(xmlSource);
         while (xmlSource.more() && !xmlSource.match(U"?>"))
         {
-            xNodePI.parameters += xmlSource.current_to_bytes();
+            xmlNodePI.parameters += xmlSource.current_to_bytes();
             xmlSource.next();
         }
-        xmlNodeElement->children.emplace_back(std::make_unique<XNodePI>(std::move(xNodePI)));
+        xmlNodeElement->children.emplace_back(std::make_unique<XMLNodePI>(std::move(xmlNodePI)));
     }
     /// <summary>
     /// Parse an XML CDATA section create an XNode for it and add it to
-    /// the list of elements under the current XNodeElement.
+    /// the list of elements under the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseCDATA(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
-        XMLNodeCDATA xNodeCDATA;
+        XMLNodeCDATA xmlNodeCDATA;
         while (xmlSource.more() && !xmlSource.match(U"]]>"))
         {
             if (xmlSource.match(U"<![CDATA["))
             {
                 throw SyntaxError(xmlSource, "Nesting of CDATA sections is not allowed.");
             }
-            xNodeCDATA.cdata += xmlSource.current_to_bytes();
+            xmlNodeCDATA.cdata += xmlSource.current_to_bytes();
             xmlSource.next();
         }
         if (!xmlNodeElement->children.empty())
@@ -181,11 +186,11 @@ namespace H4
                 XMLNodeRef<XMLNodeContent>(*xmlNodeElement->children.back()).isWhiteSpace = false;
             }
         }
-        xmlNodeElement->children.emplace_back(std::make_unique<XMLNodeCDATA>(std::move(xNodeCDATA)));
+        xmlNodeElement->children.emplace_back(std::make_unique<XMLNodeCDATA>(std::move(xmlNodeCDATA)));
     }
     /// <summary>
     /// Parse list of attributes (name/value pairs) that exist in a tag and add them to
-    /// the list of attributes associated with the current XNodeElement.
+    /// the list of attributes associated with the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
@@ -226,26 +231,26 @@ namespace H4
         }
     }
     /// <summary>
-    /// Recursively parse any child elements of the current XNodeElement.
+    /// Recursively parse any child elements of the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     void XML::parseChildElement(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
-        XMLNodeElement xNodeChildElement;
+        XMLNodeElement xmlNodeChildElement;
         for (auto &ns : xmlNodeElement->getNameSpaceList())
         {
-            xNodeChildElement.addNameSpace(ns.name, ns.value);
+            xmlNodeChildElement.addNameSpace(ns.name, ns.value);
         }
-        parseElement(xmlSource, &xNodeChildElement);
-        if (auto pos = xNodeChildElement.name.find(':'); pos != std::string::npos)
+        parseElement(xmlSource, &xmlNodeChildElement);
+        if (auto pos = xmlNodeChildElement.name.find(':'); pos != std::string::npos)
         {
-            if (!xNodeChildElement.isNameSpacePresent(xNodeChildElement.name.substr(0, pos)))
+            if (!xmlNodeChildElement.isNameSpacePresent(xmlNodeChildElement.name.substr(0, pos)))
             {
                 throw SyntaxError(xmlSource, "Namespace used but not defined.");
             }
         }
-        xmlNodeElement->children.push_back(std::make_unique<XMLNodeElement>(std::move(xNodeChildElement)));
+        xmlNodeElement->children.push_back(std::make_unique<XMLNodeElement>(std::move(xmlNodeChildElement)));
     }
     /// <summary>
     /// Parse any element content that is found.
@@ -255,7 +260,7 @@ namespace H4
     void XML::parseDefault(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         XMLValue entityReference = parseCharacter(xmlSource, m_dtd.m_entityMapping);
-        if (entityReference.unparsed.starts_with("&") && entityReference.unparsed.ends_with(";"))
+        if (entityReference.unparsed[0] == '&' && entityReference.unparsed.back() == ';')
         {
             parseEntityMappingContents(xmlNodeElement, entityReference);
         }
@@ -266,7 +271,7 @@ namespace H4
     }
     /// <summary>
     /// Parse element content area generating any XNodes and adding them
-    /// to the list of the current XNodeElement.
+    /// to the list of the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XMl source stream.</param>
     /// <returns></returns>
@@ -332,13 +337,12 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse XML prolog and create the necessary XNodeElements for it. Valid
+    /// Parse XML prolog and create the necessary XMLNodeElements for it. Valid
     /// parts of the prolog include delaration (first line if present),
     /// processing instructions, comments, whitespace content and XML
     /// document Type Definition (DTD).
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
     void XML::parseProlog(ISource &xmlSource, XMLNodeElement *xmlNodeProlog)
     {
         xmlNodeProlog->setNodeType(XMLNodeType::prolog);
@@ -387,7 +391,6 @@ namespace H4
     /// <summary>
     /// Parse XML source stream.
     /// </summary>
-    /// <returns></returns>
     void XML::parseXML()
     {
         parseProlog(m_xmlSource, &m_prolog);

@@ -166,10 +166,10 @@ namespace H4
     //
     // PI XMLNode
     //
-    struct XNodePI : XMLNode
+    struct XMLNodePI : XMLNode
     {
     public:
-        XNodePI(XMLNodeType nodeType = XMLNodeType::pi) : XMLNode(nodeType)
+        XMLNodePI(XMLNodeType nodeType = XMLNodeType::pi) : XMLNode(nodeType)
         {
         }
         std::string name;

@@ -1,7 +1,7 @@
 //
 // Class: XML
 //
-// Description: XML chracter and field value validation.
+// Description: XML declaration and attribute validation.
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -38,7 +38,7 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    /// Validate XMl declaration. This includes that it has at least a version and that
+    /// Validate XML declaration. This includes that it has at least a version and that
     /// its atributes version, encoding and standalone occur in the correct order.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
@@ -105,32 +105,32 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Make sure that XML attribute value does not contain any illegal characters.
     /// </summary>
     /// <param name=""></param>
-    /// <returns>true then valid.</returns>
+    /// <returns>true then contains all legal characters..</returns>
     bool XML::validAttributeValue(XMLValue &value)
     {
-        BufferSource valueSoure(value.parsed);
-        while (valueSoure.more())
+        BufferSource valueSource(value.parsed);
+        while (valueSource.more())
         {
-            if (valueSoure.current() == '&')
+            if (valueSource.match(U"&#"))
             {
-                parseEntityReference(valueSoure);
+                parseCharacterReference(valueSource);
             }
-            else if (valueSoure.match(U"&#"))
+            else if (valueSource.current() == '&')
             {
-                parseCharacterReference(valueSoure);
+                parseEntityReference(valueSource);
             }
-            else if ((valueSoure.current() == '<') ||
-                     (valueSoure.current() == '"') ||
-                     (valueSoure.current() == '\''))
+            else if ((valueSource.current() == '<') ||
+                     (valueSource.current() == '"') ||
+                     (valueSource.current() == '\''))
             {
                 return (false);
             }
             else
             {
-                valueSoure.next();
+                valueSource.next();
             }
         }
         return (true);

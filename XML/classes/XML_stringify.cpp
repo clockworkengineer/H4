@@ -1,8 +1,9 @@
 //
 // Class: XML
 //
-// Description:  Code to take an XML Object and produce the XML for
-// it; currently as UTF-8 encoded text but this may change in future.
+// Description:  Code to take an XML internal object description and produce 
+// the XML text for it; currently as UTF-8 encoded text but this may change in 
+// future.
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -37,11 +38,11 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    /// Recursively parse XNode root passed in to produce XML output on an XML
+    /// Recursively parse XMLNode root passed in to produce XML output on an XML
     /// destination stream in UTF-8 encoding.
     /// </summary>
-    /// <param name="xNodeRoot">XML XNode root to convert into XML.</param>
-    /// <returns></returns>
+    /// <param name="xmlNode">XMLNode root to convert into XML.</param>
+    /// <param name="xmlDestination">XML destination stream.</param>
     void XML::stringifyElements(XMLNode *xmlNode, IDestination &xmlDestination)
     {
         switch (xmlNode->getNodeType())
@@ -91,36 +92,36 @@ namespace H4
         // XML comments
         case XMLNodeType::comment:
         {
-            XMLNodeComment *xNodeComment = static_cast<XMLNodeComment *>(xmlNode);
-            xmlDestination.add("<!--" + xNodeComment->comment + "-->");
+            XMLNodeComment *xmlNodeComment = static_cast<XMLNodeComment *>(xmlNode);
+            xmlDestination.add("<!--" + xmlNodeComment->comment + "-->");
             break;
         }
         // XML element content
         case XMLNodeType::content:
         {
-            XMLNodeContent *xNodeContent = static_cast<XMLNodeContent *>(xmlNode);
-            xmlDestination.add(xNodeContent->content);
+            XMLNodeContent *xmlNodeContent = static_cast<XMLNodeContent *>(xmlNode);
+            xmlDestination.add(xmlNodeContent->content);
             break;
         }
         // XML character entity
         case XMLNodeType::entity:
         {
-            XMLNodeEntityReference *xNodeEntity = static_cast<XMLNodeEntityReference *>(xmlNode);
-            xmlDestination.add(xNodeEntity->value.unparsed);
+            XMLNodeEntityReference *xmlNodeEntity = static_cast<XMLNodeEntityReference *>(xmlNode);
+            xmlDestination.add(xmlNodeEntity->value.unparsed);
             break;
         }
         // XML processing instruction
         case XMLNodeType::pi:
         {
-            XNodePI *xNodePI = static_cast<XNodePI *>(xmlNode);
-            xmlDestination.add("<?" + xNodePI->name + " " + xNodePI->parameters + "?>");
+            XMLNodePI *xmlNodePI = static_cast<XMLNodePI *>(xmlNode);
+            xmlDestination.add("<?" + xmlNodePI->name + " " + xmlNodePI->parameters + "?>");
             break;
         }
         // XML CDATA section
         case XMLNodeType::cdata:
         {
-            XMLNodeCDATA *xNodeCDATA = static_cast<XMLNodeCDATA *>(xmlNode);
-            xmlDestination.add("<![CDATA[" + xNodeCDATA->cdata + "]]>");
+            XMLNodeCDATA *xmlNodeCDATA = static_cast<XMLNodeCDATA *>(xmlNode);
+            xmlDestination.add("<![CDATA[" + xmlNodeCDATA->cdata + "]]>");
             break;
         }
         // XML DTD
@@ -130,15 +131,14 @@ namespace H4
             break;
         }
         default:
-            throw std::runtime_error("Invalid XNode encountered during stringify.");
+            throw std::runtime_error("Invalid XMLNode encountered during stringify.");
         }
     }
     /// <summary>
-    /// Recursively parse XNode root passed in to produce XML output on an XML
+    /// Recursively parse XMLNode root passed in to produce XML output on an XML
     /// destination stream in UTF-8 encoding.
     /// </summary>
-    /// <param name="xNodeRoot">XML XNode root to convert into XML.</param>
-    /// <returns></returns>
+    /// <param name="xmlDestination">XML destination stream.</param>
     void XML::stringifyXML(IDestination &xmlDestination)
     {
         stringifyElements(&m_prolog, xmlDestination);
