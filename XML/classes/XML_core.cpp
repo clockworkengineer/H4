@@ -1,7 +1,7 @@
 //
 // Class: XML
 //
-// Description: XML Core Functions.
+// Description: XML Parser Core Functions.
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -75,7 +75,7 @@ namespace H4
                 (ch >= 0x10000 && ch <= 0xEFFFF));
     }
     /// <summary>
-    /// Check whether a name has all valid characters.
+    /// Check whether a character is valid for an XML name.
     /// </summary>
     /// <param name="ch">Name to validate.</param>
     /// <returns>true then valid.</returns>
@@ -93,16 +93,16 @@ namespace H4
     /// Check name that starts with xml is a valid reserved name.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <returns>true then valid.</returns>
     bool validReservedName(const XMLString &name)
     {
         return (name.starts_with(U"xmlns") || name.starts_with(U"xml-stylesheet") || name == U"xml");
     }
     /// <summary>
-    /// Validate XMl tag/ attribute names.
+    /// Validate XML tag/attribute names.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <returns>true then valid.</returns>
     bool validName(XMLString name)
     {
         if (name.empty())
@@ -128,10 +128,10 @@ namespace H4
         return (true);
     }
     /// <summary>
-    ///
+    /// Parse  and return XML name.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns>XML name.</returns>
     std::string parseName(ISource &xmlSource)
     {
         XMLString name;
@@ -148,10 +148,10 @@ namespace H4
         return (xmlSource.to_bytes(name));
     }
     /// <summary>
-    ///
+    /// Parse and return XML entity reference.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns>Parsed entity reference value.</returns>
     XMLValue parseEntityReference(ISource &xmlSource)
     {
         XMLValue entityReference;
@@ -162,7 +162,7 @@ namespace H4
         }
         if (xmlSource.current() != ';')
         {
-            throw XML::SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
+            throw XML::SyntaxError(xmlSource, "Invalidly formed entity reference.");
         }
         entityReference.unparsed += ';';
         xmlSource.next();
@@ -184,7 +184,7 @@ namespace H4
         }
         if (xmlSource.current() != ';')
         {
-            throw XML::SyntaxError(xmlSource, "Invalidly formed  character reference or entity.");
+            throw XML::SyntaxError(xmlSource, "Invalidly formed  character reference.");
         }
         xmlSource.next();
         characterRefence.unparsed += ';';
@@ -213,9 +213,10 @@ namespace H4
         throw XML::SyntaxError(xmlSource, "Cannot convert character reference.");
     }
     /// <summary>
-    ///
+    /// Lookup an entity reference to get its parsed value.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="entityReference">Entity reference to lookup and return.</param>
+    /// <param name="entityMapping">Entity mapping table.</param>
     /// <returns></returns>
     void mapEntityReference(XMLValue &entityReference, XMLEntityMappings &entityMapping)
     {
@@ -244,11 +245,13 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse character value which can be either be a plain character
-    /// or character reference/entity string that maps to a string of
+    /// Parse character value which can be either be a plain character,
+    /// character reference or entity reference that maps to a string of
     /// characters.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
+    /// <param name="entityMapping">Entity mapping table.</param>
+    /// <param name="translateEntity">== true then translate entity reference</param>
     /// <returns>Character value.</returns>
     XMLValue parseCharacter(ISource &xmlSource, std::unordered_map<std::string, XMLEntityMapping> &entityMapping, bool translateEntity)
     {
@@ -282,9 +285,9 @@ namespace H4
         return (character);
     }
     /// <summary>
-    ///
+    /// Parse literal string value and return it.
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="xmlSource">XML source stream.</param>
     /// <returns></returns>
     XMLValue parseValue(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity)
     {

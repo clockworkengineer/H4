@@ -73,7 +73,8 @@ namespace H4
         parseDTD(dtdSource);
     }
     /// <summary>
-    ///
+    /// Validate XML against its DTD. Throwing an exception if there is a
+    /// issue and the XML is not well-formed.
     /// </summary>
     /// <returns></returns>
     void DTD::validate(XMLNodeElement &prolog)

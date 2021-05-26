@@ -1,7 +1,7 @@
 //
 // Class: DTD
 //
-// Description: Document Type Definition (DTD) parsing.
+// Description: Parse XML Document Type Definition (DTD).
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -41,20 +41,34 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    /// <summary>
+    /// Split a string into a vector of strings using the passed in delimeter.
+    /// </summary>
+    /// <param name="stringToSplit">String to split up.</param>
+    /// <param name="delimeter">Character delimeter to split on.</param>
+    /// <returns>Vector of split strings.</returns>
     std::vector<std::string> DTD::split(std::string stringToSplit, char delimeter)
     {
-        std::stringstream ss(stringToSplit);
-        std::string item;
-        std::vector<std::string> splittedStrings;
-        while (std::getline(ss, item, delimeter))
+        std::stringstream sourceStream(stringToSplit);
+        std::string splitOffItem;
+        std::vector<std::string> splitStrings;
+        while (std::getline(sourceStream, splitOffItem, delimeter))
         {
-            splittedStrings.push_back(item);
+            splitStrings.push_back(splitOffItem);
         }
-        return splittedStrings;
+        return splitStrings;
     }
-    void DTD::checkForEntityRecursion(const std::string &entityName, std::set<std::string> names)
+    /// <summary>
+    /// Take an entity reference string, check whether it contains any infinitely recursive 
+    /// definition and throw an exception if so. This is done by recurively parsing any entities
+    /// found in a entiity mapping and adding it to a current stack of used entities; throwing an
+    /// exception if it is already being used (recursive).
+    /// </summary>
+    /// <param name="entityReference">Entity reference to check.</param>
+    /// <param name="currentEntities">Set of currently active entities.</param>
+    void DTD::checkForEntityRecursion(const std::string &entityReference, std::set<std::string> currentEntities)
     {
-        BufferSource entitySource(entityName);
+        BufferSource entitySource(entityReference);
         while (entitySource.more())
         {
             if ((entitySource.current() == '&') || (entitySource.current() == '%'))
@@ -69,15 +83,15 @@ namespace H4
                 if (mappedEntityName[1] != '#')
                 {
                     mappedEntityName += entitySource.current();
-                    if (names.contains(mappedEntityName))
+                    if (currentEntities.contains(mappedEntityName))
                     {
                         throw XML::SyntaxError("Entity '" + mappedEntityName + "' contains recursive definition which is not allowed.");
                     }
                     if (!m_entityMapping[mappedEntityName].internal.empty())
                     {
-                        names.emplace(mappedEntityName);
-                        checkForEntityRecursion(m_entityMapping[mappedEntityName].internal, names);
-                        names.erase(mappedEntityName);
+                        currentEntities.emplace(mappedEntityName);
+                        checkForEntityRecursion(m_entityMapping[mappedEntityName].internal, currentEntities);
+                        currentEntities.erase(mappedEntityName);
                     }
                 }
             }
@@ -643,7 +657,7 @@ namespace H4
         return (result);
     }
     /// <summary>
-    /// Parse DTD DTD attribute type field.
+    /// Parse DTD attribute type field.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns>Attribute type as string (UTF-8 encoded).</returns>
@@ -665,7 +679,7 @@ namespace H4
         throw XML::SyntaxError(dtdSource, "Invalid attribute type specified.");
     }
     /// <summary>
-    /// Parse DTD DTD attribute value.
+    /// Parse DTD attribute value.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns>Attribute value as string (UTF-8 encoded).</returns>
@@ -698,7 +712,7 @@ namespace H4
         return (value);
     }
     /// <summary>
-    /// Parse DTD DTD element attribute list.
+    /// Parse DTD element attribute list.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
@@ -721,7 +735,7 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse DTD DTD notation.
+    /// Parse DTD notation.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
@@ -734,7 +748,7 @@ namespace H4
         dtdSource.ignoreWS();
     }
     /// <summary>
-    /// Parse DTD DTD entity.
+    /// Parse DTD entity.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
@@ -765,7 +779,7 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse an DTD DTD element.
+    /// Parse an DTD element.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
@@ -799,7 +813,7 @@ namespace H4
         dtdSource.ignoreWS();
     }
     /// <summary>
-    /// Parse m_externally defined DTD DTD.
+    /// Parse m_externally defined DTD.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
@@ -846,7 +860,7 @@ namespace H4
         dtdSource.ignoreWS();
     }
     /// <summary>
-    /// Parse internally defined DTD DTD.
+    /// Parse internally defined DTD.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
@@ -892,7 +906,7 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse DTD DTD.
+    /// Parse XML DTD.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
