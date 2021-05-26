@@ -306,4 +306,23 @@ namespace H4
         }
         throw XML::SyntaxError(xmlSource, "Invalid attribute value.");
     }
+    /// <summary>
+    /// Extract body of tag up until '>'.
+    /// </summary>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns>Body of tag.</returns>
+    std::string extractTagBody(ISource &xmlSource)
+    {
+        xmlSource.ignoreWS();
+        std::string body;
+        while (xmlSource.more() && xmlSource.current() != '>')
+        {
+            body += xmlSource.current_to_bytes();
+            xmlSource.next();
+        }
+        // body += xmlSource.current_to_bytes();
+        // xmlSource.next();
+        // xmlSource.ignoreWS();
+        return (body);
+    }
 } // namespace H4

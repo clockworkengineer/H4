@@ -59,7 +59,7 @@ namespace H4
         return splitStrings;
     }
     /// <summary>
-    /// Take an entity reference string, check whether it contains any infinitely recursive 
+    /// Take an entity reference string, check whether it contains any infinitely recursive
     /// definition and throw an exception if so. This is done by recurively parsing any entities
     /// found in a entiity mapping and adding it to a current stack of used entities; throwing an
     /// exception if it is already being used (recursive).
@@ -110,78 +110,44 @@ namespace H4
             std::string translated;
             if (dtdSource.match(U"<!ENTITY"))
             {
-                dtdSource.ignoreWS();
-                while (dtdSource.more() && dtdSource.current() != '>')
-                {
-                    dtdSource.next();
-                }
-                dtdSource.next();
-                dtdSource.ignoreWS();
+                extractTagBody(dtdSource);
             }
             else if (dtdSource.match(U"<!ELEMENT"))
             {
-                dtdSource.ignoreWS();
-                while (dtdSource.more() && dtdSource.current() != '>')
-                {
-                    translated += dtdSource.current_to_bytes();
-                    dtdSource.next();
-                }
-                translated += dtdSource.current_to_bytes();
-                dtdSource.next();
-                dtdSource.ignoreWS();
-                translated = parseTranslateParameterEntities(translated);
+                translated = parseTranslateParameterEntities(extractTagBody(dtdSource));
                 BufferSource dtdTranslatedSource(translated);
                 parseElement(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!ATTLIST"))
             {
-                dtdSource.ignoreWS();
-                while (dtdSource.more() && dtdSource.current() != '>')
-                {
-                    translated += dtdSource.current_to_bytes();
-                    dtdSource.next();
-                }
-                translated += dtdSource.current_to_bytes();
-                dtdSource.next();
-                dtdSource.ignoreWS();
-                translated = parseTranslateParameterEntities(translated);
+                translated = parseTranslateParameterEntities(extractTagBody(dtdSource));
                 BufferSource dtdTranslatedSource(translated);
                 parseAttributeList(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!NOTATION"))
             {
-                dtdSource.ignoreWS();
-                while (dtdSource.more() && dtdSource.current() != '>')
-                {
-                    translated += dtdSource.current_to_bytes();
-                    dtdSource.next();
-                }
-                translated += dtdSource.current_to_bytes();
-                dtdSource.next();
-                dtdSource.ignoreWS();
-                translated = parseTranslateParameterEntities(translated);
+                translated = parseTranslateParameterEntities(extractTagBody(dtdSource));
                 BufferSource dtdTranslatedSource(translated);
                 parseNotation(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!--"))
             {
-                dtdSource.ignoreWS();
-                while (dtdSource.more() && dtdSource.current() != '>')
-                {
-                    dtdSource.next();
-                }
-                dtdSource.next();
-                dtdSource.ignoreWS();
+                parseComment(dtdSource);
             }
             else if (dtdSource.match(U"%"))
             {
                 parseParameterEntity(dtdSource);
-                continue;
             }
             else
             {
                 throw XML::SyntaxError(dtdSource, "Invalid DTD tag.");
             }
+            if (dtdSource.current() != '>')
+            {
+                throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
+            }
+            dtdSource.next();
+            dtdSource.ignoreWS();
         }
     }
     /// <summary>
@@ -196,62 +162,37 @@ namespace H4
             if (dtdSource.match(U"<!ENTITY"))
             {
                 parseEntity(dtdSource);
-                while (dtdSource.more() && dtdSource.current() != '>')
-                {
-                    dtdSource.next();
-                }
-                dtdSource.next();
-                dtdSource.ignoreWS();
             }
             else if (dtdSource.match(U"<!ELEMENT"))
             {
-                dtdSource.ignoreWS();
-                while (dtdSource.more() && dtdSource.current() != '>')
-                {
-                    dtdSource.next();
-                }
-                dtdSource.next();
-                dtdSource.ignoreWS();
+                extractTagBody(dtdSource);
             }
             else if (dtdSource.match(U"<!ATTLIST"))
             {
-                dtdSource.ignoreWS();
-                while (dtdSource.more() && dtdSource.current() != '>')
-                {
-                    dtdSource.next();
-                }
-                dtdSource.next();
-                dtdSource.ignoreWS();
+                extractTagBody(dtdSource);
             }
             else if (dtdSource.match(U"<!NOTATION"))
             {
-                dtdSource.ignoreWS();
-                while (dtdSource.more() && dtdSource.current() != '>')
-                {
-                    dtdSource.next();
-                }
-                dtdSource.next();
-                dtdSource.ignoreWS();
+                extractTagBody(dtdSource);
             }
             else if (dtdSource.match(U"<!--"))
             {
-                dtdSource.ignoreWS();
-                while (dtdSource.more() && dtdSource.current() != '>')
-                {
-                    dtdSource.next();
-                }
-                dtdSource.next();
-                dtdSource.ignoreWS();
+                parseComment(dtdSource);
             }
             else if (dtdSource.match(U"%"))
             {
                 parseParameterEntity(dtdSource);
-                continue;
             }
             else
             {
                 throw XML::SyntaxError(dtdSource, "Invalid DTD tag.");
             }
+            if (dtdSource.current() != '>')
+            {
+                throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
+            }
+            dtdSource.next();
+            dtdSource.ignoreWS();
         }
     }
     /// <summary>
