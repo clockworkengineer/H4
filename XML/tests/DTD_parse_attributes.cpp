@@ -218,7 +218,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
                 "</queue>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 7 Column: 39] Invalid attribute type specified.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 7 Column: 39] Missing closing ')' on enumeration attribute type.");
   }
   SECTION("Parse XML with DTD that contains a enumeration with a default value not in enumeration.", "[XML][Parse][DTD][Error][Attributes]")
   {

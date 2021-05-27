@@ -73,6 +73,7 @@ namespace H4
         std::unordered_map<std::string, XMLExternalReference> m_notations;
         std::unordered_map<std::string, DTDElement> m_elements;
         long m_lineNumber = 1;
+
     private:
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
@@ -92,6 +93,7 @@ namespace H4
         void validateElements(XMLNodeDTD *dtd, XMLNode *xNodeRoot);
         bool validateIsPCDATA(XMLNodeElement *xNodeElement);
         bool validateIsEMPTY(XMLNodeElement *xNodeElement);
+        void validateAttribute(ISource &dtdSource, DTDAttribute xDTDAttribute);
         void parseParameterENTITIES(ISource &dtdSource);
         void parseTranslateParameterENTITIES(ISource &dtdSource);
         std::string parseTranslateParameterEntities(const std::string &parameterEntities);

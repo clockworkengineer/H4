@@ -41,6 +41,32 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
+    void DTD::validateAttribute(ISource &dtdSource, DTDAttribute xDTDAttribute)
+    {
+        if (xDTDAttribute.type == "ID" && xDTDAttribute.value.parsed.starts_with("#FIXED "))
+        {
+            throw XML::SyntaxError(dtdSource, "Attribute '" + xDTDAttribute.name + "' may not be of type ID and FIXED.");
+        }
+        else if (xDTDAttribute.type[0] == '(')
+        {
+            std::set<std::string> options;
+            for (auto &option : split(xDTDAttribute.type.substr(1, xDTDAttribute.type.size() - 2), '|'))
+            {
+                if (!options.contains(option))
+                {
+                    options.insert(option);
+                }
+                else
+                {
+                    throw XML::SyntaxError("Enumerator value '" + option + "' for attribute '" + xDTDAttribute.name + "' occurs more than once in its definition.");
+                }
+            }
+            if (!options.contains(xDTDAttribute.value.parsed))
+            {
+                throw XML::SyntaxError("Default value '" + xDTDAttribute.value.parsed + "' for enumeration attribute '" + xDTDAttribute.name + "' is invalid.");
+            }
+        }
+    }
     /// <summary>
     /// Split a string into a vector of strings using the passed in delimeter.
     /// </summary>
@@ -211,7 +237,7 @@ namespace H4
         }
         if (dtdSource.current() != ')')
         {
-            throw XML::SyntaxError(dtdSource, "Invalid attribute type specified.");
+            throw XML::SyntaxError(dtdSource, "Missing closing ')' on enumeration attribute type.");
         }
         attributeType += dtdSource.current();
         dtdSource.next();
@@ -254,49 +280,12 @@ namespace H4
     {
         for (auto &element : m_elements)
         {
-            if (element.second.content.parsed.empty())
-            {
-                try
-                {
-                    parseElementContentSpecification(element.second.content);
-                }
-                catch (XML::SyntaxError &e)
-                {
-                    if (e.what() == std::string("XML Syntax Error: Invalid content region specification."))
-                    {
-                        throw XML::SyntaxError("Invalid content region specification for element <" + element.second.name + ">.");
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-            }
             if (!element.second.attributes.empty())
             {
                 bool idAttributePresent = false;
                 for (auto &attribute : element.second.attributes)
                 {
-                    if (attribute.type[0] == '(')
-                    {
-                        std::set<std::string> options;
-                        for (auto &option : split(attribute.type.substr(1, attribute.type.size() - 2), '|'))
-                        {
-                            if (!options.contains(option))
-                            {
-                                options.insert(option);
-                            }
-                            else
-                            {
-                                throw XML::SyntaxError("Enumerator value '" + option + "' for attribute '" + attribute.name + "' occurs more than once in its definition.");
-                            }
-                        }
-                        if (!options.contains(attribute.value.parsed))
-                        {
-                            throw XML::SyntaxError("Default value '" + attribute.value.parsed + "' for enumeration attribute '" + attribute.name + "' is invalid.");
-                        }
-                    }
-                    else if (attribute.type == "ID")
+                    if (attribute.type == "ID")
                     {
                         if (idAttributePresent)
                         {
@@ -429,10 +418,7 @@ namespace H4
             xDTDAttribute.name = parseName(dtdSource);
             xDTDAttribute.type = parseAttributeType(dtdSource);
             xDTDAttribute.value = parseAttributeValue(dtdSource);
-            if (xDTDAttribute.type == "ID" && xDTDAttribute.value.parsed.starts_with("#FIXED "))
-            {
-                throw XML::SyntaxError(dtdSource, "Attribute '" + xDTDAttribute.name + "' may not be of type ID and FIXED.");
-            }
+            validateAttribute(dtdSource, xDTDAttribute);
             m_elements[elementName].attributes.emplace_back(xDTDAttribute);
             dtdSource.ignoreWS();
         }
@@ -509,6 +495,21 @@ namespace H4
             {
                 contentSpecification.unparsed += dtdSource.current();
                 dtdSource.next();
+            }
+            try
+            {
+                parseElementContentSpecification(contentSpecification);
+            }
+            catch (XML::SyntaxError &e)
+            {
+                if (e.what() == std::string("XML Syntax Error: Invalid content region specification."))
+                {
+                    throw XML::SyntaxError("Invalid content region specification for element <" + elementName + ">.");
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
         DTDElement element(elementName, contentSpecification);
