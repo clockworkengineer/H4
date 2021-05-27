@@ -41,11 +41,24 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    void DTD::validateAttribute(ISource &dtdSource, DTDAttribute xDTDAttribute)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void DTD::parseValidateAttribute(const std::string &elementName, DTDAttribute xDTDAttribute)
     {
         if (xDTDAttribute.type == "ID" && xDTDAttribute.value.parsed.starts_with("#FIXED "))
         {
-            throw XML::SyntaxError(dtdSource, "Attribute '" + xDTDAttribute.name + "' may not be of type ID and FIXED.");
+            throw XML::SyntaxError("Attribute '" + xDTDAttribute.name + "' may not be of type ID and FIXED.");
+        }
+        else if (xDTDAttribute.type == "ID")
+        {
+            if (m_elements[elementName].idAttributePresent)
+            {
+                throw XML::SyntaxError("Element <" + elementName + "> has more than one ID attribute.");
+            }
+            m_elements[elementName].idAttributePresent = true;
         }
         else if (xDTDAttribute.type[0] == '(')
         {
@@ -278,24 +291,6 @@ namespace H4
     /// <returns></returns>
     void DTD::parsePostProcessing()
     {
-        for (auto &element : m_elements)
-        {
-            if (!element.second.attributes.empty())
-            {
-                bool idAttributePresent = false;
-                for (auto &attribute : element.second.attributes)
-                {
-                    if (attribute.type == "ID")
-                    {
-                        if (idAttributePresent)
-                        {
-                            throw XML::SyntaxError("Element <" + element.second.name + "> has more than one ID attribute.");
-                        }
-                        idAttributePresent = true;
-                    }
-                }
-            }
-        }
         for (auto &entityName : m_entityMapping)
         {
             std::set<std::string> names{entityName.first};
@@ -318,7 +313,7 @@ namespace H4
         }
         else if (m_external.type == "PUBLIC")
         {
-            // Public m_external DTD currently not supported
+            // Public external DTD currently not supported
         }
     }
     /// <summary>
@@ -344,7 +339,7 @@ namespace H4
         }
         else
         {
-            throw XML::SyntaxError(dtdSource, "Invalid m_external DTD specifier.");
+            throw XML::SyntaxError(dtdSource, "Invalid external DTD specifier.");
         }
         return (result);
     }
@@ -404,7 +399,7 @@ namespace H4
         return (value);
     }
     /// <summary>
-    /// Parse DTD element attribute list.
+    /// Parse DTD attribute list.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
@@ -418,7 +413,7 @@ namespace H4
             xDTDAttribute.name = parseName(dtdSource);
             xDTDAttribute.type = parseAttributeType(dtdSource);
             xDTDAttribute.value = parseAttributeValue(dtdSource);
-            validateAttribute(dtdSource, xDTDAttribute);
+            parseValidateAttribute(elementName, xDTDAttribute);
             m_elements[elementName].attributes.emplace_back(xDTDAttribute);
             dtdSource.ignoreWS();
         }
@@ -512,8 +507,7 @@ namespace H4
                 }
             }
         }
-        DTDElement element(elementName, contentSpecification);
-        m_elements.emplace(std::pair(element.name, element));
+        m_elements.emplace(elementName, DTDElement(elementName, contentSpecification));
         dtdSource.ignoreWS();
     }
     /// <summary>
@@ -533,7 +527,7 @@ namespace H4
         dtdSource.ignoreWS();
     }
     /// <summary>
-    /// Parse DTD comment in DTD.
+    /// Parse DTD comment.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
@@ -545,7 +539,7 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse DTD parameter in DTD.
+    /// Parse DTD parameter entity.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>

@@ -45,6 +45,7 @@ namespace H4
             DTDElement() {}
             DTDElement(const std::string &name, const XMLValue &content) : name(name), content(content) {}
             std::string name;
+            bool idAttributePresent;
             XMLValue content;
             std::vector<DTDAttribute> attributes;
         };
@@ -93,7 +94,7 @@ namespace H4
         void validateElements(XMLNodeDTD *dtd, XMLNode *xNodeRoot);
         bool validateIsPCDATA(XMLNodeElement *xNodeElement);
         bool validateIsEMPTY(XMLNodeElement *xNodeElement);
-        void validateAttribute(ISource &dtdSource, DTDAttribute xDTDAttribute);
+        void parseValidateAttribute(const std::string &elementName, DTDAttribute xDTDAttribute);
         void parseParameterENTITIES(ISource &dtdSource);
         void parseTranslateParameterENTITIES(ISource &dtdSource);
         std::string parseTranslateParameterEntities(const std::string &parameterEntities);
