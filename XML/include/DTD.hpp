@@ -95,8 +95,8 @@ namespace H4
         bool validateIsPCDATA(XMLNodeElement *xNodeElement);
         bool validateIsEMPTY(XMLNodeElement *xNodeElement);
         void parseValidateAttribute(const std::string &elementName, DTDAttribute xDTDAttribute);
-        void parseParameterENTITIES(ISource &dtdSource);
-        void parseTranslateParameterENTITIES(ISource &dtdSource);
+        void parseParameterEntities(ISource &dtdSource);
+        void parseTranslateParameterEntities(ISource &dtdSource);
         std::string parseTranslateParameterEntities(const std::string &parameterEntities);
         std::string parseAttributeEnumerationType(ISource &xmlSource);
         bool parseIsChoiceOrSequence(ISource &contentSpecSource);
@@ -106,7 +106,7 @@ namespace H4
         void parseElementChildren(ISource &contentSpecSource, IDestination &contentSpec);
         void parseElementName(ISource &contentSpecSource, IDestination &contentSpec);
         void parseElementMixedContent(ISource &contentSpecSource, IDestination &contentSpec);
-        void parseElementContentSpecification(XMLValue &contentSpec);
+        void parseElementContentSpecification(const std::string &elementName, XMLValue &contentSpec);
         void parsePostProcessing();
         void parseExternalContents();
         void parseAttributeList(ISource &dtdSource);

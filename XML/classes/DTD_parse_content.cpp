@@ -39,7 +39,6 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-
     /// <summary>
     ///
     /// </summary>
@@ -249,30 +248,43 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::parseElementContentSpecification(XMLValue &contentSpec)
+    void DTD::parseElementContentSpecification(const std::string &elementName, XMLValue &contentSpec)
     {
-        BufferSource contentSpecSource(contentSpec.unparsed);
-        BufferDestination contentSpecDestination;
-        contentSpecSource.ignoreWS();
-        if (contentSpecSource.current() == '(')
+        try
         {
-            contentSpecSource.next();
+            BufferSource contentSpecSource(contentSpec.unparsed);
+            BufferDestination contentSpecDestination;
             contentSpecSource.ignoreWS();
-            if (contentSpecSource.match(U"#PCDATA"))
+            if (contentSpecSource.current() == '(')
             {
-                parseElementMixedContent(contentSpecSource, contentSpecDestination);
+                contentSpecSource.next();
+                contentSpecSource.ignoreWS();
+                if (contentSpecSource.match(U"#PCDATA"))
+                {
+                    parseElementMixedContent(contentSpecSource, contentSpecDestination);
+                }
+                else
+                {
+                    contentSpecSource.backup(contentSpecSource.position());
+                    parseElementChildren(contentSpecSource, contentSpecDestination);
+                }
             }
             else
             {
-                contentSpecSource.backup(contentSpecSource.position());
-                parseElementChildren(contentSpecSource, contentSpecDestination);
+                throw XML::SyntaxError("Invalid content region specification.");
+            }
+            contentSpec.parsed = contentSpecDestination.getBuffer();
+        }
+        catch (XML::SyntaxError &e)
+        {
+            if (e.what() == std::string("XML Syntax Error: Invalid content region specification."))
+            {
+                throw XML::SyntaxError("Invalid content region specification for element <" + elementName + ">.");
+            }
+            else
+            {
+                throw;
             }
         }
-        else
-        {
-            throw XML::SyntaxError("Invalid content region specification.");
-        }
-        contentSpec.parsed = contentSpecDestination.getBuffer();
     }
-
 } // namespace H4

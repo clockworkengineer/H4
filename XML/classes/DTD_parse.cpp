@@ -42,6 +42,23 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
+    /// Split a string into a vector of strings using the passed in delimeter.
+    /// </summary>
+    /// <param name="stringToSplit">String to split up.</param>
+    /// <param name="delimeter">Character delimeter to split on.</param>
+    /// <returns>Vector of split strings.</returns>
+    std::vector<std::string> DTD::split(std::string stringToSplit, char delimeter)
+    {
+        std::stringstream sourceStream(stringToSplit);
+        std::string splitOffItem;
+        std::vector<std::string> splitStrings;
+        while (std::getline(sourceStream, splitOffItem, delimeter))
+        {
+            splitStrings.push_back(splitOffItem);
+        }
+        return splitStrings;
+    }
+    /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
@@ -79,23 +96,6 @@ namespace H4
                 throw XML::SyntaxError("Default value '" + xDTDAttribute.value.parsed + "' for enumeration attribute '" + xDTDAttribute.name + "' is invalid.");
             }
         }
-    }
-    /// <summary>
-    /// Split a string into a vector of strings using the passed in delimeter.
-    /// </summary>
-    /// <param name="stringToSplit">String to split up.</param>
-    /// <param name="delimeter">Character delimeter to split on.</param>
-    /// <returns>Vector of split strings.</returns>
-    std::vector<std::string> DTD::split(std::string stringToSplit, char delimeter)
-    {
-        std::stringstream sourceStream(stringToSplit);
-        std::string splitOffItem;
-        std::vector<std::string> splitStrings;
-        while (std::getline(sourceStream, splitOffItem, delimeter))
-        {
-            splitStrings.push_back(splitOffItem);
-        }
-        return splitStrings;
     }
     /// <summary>
     /// Take an entity reference string, check whether it contains any infinitely recursive
@@ -142,7 +142,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::parseTranslateParameterENTITIES(ISource &dtdSource)
+    void DTD::parseTranslateParameterEntities(ISource &dtdSource)
     {
         while (dtdSource.more())
         {
@@ -172,6 +172,7 @@ namespace H4
             else if (dtdSource.match(U"%"))
             {
                 parseParameterEntity(dtdSource);
+                continue;
             }
             else
             {
@@ -190,7 +191,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::parseParameterENTITIES(ISource &dtdSource)
+    void DTD::parseParameterEntities(ISource &dtdSource)
     {
         while (dtdSource.more())
         {
@@ -198,25 +199,17 @@ namespace H4
             {
                 parseEntity(dtdSource);
             }
-            else if (dtdSource.match(U"<!ELEMENT"))
-            {
-                extractTagBody(dtdSource);
-            }
-            else if (dtdSource.match(U"<!ATTLIST"))
-            {
-                extractTagBody(dtdSource);
-            }
-            else if (dtdSource.match(U"<!NOTATION"))
-            {
-                extractTagBody(dtdSource);
-            }
-            else if (dtdSource.match(U"<!--"))
-            {
-                parseComment(dtdSource);
-            }
             else if (dtdSource.match(U"%"))
             {
                 parseParameterEntity(dtdSource);
+                continue;
+            }
+            else if (dtdSource.match(U"<!ELEMENT") ||
+                     dtdSource.match(U"<!ATTLIST") ||
+                     dtdSource.match(U"<!NOTATION") ||
+                     dtdSource.match(U"<!--"))
+            {
+                extractTagBody(dtdSource);
             }
             else
             {
@@ -237,25 +230,25 @@ namespace H4
     /// <returns></returns>
     std::string DTD::parseAttributeEnumerationType(ISource &dtdSource)
     {
-        std::string attributeType(1, dtdSource.current());
+        std::string enumerationType(1, dtdSource.current());
         dtdSource.next();
         dtdSource.ignoreWS();
-        attributeType += parseName(dtdSource);
+        enumerationType += parseName(dtdSource);
         while (dtdSource.more() && dtdSource.current() == '|')
         {
-            attributeType += dtdSource.current();
+            enumerationType += dtdSource.current();
             dtdSource.next();
             dtdSource.ignoreWS();
-            attributeType += parseName(dtdSource);
+            enumerationType += parseName(dtdSource);
         }
         if (dtdSource.current() != ')')
         {
             throw XML::SyntaxError(dtdSource, "Missing closing ')' on enumeration attribute type.");
         }
-        attributeType += dtdSource.current();
+        enumerationType += dtdSource.current();
         dtdSource.next();
         dtdSource.ignoreWS();
-        return (attributeType);
+        return (enumerationType);
     }
     /// <summary>
     ///
@@ -307,9 +300,9 @@ namespace H4
         if (m_external.type == "SYSTEM")
         {
             FileSource dtdFilePass1(m_external.systemID);
-            parseParameterENTITIES(dtdFilePass1);
+            parseParameterEntities(dtdFilePass1);
             FileSource dtdFilePass2(m_external.systemID);
-            parseTranslateParameterENTITIES(dtdFilePass2);
+            parseTranslateParameterEntities(dtdFilePass2);
         }
         else if (m_external.type == "PUBLIC")
         {
@@ -409,12 +402,12 @@ namespace H4
         std::string elementName = parseName(dtdSource);
         while (dtdSource.more() && validNameStartChar(dtdSource.current()))
         {
-            DTDAttribute xDTDAttribute;
-            xDTDAttribute.name = parseName(dtdSource);
-            xDTDAttribute.type = parseAttributeType(dtdSource);
-            xDTDAttribute.value = parseAttributeValue(dtdSource);
-            parseValidateAttribute(elementName, xDTDAttribute);
-            m_elements[elementName].attributes.emplace_back(xDTDAttribute);
+            DTDAttribute dtdAttribute;
+            dtdAttribute.name = parseName(dtdSource);
+            dtdAttribute.type = parseAttributeType(dtdSource);
+            dtdAttribute.value = parseAttributeValue(dtdSource);
+            parseValidateAttribute(elementName, dtdAttribute);
+            m_elements[elementName].attributes.emplace_back(dtdAttribute);
             dtdSource.ignoreWS();
         }
     }
@@ -491,21 +484,7 @@ namespace H4
                 contentSpecification.unparsed += dtdSource.current();
                 dtdSource.next();
             }
-            try
-            {
-                parseElementContentSpecification(contentSpecification);
-            }
-            catch (XML::SyntaxError &e)
-            {
-                if (e.what() == std::string("XML Syntax Error: Invalid content region specification."))
-                {
-                    throw XML::SyntaxError("Invalid content region specification for element <" + elementName + ">.");
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            parseElementContentSpecification(elementName, contentSpecification);
         }
         m_elements.emplace(elementName, DTDElement(elementName, contentSpecification));
         dtdSource.ignoreWS();
