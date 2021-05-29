@@ -42,6 +42,17 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns
+    void DTD::parseConditional(ISource &dtdSource)
+    {
+        while(dtdSource.more() && !dtdSource.match(U"]]")) {
+            dtdSource.next();
+        }
+    }
+    /// <summary>
     /// Split a string into a vector of strings using the passed in delimeter.
     /// </summary>
     /// <param name="stringToSplit">String to split up.</param>
@@ -174,6 +185,10 @@ namespace H4
                 parseParameterEntity(dtdSource);
                 continue;
             }
+            else if (dtdSource.match(U"<!["))
+            {
+                parseConditional(dtdSource);
+            }
             else
             {
                 throw XML::SyntaxError(dtdSource, "Invalid DTD tag.");
@@ -203,6 +218,10 @@ namespace H4
             {
                 parseParameterEntity(dtdSource);
                 continue;
+            }
+            else if (dtdSource.match(U"<!["))
+            {
+                parseConditional(dtdSource);
             }
             else if (dtdSource.match(U"<!ELEMENT") ||
                      dtdSource.match(U"<!ATTLIST") ||

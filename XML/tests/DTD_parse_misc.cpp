@@ -59,7 +59,6 @@ TEST_CASE("Parse XML with DTD both internal/external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-
   SECTION("XML with external DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
   {
     xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report02.dtd\">"
@@ -268,20 +267,30 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <format>.");
   }
 }
-// TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][Conditional]")
-// {
-//   std::string xmlString;
-//   SECTION("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][Conditional]")
-//   {
-//     xmlString = "<?xml version=\"1.0\"?>\n"
-//                 "<!DOCTYPE root SYSTEM \"./testData/conditional01.dtd\"\n"
-//                 "]>\n"
-//                 "<root>\n"
-//                 "&enity;"
-//                 "</root>";
-//     BufferSource xmlSource(xmlString);
-//     XML xml(xmlSource);
-//     REQUIRE_THROWS_WITH(xml.parse(), "");
-//     REQUIRE_NOTHROW(xml.parse());
-//   }
-// }
+TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][Conditional]")
+{
+  std::string xmlString;
+  SECTION("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional001.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+  }
+  // SECTION("XML with a DTD with INCLUDE containing an entity.", "[XML][Parse][DTD][Conditional]")
+  // {
+  //   xmlString = "<?xml version=\"1.0\"?>\n"
+  //               "<!DOCTYPE root SYSTEM \"./testData/conditional001.dtd\">\n"
+  //               "<root>\n"
+  //               "</root>";
+  //   BufferSource xmlSource(xmlString);
+  //   XML xml(xmlSource);
+  //   REQUIRE_NOTHROW(xml.parse());
+  //   REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
+  //   REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
+  //   REQUIRE(xml.getEntity("&example;").internal == "Jo Doe");
+  // }
+}
