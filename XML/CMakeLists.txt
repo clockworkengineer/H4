@@ -25,8 +25,9 @@ set (XML_SOURCES
     ./classes/XML_core.cpp
     ./classes/DTD.cpp
     ./classes/DTD_parse.cpp
-    ./classes/DTD_validate.cpp
     ./classes/DTD_parse_content.cpp
+    ./classes/DTD_parse_external.cpp
+    ./classes/DTD_validate.cpp
 )
  
 set (XML_INCLUDES

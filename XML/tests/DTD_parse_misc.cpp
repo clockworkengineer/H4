@@ -280,17 +280,17 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  // SECTION("XML with a DTD with INCLUDE containing an entity.", "[XML][Parse][DTD][Conditional]")
-  // {
-  //   xmlString = "<?xml version=\"1.0\"?>\n"
-  //               "<!DOCTYPE root SYSTEM \"./testData/conditional001.dtd\">\n"
-  //               "<root>\n"
-  //               "</root>";
-  //   BufferSource xmlSource(xmlString);
-  //   XML xml(xmlSource);
-  //   REQUIRE_NOTHROW(xml.parse());
-  //   REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
-  //   REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
-  //   REQUIRE(xml.getEntity("&example;").internal == "Jo Doe");
-  // }
+  SECTION("XML with a DTD with INCLUDE containing an entity.", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional001.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(xml.getEntity("&example;").internal == "Jo Doe");
+  }
 }
