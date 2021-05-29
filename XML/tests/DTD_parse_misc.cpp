@@ -268,3 +268,20 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <format>.");
   }
 }
+// TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][Conditional]")
+// {
+//   std::string xmlString;
+//   SECTION("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][Conditional]")
+//   {
+//     xmlString = "<?xml version=\"1.0\"?>\n"
+//                 "<!DOCTYPE root SYSTEM \"./testData/conditional01.dtd\"\n"
+//                 "]>\n"
+//                 "<root>\n"
+//                 "&enity;"
+//                 "</root>";
+//     BufferSource xmlSource(xmlString);
+//     XML xml(xmlSource);
+//     REQUIRE_THROWS_WITH(xml.parse(), "");
+//     REQUIRE_NOTHROW(xml.parse());
+//   }
+// }
