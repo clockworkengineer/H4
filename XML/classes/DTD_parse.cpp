@@ -153,13 +153,13 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::parseTranslateParameterEntities(ISource &dtdSource)
+    void DTD::parseExternalContent(ISource &dtdSource)
     {
         while (dtdSource.more())
         {
             if (dtdSource.match(U"<!ENTITY"))
             {
-                extractTagBody(dtdSource);
+                parseEntity(dtdSource);
             }
             else if (dtdSource.match(U"<!ELEMENT"))
             {
@@ -188,47 +188,6 @@ namespace H4
             else if (dtdSource.match(U"<!["))
             {
                 parseConditional(dtdSource);
-            }
-            else
-            {
-                throw XML::SyntaxError(dtdSource, "Invalid DTD tag.");
-            }
-            if (dtdSource.current() != '>')
-            {
-                throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
-            }
-            dtdSource.next();
-            dtdSource.ignoreWS();
-        }
-    }
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
-    void DTD::parseParameterEntities(ISource &dtdSource)
-    {
-        while (dtdSource.more())
-        {
-            if (dtdSource.match(U"<!ENTITY"))
-            {
-                parseEntity(dtdSource);
-            }
-            else if (dtdSource.match(U"%"))
-            {
-                parseParameterEntity(dtdSource);
-                continue;
-            }
-            else if (dtdSource.match(U"<!["))
-            {
-                parseConditional(dtdSource);
-            }
-            else if (dtdSource.match(U"<!ELEMENT") ||
-                     dtdSource.match(U"<!ATTLIST") ||
-                     dtdSource.match(U"<!NOTATION") ||
-                     dtdSource.match(U"<!--"))
-            {
-                extractTagBody(dtdSource);
             }
             else
             {
@@ -314,14 +273,12 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::parseExternalContents()
+    void DTD::parseExternalRefenceContent()
     {
         if (m_external.type == "SYSTEM")
         {
             FileSource dtdFile(m_external.systemID);
-            parseParameterEntities(dtdFile);
-            dtdFile.reset();
-            parseTranslateParameterEntities(dtdFile);
+            parseExternalContent(dtdFile);
         }
         else if (m_external.type == "PUBLIC")
         {
@@ -442,7 +399,7 @@ namespace H4
         std::string name = parseName(dtdSource);
         m_notations[name] = parseExternalReference(dtdSource);
         dtdSource.ignoreWS();
-    }
+    } 
     /// <summary>
     /// Parse DTD entity.
     /// </summary>
@@ -516,7 +473,7 @@ namespace H4
     void DTD::parseExternal(ISource &dtdSource)
     {
         m_external = parseExternalReference(dtdSource);
-        parseExternalContents();
+        parseExternalRefenceContent();
         if (dtdSource.current() != '>')
         {
             throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");

@@ -1,7 +1,7 @@
+<!ENTITY % area "name, street, pincode, city">
+<!ENTITY % contact "phone">
 <!ELEMENT REPORT (residence|apartment|office|shop)*>
 <!ELEMENT residence (%area;, %contact;)>
 <!ELEMENT apartment (%area;, %contact;)>
 <!ELEMENT office (%area;, %contact;)>
 <!ELEMENT shop (%area;, %contact;)>
-<!ENTITY % area "name, street, pincode, city">
-<!ENTITY % contact "phone">

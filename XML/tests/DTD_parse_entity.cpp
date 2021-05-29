@@ -224,7 +224,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
   }
   SECTION("XML with external DTD with parameter entities to parse.", "[XML][Parse][DTD][Entity]")
   {
-    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report.dtd\">\n"
+    xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report01.dtd\">\n"
                 "<REPORT></REPORT>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);

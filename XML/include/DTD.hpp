@@ -97,7 +97,7 @@ namespace H4
             void parseConditional(ISource &dtdSource);
         void parseValidateAttribute(const std::string &elementName, DTDAttribute xDTDAttribute);
         void parseParameterEntities(ISource &dtdSource);
-        void parseTranslateParameterEntities(ISource &dtdSource);
+        void parseExternalContent(ISource &dtdSource);
         std::string parseTranslateParameterEntities(const std::string &parameterEntities);
         std::string parseAttributeEnumerationType(ISource &xmlSource);
         bool parseIsChoiceOrSequence(ISource &contentSpecSource);
@@ -109,7 +109,7 @@ namespace H4
         void parseElementMixedContent(ISource &contentSpecSource, IDestination &contentSpec);
         void parseElementContentSpecification(const std::string &elementName, XMLValue &contentSpec);
         void parsePostProcessing();
-        void parseExternalContents();
+        void parseExternalRefenceContent();
         void parseAttributeList(ISource &dtdSource);
         void parseNotation(ISource &dtdSource);
         void parseEntity(ISource &dtdSource);
