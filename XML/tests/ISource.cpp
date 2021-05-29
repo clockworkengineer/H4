@@ -425,4 +425,40 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
         REQUIRE(xmlSource.getRange(start, xmlSource.position()) == "1    Match2");
         REQUIRE(xmlSource.position() == 22);
     }
+
+    SECTION("Check that BufferSource reset() works correctly.", "[XML][Parse][BufferSource]")
+    {
+        xmlString = "<root>Match1    Match2 2hctam        MMAATTCCHHHH4 &</root>";
+        BufferSource xmlSource(xmlString);
+        while (xmlSource.more() && !xmlSource.match(U"Match"))
+        {
+            xmlSource.next();
+        }
+        REQUIRE(xmlSource.position() == 11);
+        xmlSource.reset();
+        REQUIRE(xmlSource.position() == 0);
+        while (xmlSource.more() && !xmlSource.match(U"Match"))
+        {
+            xmlSource.next();
+        }
+        REQUIRE(xmlSource.position() == 11);
+    }
+    SECTION("Check that FileSource reset() works correctly.", "[XML][Parse][FileSource]")
+    {
+        xmlString = "<root>Match1    Match2 2hctam        MMAATTCCHHHH4 &</root>";
+        writeXMLToFileUTF8(kGeneratedXMLFile, xmlString);
+        FileSource xmlSource(kGeneratedXMLFile);
+        while (xmlSource.more() && !xmlSource.match(U"Match"))
+        {
+            xmlSource.next();
+        }
+        REQUIRE(xmlSource.position() == 11);
+        xmlSource.reset();
+        REQUIRE(xmlSource.position() == 0);
+        while (xmlSource.more() && !xmlSource.match(U"Match"))
+        {
+            xmlSource.next();
+        }
+        REQUIRE(xmlSource.position() == 11);
+    }
 }

@@ -318,10 +318,10 @@ namespace H4
     {
         if (m_external.type == "SYSTEM")
         {
-            FileSource dtdFilePass1(m_external.systemID);
-            parseParameterEntities(dtdFilePass1);
-            FileSource dtdFilePass2(m_external.systemID);
-            parseTranslateParameterEntities(dtdFilePass2);
+            FileSource dtdFile(m_external.systemID);
+            parseParameterEntities(dtdFile);
+            dtdFile.reset();
+            parseTranslateParameterEntities(dtdFile);
         }
         else if (m_external.type == "PUBLIC")
         {

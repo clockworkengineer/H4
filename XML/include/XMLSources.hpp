@@ -84,6 +84,13 @@ namespace H4
         {
             return (m_UTF8.to_bytes(m_parseBuffer.substr(start, end - start)));
         }
+        void reset()
+        {
+            m_lineNo = 1;
+            m_column = 1;
+            m_bufferPosition = 0;
+        }
+
     private:
         void convertCRLFToLF(XMLString &xmlString)
         {
@@ -162,6 +169,13 @@ namespace H4
         {
             return (m_source.tellg());
         }
+        void reset()
+        {
+            m_lineNo = 1;
+            m_column = 1;
+            m_source.clear();
+            m_source.seekg(0, std::ios_base::beg);
+        }
         std::string getRange(long start, long end)
         {
             std::string rangeBuffer(end - start, ' ');
@@ -171,6 +185,7 @@ namespace H4
             m_source.seekg(currentPosition, std::ios_base::beg);
             return (rangeBuffer);
         }
+
     private:
         std::ifstream m_source;
     };
