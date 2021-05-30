@@ -1,0 +1,8 @@
+<![ INCUDE [
+<!--The declarations you want to include-->
+<!ENTITY example "Joe Smith">
+]]>
+<![ IGNORE [
+<!--The declarations you want to ignore-->
+<!ENTITY example "Not Joe Smith">
+]]>

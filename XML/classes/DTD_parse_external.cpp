@@ -46,9 +46,56 @@ namespace H4
     /// <returns></returns
     void DTD::parseConditional(ISource &dtdSource)
     {
-        while(dtdSource.more() && !dtdSource.match(U"]]")) {
+        dtdSource.ignoreWS();
+        if (dtdSource.match(U"INCLUDE"))
+        {
+            dtdSource.ignoreWS();
+            if (dtdSource.current() != '[')
+            {
+                throw XML::SyntaxError(dtdSource, "Missing opening '[' from conditional.");
+            }
             dtdSource.next();
+            dtdSource.ignoreWS();
+            std::string conditionalDTD;
+            while (dtdSource.more() && !dtdSource.match(U"]]"))
+            {
+                if (dtdSource.match(U"<!["))
+                {
+                    parseConditional(dtdSource);
+                }
+                else
+                {
+                    conditionalDTD += dtdSource.current();
+                    dtdSource.next();
+                }
+            }
+            BufferSource conditionalDTDSource(conditionalDTD);
+            parseExternalContent(conditionalDTDSource);
         }
+        else if (dtdSource.match(U"IGNORE"))
+        {
+            while (dtdSource.more() && !dtdSource.match(U"]]"))
+            {
+                if (dtdSource.match(U"<!["))
+                {
+                    parseConditional(dtdSource);
+                }
+                else
+                {
+                    dtdSource.next();
+                }
+            }
+        }
+        else
+        {
+            throw XML::SyntaxError(dtdSource, "Conditional value not INCLUDE or IGNORE.");
+        }
+        if (dtdSource.current() != '>')
+        {
+            throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
+        }
+        dtdSource.next();
+        dtdSource.ignoreWS();
     }
     /// <summary>
     ///
@@ -90,6 +137,7 @@ namespace H4
             else if (dtdSource.match(U"<!["))
             {
                 parseConditional(dtdSource);
+                continue;
             }
             else
             {

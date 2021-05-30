@@ -280,7 +280,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("XML with a DTD with INCLUDE containing an entity.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with conditioanl INCLUDE containing an entity.", "[XML][Parse][DTD][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional001.dtd\">\n"
@@ -289,8 +289,26 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
-    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
-    REQUIRE(xml.getEntity("&example;").internal == "Jo Doe");
+    REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
+  }
+  SECTION("XML with a DTD with invalid conditional value.", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional002.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 19] Conditional value not INCLUDE or IGNORE.");
+  }
+  SECTION("XML with a DTD with missing opening '[' from conditional.", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional003.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 23] Missing opening '[' from conditional.");
   }
 }
