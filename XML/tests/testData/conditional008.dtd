@@ -1,0 +1,7 @@
+<![ INCLUDE [
+<!--The declarations you want to include-->
+<![ IGNORE [
+<!ENTITY example "Joe Smith">
+]]>
+<!ENTITY example1 "Joe Smith 1">
+]]>

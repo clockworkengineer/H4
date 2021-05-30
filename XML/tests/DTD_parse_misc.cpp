@@ -311,7 +311,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 23] Missing opening '[' from conditional.");
   }
-  SECTION("XML with a DTD with conditional entity refence value (INCLUDE) containing an entity.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with conditional controlled with a entity refence value (INCLUDE) containing an entity definition.", "[XML][Parse][DTD][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional004.dtd\">\n"
@@ -322,7 +322,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE_NOTHROW(xml.parse());
     REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
   }
-  SECTION("XML with a DTD with conditional entity refence value (IGNORE) containing an entity.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with conditional controlled entity refence value (IGNORE) containing an entity definition.", "[XML][Parse][DTD][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional005.dtd\">\n"
@@ -331,6 +331,53 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(xml.getEntity("&example;").internal == "");
+  }
+  SECTION("XML with a DTD with nested conditionals that are both INCLUDE.", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional006.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
+  }
+  SECTION("XML with a DTD with nested conditionals that are both INCLUDE and two entities.", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional007.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
+    REQUIRE(xml.getEntity("&example1;").internal == "Joe Smith 1");
+  }
+  SECTION("XML with a DTD with nested conditionals that are  outter INCLUDE inner IGNORE plus two entities.", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional008.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(xml.getEntity("&example;").internal == "");
+    REQUIRE(xml.getEntity("&example1;").internal == "Joe Smith 1");
+  }
+  SECTION("XML with a DTD with nested conditionals that are  outter IGNORE inner INCLUDE plus two entities.", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional009.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(xml.getEntity("&example1;").internal == "");
     REQUIRE(xml.getEntity("&example;").internal == "");
   }
 }

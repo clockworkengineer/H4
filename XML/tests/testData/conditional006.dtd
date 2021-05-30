@@ -1,0 +1,6 @@
+<![ INCLUDE [
+<!--The declarations you want to include-->
+<![ INCLUDE [
+<!ENTITY example "Joe Smith">
+]]>
+]]>

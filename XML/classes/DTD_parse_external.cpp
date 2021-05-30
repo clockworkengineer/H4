@@ -44,7 +44,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns
-    void DTD::parseConditional(ISource &dtdSource)
+    void DTD::parseConditional(ISource &dtdSource, bool /* includeOn*/)
     {
         dtdSource.ignoreWS();
         std::string conditionalValue;
@@ -94,7 +94,7 @@ namespace H4
             {
                 if (dtdSource.match(U"<!["))
                 {
-                    parseConditional(dtdSource);
+                    parseConditional(dtdSource, false);
                 }
                 else
                 {
