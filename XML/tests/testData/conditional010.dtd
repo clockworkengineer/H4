@@ -1,0 +1,7 @@
+<![ %debug; [
+<!--The declarations you want to include-->
+<![ %debug; [
+<!ENTITY example "Joe Smith">
+]]>
+<!ENTITY example1 "Joe Smith 1">
+]]>

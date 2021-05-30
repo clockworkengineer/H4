@@ -264,7 +264,7 @@ namespace H4
         std::string name = parseName(dtdSource);
         m_notations[name] = parseExternalReference(dtdSource);
         dtdSource.ignoreWS();
-    } 
+    }
     /// <summary>
     /// Parse DTD entity.
     /// </summary>
@@ -420,15 +420,26 @@ namespace H4
         long start = dtdSource.position();
         dtdSource.ignoreWS();
         m_name = parseName(dtdSource);
-        // TODO: External needs to be parsed after any internal that is there as
-        // both can be used in an DTD file.
+        if (dtdSource.current() != '[')
+        {
+            m_external = parseExternalReference(dtdSource);
+        }
         if (dtdSource.current() == '[')
         {
             dtdSource.next();
             dtdSource.ignoreWS();
             parseInternal(dtdSource);
         }
+        else if (dtdSource.current() != '>')
+        {
+            throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
+        }
         else
+        {
+            dtdSource.next();
+            dtdSource.ignoreWS();
+        }
+        if (!m_external.type.empty())
         {
             parseExternal(dtdSource);
         }

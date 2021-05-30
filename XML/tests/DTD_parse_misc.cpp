@@ -380,4 +380,48 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE(xml.getEntity("&example1;").internal == "");
     REQUIRE(xml.getEntity("&example;").internal == "");
   }
+  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (switch on).", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional010.dtd\" [ <!ENTITY % debug \"INCLUDE\"> ]>\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
+    REQUIRE(xml.getEntity("&example1;").internal == "Joe Smith 1");
+  }
+  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (switch off).", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional010.dtd\" [ <!ENTITY % debug \"IGNORE\"> ]>\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(xml.getEntity("&example;").internal == "");
+    REQUIRE(xml.getEntity("&example1;").internal == "");
+  }
+  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (invalid value).", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional010.dtd\" [ <!ENTITY % debug \"IGNOE\"> ]>\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 23] Conditional value not INCLUDE or IGNORE.");
+  }
+  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (novalue).", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional010.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 23] Conditional value not INCLUDE or IGNORE.");
+  }
 }

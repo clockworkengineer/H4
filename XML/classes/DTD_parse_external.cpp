@@ -47,7 +47,7 @@ namespace H4
     void DTD::parseConditional(ISource &dtdSource, bool includeOn)
     {
         dtdSource.ignoreWS();
-        std::string conditionalValue="";
+        std::string conditionalValue = "";
         if (includeOn)
         {
             if (dtdSource.current() == '%')
@@ -65,8 +65,10 @@ namespace H4
             {
                 conditionalValue = "IGNORE";
             }
-        } else {
-            conditionalValue="IGNORE";
+        }
+        else
+        {
+            conditionalValue = "IGNORE";
         }
         if (conditionalValue == "INCLUDE")
         {
@@ -248,15 +250,15 @@ namespace H4
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
-    void DTD::parseExternal(ISource &dtdSource)
+    void DTD::parseExternal(ISource &/*dtdSource*/)
     {
-        m_external = parseExternalReference(dtdSource);
+        // m_external = parseExternalReference(dtdSource);
         parseExternalRefenceContent();
-        if (dtdSource.current() != '>')
-        {
-            throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
-        }
-        dtdSource.next();
-        dtdSource.ignoreWS();
+        // // if (dtdSource.current() != '>')
+        // // {
+        // //     throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
+        // // }
+        // dtdSource.next();
+        // dtdSource.ignoreWS();
     }
 } // namespace H4
