@@ -44,24 +44,29 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns
-    void DTD::parseConditional(ISource &dtdSource, bool /* includeOn*/)
+    void DTD::parseConditional(ISource &dtdSource, bool includeOn)
     {
         dtdSource.ignoreWS();
-        std::string conditionalValue;
-        if (dtdSource.current() == '%')
+        std::string conditionalValue="";
+        if (includeOn)
         {
-            XMLValue entityRerence = parseEntityReference(dtdSource);
-            dtdSource.ignoreWS();
-            mapEntityReference(entityRerence, m_entityMapping);
-            conditionalValue = entityRerence.parsed;
-        }
-        else if (dtdSource.match(U"INCLUDE"))
-        {
-            conditionalValue = "INCLUDE";
-        }
-        else if (dtdSource.match(U"IGNORE"))
-        {
-            conditionalValue = "IGNORE";
+            if (dtdSource.current() == '%')
+            {
+                XMLValue entityRerence = parseEntityReference(dtdSource);
+                dtdSource.ignoreWS();
+                mapEntityReference(entityRerence, m_entityMapping);
+                conditionalValue = entityRerence.parsed;
+            }
+            else if (dtdSource.match(U"INCLUDE"))
+            {
+                conditionalValue = "INCLUDE";
+            }
+            else if (dtdSource.match(U"IGNORE"))
+            {
+                conditionalValue = "IGNORE";
+            }
+        } else {
+            conditionalValue="IGNORE";
         }
         if (conditionalValue == "INCLUDE")
         {
