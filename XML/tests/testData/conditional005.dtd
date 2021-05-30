@@ -1,0 +1,5 @@
+<!ENTITY % debug "IGNORE">
+<![ %debug; [
+<!--The declarations you want to include-->
+<!ENTITY example "Joe Smith">
+]]>

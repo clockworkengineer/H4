@@ -311,4 +311,26 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 23] Missing opening '[' from conditional.");
   }
+  SECTION("XML with a DTD with conditional entity refence value (INCLUDE) containing an entity.", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional004.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
+  }
+  SECTION("XML with a DTD with conditional entity refence value (IGNORE) containing an entity.", "[XML][Parse][DTD][Conditional]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE root SYSTEM \"./testData/conditional005.dtd\">\n"
+                "<root>\n"
+                "</root>";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(xml.getEntity("&example;").internal == "");
+  }
 }

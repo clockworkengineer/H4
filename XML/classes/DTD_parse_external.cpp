@@ -47,7 +47,23 @@ namespace H4
     void DTD::parseConditional(ISource &dtdSource)
     {
         dtdSource.ignoreWS();
-        if (dtdSource.match(U"INCLUDE"))
+        std::string conditionalValue;
+        if (dtdSource.current() == '%')
+        {
+            XMLValue entityRerence = parseEntityReference(dtdSource);
+            dtdSource.ignoreWS();
+            mapEntityReference(entityRerence, m_entityMapping);
+            conditionalValue = entityRerence.parsed;
+        }
+        else if (dtdSource.match(U"INCLUDE"))
+        {
+            conditionalValue = "INCLUDE";
+        }
+        else if (dtdSource.match(U"IGNORE"))
+        {
+            conditionalValue = "IGNORE";
+        }
+        if (conditionalValue == "INCLUDE")
         {
             dtdSource.ignoreWS();
             if (dtdSource.current() != '[')
@@ -72,7 +88,7 @@ namespace H4
             BufferSource conditionalDTDSource(conditionalDTD);
             parseExternalContent(conditionalDTDSource);
         }
-        else if (dtdSource.match(U"IGNORE"))
+        else if (conditionalValue == "IGNORE")
         {
             while (dtdSource.more() && !dtdSource.match(U"]]"))
             {
