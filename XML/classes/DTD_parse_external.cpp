@@ -135,17 +135,17 @@ namespace H4
             }
             else if (dtdSource.match(U"<!ELEMENT"))
             {
-                BufferSource dtdTranslatedSource(parseTranslateParameterEntities(extractTagBody(dtdSource)));
+                BufferSource dtdTranslatedSource(translateEntities(extractTagBody(dtdSource),m_entityMapping));
                 parseElement(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!ATTLIST"))
             {
-                BufferSource dtdTranslatedSource(parseTranslateParameterEntities(extractTagBody(dtdSource)));
+                BufferSource dtdTranslatedSource(translateEntities(extractTagBody(dtdSource), m_entityMapping));
                 parseAttributeList(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!NOTATION"))
             {
-                BufferSource dtdTranslatedSource(parseTranslateParameterEntities(extractTagBody(dtdSource)));
+                BufferSource dtdTranslatedSource(translateEntities(extractTagBody(dtdSource), m_entityMapping));
                 parseNotation(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!--"))
@@ -173,33 +173,6 @@ namespace H4
             dtdSource.next();
             dtdSource.ignoreWS();
         }
-    }
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
-    std::string DTD::parseTranslateParameterEntities(const std::string &parameterEntities)
-    {
-        std::string result = parameterEntities;
-        while (result.find('%') != std::string::npos)
-        {
-            bool noMatch = true;
-            for (auto entity : m_entityMapping)
-            {
-                size_t pos = result.find(entity.first);
-                if (pos != std::string::npos)
-                {
-                    result.replace(pos, entity.first.length(), entity.second.internal);
-                    noMatch = false;
-                }
-            }
-            if (noMatch)
-            {
-                throw XML::SyntaxError("No match found for entity string '" + result + "'.");
-            }
-        }
-        return (result);
     }
     /// <summary>
     /// Parse externally defined DTD into DTD XNode.
@@ -250,15 +223,8 @@ namespace H4
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
-    void DTD::parseExternal(ISource &/*dtdSource*/)
+    void DTD::parseExternal(ISource & /*dtdSource*/)
     {
-        // m_external = parseExternalReference(dtdSource);
         parseExternalRefenceContent();
-        // // if (dtdSource.current() != '>')
-        // // {
-        // //     throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
-        // // }
-        // dtdSource.next();
-        // dtdSource.ignoreWS();
     }
 } // namespace H4

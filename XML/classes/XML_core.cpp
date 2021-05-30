@@ -320,9 +320,36 @@ namespace H4
             body += xmlSource.current_to_bytes();
             xmlSource.next();
         }
-        // body += xmlSource.current_to_bytes();
-        // xmlSource.next();
-        // xmlSource.ignoreWS();
         return (body);
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    std::string translateEntities(const std::string &toTranslate, const XMLEntityMappings &entityMapping, char type)
+    {
+        std::string translated = toTranslate;
+        while (translated.find(type) != std::string::npos)
+        {
+            bool noMatch = true;
+            for (auto entity : entityMapping)
+            {
+                if (entity.first[0] == type)
+                {
+                    size_t pos = translated.find(entity.first);
+                    if (pos != std::string::npos)
+                    {
+                        translated.replace(pos, entity.first.length(), entity.second.internal);
+                        noMatch = false;
+                    }
+                }
+            }
+            if (noMatch)
+            {
+                throw XML::SyntaxError("No match found for entity string '" + translated + "'.");
+            }
+        }
+        return (translated);
     }
 } // namespace H4

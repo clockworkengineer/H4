@@ -356,7 +356,7 @@ namespace H4
             dtdSource.next();
         }
         parameterEntity += dtdSource.current_to_bytes();
-        BufferSource entitySource(parseTranslateParameterEntities(parameterEntity));
+        BufferSource entitySource(translateEntities(parameterEntity, m_entityMapping));
         parseInternal(entitySource);
         dtdSource.next();
         dtdSource.ignoreWS();

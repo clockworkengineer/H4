@@ -94,11 +94,10 @@ namespace H4
         void validateElements(XMLNodeDTD *dtd, XMLNode *xNodeRoot);
         bool validateIsPCDATA(XMLNodeElement *xNodeElement);
         bool validateIsEMPTY(XMLNodeElement *xNodeElement);
-            void parseConditional(ISource &dtdSource, bool includeOff=true);
+        void parseConditional(ISource &dtdSource, bool includeOff = true);
         void parseValidateAttribute(const std::string &elementName, DTDAttribute xDTDAttribute);
         void parseParameterEntities(ISource &dtdSource);
         void parseExternalContent(ISource &dtdSource);
-        std::string parseTranslateParameterEntities(const std::string &parameterEntities);
         std::string parseAttributeEnumerationType(ISource &xmlSource);
         bool parseIsChoiceOrSequence(ISource &contentSpecSource);
         void parseElementCP(ISource &contentSpecSource, IDestination &contentSpec);
