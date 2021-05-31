@@ -34,7 +34,7 @@ TEST_CASE("Stringify XML with DTD both internal and external", "[XML][Stringify]
     SECTION("Stringify XML with external (SYSTEM) DTD", "[XML][Stringify][DTD]")
     {
         checkStringify("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
-                       "<!DOCTYPE note SYSTEM \"./testData/note.dtd\">\n"
+                       "<!DOCTYPE note SYSTEM \"./testData/note001.dtd\">\n"
                        "<note>\n"
                        "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
                        "<body>Don't forget me this weekend!</body>\n"
@@ -59,12 +59,12 @@ TEST_CASE("Stringify XML with DTD both internal and external", "[XML][Stringify]
                        "<note>\n"
                        "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
                        "<body>Don't forget me this weekend!</body><footer>&writer;&nbsp;&copyright;</footer>\n"
-                       "</note>\n");
+                       "</note>\n"); 
     }
     SECTION("Stringify XML with external file DTD.", "[XML][Stringify][DTD]")
     {
         checkStringify("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
-                       "<!DOCTYPE note SYSTEM \"./testData/note.dtd\">\n"
+                       "<!DOCTYPE note SYSTEM \"./testData/note001.dtd\">\n"
                        "<note>\n"
                        "<to>Tove"
                        "</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body>\n"

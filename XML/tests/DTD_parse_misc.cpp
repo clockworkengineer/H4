@@ -38,7 +38,7 @@ TEST_CASE("Parse XML with DTD both internal/external", "[XML][Parse][DTD]")
   SECTION("XML with external (SYSTEM) DTD", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                "<!DOCTYPE note SYSTEM \"./testData/note.dtd\">\n"
+                "<!DOCTYPE note SYSTEM \"./testData/note001.dtd\">\n"
                 "<note>\n"
                 "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
                 "<body>Don't forget me this weekend!</body>\n"
@@ -136,7 +136,7 @@ TEST_CASE("Parse XML DTD and check values.", "[XML][Parse][DTD]")
   SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                "<!DOCTYPE note SYSTEM \"./testData/note.dtd\">\n"
+                "<!DOCTYPE note SYSTEM \"./testData/note001.dtd\">\n"
                 "<note>\n"
                 "<to>Tove"
                 "</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body>\n"
@@ -147,7 +147,7 @@ TEST_CASE("Parse XML DTD and check values.", "[XML][Parse][DTD]")
     REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_dtd.m_external.type == "SYSTEM");
-    REQUIRE(xml.m_dtd.m_external.systemID == "./testData/note.dtd");
+    REQUIRE(xml.m_dtd.m_external.systemID == "./testData/note001.dtd");
     REQUIRE(xml.m_dtd.m_elements["note"].name == "note");
     REQUIRE(xml.m_dtd.m_elements["note"].content.unparsed == "(to,from,heading,body)");
   }

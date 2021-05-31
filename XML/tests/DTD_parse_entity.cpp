@@ -255,4 +255,19 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.m_dtd.m_elements["shop"].name == "shop");
     REQUIRE(xml.m_dtd.m_elements["shop"].content.unparsed == "(name, street, pincode, city, phone)");
   }
+   SECTION("XML DTD with parameter entity within general entity.", "[XML][Parse][DTD][Entity]")
+  {
+    xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                "<!DOCTYPE note SYSTEM \"./testData/note002.dtd\">\n"
+                "<note>"
+                "&signature;"
+                "</note>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource); 
+    xml.parse();
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(XMLNodeRef<XMLNode>(xml.m_prolog[0]).getNodeType() == XMLNodeType::root);
+    REQUIRE(xml.getEntity("&signature;").internal == "© 1999 Yoyodyne, Inc. &legal;");
+    REQUIRE(xml.m_prolog[0].getContents() == "© 1999 Yoyodyne, Inc. All Rights Reserved.");
+  }
 }

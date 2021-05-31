@@ -330,9 +330,10 @@ namespace H4
     std::string translateEntities(const std::string &toTranslate, const XMLEntityMappings &entityMapping, char type)
     {
         std::string translated = toTranslate;
-        while (translated.find(type) != std::string::npos)
+        bool matchFound;
+        do
         {
-            bool noMatch = true;
+            matchFound = false;
             for (auto entity : entityMapping)
             {
                 if (entity.first[0] == type)
@@ -341,15 +342,11 @@ namespace H4
                     if (pos != std::string::npos)
                     {
                         translated.replace(pos, entity.first.length(), entity.second.internal);
-                        noMatch = false;
+                        matchFound = true;
                     }
                 }
             }
-            if (noMatch)
-            {
-                throw XML::SyntaxError("No match found for entity string '" + translated + "'.");
-            }
-        }
+        } while (matchFound);
         return (translated);
     }
 } // namespace H4

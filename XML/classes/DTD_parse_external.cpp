@@ -131,11 +131,12 @@ namespace H4
         {
             if (dtdSource.match(U"<!ENTITY"))
             {
-                parseEntity(dtdSource);
+                BufferSource dtdTranslatedSource(translateEntities(extractTagBody(dtdSource), m_entityMapping));
+                parseEntity(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!ELEMENT"))
             {
-                BufferSource dtdTranslatedSource(translateEntities(extractTagBody(dtdSource),m_entityMapping));
+                BufferSource dtdTranslatedSource(translateEntities(extractTagBody(dtdSource), m_entityMapping));
                 parseElement(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!ATTLIST"))
