@@ -37,7 +37,7 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    /// Check whether a character is valid.
+    /// Check whether a character is valid for XML.
     /// </summary>
     /// <param name="ch">Character to validate</param>
     /// <returns>true then valid/.</returns>
@@ -51,7 +51,7 @@ namespace H4
                 (ch >= 0x10000 && ch <= 0x10FFFF));
     }
     /// <summary>
-    /// Check whether character is a valid to start a name with.
+    /// Check whether character is a valid to start an XML name with.
     /// </summary>
     /// <param name="ch">Character value to validate.</param>
     /// <returns>true then valid.</returns>
@@ -155,11 +155,9 @@ namespace H4
     XMLValue parseEntityReference(ISource &xmlSource)
     {
         XMLValue entityReference;
-        while (xmlSource.more() && xmlSource.current() != ';')
-        {
-            entityReference.unparsed += xmlSource.current_to_bytes();
-            xmlSource.next();
-        }
+        entityReference.unparsed = xmlSource.current_to_bytes();
+        xmlSource.next();
+        entityReference.unparsed += parseName(xmlSource);
         if (xmlSource.current() != ';')
         {
             throw XML::SyntaxError(xmlSource, "Invalidly formed entity reference.");
@@ -323,7 +321,7 @@ namespace H4
         return (body);
     }
     /// <summary>
-    ///
+    /// Translate any entities found in passed in string.
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
@@ -348,5 +346,22 @@ namespace H4
             }
         } while (matchFound);
         return (translated);
+    }
+    /// <summary>
+    /// Split a string into a vector of strings using the passed in delimeter.
+    /// </summary>
+    /// <param name="stringToSplit">String to split up.</param>
+    /// <param name="delimeter">Character delimeter to split on.</param>
+    /// <returns>Vector of split strings.</returns>
+    std::vector<std::string> splitString(std::string stringToSplit, char delimeter)
+    {
+        std::stringstream sourceStream(stringToSplit);
+        std::string splitOffItem;
+        std::vector<std::string> splitStrings;
+        while (std::getline(sourceStream, splitOffItem, delimeter))
+        {
+            splitStrings.push_back(splitOffItem);
+        }
+        return splitStrings;
     }
 } // namespace H4

@@ -1,7 +1,7 @@
 //
 // Class: DTD
 //
-// Description: Parse XML Document Type Definition (DTD).
+// Description: Parse XML Document Type Declaration (DTD).
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -15,10 +15,6 @@
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
-//
-// C++ STL
-//
-#include <sstream>
 // =========
 // NAMESPACE
 // =========
@@ -42,34 +38,20 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    /// Split a string into a vector of strings using the passed in delimeter.
+    /// Validate attribute description.
     /// </summary>
-    /// <param name="stringToSplit">String to split up.</param>
-    /// <param name="delimeter">Character delimeter to split on.</param>
-    /// <returns>Vector of split strings.</returns>
-    std::vector<std::string> DTD::split(std::string stringToSplit, char delimeter)
-    {
-        std::stringstream sourceStream(stringToSplit);
-        std::string splitOffItem;
-        std::vector<std::string> splitStrings;
-        while (std::getline(sourceStream, splitOffItem, delimeter))
-        {
-            splitStrings.push_back(splitOffItem);
-        }
-        return splitStrings;
-    }
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
+    /// <param name="elementName">Element associated with attribute.</param>
+    /// <param name="dtdattribute">Attribute description to validate.</param>
     /// <returns></returns>
-    void DTD::parseValidateAttribute(const std::string &elementName, DTDAttribute xDTDAttribute)
+    void DTD::parseValidateAttribute(const std::string &elementName, DTDAttribute dtdAttribute)
     {
-        if (xDTDAttribute.type == "ID" && xDTDAttribute.value.parsed.starts_with("#FIXED "))
+        // Attribute cannot be ID and fixed
+        if (dtdAttribute.type == "ID" && dtdAttribute.value.parsed.starts_with("#FIXED "))
         {
-            throw XML::SyntaxError("Attribute '" + xDTDAttribute.name + "' may not be of type ID and FIXED.");
+            throw XML::SyntaxError("Attribute '" + dtdAttribute.name + "' may not be of type ID and FIXED.");
         }
-        else if (xDTDAttribute.type == "ID")
+        // Only on ID attribute allowed per element
+        else if (dtdAttribute.type == "ID")
         {
             if (m_elements[elementName].idAttributePresent)
             {
@@ -77,10 +59,11 @@ namespace H4
             }
             m_elements[elementName].idAttributePresent = true;
         }
-        else if (xDTDAttribute.type[0] == '(')
+        // Enumeration contains unique values and default is valid value
+        else if (dtdAttribute.type[0] == '(')
         {
             std::set<std::string> options;
-            for (auto &option : split(xDTDAttribute.type.substr(1, xDTDAttribute.type.size() - 2), '|'))
+            for (auto &option : splitString(dtdAttribute.type.substr(1, dtdAttribute.type.size() - 2), '|'))
             {
                 if (!options.contains(option))
                 {
@@ -88,12 +71,12 @@ namespace H4
                 }
                 else
                 {
-                    throw XML::SyntaxError("Enumerator value '" + option + "' for attribute '" + xDTDAttribute.name + "' occurs more than once in its definition.");
+                    throw XML::SyntaxError("Enumerator value '" + option + "' for attribute '" + dtdAttribute.name + "' occurs more than once in its definition.");
                 }
             }
-            if (!options.contains(xDTDAttribute.value.parsed))
+            if (!options.contains(dtdAttribute.value.parsed))
             {
-                throw XML::SyntaxError("Default value '" + xDTDAttribute.value.parsed + "' for enumeration attribute '" + xDTDAttribute.name + "' is invalid.");
+                throw XML::SyntaxError("Default value '" + dtdAttribute.value.parsed + "' for enumeration attribute '" + dtdAttribute.name + "' is invalid.");
             }
         }
     }
@@ -138,10 +121,10 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Parse attribute of type enumeration.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns></returns>
+    /// <returns>Enumeration string.</returns>
     std::string DTD::parseAttributeEnumerationType(ISource &dtdSource)
     {
         std::string enumerationType(1, dtdSource.current());
@@ -343,22 +326,15 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse DTD parameter entity.
+    /// Parse DTD parameter entity reference.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
-    void DTD::parseParameterEntity(ISource &dtdSource)
+    void DTD::parseParameterEntityReference(ISource &dtdSource)
     {
-        std::string parameterEntity = "%";
-        while (dtdSource.more() && dtdSource.current() != ';')
-        {
-            parameterEntity += dtdSource.current_to_bytes();
-            dtdSource.next();
-        }
-        parameterEntity += dtdSource.current_to_bytes();
-        BufferSource entitySource(translateEntities(parameterEntity, m_entityMapping));
+        XMLValue parameterEntity = parseEntityReference(dtdSource);
+        BufferSource entitySource(translateEntities(parameterEntity.unparsed, m_entityMapping));
         parseInternal(entitySource);
-        dtdSource.next();
         dtdSource.ignoreWS();
     }
     /// <summary>
@@ -390,9 +366,9 @@ namespace H4
             {
                 parseComment(dtdSource);
             }
-            else if (dtdSource.match(U"%"))
+            else if (dtdSource.current() == '%')
             {
-                parseParameterEntity(dtdSource);
+                parseParameterEntityReference(dtdSource);
                 continue;
             }
             else
@@ -408,7 +384,8 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse XML DTD.
+    /// Parse XML DTD. If the DTD contains an external reference this is parsed
+    /// after any internal DTD that may be specified after it in the DTD.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>
@@ -420,30 +397,35 @@ namespace H4
         long start = dtdSource.position();
         dtdSource.ignoreWS();
         m_name = parseName(dtdSource);
+        // Parse in external DTD reference
         if (dtdSource.current() != '[')
         {
             m_external = parseExternalReference(dtdSource);
         }
+        // We have internal DTD so parse that first
         if (dtdSource.current() == '[')
         {
             dtdSource.next();
             dtdSource.ignoreWS();
             parseInternal(dtdSource);
         }
+        // Missing '>' after external DTD reference
         else if (dtdSource.current() != '>')
         {
             throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
         }
+        // Move to the next component in XML prolog
         else
         {
             dtdSource.next();
             dtdSource.ignoreWS();
         }
+        // Parse any DTD in external reference found
         if (!m_external.type.empty())
         {
             parseExternal(dtdSource);
         }
-        // Save away unparsed form
+        // Save away unparsed form of DTD
         m_unparsed = "<!DOCTYPE" + dtdSource.getRange(start, dtdSource.position());
         for (auto ch : m_unparsed)
         {

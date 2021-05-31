@@ -86,7 +86,6 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void checkForEntityRecursion(const std::string &entityName, std::set<std::string> names = {});
-        std::vector<std::string> split(std::string strToSplit, char delimeter);
         void initialiseTables();
         void validateAttributes(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
         void validateContentSpecification(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
@@ -117,7 +116,7 @@ namespace H4
         std::string parseAttributeType(ISource &dtdSource);
         XMLValue parseAttributeValue(ISource &dtdSource);
         void parseComment(ISource &dtdSource);
-        void parseParameterEntity(ISource &dtdSource);
+        void parseParameterEntityReference(ISource &dtdSource);
         void parseExternal(ISource &dtdSource);
         void parseInternal(ISource &dtdSource);
         void parseDTD(ISource &dtdSource);

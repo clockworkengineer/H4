@@ -1,7 +1,7 @@
 //
 // Class: DTD
 //
-// Description: Parse XML Document Type Definition (DTD).
+// Description: Parse XML Document Type Declaration (DTD).
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -153,9 +153,9 @@ namespace H4
             {
                 parseComment(dtdSource);
             }
-            else if (dtdSource.match(U"%"))
+            else if (dtdSource.current()=='%')
             {
-                parseParameterEntity(dtdSource);
+                parseParameterEntityReference(dtdSource);
                 continue;
             }
             else if (dtdSource.match(U"<!["))

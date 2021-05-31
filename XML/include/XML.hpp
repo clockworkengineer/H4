@@ -8,6 +8,7 @@
 #include <memory>
 #include <unordered_map>
 #include <set>
+#include <vector>
 //
 // XML Core
 //

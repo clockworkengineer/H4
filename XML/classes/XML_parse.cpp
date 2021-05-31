@@ -340,7 +340,7 @@ namespace H4
     /// Parse XML prolog and create the necessary XMLNodeElements for it. Valid
     /// parts of the prolog include delaration (first line if present),
     /// processing instructions, comments, whitespace content and XML
-    /// document Type Definition (DTD).
+    /// Document Type Declaration (DTD).
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     void XML::parseProlog(ISource &xmlSource, XMLNodeElement *xmlNodeProlog)

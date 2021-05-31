@@ -1,7 +1,7 @@
 //
 // Class: DTD
 //
-// Description: Document Type Definition (DTD) XML validation code.
+// Description: Document Type Declaration (DTD) XML validation code.
 //
 // Dependencies:   C20++ - Language standard features used.
 //
@@ -134,7 +134,7 @@ namespace H4
             else if (attribute.type[0] == '(')
             {
                 std::set<std::string> options;
-                for (auto &option : split(attribute.type.substr(1, attribute.type.size() - 2), '|'))
+                for (auto &option : splitString(attribute.type.substr(1, attribute.type.size() - 2), '|'))
                 {
                     options.insert(option);
                 }

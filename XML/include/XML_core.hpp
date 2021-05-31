@@ -83,6 +83,7 @@ namespace H4
     XMLValue parseValue(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity = true);
     std::string extractTagBody(ISource &xmlSource);
     std::string translateEntities(const std::string &toTranslate, const XMLEntityMappings &entityMapping, char type='%');
+    std::vector<std::string> splitString(std::string stringToSplit, char delimeter);
     //
     // XML entity
     //
