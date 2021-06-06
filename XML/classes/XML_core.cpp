@@ -3,7 +3,7 @@
 //
 // Description: XML Parser Core Functions.
 //
-// Dependencies:   C20++ - Language standard features used.
+// Dependencies:   C17++ - Language standard features used.
 //
 // =================
 // CLASS DEFINITIONS

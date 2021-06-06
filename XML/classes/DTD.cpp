@@ -1,11 +1,11 @@
 //
 // Class: DTD
 //
-// Description: Parse XML Data Type Definition (DTD) portion of an XML file so
+// Description: Parse XML Data Type Declaration (DTD) portion of an XML file so
 // that the XML maybe be validated against it and flagged as well-formed if it passes. 
 // For more information on the XML standard check out https://www.w3.org/TR/REC-xml/.
 //
-// Dependencies:   C20++ - Language standard features used.
+// Dependencies:   C17++ - Language standard features used.
 //
 // =================
 // CLASS DEFINITIONS
@@ -52,15 +52,15 @@ namespace H4
         m_entityMapping["&gt;"].internal = "&#x3E;";
         // DTD attribute list type tokens
         // Make sure longer possible matches are first
-        DTD::m_dtdAttrListTypes.push_back(U"CDATA");
-        DTD::m_dtdAttrListTypes.push_back(U"IDREFS");
-        DTD::m_dtdAttrListTypes.push_back(U"IDREF");
-        DTD::m_dtdAttrListTypes.push_back(U"ID");
-        DTD::m_dtdAttrListTypes.push_back(U"NMTOKENS");
-        DTD::m_dtdAttrListTypes.push_back(U"NMTOKEN");
-        DTD::m_dtdAttrListTypes.push_back(U"ENTITIES");
-        DTD::m_dtdAttrListTypes.push_back(U"ENTITY");
-        DTD::m_dtdAttrListTypes.push_back(U"NOTATION");
+        m_dtdAttrListTypes.push_back(U"CDATA");
+        m_dtdAttrListTypes.push_back(U"IDREFS");
+        m_dtdAttrListTypes.push_back(U"IDREF");
+        m_dtdAttrListTypes.push_back(U"ID");
+        m_dtdAttrListTypes.push_back(U"NMTOKENS");
+        m_dtdAttrListTypes.push_back(U"NMTOKEN");
+        m_dtdAttrListTypes.push_back(U"ENTITIES");
+        m_dtdAttrListTypes.push_back(U"ENTITY");
+        m_dtdAttrListTypes.push_back(U"NOTATION");
     }
     // ==============
     // PUBLIC METHODS

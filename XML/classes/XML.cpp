@@ -6,7 +6,7 @@
 // interrogated and saved back to a text form (stringify). For more 
 // information on the XML standard check out https://www.w3.org/TR/REC-xml/.
 //
-// Dependencies:   C20++ - Language standard features used.
+// Dependencies:   C17++ - Language standard features used.
 //
 // =================
 // CLASS DEFINITIONS

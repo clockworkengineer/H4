@@ -3,7 +3,7 @@
 //
 // Description: Parse XML Document Type Declaration (DTD).
 //
-// Dependencies:   C20++ - Language standard features used.
+// Dependencies:   C17++ - Language standard features used.
 //
 // =================
 // CLASS DEFINITIONS
@@ -385,7 +385,7 @@ namespace H4
     }
     /// <summary>
     /// Parse XML DTD. If the DTD contains an external reference this is parsed
-    /// after any internal DTD that may be specified after it in the DTD.
+    /// after any internal DTD that may be specified after it.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns></returns>

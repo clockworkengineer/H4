@@ -5,7 +5,7 @@
 // the XML text for it; currently as UTF-8 encoded text but this may change in 
 // future.
 //
-// Dependencies:   C20++ - Language standard features used.
+// Dependencies:   C17++ - Language standard features used.
 //
 // =================
 // CLASS DEFINITIONS
