@@ -45,7 +45,7 @@ namespace H4
             DTDElement() {}
             DTDElement(const std::string &name, const XMLValue &content) : name(name), content(content) {}
             std::string name;
-            bool idAttributePresent;
+            bool idAttributePresent = false;
             XMLValue content;
             std::vector<DTDAttribute> attributes;
         };

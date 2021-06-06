@@ -46,7 +46,7 @@ namespace H4
     void DTD::parseValidateAttribute(const std::string &elementName, DTDAttribute dtdAttribute)
     {
         // Attribute cannot be ID and fixed
-        if (dtdAttribute.type == "ID" && dtdAttribute.value.parsed.starts_with("#FIXED "))
+        if (dtdAttribute.type == "ID" && dtdAttribute.value.parsed.find("#FIXED ")==0)
         {
             throw XML::SyntaxError("Attribute '" + dtdAttribute.name + "' may not be of type ID and FIXED.");
         }
@@ -65,7 +65,7 @@ namespace H4
             std::set<std::string> options;
             for (auto &option : splitString(dtdAttribute.type.substr(1, dtdAttribute.type.size() - 2), '|'))
             {
-                if (!options.contains(option))
+                if (options.find(option)==options.end())
                 {
                     options.insert(option);
                 }
@@ -74,7 +74,7 @@ namespace H4
                     throw XML::SyntaxError("Enumerator value '" + option + "' for attribute '" + dtdAttribute.name + "' occurs more than once in its definition.");
                 }
             }
-            if (!options.contains(dtdAttribute.value.parsed))
+            if (options.find(dtdAttribute.value.parsed)==options.end())
             {
                 throw XML::SyntaxError("Default value '" + dtdAttribute.value.parsed + "' for enumeration attribute '" + dtdAttribute.name + "' is invalid.");
             }
@@ -105,7 +105,7 @@ namespace H4
                 if (mappedEntityName[1] != '#')
                 {
                     mappedEntityName += entitySource.current();
-                    if (currentEntities.contains(mappedEntityName))
+                    if (currentEntities.find(mappedEntityName)!=currentEntities.end())
                     {
                         throw XML::SyntaxError("Entity '" + mappedEntityName + "' contains recursive definition which is not allowed.");
                     }

@@ -223,7 +223,7 @@ namespace H4
         }
         for (auto attribute : xmlNodeElement->getAttributeList())
         {
-            if (attribute.name.starts_with("xmlns"))
+            if (attribute.name.find("xmlns")==0)
             {
                 attribute.name = (attribute.name.size() > 5) ? attribute.name.substr(6) : ":";
                 xmlNodeElement->addNameSpace(attribute.name, attribute.value);

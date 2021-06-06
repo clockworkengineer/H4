@@ -12,10 +12,6 @@
 #include "XML.hpp"
 #include "XMLSources.hpp"
 #include "XMLDestinations.hpp"
-//
-// C++ STL
-//
-#include <filesystem>
 // =========
 // NAMESPACE
 // =========
@@ -96,7 +92,7 @@ namespace H4
     /// <returns>true then valid.</returns>
     bool validReservedName(const XMLString &name)
     {
-        return (name.starts_with(U"xmlns") || name.starts_with(U"xml-stylesheet") || name == U"xml");
+        return ((name.find(U"xmlns")==0) || (name.find(U"xml-stylesheet")==0) || (name == U"xml"));
     }
     /// <summary>
     /// Validate XML tag/attribute names.
@@ -110,7 +106,7 @@ namespace H4
             return (false);
         }
         std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-        if (name.starts_with(U"xml") && !(validReservedName(name)))
+        if (name.find(U"xml")==0 && !(validReservedName(name)))
         {
             return (false);
         }

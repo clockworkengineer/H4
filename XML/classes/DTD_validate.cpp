@@ -69,7 +69,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateAttributes(XMLNodeDTD */*dtd*/, XMLNodeElement *xmlNodeElement)
+    void DTD::validateAttributes(XMLNodeDTD * /*dtd*/, XMLNodeElement *xmlNodeElement)
     {
         for (auto &attribute : m_elements[xmlNodeElement->name].attributes)
         {
@@ -110,7 +110,7 @@ namespace H4
                     {
                         throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
                     }
-                    if (m_assignedIDValues.contains(elementAttribute.value.parsed))
+                    if (m_assignedIDValues.find(elementAttribute.value.parsed) != m_assignedIDValues.end())
                     {
                         throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + elementAttribute.name + "' is not unique.");
                     }
@@ -141,7 +141,7 @@ namespace H4
                 if (xmlNodeElement->isAttributePresent(attribute.name))
                 {
                     XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-                    if (!options.contains(elementAttribute.value.parsed))
+                    if (options.find(elementAttribute.value.parsed) == options.end())
                     {
                         throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' contains invalid enumeration value '" + elementAttribute.value.parsed + "'.");
                     }
@@ -163,7 +163,7 @@ namespace H4
             {
                 continue;
             }
-            else if (attribute.value.parsed.starts_with("#FIXED "))
+            else if (attribute.value.parsed.find("#FIXED ") == 0)
             {
                 if (xmlNodeElement->isAttributePresent(attribute.name))
                 {
@@ -242,7 +242,7 @@ namespace H4
         if (!std::regex_match(elements, match))
         {
             throw XML::ValidationError(*this, "<" + xmlNodeElement->name + "> element does not conform to the content specification " +
-                                           m_elements[xmlNodeElement->name].content.unparsed + ".");
+                                                  m_elements[xmlNodeElement->name].content.unparsed + ".");
         }
     }
     /// <summary>
@@ -271,11 +271,11 @@ namespace H4
             }
             break;
         case XMLNodeType::root:
-            if (XMLNodeRef<XMLNodeElement>((*xmlNode)).name != m_name)
+        case XMLNodeType::element:
+            if (xmlNode->getNodeType()==XMLNodeType::root && XMLNodeRef<XMLNodeElement>((*xmlNode)).name != m_name)
             {
                 throw XML::ValidationError(*this, "DOCTYPE name does not match that of root element " + XMLNodeRef<XMLNodeElement>((*xmlNode)).name + " of DTD.");
             }
-        case XMLNodeType::element:
             validateElement(dtd, static_cast<XMLNodeElement *>(xmlNode));
             for (auto &element : XMLNodeRef<XMLNodeElement>((*xmlNode)).children)
             {
@@ -327,9 +327,9 @@ namespace H4
                 validateElements(dtd, &prolog);
                 for (auto &idref : m_assignedIDREFValues)
                 {
-                    if (!m_assignedIDValues.contains(idref))
+                    if (m_assignedIDValues.find(idref)==m_assignedIDValues.end())
                     {
-                        throw XML::ValidationError(*this, "IDREF attribute '"+idref+"' does not reference any element with the ID.");
+                        throw XML::ValidationError(*this, "IDREF attribute '" + idref + "' does not reference any element with the ID.");
                     }
                 }
             }

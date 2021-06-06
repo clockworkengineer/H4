@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.17.0)
+cmake_minimum_required(VERSION 3.16.0)
 
 project("XML" VERSION 0.0.1 DESCRIPTION "XML C++ Static Library")
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
@@ -46,7 +46,7 @@ set (XML_INCLUDES
 
 add_library(${XML_LIBRARY_NAME} STATIC ${XML_SOURCES})
 target_include_directories(${XML_LIBRARY_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR} )
-target_link_libraries(${XML_LIBRARY_NAME})
+target_link_libraries(${XML_LIBRARY_NAME} stdc++fs )
 
 # Add tests
 

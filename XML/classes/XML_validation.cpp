@@ -84,17 +84,17 @@ namespace H4
                        { return std::toupper(c); });
         // Check valid declaration values
         std::set<std::string> versions{"1.0", "1.1"};
-        if (!versions.contains(validatedAttributes[0].value.parsed))
+        if (versions.find(validatedAttributes[0].value.parsed)==versions.end())
         {
             throw SyntaxError(xmlSource, "Unsupported version number " + validatedAttributes[0].value.parsed + ".");
         }
         std::set<std::string> encoding{"UTF-8", "UTF-16"};
-        if (!encoding.contains(validatedAttributes[1].value.parsed))
+        if (encoding.find(validatedAttributes[1].value.parsed)==encoding.end())
         {
             throw SyntaxError(xmlSource, "Unsupported encoding " + validatedAttributes[1].value.parsed + " specified.");
         }
         std::set<std::string> standalone{"yes", "no"};
-        if (!standalone.contains(validatedAttributes[2].value.parsed))
+        if (standalone.find(validatedAttributes[2].value.parsed)==standalone.end())
         {
             throw SyntaxError(xmlSource, "Invalid standalone value of '" + validatedAttributes[2].value.parsed + "'.");
         }

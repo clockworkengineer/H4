@@ -31,7 +31,7 @@ TEST_CASE("Parse XML with DTD both internal/external", "[XML][Parse][DTD]")
                 "<to>Tove</to><from>Jani</from><heading>Reminder</heading>\n"
                 "<body>Don't forget me this weekend</body>\n"
                 "</note>\n";
-    BufferSource xmlSource(xmlString);
+    BufferSource xmlSource(xmlString); 
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }

@@ -20,8 +20,9 @@ namespace H4
                 throw std::invalid_argument("Empty source buffer passed to be parsed.");
             }
             std::u16string utf16xml{sourceBuffer};
-            if (!utf16xml.starts_with(u"<?xml"))
-            {
+            if (utf16xml.find(u"<?xml")!=0)
+            {  
+                
                 for (char16_t &ch : utf16xml)
                 {
                     ch = (static_cast<u_int16_t>(ch) >> 8) | (static_cast<u_int16_t>(ch) << 8);
@@ -155,7 +156,7 @@ namespace H4
         }
         void backup(long length)
         {
-            if ((m_source.tellg() - length >= 0) || (current() == (XMLChar)EOF))
+            if ((static_cast<long> (m_source.tellg()) - length >= 0) || (current() == (XMLChar)EOF))
             {
                 m_source.clear();
                 m_source.seekg(-length, std::ios_base::cur);
