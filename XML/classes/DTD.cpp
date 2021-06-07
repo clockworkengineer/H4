@@ -2,7 +2,7 @@
 // Class: DTD
 //
 // Description: Parse XML Data Type Declaration (DTD) portion of an XML file so
-// that the XML maybe be validated against it and flagged as well-formed if it passes. 
+// that the XML maybe be validated against it and flagged as well-formed if it passes.
 // For more information on the XML standard check out https://www.w3.org/TR/REC-xml/.
 //
 // Dependencies:   C17++ - Language standard features used.
@@ -41,7 +41,6 @@ namespace H4
     /// Intialise internal tables used by  DTD parser.
     /// </summary>
     /// <param name=""></param>
-    /// <returns></returns>
     void DTD::initialiseTables()
     {
         // Default entity mappings
@@ -68,6 +67,7 @@ namespace H4
     /// <summary>
     /// Parse DTD read from source stream.
     /// </summary>
+    /// <param name="dtdSource">DTD source stream.</param>
     void DTD::parse(ISource &dtdSource)
     {
         parseDTD(dtdSource);
@@ -76,7 +76,7 @@ namespace H4
     /// Validate XML against its DTD. Throwing an exception if there is a
     /// issue and the XML is not well-formed.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="prolog">Prolog element containing root of XML to validate.</param>
     void DTD::validate(XMLNodeElement &prolog)
     {
         validateDTD(prolog);

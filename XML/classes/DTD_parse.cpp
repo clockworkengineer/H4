@@ -1,7 +1,7 @@
 //
 // Class: DTD
 //
-// Description: Parse XML Document Type Declaration (DTD).
+// Description: Parse XML DTD.
 //
 // Dependencies:   C17++ - Language standard features used.
 //
@@ -42,15 +42,14 @@ namespace H4
     /// </summary>
     /// <param name="elementName">Element associated with attribute.</param>
     /// <param name="dtdattribute">Attribute description to validate.</param>
-    /// <returns></returns>
     void DTD::parseValidateAttribute(const std::string &elementName, DTDAttribute dtdAttribute)
     {
         // Attribute cannot be ID and fixed
-        if (dtdAttribute.type == "ID" && dtdAttribute.value.parsed.find("#FIXED ")==0)
+        if (dtdAttribute.type == "ID" && dtdAttribute.value.parsed.find("#FIXED ") == 0)
         {
             throw XML::SyntaxError("Attribute '" + dtdAttribute.name + "' may not be of type ID and FIXED.");
         }
-        // Only on ID attribute allowed per element
+        // Only one ID attribute allowed per element
         else if (dtdAttribute.type == "ID")
         {
             if (m_elements[elementName].idAttributePresent)
@@ -65,7 +64,7 @@ namespace H4
             std::set<std::string> options;
             for (auto &option : splitString(dtdAttribute.type.substr(1, dtdAttribute.type.size() - 2), '|'))
             {
-                if (options.find(option)==options.end())
+                if (options.find(option) == options.end())
                 {
                     options.insert(option);
                 }
@@ -74,7 +73,7 @@ namespace H4
                     throw XML::SyntaxError("Enumerator value '" + option + "' for attribute '" + dtdAttribute.name + "' occurs more than once in its definition.");
                 }
             }
-            if (options.find(dtdAttribute.value.parsed)==options.end())
+            if (options.find(dtdAttribute.value.parsed) == options.end())
             {
                 throw XML::SyntaxError("Default value '" + dtdAttribute.value.parsed + "' for enumeration attribute '" + dtdAttribute.name + "' is invalid.");
             }
@@ -105,7 +104,7 @@ namespace H4
                 if (mappedEntityName[1] != '#')
                 {
                     mappedEntityName += entitySource.current();
-                    if (currentEntities.find(mappedEntityName)!=currentEntities.end())
+                    if (currentEntities.find(mappedEntityName) != currentEntities.end())
                     {
                         throw XML::SyntaxError("Entity '" + mappedEntityName + "' contains recursive definition which is not allowed.");
                     }
@@ -148,19 +147,6 @@ namespace H4
         return (enumerationType);
     }
     /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
-    void DTD::parsePostProcessing()
-    {
-        for (auto &entityName : m_entityMapping)
-        {
-            std::set<std::string> names{entityName.first};
-            checkForEntityRecursion(entityName.first);
-        }
-    }
-    /// <summary>
     /// Parse DTD attribute type field.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
@@ -187,7 +173,7 @@ namespace H4
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
     /// <returns>Attribute value as string (UTF-8 encoded).</returns>
-    /// <returns></returns>
+    /// <returns>Attribute value.</returns>
     XMLValue DTD::parseAttributeValue(ISource &dtdSource)
     {
         XMLValue value;
@@ -219,7 +205,6 @@ namespace H4
     /// Parse DTD attribute list.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns></returns>
     void DTD::parseAttributeList(ISource &dtdSource)
     {
         dtdSource.ignoreWS();
@@ -239,7 +224,6 @@ namespace H4
     /// Parse DTD notation.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns></returns>
     void DTD::parseNotation(ISource &dtdSource)
     {
         dtdSource.ignoreWS();
@@ -252,7 +236,6 @@ namespace H4
     /// Parse DTD entity.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns></returns>
     void DTD::parseEntity(ISource &dtdSource)
     {
         std::string entityName = "&";
@@ -283,7 +266,6 @@ namespace H4
     /// Parse an DTD element.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns></returns>
     void DTD::parseElement(ISource &dtdSource)
     {
         dtdSource.ignoreWS();
@@ -317,7 +299,6 @@ namespace H4
     /// Parse DTD comment.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns></returns>
     void DTD::parseComment(ISource &dtdSource)
     {
         while (dtdSource.more() && !dtdSource.match(U"--"))
@@ -329,7 +310,6 @@ namespace H4
     /// Parse DTD parameter entity reference.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns></returns>
     void DTD::parseParameterEntityReference(ISource &dtdSource)
     {
         XMLValue parameterEntity = parseEntityReference(dtdSource);
@@ -341,7 +321,6 @@ namespace H4
     /// Parse internally defined DTD.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns></returns>
     void DTD::parseInternal(ISource &dtdSource)
     {
         while (dtdSource.more() && !dtdSource.match(U"]>"))
@@ -384,11 +363,11 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse XML DTD. If the DTD contains an external reference this is parsed
-    /// after any internal DTD that may be specified after it.
+    /// Parse XML DTD. If the DTD contains an external reference then the DTD 
+    /// that points to is parsed after any internal DTD that may be specified 
+    /// after it.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns></returns>
     void DTD::parseDTD(ISource &dtdSource)
     {
         // We take the easy option for allowing a DTD to be stringifyed
@@ -434,6 +413,10 @@ namespace H4
                 m_lineNumber++;
             }
         }
-        parsePostProcessing();
+        // Make sure no defined entity contains recursion
+        for (auto &entityName : m_entityMapping)
+        {
+            checkForEntityRecursion(entityName.first);
+        }
     }
 } // namespace H4

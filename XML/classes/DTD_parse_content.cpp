@@ -1,7 +1,7 @@
 //
 // Class: DTD
 //
-// Description: Parse XML Document Type Declaration (DTD).
+// Description: Parse XML DTD element content specifications.
 //
 // Dependencies:   C17++ - Language standard features used.
 //
@@ -15,10 +15,6 @@
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
-//
-// C++ STL
-//
-#include <sstream>
 // =========
 // NAMESPACE
 // =========
@@ -40,10 +36,10 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    ///
+    /// Is the next specification operator to be parsed choice '|' or sequence ','.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="contentSpecSource">Content specification source stream.</param>
+    /// <returns>Returns true if it is choice.</returns>
     bool DTD::parseIsChoiceOrSequence(ISource &contentSpecSource)
     {
         bool choice = false;
@@ -62,10 +58,10 @@ namespace H4
         return (choice);
     }
     /// <summary>
-    ///
+    /// Parse element name, choice or sequence next in content specification.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="contentSpecSource">Content specification source stream.</param>
+    /// <param name="contentSpecDestination">Parsed content specification stream.</param>
     void DTD::parseElementCP(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         contentSpecSource.next();
@@ -92,10 +88,10 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Parse content specification choice next.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="contentSpecSource">Content specification source stream.</param>
+    /// <param name="contentSpecDestination">Parsed content specification stream.</param>
     void DTD::parseElementChoice(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         if (contentSpecSource.current() != '(')
@@ -118,10 +114,10 @@ namespace H4
         contentSpecSource.ignoreWS();
     }
     /// <summary>
-    ///
+    /// Parse content specification sequence next.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="contentSpecSource">Content specification source stream.</param>
+    /// <param name="contentSpecDestination">Parsed content specification stream.</param>
     void DTD::parseElementSequence(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         if (contentSpecSource.current() != '(')
@@ -143,10 +139,10 @@ namespace H4
         contentSpecSource.ignoreWS();
     }
     /// <summary>
-    ///
+    /// Parse content specification element name next.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="contentSpecSource">Content specification source stream.</param>
+    /// <param name="contentSpecDestination">Parsed content specification stream.</param>
     void DTD::parseElementName(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         contentSpecDestination.add("(<");
@@ -161,10 +157,10 @@ namespace H4
         contentSpecSource.ignoreWS();
     }
     /// <summary>
-    ///
+    /// Parse content specification element children.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="contentSpecSource">Content specification source stream.</param>
+    /// <param name="contentSpecDestination">Parsed content specification stream.</param>
     void DTD::parseElementChildren(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         if (contentSpecSource.current() == '(')
@@ -192,10 +188,10 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Parse content specification mixed content.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="contentSpecSource">Content specification source stream.</param>
+    /// <param name="contentSpecDestination">Parsed content specification stream.</param>
     void DTD::parseElementMixedContent(ISource &contentSpecSource, IDestination &contentSpecDestination)
     {
         contentSpecSource.ignoreWS();
@@ -244,10 +240,10 @@ namespace H4
         }
     }
     /// <summary>
-    ///
+    /// Parse elements content specification.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="elementName">Elements name.</param>
+    /// <param name="contentSpec">Elements content specification.</param>
     void DTD::parseElementContentSpecification(const std::string &elementName, XMLValue &contentSpec)
     {
         try

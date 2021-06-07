@@ -1,7 +1,7 @@
 //
 // Class: DTD
 //
-// Description: Parse XML Document Type Declaration (DTD).
+// Description: Parse external XML DTD.
 //
 // Dependencies:   C17++ - Language standard features used.
 //
@@ -15,10 +15,6 @@
 // ====================
 // CLASS IMPLEMENTATION
 // ====================
-//
-// C++ STL
-//
-#include <sstream>
 // =========
 // NAMESPACE
 // =========
@@ -40,10 +36,10 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
-    ///
+    /// Parse conditional DTD (recusively if necessary).
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns
+    /// <param name="dtdSource">DTD source stream.</param>
+    /// <param name="includeOn">If set to false then enclosing conditionals treated as ignored.</param>
     void DTD::parseConditional(ISource &dtdSource, bool includeOn)
     {
         dtdSource.ignoreWS();
@@ -121,10 +117,9 @@ namespace H4
         dtdSource.ignoreWS();
     }
     /// <summary>
-    ///
+    /// Parse external DTD.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="dtdSource">DTD source stream.</param>
     void DTD::parseExternalContent(ISource &dtdSource)
     {
         while (dtdSource.more())
@@ -153,7 +148,7 @@ namespace H4
             {
                 parseComment(dtdSource);
             }
-            else if (dtdSource.current()=='%')
+            else if (dtdSource.current() == '%')
             {
                 parseParameterEntityReference(dtdSource);
                 continue;
@@ -176,10 +171,8 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse externally defined DTD into DTD XNode.
+    /// Parse externally defined DTD into XMLNodeDTD.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
     void DTD::parseExternalRefenceContent()
     {
         if (m_external.type == "SYSTEM")
@@ -189,14 +182,14 @@ namespace H4
         }
         else if (m_external.type == "PUBLIC")
         {
-            // Public external DTD currently not supported
+            // Public external DTD currently not supported (Use system id ?)
         }
     }
     /// <summary>
-    ///
+    /// Parse an external reference.
     /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
+    /// <param name="dtdSource">DTD source stream.</param>
+    /// <returns>External reference.</returns>
     XMLExternalReference DTD::parseExternalReference(ISource &dtdSource)
     {
         XMLExternalReference result;
@@ -223,7 +216,6 @@ namespace H4
     /// Parse externally defined DTD.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns></returns>
     void DTD::parseExternal(ISource & /*dtdSource*/)
     {
         parseExternalRefenceContent();

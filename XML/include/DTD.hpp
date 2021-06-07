@@ -106,7 +106,6 @@ namespace H4
         void parseElementName(ISource &contentSpecSource, IDestination &contentSpec);
         void parseElementMixedContent(ISource &contentSpecSource, IDestination &contentSpec);
         void parseElementContentSpecification(const std::string &elementName, XMLValue &contentSpec);
-        void parsePostProcessing();
         void parseExternalRefenceContent();
         void parseAttributeList(ISource &dtdSource);
         void parseNotation(ISource &dtdSource);
