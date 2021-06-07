@@ -96,7 +96,7 @@ namespace H4
     {
         if (contentSpecSource.current() != '(')
         {
-            throw XML::SyntaxError("Invalid content region specification.");
+            throw XML::SyntaxError("Invalid element content specification.");
         }
         contentSpecDestination.add("(");
         parseElementCP(contentSpecSource, contentSpecDestination);
@@ -107,7 +107,7 @@ namespace H4
         }
         if (contentSpecSource.current() != ')')
         {
-            throw XML::SyntaxError("Invalid content region specification.");
+            throw XML::SyntaxError("Invalid element content specification.");
         }
         contentSpecDestination.add(")");
         contentSpecSource.next();
@@ -122,7 +122,7 @@ namespace H4
     {
         if (contentSpecSource.current() != '(')
         {
-            throw XML::SyntaxError("Invalid content region specification.");
+            throw XML::SyntaxError("Invalid element content specification.");
         }
         contentSpecDestination.add("(");
         parseElementCP(contentSpecSource, contentSpecDestination);
@@ -132,7 +132,7 @@ namespace H4
         }
         if (contentSpecSource.current() != ')')
         {
-            throw XML::SyntaxError("Invalid content region specification.");
+            throw XML::SyntaxError("Invalid element content specification.");
         }
         contentSpecDestination.add(")");
         contentSpecSource.next();
@@ -184,7 +184,7 @@ namespace H4
         }
         else
         {
-            throw XML::SyntaxError("Invalid content region specification.");
+            throw XML::SyntaxError("Invalid element content specification.");
         }
     }
     /// <summary>
@@ -209,12 +209,12 @@ namespace H4
                 }
                 else
                 {
-                    throw XML::SyntaxError("Invalid content region specification.");
+                    throw XML::SyntaxError("Invalid element content specification.");
                 }
             }
             if (contentSpecSource.current() != ')')
             {
-                throw XML::SyntaxError("Invalid content region specification.");
+                throw XML::SyntaxError("Invalid element content specification.");
             }
             contentSpecDestination.add(")");
             contentSpecSource.next();
@@ -227,7 +227,7 @@ namespace H4
             }
             if (contentSpecSource.more() && !std::iswspace(contentSpecSource.current()))
             {
-                throw XML::SyntaxError("Invalid content region specification.");
+                throw XML::SyntaxError("Invalid element content specification.");
             }
         }
         else if (contentSpecSource.current() == ')')
@@ -236,7 +236,7 @@ namespace H4
         }
         else
         {
-            throw XML::SyntaxError("Invalid content region specification.");
+            throw XML::SyntaxError("Invalid element content specification.");
         }
     }
     /// <summary>
@@ -267,15 +267,15 @@ namespace H4
             }
             else
             {
-                throw XML::SyntaxError("Invalid content region specification.");
+                throw XML::SyntaxError("Invalid element content specification.");
             }
             contentSpec.parsed = contentSpecDestination.getBuffer();
         }
         catch (XML::SyntaxError &e)
         {
-            if (e.what() == std::string("XML Syntax Error: Invalid content region specification."))
+            if (e.what() == std::string("XML Syntax Error: Invalid element content specification."))
             {
-                throw XML::SyntaxError("Invalid content region specification for element <" + elementName + ">.");
+                throw XML::SyntaxError("Invalid content specification for element <" + elementName + ">.");
             }
             else
             {

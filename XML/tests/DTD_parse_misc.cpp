@@ -170,7 +170,7 @@ TEST_CASE("Parse XML DTD and check values.", "[XML][Parse][DTD]")
 TEST_CASE("Parse XML DTD with various element content specification errors.", "[XML][Parse][DTD][Error]")
 {
   std::string xmlString;
-  SECTION("XML with a DTD that contains an illegal mixed content specification (#PCDATA doesnt come first).", "[XML][Parse][DTD]")
+  SECTION("XML with a DTD that contains an illegal mixed content specification (#PCDATA doesnt come first).", "[XML][Parse][DTD][Error]"")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!-- Fig. B.5 : mixed.xml-->\n"
@@ -188,7 +188,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
                 "</format>";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <format>.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <format>.");
   }
   SECTION("XML with a DTD that contains an illegal mixed content specification (does not end with '*').", "[XML][Parse][DTD][Error]")
   {
@@ -208,7 +208,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
                 "</format>";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <format>.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <format>.");
   }
   SECTION("Parse XML with DTD that cotains a content specification in error (missing ',').", "[XML][Parse][DTD][Error]")
   {
@@ -226,7 +226,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
                 "</note>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <note>.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <note>.");
   }
   SECTION("Parse XML with DTD that cotains a content specification in error (missing element name).", "[XML][Parse][DTD][Error]")
   {
@@ -244,7 +244,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
                 "</note>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <note>.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <note>.");
   }
   SECTION("XML with a DTD that contains an illegal mixed content specification (uses ',').", "[XML][Parse][DTD][Error]")
   {
@@ -264,7 +264,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
                 "</format>";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content region specification for element <format>.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <format>.");
   }
 }
 TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][Conditional]")

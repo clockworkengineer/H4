@@ -1,9 +1,11 @@
 //
 // Class: DTD
 //
-// Description: Document Type Declaration (DTD) XML validation code.
+// Description: XML DTD validation code.
 //
 // Dependencies:   C17++ - Language standard features used.
+//
+// TODO: This module is a work in progress (functionality and tests to be added).
 //
 // =================
 // CLASS DEFINITIONS
