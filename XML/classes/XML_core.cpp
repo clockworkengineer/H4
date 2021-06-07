@@ -211,7 +211,6 @@ namespace H4
     /// </summary>
     /// <param name="entityReference">Entity reference to lookup and return.</param>
     /// <param name="entityMapping">Entity mapping table.</param>
-    /// <returns></returns>
     void mapEntityReference(XMLValue &entityReference, XMLEntityMappings &entityMapping)
     {
         if (entityMapping.count(entityReference.unparsed) > 0)
@@ -282,7 +281,7 @@ namespace H4
     /// Parse literal string value and return it.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <returns>Literal string value.</returns>
     XMLValue parseValue(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity)
     {
         if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
@@ -320,7 +319,7 @@ namespace H4
     /// Translate any entities found in passed in string.
     /// </summary>
     /// <param name=""></param>
-    /// <returns></returns>
+    /// <returns>Translated string.</returns>
     std::string translateEntities(const std::string &toTranslate, const XMLEntityMappings &entityMapping, char type)
     {
         std::string translated = toTranslate;

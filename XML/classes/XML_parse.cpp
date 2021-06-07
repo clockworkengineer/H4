@@ -83,7 +83,6 @@ namespace H4
     /// </summary>
     /// <param name="xmlNodeElement">Current element node.</param>
     /// <param name="content">Content to add to new content node (XMLNodeCotent).</param>
-    /// <returns></returns>
     void XML::parseAddElementContent(XMLNodeElement *xmlNodeElement, const std::string &content)
     {
         // Make sure there is a content node to recieve characters
@@ -119,7 +118,7 @@ namespace H4
     /// Parse a element tag name and set its value in current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <param name="xmlNodeElement">Current element node.</param>
     void XML::parseTagName(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         xmlNodeElement->name = parseName(xmlSource);
@@ -129,7 +128,7 @@ namespace H4
     /// of elements for the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <param name="xmlNodeElement">Current element node.</param>
     void XML::parseComment(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         XMLNodeComment xmlNodeComment;
@@ -145,11 +144,11 @@ namespace H4
         xmlNodeElement->children.emplace_back(std::make_unique<XMLNodeComment>(std::move(xmlNodeComment)));
     }
     /// <summary>
-    /// Parse a XML process instruction, create an XNode for it and add it to
+    /// Parse a XML process instruction, create an XMLNodePI for it and add it to
     /// the list of elements under the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <param name="xmlNodeElement">Current element node.</param>
     void XML::parsePI(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         XMLNodePI xmlNodePI;
@@ -162,11 +161,11 @@ namespace H4
         xmlNodeElement->children.emplace_back(std::make_unique<XMLNodePI>(std::move(xmlNodePI)));
     }
     /// <summary>
-    /// Parse an XML CDATA section create an XNode for it and add it to
+    /// Parse an XML CDATA section, create an XNodeCDATA for it and add it to
     /// the list of elements under the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <param name="xmlNodeElement">Current element node.</param>
     void XML::parseCDATA(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         XMLNodeCDATA xmlNodeCDATA;
@@ -193,7 +192,7 @@ namespace H4
     /// the list of attributes associated with the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <param name="xmlNodeElement">Current element node.</param>
     void XML::parseAttributes(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         while (xmlSource.more() &&
@@ -223,7 +222,7 @@ namespace H4
         }
         for (auto attribute : xmlNodeElement->getAttributeList())
         {
-            if (attribute.name.find("xmlns")==0)
+            if (attribute.name.find("xmlns") == 0)
             {
                 attribute.name = (attribute.name.size() > 5) ? attribute.name.substr(6) : ":";
                 xmlNodeElement->addNameSpace(attribute.name, attribute.value);
@@ -234,7 +233,7 @@ namespace H4
     /// Recursively parse any child elements of the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <param name="xmlNodeElement">Current element node.</param>
     void XML::parseChildElement(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         XMLNodeElement xmlNodeChildElement;
@@ -256,7 +255,7 @@ namespace H4
     /// Parse any element content that is found.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <param name="xmlNodeElement">Current element node.</param>
     void XML::parseDefault(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         XMLValue entityReference = parseCharacter(xmlSource, m_dtd.m_entityMapping);
@@ -270,11 +269,11 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse element content area generating any XNodes and adding them
+    /// Parse element content area, generating any XNodes and adding them
     /// to the list of the current XMLNodeElement.
     /// </summary>
     /// <param name="xmlSource">XMl source stream.</param>
-    /// <returns></returns>
+    /// <param name="xmlNodeElement">Current element node.</param>
     void XML::parseElementContents(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         if (xmlSource.match(U"<!--"))
@@ -310,7 +309,7 @@ namespace H4
     /// Parse current XML element found.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
-    /// <returns></returns>
+    /// <param name="xmlNodeElement">Current element node.</param>
     void XML::parseElement(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         parseTagName(xmlSource, xmlNodeElement);
@@ -343,6 +342,7 @@ namespace H4
     /// Document Type Declaration (DTD).
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
+    /// <param name="xmlNodeProlog">Prolog element node.</param>
     void XML::parseProlog(ISource &xmlSource, XMLNodeElement *xmlNodeProlog)
     {
         xmlNodeProlog->setNodeType(XMLNodeType::prolog);
