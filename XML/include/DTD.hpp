@@ -91,6 +91,7 @@ namespace H4
         void validateContentSpecification(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
         void validateElement(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
         void validateElements(XMLNodeDTD *dtd, XMLNode *xNodeRoot);
+        bool validateIsIDOK(const std::string &idValue);
         bool validateIsPCDATA(XMLNodeElement *xNodeElement);
         bool validateIsEMPTY(XMLNodeElement *xNodeElement);
         void parseConditional(ISource &dtdSource, bool includeOff = true);

@@ -698,4 +698,52 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     xml.parse();
     REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 18] IDREF attribute 'i010' does not reference any element with the ID.");
   }
+  SECTION("Validate XML that has a an IDREF attribute value that does not start with a letter, '_' or ':'.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE collection [\n"
+                "<!ELEMENT collection (item|itemsOnLoan)+>\n"
+                "<!ELEMENT item (#PCDATA)>\n"
+                "<!ELEMENT itemsOnLoan (#PCDATA)>\n"
+                "<!ATTLIST item itemID ID #REQUIRED >\n"
+                "<!ATTLIST itemsOnLoan itemsLoanedIDs IDREFS #IMPLIED >\n"
+                "]>\n"
+                "<collection>\n"
+                "<item itemID=\"i001\">item descripton</item>\n"
+                "<item itemID=\"i002\">item descripton</item>\n"
+                "<item itemID=\"i003\">item descripton</item>\n"
+                "<item itemID=\"i004\">item descripton</item>\n"
+                "<item itemID=\"i005\">item descripton</item>\n"
+                "<item itemID=\"i006\">item descripton</item>\n"
+                "<itemsOnLoan itemsLoanedIDs=\"i006 i003 005\">reason for loan</itemsOnLoan>\n"
+                "</collection>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 16] Element <itemsOnLoan> ID attribute 'itemsLoanedIDs' has a value that does not start with a letter, '_' or ':'.");
+  }
+  SECTION("Validate XML that has a an IDREF attribute value that does not exist on an element.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE collection [\n"
+                "<!ELEMENT collection (item|itemsOnLoan)+>\n"
+                "<!ELEMENT item (#PCDATA)>\n"
+                "<!ELEMENT itemsOnLoan (#PCDATA)>\n"
+                "<!ATTLIST item itemID ID #REQUIRED >\n"
+                "<!ATTLIST itemsOnLoan itemsLoanedIDs IDREFS #IMPLIED >\n"
+                "]>\n"
+                "<collection>\n"
+                "<item itemID=\"i001\">item descripton</item>\n"
+                "<item itemID=\"i002\">item descripton</item>\n"
+                "<item itemID=\"i003\">item descripton</item>\n"
+                "<item itemID=\"i004\">item descripton</item>\n"
+                "<item itemID=\"i005\">item descripton</item>\n"
+                "<item itemID=\"i006\">item descripton</item>\n"
+                "<itemsOnLoan itemsLoanedIDs=\"i006 i003 i008\">reason for loan</itemsOnLoan>\n"
+                "</collection>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 18] IDREF attribute 'i008' does not reference any element with the ID.");
+  }
 }

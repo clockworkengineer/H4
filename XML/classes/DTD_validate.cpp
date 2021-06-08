@@ -45,6 +45,20 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
+    bool DTD::validateIsIDOK(const std::string &idValue)
+    {
+
+        if (idValue[0] != '_' && !std::isalpha(idValue[0]) && idValue[0] != ':')
+        {
+            return (false);
+        }
+        return (true);
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     bool DTD::validateIsPCDATA(XMLNodeElement *xmlNodeElement)
     {
         for (auto &element : xmlNodeElement->children)
@@ -106,15 +120,13 @@ namespace H4
                 if (xmlNodeElement->isAttributePresent(attribute.name))
                 {
                     XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-                    if (elementAttribute.value.parsed[0] != '_' &&
-                        !std::isalpha(elementAttribute.value.parsed[0]) &&
-                        elementAttribute.value.parsed[0] != ':')
+                    if (!validateIsIDOK(elementAttribute.value.parsed))
                     {
-                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
+                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' has a value that does not start with a letter, '_' or ':'.");
                     }
                     if (m_assignedIDValues.find(elementAttribute.value.parsed) != m_assignedIDValues.end())
                     {
-                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + elementAttribute.name + "' is not unique.");
+                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' is not unique.");
                     }
                     m_assignedIDValues.insert(elementAttribute.value.parsed);
                 }
@@ -124,13 +136,25 @@ namespace H4
                 if (xmlNodeElement->isAttributePresent(attribute.name))
                 {
                     XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-                    if (elementAttribute.value.parsed[0] != '_' &&
-                        !std::isalpha(elementAttribute.value.parsed[0]) &&
-                        elementAttribute.value.parsed[0] != ':')
+                    if (!validateIsIDOK(elementAttribute.value.parsed))
                     {
-                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> IDREF attribute '" + elementAttribute.name + "' has a value that does not start with a letter, '_' or ':'.");
+                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' has a value that does not start with a letter, '_' or ':'.");
                     }
                     m_assignedIDREFValues.insert(elementAttribute.value.parsed);
+                }
+            }
+            else if (attribute.type == "IDREFS")
+            {
+                if (xmlNodeElement->isAttributePresent(attribute.name))
+                {
+                    for (auto &id : splitString(xmlNodeElement->getAttribute(attribute.name).value.parsed, ' '))
+                    {
+                        if (!validateIsIDOK(id))
+                        {
+                            throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' has a value that does not start with a letter, '_' or ':'.");
+                        }
+                        m_assignedIDREFValues.insert(id);
+                    }
                 }
             }
             else if (attribute.type[0] == '(')
@@ -274,7 +298,7 @@ namespace H4
             break;
         case XMLNodeType::root:
         case XMLNodeType::element:
-            if (xmlNode->getNodeType()==XMLNodeType::root && XMLNodeRef<XMLNodeElement>((*xmlNode)).name != m_name)
+            if (xmlNode->getNodeType() == XMLNodeType::root && XMLNodeRef<XMLNodeElement>((*xmlNode)).name != m_name)
             {
                 throw XML::ValidationError(*this, "DOCTYPE name does not match that of root element " + XMLNodeRef<XMLNodeElement>((*xmlNode)).name + " of DTD.");
             }
@@ -329,7 +353,7 @@ namespace H4
                 validateElements(dtd, &prolog);
                 for (auto &idref : m_assignedIDREFValues)
                 {
-                    if (m_assignedIDValues.find(idref)==m_assignedIDValues.end())
+                    if (m_assignedIDValues.find(idref) == m_assignedIDValues.end())
                     {
                         throw XML::ValidationError(*this, "IDREF attribute '" + idref + "' does not reference any element with the ID.");
                     }

@@ -170,7 +170,7 @@ TEST_CASE("Parse XML DTD and check values.", "[XML][Parse][DTD]")
 TEST_CASE("Parse XML DTD with various element content specification errors.", "[XML][Parse][DTD][Error]")
 {
   std::string xmlString;
-  SECTION("XML with a DTD that contains an illegal mixed content specification (#PCDATA doesnt come first).", "[XML][Parse][DTD][Error]"")
+  SECTION("XML with a DTD that contains an illegal mixed content specification (#PCDATA doesnt come first).", "[XML][Parse][DTD][Error]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!-- Fig. B.5 : mixed.xml-->\n"
