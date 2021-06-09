@@ -652,7 +652,7 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     xml.parse();
     REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 11] Element <item> ID attribute 'itemID' is not unique.");
   }
-  SECTION("Validate XML that has an element with an ID attribute value that does not start with a letter, '_' or ':'.", "[XML][Valid][DTD]")
+  SECTION("Validate XML that has an element with an ID attribute value that is invalid.", "[XML][Valid][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE collection ["
@@ -671,7 +671,7 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 11] Element <item> ID attribute 'itemID' that is invalid.");
+    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 11] Element <item> ID attribute 'itemID' is invalid.");
   }
   SECTION("Validate XML that has a missing ID referenced  by an IDREF.", "[XML][Valid][DTD]")
   {
@@ -698,7 +698,7 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     xml.parse();
     REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 18] IDREF attribute 'i010' does not reference any element with the ID.");
   }
-  SECTION("Validate XML that has a an IDREF attribute value that does not start with a letter, '_' or ':'.", "[XML][Valid][DTD]")
+  SECTION("Validate XML that has a an IDREF attribute value that is invalid.", "[XML][Valid][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE collection [\n"
@@ -720,7 +720,7 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 16] Element <itemsOnLoan> ID attribute 'itemsLoanedIDs' that is invalid.");
+    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 16] Element <itemsOnLoan> IDREFS attribute 'itemsLoanedIDs' contains an invalid IDREF.");
   }
   SECTION("Validate XML that has a an IDREF attribute value that does not exist on an element.", "[XML][Valid][DTD]")
   {
@@ -745,5 +745,49 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     XML xml(xmlSource);
     xml.parse();
     REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 18] IDREF attribute 'i008' does not reference any element with the ID.");
+  }
+  SECTION("Validate XML that has an valid NMTOKEN attributes and usage.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE mountains [\n"
+                "<!ELEMENT mountains (mountain)+>\n"
+                "<!ELEMENT mountain (name)>\n"
+                "<!ELEMENT name (#PCDATA)>\n"
+                "<!ATTLIST mountain country NMTOKEN #REQUIRED >\n"
+                "]>\n"
+                "<mountains>\n"
+                "<mountain country=\"NZ\">\n"
+                "<name>Mount Cook</name>\n"
+                "</mountain>\n"
+                "<mountain country=\" AU \">\n"
+                "<name>Cradle Mountain</name>\n"
+                "</mountain>\n"
+                "</mountains>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE_NOTHROW(xml.validate());
+  }
+  SECTION("Validate XML that has an invalid NMTOKEN attribute (internal whitespace).", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE mountains [\n"
+                "<!ELEMENT mountains (mountain)+>\n"
+                "<!ELEMENT mountain (name)>\n"
+                "<!ELEMENT name (#PCDATA)>\n"
+                "<!ATTLIST mountain country NMTOKEN #REQUIRED >\n"
+                "]>\n"
+                "<mountains>\n"
+                "<mountain country=\"New Zealand\">\n"
+                "<name>Mount Cook</name>\n"
+                "</mountain>\n"
+                "<mountain country=\"Australia\">\n"
+                "<name>Cradle Mountain</name>\n"
+                "</mountain>\n"
+                "</mountains>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 9] Element <mountain> NMTOKEN attribute 'country' is invalid.");
   }
 }

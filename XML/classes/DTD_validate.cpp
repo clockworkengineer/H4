@@ -45,10 +45,34 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
+    bool DTD::validateIsNMTOKENOK(std::string nmTokenValue)
+    {
+        nmTokenValue.erase(nmTokenValue.begin(), std::find_if(nmTokenValue.begin(), nmTokenValue.end(), [](unsigned char ch)
+                                                              { return !std::iswspace(ch); }));
+        nmTokenValue.erase(std::find_if(nmTokenValue.rbegin(), nmTokenValue.rend(), [](unsigned char ch)
+                                        { return !std::iswspace(ch); }).base(), nmTokenValue.end());
+        BufferSource nmTokenValueSource(nmTokenValue);
+        while(nmTokenValueSource.more()) {
+            if (!validNameChar(nmTokenValueSource.current())){
+                return(false);
+            }
+            nmTokenValueSource.next();
+        }
+        return (true);
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     bool DTD::validateIsIDOK(const std::string &idValue)
     {
-
-        if (idValue[0] != '_' && !std::isalpha(idValue[0]) && idValue[0] != ':')
+        try
+        {
+            BufferSource idSource(idValue);
+            parseName(idSource);
+        }
+        catch (std::exception &e)
         {
             return (false);
         }
@@ -82,96 +106,91 @@ namespace H4
     }
     /// <summary>
     ///
+    /// Validate a elements attribute type which can be one of the following.
+    ///
+    /// CDATA	      The value is character data
+    /// (en1|en2|..)  The value must be one from an enumerated list
+    /// ID	          The value is a unique id
+    /// IDREF         The value is the id of another element
+    /// IDREFS        The value is a list of other ids
+    /// NMTOKEN       The value is a valid DTD name
+    /// NMTOKENS	  The value is a list of valid DTD names
+    /// ENTIT         The value is an entity
+    /// ENTITIES	  The value is a list of entities
+    /// NOTATION	  The value is a name of a notation
+    /// xml:          The value is a predefined xml value
+    ///
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
+    void DTD::validateAttributeType(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
+    {
+        XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
+        if (attribute.type == "CDATA")
+        {
+            if (elementAttribute.value.parsed.empty()) // No character data present.
+            {
+                //throw XML::ValidationError(*this, "");
+            }
+        }
+        else if (attribute.type == "ID")
+        {
+            if (!validateIsIDOK(elementAttribute.value.parsed))
+            {
+                throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' is invalid.");
+            }
+            if (m_assignedIDValues.find(elementAttribute.value.parsed) != m_assignedIDValues.end())
+            {
+                throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' is not unique.");
+            }
+            m_assignedIDValues.insert(elementAttribute.value.parsed);
+        }
+        else if (attribute.type == "IDREF")
+        {
+            if (!validateIsIDOK(elementAttribute.value.parsed))
+            {
+                throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> IDREF attribute '" + attribute.name + "' is invalid.");
+            }
+            m_assignedIDREFValues.insert(elementAttribute.value.parsed);
+        }
+        else if (attribute.type == "IDREFS")
+        {
+            for (auto &id : splitString(elementAttribute.value.parsed, ' '))
+            {
+                if (!validateIsIDOK(id))
+                {
+                    throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> IDREFS attribute '" + attribute.name + "' contains an invalid IDREF.");
+                }
+                m_assignedIDREFValues.insert(id);
+            }
+        }
+        else if (attribute.type == "NMTOKEN")
+        {
+            if (!validateIsNMTOKENOK(elementAttribute.value.parsed))
+            {
+                throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> NMTOKEN attribute '" + attribute.name + "' is invalid.");
+            }
+        }
+        else if (attribute.type[0] == '(')
+        {
+            std::set<std::string> options;
+            for (auto &option : splitString(attribute.type.substr(1, attribute.type.size() - 2), '|'))
+            {
+                options.insert(option);
+            }
+            if (options.find(elementAttribute.value.parsed) == options.end())
+            {
+                throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' contains invalid enumeration value '" + elementAttribute.value.parsed + "'.");
+            }
+        }
+    }
     void DTD::validateAttributes(XMLNodeDTD * /*dtd*/, XMLNodeElement *xmlNodeElement)
     {
         for (auto &attribute : m_elements[xmlNodeElement->name].attributes)
         {
-            // Validate a elements attribute type which can be one of the following.
-            //
-            // CDATA	    The value is character data
-            // (en1|en2|..)	The value must be one from an enumerated list
-            // ID	        The value is a unique id
-            // IDREF        The value is the id of another element
-            // IDREFS       The value is a list of other ids
-            // NMTOKEN      The value is a valid DTD name
-            // NMTOKENS	    The value is a list of valid DTD names
-            // ENTIT        The value is an entity
-            // ENTITIES	    The value is a list of entities
-            // NOTATION	    The value is a name of a notation
-            // xml:         The value is a predefined xml value
-            //
-            // AT PRESENT ONLY ENUMERATION DEALT WITH.
-            if (attribute.type == "CDATA")
+            if (xmlNodeElement->isAttributePresent(attribute.name))
             {
-                if (xmlNodeElement->isAttributePresent(attribute.name))
-                {
-                    XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-                    if (elementAttribute.value.parsed.empty()) // No character data present.
-                    {
-                        //throw XML::ValidationError(*this, "");
-                    }
-                }
-            }
-            else if (attribute.type == "ID")
-            {
-                if (xmlNodeElement->isAttributePresent(attribute.name))
-                {
-                    XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-                    if (!validateIsIDOK(elementAttribute.value.parsed))
-                    {
-                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' that is invalid.");
-                    }
-                    if (m_assignedIDValues.find(elementAttribute.value.parsed) != m_assignedIDValues.end())
-                    {
-                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' is not unique.");
-                    }
-                    m_assignedIDValues.insert(elementAttribute.value.parsed);
-                }
-            }
-            else if (attribute.type == "IDREF")
-            {
-                if (xmlNodeElement->isAttributePresent(attribute.name))
-                {
-                    XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-                    if (!validateIsIDOK(elementAttribute.value.parsed))
-                    {
-                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' that is invalid.");
-                    }
-                    m_assignedIDREFValues.insert(elementAttribute.value.parsed);
-                }
-            }
-            else if (attribute.type == "IDREFS")
-            {
-                if (xmlNodeElement->isAttributePresent(attribute.name))
-                {
-                    for (auto &id : splitString(xmlNodeElement->getAttribute(attribute.name).value.parsed, ' '))
-                    {
-                        if (!validateIsIDOK(id))
-                        {
-                            throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' that is invalid.");
-                        }
-                        m_assignedIDREFValues.insert(id);
-                    }
-                }
-            }
-            else if (attribute.type[0] == '(')
-            {
-                std::set<std::string> options;
-                for (auto &option : splitString(attribute.type.substr(1, attribute.type.size() - 2), '|'))
-                {
-                    options.insert(option);
-                }
-                if (xmlNodeElement->isAttributePresent(attribute.name))
-                {
-                    XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-                    if (options.find(elementAttribute.value.parsed) == options.end())
-                    {
-                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' contains invalid enumeration value '" + elementAttribute.value.parsed + "'.");
-                    }
-                }
+                validateAttributeType(xmlNodeElement, attribute);
             }
             // Validate attribute value which can be:
             // value	    The default value of the attribute
