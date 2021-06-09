@@ -671,7 +671,7 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 11] Element <item> ID attribute 'itemID' has a value that does not start with a letter, '_' or ':'.");
+    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 11] Element <item> ID attribute 'itemID' that is invalid.");
   }
   SECTION("Validate XML that has a missing ID referenced  by an IDREF.", "[XML][Valid][DTD]")
   {
@@ -720,7 +720,7 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 16] Element <itemsOnLoan> ID attribute 'itemsLoanedIDs' has a value that does not start with a letter, '_' or ':'.");
+    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 16] Element <itemsOnLoan> ID attribute 'itemsLoanedIDs' that is invalid.");
   }
   SECTION("Validate XML that has a an IDREF attribute value that does not exist on an element.", "[XML][Valid][DTD]")
   {

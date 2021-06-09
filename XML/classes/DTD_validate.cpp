@@ -122,7 +122,7 @@ namespace H4
                     XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
                     if (!validateIsIDOK(elementAttribute.value.parsed))
                     {
-                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' has a value that does not start with a letter, '_' or ':'.");
+                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' that is invalid.");
                     }
                     if (m_assignedIDValues.find(elementAttribute.value.parsed) != m_assignedIDValues.end())
                     {
@@ -138,7 +138,7 @@ namespace H4
                     XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
                     if (!validateIsIDOK(elementAttribute.value.parsed))
                     {
-                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' has a value that does not start with a letter, '_' or ':'.");
+                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' that is invalid.");
                     }
                     m_assignedIDREFValues.insert(elementAttribute.value.parsed);
                 }
@@ -151,7 +151,7 @@ namespace H4
                     {
                         if (!validateIsIDOK(id))
                         {
-                            throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' has a value that does not start with a letter, '_' or ':'.");
+                            throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' that is invalid.");
                         }
                         m_assignedIDREFValues.insert(id);
                     }
