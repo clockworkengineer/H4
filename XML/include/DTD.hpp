@@ -93,6 +93,7 @@ namespace H4
         void validateElements(XMLNodeDTD *dtd, XMLNode *xNodeRoot);
         bool validateIsNMTOKENOK(std::string nmTokenValue);
         bool validateIsIDOK(const std::string &idValue);
+        void validateAttributeValue(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute);
         void validateAttributeType(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute);
         bool validateIsPCDATA(XMLNodeElement *xNodeElement);
         bool validateIsEMPTY(XMLNodeElement *xNodeElement);

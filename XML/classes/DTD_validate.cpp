@@ -47,14 +47,13 @@ namespace H4
     /// <returns></returns>
     bool DTD::validateIsNMTOKENOK(std::string nmTokenValue)
     {
-        nmTokenValue.erase(nmTokenValue.begin(), std::find_if(nmTokenValue.begin(), nmTokenValue.end(), [](unsigned char ch)
-                                                              { return !std::iswspace(ch); }));
-        nmTokenValue.erase(std::find_if(nmTokenValue.rbegin(), nmTokenValue.rend(), [](unsigned char ch)
-                                        { return !std::iswspace(ch); }).base(), nmTokenValue.end());
+        trimmString(nmTokenValue);
         BufferSource nmTokenValueSource(nmTokenValue);
-        while(nmTokenValueSource.more()) {
-            if (!validNameChar(nmTokenValueSource.current())){
-                return(false);
+        while (nmTokenValueSource.more())
+        {
+            if (!validNameChar(nmTokenValueSource.current()))
+            {
+                return (false);
             }
             nmTokenValueSource.next();
         }
@@ -106,6 +105,58 @@ namespace H4
     }
     /// <summary>
     ///
+    /// Validate attribute value which can be:
+    ///
+    /// value	        The default value of the attribute
+    /// #REQUIRED       The attribute is required
+    /// #IMPLIED	    The attribute is optional
+    /// #FIXED value	The attribute value is fixed
+    ////
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void DTD::validateAttributeValue(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
+    {
+        if (attribute.value.parsed == "#REQUIRED")
+        {
+            if (!xmlNodeElement->isAttributePresent(attribute.name))
+            {
+                throw XML::ValidationError(*this, "Required attribute '" + attribute.name + "' missing for element <" + xmlNodeElement->name + ">.");
+            }
+        }
+        else if (attribute.value.parsed == "#IMPLIED")
+        {
+            return;
+        }
+        else if (attribute.value.parsed.find("#FIXED ") == 0)
+        {
+            if (xmlNodeElement->isAttributePresent(attribute.name))
+            {
+                XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
+                if (attribute.value.parsed.substr(7) != elementAttribute.value.parsed)
+                {
+                    throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' is '" + elementAttribute.value.parsed + "' instead of '" + attribute.value.parsed.substr(7) + "'.");
+                }
+            }
+            else
+            {
+                XMLValue value;
+                value.parsed = value.unparsed = attribute.value.parsed.substr(7);
+                xmlNodeElement->addAttribute(attribute.name, value);
+            }
+        }
+        else
+        {
+            if (!xmlNodeElement->isAttributePresent(attribute.name))
+            {
+                XMLValue value;
+                value.parsed = value.unparsed = attribute.value.parsed;
+                xmlNodeElement->addAttribute(attribute.name, value);
+            }
+        }
+    }
+    /// <summary>
+    ///
     /// Validate a elements attribute type which can be one of the following.
     ///
     /// CDATA	      The value is character data
@@ -115,7 +166,7 @@ namespace H4
     /// IDREFS        The value is a list of other ids
     /// NMTOKEN       The value is a valid DTD name
     /// NMTOKENS	  The value is a list of valid DTD names
-    /// ENTIT         The value is an entity
+    /// ENTITY        The value is an entity
     /// ENTITIES	  The value is a list of entities
     /// NOTATION	  The value is a name of a notation
     /// xml:          The value is a predefined xml value
@@ -130,7 +181,7 @@ namespace H4
         {
             if (elementAttribute.value.parsed.empty()) // No character data present.
             {
-                //throw XML::ValidationError(*this, "");
+                XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' does not contain character data.");
             }
         }
         else if (attribute.type == "ID")
@@ -171,6 +222,29 @@ namespace H4
                 throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> NMTOKEN attribute '" + attribute.name + "' is invalid.");
             }
         }
+        else if (attribute.type == "NMTOKENS")
+        {
+            for (auto &nmtoken : splitString(elementAttribute.value.parsed, ' '))
+            {
+                if (!validateIsNMTOKENOK(nmtoken))
+                {
+                    throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> NMTOKEN attribute '" + attribute.name + "' contains an invald NMTOKEN.");
+                }
+            }
+        }
+        else if (attribute.type == "ENTITY")
+        {
+            if (m_entityMapping.count("&" + elementAttribute.value.parsed + ";") == 0)
+            {
+                throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ENTITY attribute '" + attribute.name + "' value '"+elementAttribute.value.parsed+"' is not defined.");
+            }
+        }
+        else if (attribute.type == "ENTITIES")
+        {
+        }
+        else if (attribute.type == "NOTATION")
+        {
+        }
         else if (attribute.type[0] == '(')
         {
             std::set<std::string> options;
@@ -184,6 +258,11 @@ namespace H4
             }
         }
     }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     void DTD::validateAttributes(XMLNodeDTD * /*dtd*/, XMLNodeElement *xmlNodeElement)
     {
         for (auto &attribute : m_elements[xmlNodeElement->name].attributes)
@@ -192,48 +271,7 @@ namespace H4
             {
                 validateAttributeType(xmlNodeElement, attribute);
             }
-            // Validate attribute value which can be:
-            // value	    The default value of the attribute
-            // #REQUIRED    The attribute is required
-            // #IMPLIED	    The attribute is optional
-            // #FIXED value	The attribute value is fixed
-            if (attribute.value.parsed == "#REQUIRED")
-            {
-                if (!xmlNodeElement->isAttributePresent(attribute.name))
-                {
-                    throw XML::ValidationError(*this, "Required attribute '" + attribute.name + "' missing for element <" + xmlNodeElement->name + ">.");
-                }
-            }
-            else if (attribute.value.parsed == "#IMPLIED")
-            {
-                continue;
-            }
-            else if (attribute.value.parsed.find("#FIXED ") == 0)
-            {
-                if (xmlNodeElement->isAttributePresent(attribute.name))
-                {
-                    XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-                    if (attribute.value.parsed.substr(7) != elementAttribute.value.parsed)
-                    {
-                        throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' is '" + elementAttribute.value.parsed + "' instead of '" + attribute.value.parsed.substr(7) + "'.");
-                    }
-                }
-                else
-                {
-                    XMLValue value;
-                    value.parsed = value.unparsed = attribute.value.parsed.substr(7);
-                    xmlNodeElement->addAttribute(attribute.name, value);
-                }
-            }
-            else
-            {
-                if (!xmlNodeElement->isAttributePresent(attribute.name))
-                {
-                    XMLValue value;
-                    value.parsed = value.unparsed = attribute.value.parsed;
-                    xmlNodeElement->addAttribute(attribute.name, value);
-                }
-            }
+            validateAttributeValue(xmlNodeElement, attribute);
         }
     }
     /// <summary>

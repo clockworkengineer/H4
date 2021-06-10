@@ -790,4 +790,72 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     xml.parse();
     REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 9] Element <mountain> NMTOKEN attribute 'country' is invalid.");
   }
+  SECTION("Validate XML that has an valid NMTOKENS attributes and usage.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE mountains [\n"
+                "<!ELEMENT mountains (mountain)+>\n"
+                "<!ELEMENT mountain (name)>\n"
+                "<!ELEMENT name (#PCDATA)>\n"
+                "<!ATTLIST mountains country NMTOKENS #REQUIRED >\n"
+                "]>\n"
+                "<mountains country=\"NZ AU\">\n"
+                "<mountain>\n"
+                "<name>Mount Cook</name>\n"
+                "</mountain>\n"
+                "<mountain>\n"
+                "<name>Cradle Mountain</name>\n"
+                "</mountain>\n"
+                "</mountains>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE_NOTHROW(xml.validate());
+  }
+  SECTION("Validate XML that has a valid ENTITY attribute (photo) and usage.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE mountains [\n"
+                "<!ELEMENT mountains (mountain)+>\n"
+                "<!ELEMENT mountain (name)>\n"
+                "<!ELEMENT name (#PCDATA)>\n"
+                "<!ATTLIST mountain photo ENTITY #IMPLIED>\n"
+                "<!ENTITY mt_cook_1 SYSTEM \"mt_cook1.jpg\">\n"
+                "]>\n"
+                "<mountains>\n"
+                "<mountain photo=\"mt_cook_1\">\n"
+                "<name>Mount Cook</name>\n"
+                "</mountain>\n"
+                "<mountain>\n"
+                "<name>Cradle Mountain</name>\n"
+                "</mountain>\n"
+                "</mountains>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE_NOTHROW(xml.validate());
+  }
+    SECTION("Validate XML that has an invalid ENTITY attribute (photo) and usage.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE mountains [\n"
+                "<!ELEMENT mountains (mountain)+>\n"
+                "<!ELEMENT mountain (name)>\n"
+                "<!ELEMENT name (#PCDATA)>\n"
+                "<!ATTLIST mountain photo ENTITY #IMPLIED>\n"
+                "<!ENTITY mt_cook_1 SYSTEM \"mt_cook1.jpg\">\n"
+                "]>\n"
+                "<mountains>\n"
+                "<mountain photo='mt_cook_1'>\n"
+                "<name>Mount Cook</name>\n"
+                "</mountain>\n"
+                "<mountain photo='None'>\n"
+                "<name>Cradle Mountain</name>\n"
+                "</mountain>\n"
+                "</mountains>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 13] Element <mountain> ENTITY attribute 'photo' value 'None' is not defined.");
+  }
 }
