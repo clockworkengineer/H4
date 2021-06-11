@@ -236,23 +236,30 @@ namespace H4
         {
             if (m_entityMapping.count("&" + elementAttribute.value.parsed + ";") == 0)
             {
-                throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ENTITY attribute '" + attribute.name + "' value '"+elementAttribute.value.parsed+"' is not defined.");
+                throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ENTITY attribute '" + attribute.name + "' value '" + elementAttribute.value.parsed + "' is not defined.");
             }
         }
         else if (attribute.type == "ENTITIES")
         {
+            for (auto &entity : splitString(elementAttribute.value.parsed, ' '))
+            {
+                if (m_entityMapping.count("&" + entity + ";") == 0)
+                {
+                    throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ENTITIES attribute '" + attribute.name + "' value '" + entity + "' is not defined.");
+                }
+            }
         }
         else if (attribute.type == "NOTATION")
         {
         }
         else if (attribute.type[0] == '(')
         {
-            std::set<std::string> options;
+            std::set<std::string> enumeration;
             for (auto &option : splitString(attribute.type.substr(1, attribute.type.size() - 2), '|'))
             {
-                options.insert(option);
+                enumeration.insert(option);
             }
-            if (options.find(elementAttribute.value.parsed) == options.end())
+            if (enumeration.find(elementAttribute.value.parsed) == enumeration.end())
             {
                 throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' contains invalid enumeration value '" + elementAttribute.value.parsed + "'.");
             }
