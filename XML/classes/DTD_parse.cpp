@@ -154,7 +154,7 @@ namespace H4
     std::string DTD::parseAttributeType(ISource &dtdSource)
     {
         std::string attributeType;
-        for (auto attrType : DTD::m_dtdAttrListTypes)
+        for (auto attrType : m_dtdAttrListTypes)
         {
             if (dtdSource.match(attrType))
             {
@@ -162,9 +162,13 @@ namespace H4
                 return (dtdSource.to_bytes(attrType));
             }
         }
+        if (dtdSource.match(U"NOTATION")) {
+            attributeType= "NOTATION ";
+            dtdSource.ignoreWS();
+        }
         if (dtdSource.current() == '(')
         {
-            return (parseAttributeEnumerationType(dtdSource));
+            return (attributeType+parseAttributeEnumerationType(dtdSource));
         }
         throw XML::SyntaxError(dtdSource, "Invalid attribute type specified.");
     }

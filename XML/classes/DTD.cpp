@@ -59,7 +59,6 @@ namespace H4
         m_dtdAttrListTypes.push_back(U"NMTOKEN");
         m_dtdAttrListTypes.push_back(U"ENTITIES");
         m_dtdAttrListTypes.push_back(U"ENTITY");
-        m_dtdAttrListTypes.push_back(U"NOTATION");
     }
     // ==============
     // PUBLIC METHODS

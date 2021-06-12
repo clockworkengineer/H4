@@ -249,8 +249,17 @@ namespace H4
                 }
             }
         }
-        else if (attribute.type == "NOTATION")
+        else if (attribute.type.find("NOTATION ") == 0)
         {
+            std::set<std::string> notations;
+            for (auto &notation : splitString(attribute.type.substr(10, attribute.type.size() - 11), '|'))
+            {
+                notations.insert(notation);
+            }
+            if (m_notations.count(elementAttribute.value.parsed) == 0)
+            {
+                throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> NOTATION attribute '" + attribute.name + "' value '" + elementAttribute.value.parsed + "' is not defined.");
+            }
         }
         else if (attribute.type[0] == '(')
         {

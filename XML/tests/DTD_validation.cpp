@@ -882,7 +882,7 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     xml.parse();
     REQUIRE_NOTHROW(xml.validate());
   }
-    SECTION("Validate XML that has a invalid ENTITIES attribute (photo).", "[XML][Valid][DTD]")
+  SECTION("Validate XML that has a invalid ENTITIES attribute (photo).", "[XML][Valid][DTD]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE mountains [\n"
@@ -904,33 +904,60 @@ TEST_CASE("Parse XML with various DTD attribute validation issues.", "[XML][DTD]
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
     xml.parse();
-    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 11] Element <mountain> ENTITIES attribute 'photo' value 'mt_cook_1,mt_cook_2' is not defined." );
+    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 11] Element <mountain> ENTITIES attribute 'photo' value 'mt_cook_1,mt_cook_2' is not defined.");
   }
-  //   SECTION("Validate XML that has a valid NOTATION attribute (photo) and usage.", "[XML][Valid][DTD]")
-  // {
-  //   xmlString = "<?xml version=\"1.0\"?>\n"
-  //               "<!DOCTYPE mountains [\n"
-  //               "<!ELEMENT mountains (mountain)+>\n"
-  //               "<!ELEMENT mountain (name)>\n"
-  //               "<!ELEMENT name (#PCDATA)>\n"
-  //               "<!NOTATION GIF SYSTEM \"image/gif\">\n"
-  //               "<!NOTATION JPG SYSTEM \"image/jpeg\">\n"
-  //               "<!NOTATION PNG SYSTEM \"image/png\">\n"
-  //               "<!ATTLIST mountain photo ENTITY #IMPLIED\n"
-  //               "photo_type NOTATION (GIF | JPG | PNG) #IMPLIED>\n"
-  //               "<!ENTITY mt_cook_1 SYSTEM \"mt_cook1.jpg\">\n"
-  //               "]>\n"
-  //               "<mountains>\n"
-  //               "<mountain photo=\"mt_cook_1\" photo_type=\"JPG\">\n"
-  //               "<name>Mount Cook</name>\n"
-  //               "</mountain>\n"
-  //               "<mountain>\n"
-  //               "<name>Cradle Mountain</name>\n"
-  //               "</mountain>\n"
-  //               "</mountains>\n";
-  //   BufferSource xmlSource(xmlString);
-  //   XML xml(xmlSource);
-  //   xml.parse();
-  //   REQUIRE_NOTHROW(xml.validate());
-  // }
+  SECTION("Validate XML that has a valid NOTATION attribute (photo_type) and usage.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE mountains [\n"
+                "<!ELEMENT mountains (mountain)+>\n"
+                "<!ELEMENT mountain (name)>\n"
+                "<!ELEMENT name (#PCDATA)>\n"
+                "<!NOTATION GIF SYSTEM \"image/gif\">\n"
+                "<!NOTATION JPG SYSTEM \"image/jpeg\">\n"
+                "<!NOTATION PNG SYSTEM \"image/png\">\n"
+                "<!ATTLIST mountain photo ENTITY #IMPLIED\n"
+                "photo_type NOTATION (GIF | JPG | PNG) #IMPLIED>\n"
+                "<!ENTITY mt_cook_1 SYSTEM \"mt_cook1.jpg\">\n"
+                "]>\n"
+                "<mountains>\n"
+                "<mountain photo=\"mt_cook_1\" photo_type=\"JPG\">\n"
+                "<name>Mount Cook</name>\n"
+                "</mountain>\n"
+                "<mountain>\n"
+                "<name>Cradle Mountain</name>\n"
+                "</mountain>\n"
+                "</mountains>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE_NOTHROW(xml.validate());
+  }
+  SECTION("Validate XML that has a invalid NOTATION attribute (photo_type BMP) and usage.", "[XML][Valid][DTD]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE mountains [\n"
+                "<!ELEMENT mountains (mountain)+>\n"
+                "<!ELEMENT mountain (name)>\n"
+                "<!ELEMENT name (#PCDATA)>\n"
+                "<!NOTATION GIF SYSTEM \"image/gif\">\n"
+                "<!NOTATION JPG SYSTEM \"image/jpeg\">\n"
+                "<!NOTATION PNG SYSTEM \"image/png\">\n"
+                "<!ATTLIST mountain photo ENTITY #IMPLIED\n"
+                "photo_type NOTATION (GIF | JPG | PNG) #IMPLIED>\n"
+                "<!ENTITY mt_cook_1 SYSTEM \"mt_cook1.jpg\">\n"
+                "]>\n"
+                "<mountains>\n"
+                "<mountain photo=\"mt_cook_1\" photo_type=\"BMP\">\n"
+                "<name>Mount Cook</name>\n"
+                "</mountain>\n"
+                "<mountain>\n"
+                "<name>Cradle Mountain</name>\n"
+                "</mountain>\n"
+                "</mountains>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    xml.parse();
+    REQUIRE_THROWS_WITH(xml.validate(), "XML Validation Error [Line: 14] Element <mountain> NOTATION attribute 'photo_type' value 'BMP' is not defined.");
+  }
 }

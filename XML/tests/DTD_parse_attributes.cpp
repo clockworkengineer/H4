@@ -278,7 +278,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Element <item> has more than one ID attribute.");
   }
-   SECTION("Parse XML with DTD that has a valid NOTATION attribute (photo) and usage.", "[XML][Parse][DTD][Attribtes][NOTATION]")
+  SECTION("Parse XML with DTD that has a valid NOTATION attribute (photo_type) and usage.", "[XML][Parse][DTD][Attribtes][NOTATION]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE mountains [\n"
@@ -302,7 +302,15 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
                 "</mountains>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    xml.parse();
-    REQUIRE_NOTHROW(xml.validate());
+    REQUIRE_NOTHROW(xml.parse());
+    REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
+    REQUIRE(xml.m_dtd.m_elements.find("mountain") != xml.m_dtd.m_elements.end());
+    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes.size() == 2);
+    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[0].name == "photo");
+    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[0].type == "ENTITY");
+    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[0].value.parsed == "#IMPLIED");
+    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].name == "photo_type");
+    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].type == "NOTATION (GIF|JPG|PNG)");
+    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].value.parsed == "#IMPLIED");
   }
 }
