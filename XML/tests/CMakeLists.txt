@@ -33,7 +33,8 @@ set(TEST_SOURCES
     DTD_parse_attributes.cpp
     DTD_parse_tags.cpp
     DTD_stringify.cpp
-    DTD_validation.cpp
+    DTD_validate_elements.cpp
+    DTD_validate_attributes.cpp
 )
 
 add_executable(${TEST_EXECUTABLE} ${TEST_SOURCES})

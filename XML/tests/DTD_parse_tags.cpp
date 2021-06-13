@@ -14,10 +14,10 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Parse XML DTD with missing terminating '>' on tags.", "[XML][Parse][DTD][Tags][Error]")
+TEST_CASE("Parse XML DTD with missing terminating '>' on tags.", "[XML][DTD][Parse][Tags][Error]")
 {
   std::string xmlString;
-  SECTION("XML with internal DTD with missing terminating '>' on !ELEMENT", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD with missing terminating '>' on !ELEMENT", "[XML][DTD][Parse]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE note ["
@@ -35,7 +35,7 @@ TEST_CASE("Parse XML DTD with missing terminating '>' on tags.", "[XML][Parse][D
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 4 Column: 2] Missing '>' terminator.");
   }
-  SECTION("XML with internal DTD with missing terminating '>' on !ATTLIST", "[XML][Parse][DTD][Tags][Error]")
+  SECTION("XML with internal DTD with missing terminating '>' on !ATTLIST", "[XML][DTD][Parse][Tags][Error]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE TVSCHEDULE [\n"
@@ -59,7 +59,7 @@ TEST_CASE("Parse XML DTD with missing terminating '>' on tags.", "[XML][Parse][D
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 15 Column: 2] Missing '>' terminator.");
   }
-  SECTION("XML with internal DTD with missing terminating '>' on !ENTITY", "[XML][Parse][DTD][Tags][Error]")
+  SECTION("XML with internal DTD with missing terminating '>' on !ENTITY", "[XML][DTD][Parse][Tags][Error]")
   {
     xmlString = "<!DOCTYPE REPORT [\n"
                 "<!ELEMENT REPORT (paragraph)*>\n"
@@ -70,7 +70,7 @@ TEST_CASE("Parse XML DTD with missing terminating '>' on tags.", "[XML][Parse][D
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 4 Column: 36] Missing '>' terminator.");
   }
-  SECTION("XML with internal DTD with missing terminating '>' on !NOTATION", "[XML][Parse][DTD][Tags][Error]")
+  SECTION("XML with internal DTD with missing terminating '>' on !NOTATION", "[XML][DTD][Parse][Tags][Error]")
   {
     xmlString = "<!DOCTYPE REPORT [\n"
                 "<!ELEMENT REPORT (paragraph)*>\n"

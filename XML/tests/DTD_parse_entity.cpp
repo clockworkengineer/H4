@@ -14,10 +14,10 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses", "[XML][Parse][DTD][Entity]")
+TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses", "[XML][DTD][Parse][Entity]")
 {
   std::string xmlString;
-  SECTION("XML DTD with entity definitions and uses", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity definitions and uses", "[XML][DTD][Parse]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note [\n"
@@ -32,7 +32,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("XML DTD with entity internal definitions and uses. Check translation of entity values", "[XML][Parse][DTD][Entity]")
+  SECTION("XML DTD with entity internal definitions and uses. Check translation of entity values", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note [\n"
@@ -51,7 +51,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.m_prolog[0][4].name == "footer");
     REQUIRE(xml.m_prolog[0][4].getContents() == "Writer: Donald Duck.\u00A0Copyright: W3Schools.");
   }
-  SECTION("XML DTD with entity and how it deals with entity character expansion case 1)", "[XML][Parse][DTD][Entity]")
+  SECTION("XML DTD with entity and how it deals with entity character expansion case 1)", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note [\n"
@@ -65,7 +65,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.m_prolog[0][0].name == "p");
     REQUIRE(xml.m_prolog[0][0].getContents() == "An ampersand (&) may be escaped numerically (&#38;) or with a general entity (&amp;).");
   }
-  SECTION("XML DTD with entity and how it deals with entity character expansion case 2)", "[XML][Parse][DTD][Entity]")
+  SECTION("XML DTD with entity and how it deals with entity character expansion case 2)", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE test [\n"
@@ -84,7 +84,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.m_prolog[0].name == "test");
     REQUIRE(xml.m_prolog[0].getContents() == "This sample shows a error-prone method.");
   }
-  SECTION("XML DTD with entity and how it deals with entity character expansion case 3)", "[XML][Parse][DTD][Entity]")
+  SECTION("XML DTD with entity and how it deals with entity character expansion case 3)", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE foo [\n"
@@ -103,7 +103,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(attribute.value.parsed == "&lt;");
   }
   // This should throw an error as & ' " < >  not allowed to be assigned to attribute directly (NEED TO FIX)
-  SECTION("XML DTD with entity and how it deals with entity character expansion case 4)", "[XML][Parse][DTD][Entity]")
+  SECTION("XML DTD with entity and how it deals with entity character expansion case 4)", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE foo [\n"
@@ -114,7 +114,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 5 Column: 21] Attribute value contains invalid character '<', '\"', ''' or '&'.");
   }
-  SECTION("XML DTD with entity used within an entity.", "[XML][Parse][DTD][Entity]")
+  SECTION("XML DTD with entity used within an entity.", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE author [\n"
@@ -135,7 +135,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(XMLNodeRef<XMLNodeEntityReference>(*xml.m_prolog[0].children[0]).getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
     REQUIRE(xml.m_prolog[0].getContents() == "Jo Smith josmith@theworldaccordingtojosmith.com");
   }
-  SECTION("XML DTD with entity used within an entity with recursion.", "[XML][Parse][DTD]")
+  SECTION("XML DTD with entity used within an entity with recursion.", "[XML][DTD][Parse]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE author [\n"
@@ -151,7 +151,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Entity '&js;' contains recursive definition which is not allowed.");
   }
-  SECTION("XML DTD with entity that contains a character reference that is parsed straight away.", "[XML][Parse][DTD][Entity]")
+  SECTION("XML DTD with entity that contains a character reference that is parsed straight away.", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE author [\n"
@@ -166,7 +166,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.getEntity("&email;").internal == "josmith@theworldaccordingtojosmith.com");
   }
-  SECTION("XML DTD with entity that is defined externally (file user.txt).", "[XML][Parse][DTD][Entity]")
+  SECTION("XML DTD with entity that is defined externally (file user.txt).", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE foo [\n"
@@ -182,7 +182,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.m_prolog[0].name == "foo");
     REQUIRE(xml.m_prolog[0].getContents() == "Hello John Joe Doe");
   }
-  SECTION("XML DTD with entity that is defined externally (file that does not exist).", "[XML][Parse][DTD][Entity]")
+  SECTION("XML DTD with entity that is defined externally (file that does not exist).", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE foo [\n"
@@ -194,7 +194,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Entity '&name;' source file './testData/unknown.txt' does not exist.");
   }
-  SECTION("XML with internal DTD with parameter entities to parse  (internal cannot appear within tags).", "[XML][Parse][DTD][Entity]")
+  SECTION("XML with internal DTD with parameter entities to parse  (internal cannot appear within tags).", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<!DOCTYPE REPORT [\n"
                 "<!ENTITY % empty_report \"<!ELEMENT REPORT EMPTY>\">"
@@ -205,7 +205,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("XML with internal DTD with parameter entities to parse and check values (internal cannot appear within tags).", "[XML][Parse][DTD][Entity]")
+  SECTION("XML with internal DTD with parameter entities to parse and check values (internal cannot appear within tags).", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<!DOCTYPE REPORT [\n"
                 "<!ENTITY % empty_report \"<!ELEMENT REPORT EMPTY>\">"
@@ -222,7 +222,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.m_dtd.m_elements["REPORT"].name == "REPORT");
     REQUIRE(xml.m_dtd.m_elements["REPORT"].content.parsed == "EMPTY");
   }
-  SECTION("XML with external DTD with parameter entities to parse.", "[XML][Parse][DTD][Entity]")
+  SECTION("XML with external DTD with parameter entities to parse.", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report01.dtd\">\n"
                 "<REPORT></REPORT>\n";
@@ -231,7 +231,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE_NOTHROW(xml.parse());
   }
 
-  SECTION("XML with external DTD with both types of entities to parse an check values", "[XML][Parse][DTD][Entity]")
+  SECTION("XML with external DTD with both types of entities to parse an check values", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report01.dtd\">"
                 "<REPORT></REPORT>\n";
@@ -255,7 +255,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.m_dtd.m_elements["shop"].name == "shop");
     REQUIRE(xml.m_dtd.m_elements["shop"].content.unparsed == "(name, street, pincode, city, phone)");
   }
-   SECTION("XML DTD with parameter entity within general entity.", "[XML][Parse][DTD][Entity]")
+   SECTION("XML DTD with parameter entity within general entity.", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note SYSTEM \"./testData/note002.dtd\">\n"

@@ -14,10 +14,10 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Parse XML with DTD both internal/external", "[XML][Parse][DTD]")
+TEST_CASE("Parse XML with DTD both internal/external", "[XML][DTD][Parse]")
 {
   std::string xmlString;
-  SECTION("XML with internal DTD", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD", "[XML][DTD][Parse]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE note ["
@@ -35,7 +35,7 @@ TEST_CASE("Parse XML with DTD both internal/external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("XML with external (SYSTEM) DTD", "[XML][Parse][DTD]")
+  SECTION("XML with external (SYSTEM) DTD", "[XML][DTD][Parse]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note SYSTEM \"./testData/note001.dtd\">\n"
@@ -47,7 +47,7 @@ TEST_CASE("Parse XML with DTD both internal/external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("XML with external (PUBLIC) DTD", "[XML][Parse][DTD]")
+  SECTION("XML with external (PUBLIC) DTD", "[XML][DTD][Parse]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
@@ -59,7 +59,7 @@ TEST_CASE("Parse XML with DTD both internal/external", "[XML][Parse][DTD]")
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("XML with external DTD with !NOTATION to parse and check values.", "[XML][Parse][DTD]")
+  SECTION("XML with external DTD with !NOTATION to parse and check values.", "[XML][DTD][Parse]")
   {
     xmlString = "<!DOCTYPE REPORT SYSTEM \"./testData/report02.dtd\">"
                 "<REPORT></REPORT>\n";
@@ -74,7 +74,7 @@ TEST_CASE("Parse XML with DTD both internal/external", "[XML][Parse][DTD]")
     REQUIRE(xml.m_dtd.m_notations["BMP"].type == "SYSTEM");
     REQUIRE(xml.m_dtd.m_notations["BMP"].systemID == "BMP");
   }
-  SECTION("XML with internal DTD containing comments.", "[XML][Parse][DTD]")
+  SECTION("XML with internal DTD containing comments.", "[XML][DTD][Parse]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE note ["
@@ -98,10 +98,10 @@ TEST_CASE("Parse XML with DTD both internal/external", "[XML][Parse][DTD]")
     REQUIRE_NOTHROW(xml.parse());
   }
 }
-TEST_CASE("Parse XML DTD and check values.", "[XML][Parse][DTD]")
+TEST_CASE("Parse XML DTD and check values.", "[XML][DTD][Parse]")
 {
   std::string xmlString;
-  SECTION("XML with internal to parse DTD and check values", "[XML][Parse][DTD]")
+  SECTION("XML with internal to parse DTD and check values", "[XML][DTD][Parse]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\n"
                 "<!DOCTYPE address [\n"
@@ -133,7 +133,7 @@ TEST_CASE("Parse XML DTD and check values.", "[XML][Parse][DTD]")
     REQUIRE(xml.m_dtd.m_elements["footer"].name == "footer");
     REQUIRE(xml.m_dtd.m_elements["footer"].content.unparsed == "ANY");
   }
-  SECTION("XML with external file DTD and check values", "[XML][Parse][DTD]")
+  SECTION("XML with external file DTD and check values", "[XML][DTD][Parse]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE note SYSTEM \"./testData/note001.dtd\">\n"
@@ -151,7 +151,7 @@ TEST_CASE("Parse XML DTD and check values.", "[XML][Parse][DTD]")
     REQUIRE(xml.m_dtd.m_elements["note"].name == "note");
     REQUIRE(xml.m_dtd.m_elements["note"].content.unparsed == "(to,from,heading,body)");
   }
-  SECTION("XML with external URL DTD to parse and check values", "[XML][Parse][DTD]")
+  SECTION("XML with external URL DTD to parse and check values", "[XML][DTD][Parse]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\""
@@ -167,10 +167,10 @@ TEST_CASE("Parse XML DTD and check values.", "[XML][Parse][DTD]")
     REQUIRE(xml.m_dtd.m_external.publicID == "-//W3C//DTD XHTML 1.0 Transitional//EN");
   }
 }
-TEST_CASE("Parse XML DTD with various element content specification errors.", "[XML][Parse][DTD][Error]")
+TEST_CASE("Parse XML DTD with various element content specification errors.", "[XML][DTD][Parse][Error]")
 {
   std::string xmlString;
-  SECTION("XML with a DTD that contains an illegal mixed content specification (#PCDATA doesnt come first).", "[XML][Parse][DTD][Error]")
+  SECTION("XML with a DTD that contains an illegal mixed content specification (#PCDATA doesnt come first).", "[XML][DTD][Parse][Error]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!-- Fig. B.5 : mixed.xml-->\n"
@@ -190,7 +190,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <format>.");
   }
-  SECTION("XML with a DTD that contains an illegal mixed content specification (does not end with '*').", "[XML][Parse][DTD][Error]")
+  SECTION("XML with a DTD that contains an illegal mixed content specification (does not end with '*').", "[XML][DTD][Parse][Error]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!-- Fig. B.5 : mixed.xml-->\n"
@@ -210,7 +210,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <format>.");
   }
-  SECTION("Parse XML with DTD that cotains a content specification in error (missing ',').", "[XML][Parse][DTD][Error]")
+  SECTION("Parse XML with DTD that cotains a content specification in error (missing ',').", "[XML][DTD][Parse][Error]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE note ["
@@ -228,7 +228,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <note>.");
   }
-  SECTION("Parse XML with DTD that cotains a content specification in error (missing element name).", "[XML][Parse][DTD][Error]")
+  SECTION("Parse XML with DTD that cotains a content specification in error (missing element name).", "[XML][DTD][Parse][Error]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE note ["
@@ -246,7 +246,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <note>.");
   }
-  SECTION("XML with a DTD that contains an illegal mixed content specification (uses ',').", "[XML][Parse][DTD][Error]")
+  SECTION("XML with a DTD that contains an illegal mixed content specification (uses ',').", "[XML][DTD][Parse][Error]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!-- Fig. B.5 : mixed.xml-->\n"
@@ -267,10 +267,10 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <format>.");
   }
 }
-TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][Conditional]")
+TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][DTD][Parse][Conditional]")
 {
   std::string xmlString;
-  SECTION("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional001.dtd\">\n"
@@ -280,7 +280,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("XML with a DTD with conditioanl INCLUDE containing an entity.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with conditioanl INCLUDE containing an entity.", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional001.dtd\">\n"
@@ -291,7 +291,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE_NOTHROW(xml.parse());
     REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
   }
-  SECTION("XML with a DTD with invalid conditional value.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with invalid conditional value.", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional002.dtd\">\n"
@@ -301,7 +301,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 19] Conditional value not INCLUDE or IGNORE.");
   }
-  SECTION("XML with a DTD with missing opening '[' from conditional.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with missing opening '[' from conditional.", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional003.dtd\">\n"
@@ -311,7 +311,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 23] Missing opening '[' from conditional.");
   }
-  SECTION("XML with a DTD with conditional controlled with a entity refence value (INCLUDE) containing an entity definition.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with conditional controlled with a entity refence value (INCLUDE) containing an entity definition.", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional004.dtd\">\n"
@@ -322,7 +322,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE_NOTHROW(xml.parse());
     REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
   }
-  SECTION("XML with a DTD with conditional controlled entity refence value (IGNORE) containing an entity definition.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with conditional controlled entity refence value (IGNORE) containing an entity definition.", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional005.dtd\">\n"
@@ -333,7 +333,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE_NOTHROW(xml.parse());
     REQUIRE(xml.getEntity("&example;").internal == "");
   }
-  SECTION("XML with a DTD with nested conditionals that are both INCLUDE.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with nested conditionals that are both INCLUDE.", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional006.dtd\">\n"
@@ -344,7 +344,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE_NOTHROW(xml.parse());
     REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
   }
-  SECTION("XML with a DTD with nested conditionals that are both INCLUDE and two entities.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with nested conditionals that are both INCLUDE and two entities.", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional007.dtd\">\n"
@@ -356,7 +356,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
     REQUIRE(xml.getEntity("&example1;").internal == "Joe Smith 1");
   }
-  SECTION("XML with a DTD with nested conditionals that are  outter INCLUDE inner IGNORE plus two entities.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with nested conditionals that are  outter INCLUDE inner IGNORE plus two entities.", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional008.dtd\">\n"
@@ -368,7 +368,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE(xml.getEntity("&example;").internal == "");
     REQUIRE(xml.getEntity("&example1;").internal == "Joe Smith 1");
   }
-  SECTION("XML with a DTD with nested conditionals that are  outter IGNORE inner INCLUDE plus two entities.", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with nested conditionals that are  outter IGNORE inner INCLUDE plus two entities.", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional009.dtd\">\n"
@@ -380,7 +380,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE(xml.getEntity("&example1;").internal == "");
     REQUIRE(xml.getEntity("&example;").internal == "");
   }
-  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (switch on).", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (switch on).", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional010.dtd\" [ <!ENTITY % debug \"INCLUDE\"> ]>\n"
@@ -392,7 +392,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE(xml.getEntity("&example;").internal == "Joe Smith");
     REQUIRE(xml.getEntity("&example1;").internal == "Joe Smith 1");
   }
-  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (switch off).", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (switch off).", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional010.dtd\" [ <!ENTITY % debug \"IGNORE\"> ]>\n"
@@ -404,7 +404,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     REQUIRE(xml.getEntity("&example;").internal == "");
     REQUIRE(xml.getEntity("&example1;").internal == "");
   }
-  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (invalid value).", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (invalid value).", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional010.dtd\" [ <!ENTITY % debug \"IGNOE\"> ]>\n"
@@ -414,7 +414,7 @@ TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][Parse][DTD][C
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 23] Conditional value not INCLUDE or IGNORE.");
   }
-  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (novalue).", "[XML][Parse][DTD][Conditional]")
+  SECTION("XML with a DTD with nested conditionals controlled from internally defined DTD that is parsed first (novalue).", "[XML][DTD][Parse][Conditional]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE root SYSTEM \"./testData/conditional010.dtd\">\n"

@@ -14,10 +14,10 @@ using namespace H4;
 // ==========
 // Test cases
 // ==========
-TEST_CASE("Parse XML DTD with atttributes and check values.", "[XML][Parse][DTD][Attributes]")
+TEST_CASE("Parse XML DTD with atttributes and check values.", "[XML][DTD][Parse][Attributes]")
 {
   std::string xmlString;
-  SECTION("XML with internal DTD with attributes to parse ", "[XML][Parse][DTD][Attributes]")
+  SECTION("XML with internal DTD with attributes to parse ", "[XML][DTD][Parse][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE TVSCHEDULE [\n"
@@ -41,7 +41,7 @@ TEST_CASE("Parse XML DTD with atttributes and check values.", "[XML][Parse][DTD]
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
   }
-  SECTION("XML with internal DTD with attributes to parse and check values", "[XML][Parse][DTD][Attributes]")
+  SECTION("XML with internal DTD with attributes to parse and check values", "[XML][DTD][Parse][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 "<!DOCTYPE TVSCHEDULE [\n"
@@ -97,7 +97,7 @@ TEST_CASE("Parse XML DTD with atttributes and check values.", "[XML][Parse][DTD]
     REQUIRE(xml.m_dtd.m_elements["TITLE"].attributes[0].value.parsed == "#IMPLIED");
     REQUIRE(xml.m_dtd.m_elements["TITLE"].attributes[1].value.parsed == "#IMPLIED");
   }
-  SECTION("XML with internal DTD with elements with multiple attributes to parse and check values", "[XML][Parse][DTD][Attributes]")
+  SECTION("XML with internal DTD with elements with multiple attributes to parse and check values", "[XML][DTD][Parse][Attributes]")
   {
     xmlString = "<!DOCTYPE CATALOG [\n"
                 "<!ENTITY AUTHOR \"John Doe\">\n"
@@ -145,10 +145,10 @@ TEST_CASE("Parse XML DTD with atttributes and check values.", "[XML][Parse][DTD]
     REQUIRE(xml.m_dtd.m_elements["NOTES"].content.unparsed == "(#PCDATA)");
   }
 }
-TEST_CASE("Parse XML DTD that contains enumeration attributes with various errors.", "[XML][Parse][DTD][Error][Attributes]")
+TEST_CASE("Parse XML DTD that contains enumeration attributes with various errors.", "[XML][DTD][Parse][Error][Attributes]")
 {
   std::string xmlString;
-  SECTION("Parse XML with DTD that cotains a enumeration attribute gender with a default value if 'F'.", "[XML][Parse][DTD][Error][Attributes]")
+  SECTION("Parse XML with DTD that cotains a enumeration attribute gender with a default value if 'F'.", "[XML][DTD][Parse][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -182,7 +182,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     REQUIRE(xml.m_prolog[0][1].name == "person");
     REQUIRE(xml.m_prolog[0][1].getAttributeList().size() == 0);
   }
-  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing enumeration name).", "[XML][Parse][DTD][Error][Attributes]")
+  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing enumeration name).", "[XML][DTD][Parse][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -201,7 +201,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 7 Column: 36] Invalid name '' encountered.");
   }
-  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing end bracket).", "[XML][Parse][DTD][Error][Attributes]")
+  SECTION("Parse XML with DTD that cotains a enumeration with a syntax error (missing end bracket).", "[XML][DTD][Parse][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -220,7 +220,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 7 Column: 39] Missing closing ')' on enumeration attribute type.");
   }
-  SECTION("Parse XML with DTD that contains a enumeration with a default value not in enumeration.", "[XML][Parse][DTD][Error][Attributes]")
+  SECTION("Parse XML with DTD that contains a enumeration with a default value not in enumeration.", "[XML][DTD][Parse][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -239,7 +239,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Default value 'D' for enumeration attribute 'gender' is invalid.");
   }
-  SECTION("Parse XML with DTD that contains a enumeration with not all values unique.", "[XML][Parse][DTD][Error][Attributes]")
+  SECTION("Parse XML with DTD that contains a enumeration with not all values unique.", "[XML][DTD][Parse][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE queue ["
@@ -258,7 +258,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Enumerator value 'F' for attribute 'gender' occurs more than once in its definition.");
   }
-  SECTION("Parse XML with DTD that specifies the use of an two different ID attributes for an element.", "[XML][Parse][DTD][Error][Attributes]")
+  SECTION("Parse XML with DTD that specifies the use of an two different ID attributes for an element.", "[XML][DTD][Parse][Error][Attributes]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE collection ["
@@ -278,7 +278,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     XML xml(xmlSource);
     REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Element <item> has more than one ID attribute.");
   }
-  SECTION("Parse XML with DTD that has a valid NOTATION attribute (photo_type) and usage.", "[XML][Parse][DTD][Attribtes][NOTATION]")
+  SECTION("Parse XML with DTD that has a valid NOTATION attribute (photo_type) and usage.", "[XML][DTD][Parse][Attribtes][NOTATION]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE mountains [\n"
@@ -313,7 +313,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].type == "NOTATION (GIF|JPG|PNG)");
     REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].value.parsed == "#IMPLIED");
   }
-   SECTION("Parse XML with DTD that has a missing NOTATION attribute (photo_type GIF) and usage.", "[XML][Parse][DTD][Attribtes][NOTATION]")
+   SECTION("Parse XML with DTD that has a missing NOTATION attribute (photo_type GIF) and usage.", "[XML][DTD][Parse][Attribtes][NOTATION]")
   {
     xmlString = "<?xml version=\"1.0\"?>\n"
                 "<!DOCTYPE mountains [\n"
