@@ -5,7 +5,7 @@ project("XML" VERSION 0.0.1 DESCRIPTION "XML C++ Static Library")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 configure_file(XMLConfig.h.in XMLConfig.hpp)
 

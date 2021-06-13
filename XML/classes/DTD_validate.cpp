@@ -256,7 +256,7 @@ namespace H4
             {
                 notations.insert(notation);
             }
-            if (m_notations.count(elementAttribute.value.parsed) == 0)
+            if (notations.count(elementAttribute.value.parsed) == 0)
             {
                 throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> NOTATION attribute '" + attribute.name + "' value '" + elementAttribute.value.parsed + "' is not defined.");
             }

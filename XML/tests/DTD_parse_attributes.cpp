@@ -313,4 +313,29 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].type == "NOTATION (GIF|JPG|PNG)");
     REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].value.parsed == "#IMPLIED");
   }
+   SECTION("Parse XML with DTD that has a missing NOTATION attribute (photo_type GIF) and usage.", "[XML][Parse][DTD][Attribtes][NOTATION]")
+  {
+    xmlString = "<?xml version=\"1.0\"?>\n"
+                "<!DOCTYPE mountains [\n"
+                "<!ELEMENT mountains (mountain)+>\n"
+                "<!ELEMENT mountain (name)>\n"
+                "<!ELEMENT name (#PCDATA)>\n"
+                "<!NOTATION JPG SYSTEM \"image/jpeg\">\n"
+                "<!NOTATION PNG SYSTEM \"image/png\">\n"
+                "<!ATTLIST mountain photo ENTITY #IMPLIED\n"
+                "photo_type NOTATION (GIF | JPG | PNG) #IMPLIED>\n"
+                "<!ENTITY mt_cook_1 SYSTEM \"mt_cook1.jpg\">\n"
+                "]>\n"
+                "<mountains>\n"
+                "<mountain photo=\"mt_cook_1\" photo_type=\"JPG\">\n"
+                "<name>Mount Cook</name>\n"
+                "</mountain>\n"
+                "<mountain>\n"
+                "<name>Cradle Mountain</name>\n"
+                "</mountain>\n"
+                "</mountains>\n";
+    BufferSource xmlSource(xmlString);
+    XML xml(xmlSource);
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: NOTATION GIF is not defined.");
+  }
 }

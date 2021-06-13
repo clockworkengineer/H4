@@ -38,6 +38,21 @@ namespace H4
     // PRIVATE METHODS
     // ===============
     /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    void DTD::parseValidNotations(const std::string &notations)
+    {
+        for (auto &notation : splitString(notations.substr(1, notations.size() - 2), '|'))
+        {
+            if (m_notations.count(notation) == 0)
+            {
+                throw XML::SyntaxError("NOTATION " + notation + " is not defined.");
+            }
+        }
+    }
+    /// <summary>
     /// Validate attribute description.
     /// </summary>
     /// <param name="elementName">Element associated with attribute.</param>
@@ -162,13 +177,19 @@ namespace H4
                 return (dtdSource.to_bytes(attrType));
             }
         }
-        if (dtdSource.match(U"NOTATION")) {
-            attributeType= "NOTATION ";
+        if (dtdSource.match(U"NOTATION"))
+        {
+            attributeType = "NOTATION ";
             dtdSource.ignoreWS();
         }
         if (dtdSource.current() == '(')
         {
-            return (attributeType+parseAttributeEnumerationType(dtdSource));
+            std::string enumeration = parseAttributeEnumerationType(dtdSource);
+            if (!attributeType.empty())
+            {
+                parseValidNotations(enumeration);
+            }
+            return (attributeType + enumeration);
         }
         throw XML::SyntaxError(dtdSource, "Invalid attribute type specified.");
     }
@@ -367,8 +388,8 @@ namespace H4
         }
     }
     /// <summary>
-    /// Parse XML DTD. If the DTD contains an external reference then the DTD 
-    /// that points to is parsed after any internal DTD that may be specified 
+    /// Parse XML DTD. If the DTD contains an external reference then the DTD
+    /// that points to is parsed after any internal DTD that may be specified
     /// after it.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
