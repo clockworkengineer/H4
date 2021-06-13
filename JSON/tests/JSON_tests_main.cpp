@@ -21,7 +21,7 @@ using namespace H4;
 /// </summary>
 /// <param name="jsonFileName">JSON file name</param>
 /// <returns></returns>
-std::string readXMLFromFile(const std::string &jsonFileName)
+std::string readJSONFromFile(const std::string &jsonFileName)
 {
   std::ifstream jsonFile;
   jsonFile.open(jsonFileName);
@@ -70,7 +70,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[JSON][Parse][ISourc
 {
   SECTION("Create FileSource with testfile001.json.", "[JSON][Parse][ISource]")
   {
-    REQUIRE_NOTHROW(FileSource(kGeneratedXMLFile));
+    REQUIRE_NOTHROW(FileSource(kGeneratedJSONFile));
   }
   SECTION("Create FileSource with non existants file.", "[JSON][Parse][ISource][Exception]")
   {
@@ -105,7 +105,7 @@ TEST_CASE("Creation and use of ISource (File) interface.", "[JSON][Parse][ISourc
 }
 TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file testfile001.json).", "[JSON][Parse][ISource]")
 {
-  std::string buffer = readXMLFromFile(kSIngleJSONFile);
+  std::string buffer = readJSONFromFile(kSIngleJSONFile);
   SECTION("Create BufferSource.", "[JSON][Parse][ISource]")
   {
     REQUIRE_NOTHROW(BufferSource(buffer));
@@ -170,39 +170,39 @@ TEST_CASE("Creation and use of IDestination (File) interface.", "[JSON][Parse][I
 {
   SECTION("Create FileDestination.", "[JSON][Stringify][IDesination]")
   {
-    std::filesystem::remove(kGeneratedXMLFile);
-    REQUIRE_NOTHROW(FileDestination(kGeneratedXMLFile));
+    std::filesystem::remove(kGeneratedJSONFile);
+    REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
   }
   SECTION("Create FileDestination when file already exists.", "[JSON][Stringify][IDesination]")
   {
-    FileDestination file(kGeneratedXMLFile);
-    file = FileDestination(kGeneratedXMLFile);
-    REQUIRE_NOTHROW(FileDestination(kGeneratedXMLFile));
+    FileDestination file(kGeneratedJSONFile);
+    file = FileDestination(kGeneratedJSONFile);
+    REQUIRE_NOTHROW(FileDestination(kGeneratedJSONFile));
   }
   SECTION("Create FileDestination and test file exists and should be empty.", "[JSON][Stringify][IDesination]")
   {
-    std::filesystem::remove(kGeneratedXMLFile);
-    FileDestination file(kGeneratedXMLFile);
-    REQUIRE_FALSE(!std::filesystem::exists(kGeneratedXMLFile));
-    std::filesystem::path filePath(kGeneratedXMLFile);
+    std::filesystem::remove(kGeneratedJSONFile);
+    FileDestination file(kGeneratedJSONFile);
+    REQUIRE_FALSE(!std::filesystem::exists(kGeneratedJSONFile));
+    std::filesystem::path filePath(kGeneratedJSONFile);
     REQUIRE(std::filesystem::file_size(filePath) == 0);
   }
   SECTION("Create FileDestination and add one character.", "[JSON][Stringify][IDesination]")
   {
-    std::filesystem::remove(kGeneratedXMLFile);
-    FileDestination file(kGeneratedXMLFile);
+    std::filesystem::remove(kGeneratedJSONFile);
+    FileDestination file(kGeneratedJSONFile);
     file.addBytes("t");
-    std::filesystem::path filePath(kGeneratedXMLFile);
+    std::filesystem::path filePath(kGeneratedJSONFile);
     REQUIRE(std::filesystem::file_size(filePath) == 1);
   }
   SECTION("Create FileDestination, add an stringified integer and check result.", "[JSON][Stringify][IDesination]")
   {
-    std::filesystem::remove(kGeneratedXMLFile);
-    FileDestination file(kGeneratedXMLFile);
+    std::filesystem::remove(kGeneratedJSONFile);
+    FileDestination file(kGeneratedJSONFile);
     file.addBytes("65767");
-    std::filesystem::path filePath(kGeneratedXMLFile);
+    std::filesystem::path filePath(kGeneratedJSONFile);
     REQUIRE(std::filesystem::file_size(filePath) == 5);
-    std::string expected = readXMLFromFile(kGeneratedXMLFile);
+    std::string expected = readJSONFromFile(kGeneratedJSONFile);
     REQUIRE(expected == "65767");
   }
 }

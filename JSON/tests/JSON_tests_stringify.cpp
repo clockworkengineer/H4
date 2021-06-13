@@ -84,16 +84,16 @@ TEST_CASE("Stringify to a file and check result", "[JSON][Stringify][Exceptions]
     SECTION("Stringify object to file and check value", "[JSON][Stringify]")
     {
         std::string expected = "{\"City\":\"London\",\"Population\":8000000}";
-        std::filesystem::remove(kGeneratedTorrentFile);
-        json.stringifyToFile(json.parseBuffer(expected), kGeneratedTorrentFile);
-        REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == expected);
+        std::filesystem::remove(kGeneratedJSONFile);
+        json.stringifyToFile(json.parseBuffer(expected), kGeneratedJSONFile);
+        REQUIRE(readJSONFromFile(kGeneratedJSONFile) == expected);
     }
     SECTION("Stringify array to file and check value", "[JSON][Stringify]")
     {
         std::string expected = "[999,\"Time\",null,true]";
-        std::filesystem::remove(kGeneratedTorrentFile);
-        json.stringifyToFile(json.parseBuffer(expected), kGeneratedTorrentFile);
-        REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == expected);
+        std::filesystem::remove(kGeneratedJSONFile);
+        json.stringifyToFile(json.parseBuffer(expected), kGeneratedJSONFile);
+        REQUIRE(readJSONFromFile(kGeneratedJSONFile) == expected);
     }
 }
 TEST_CASE("Stringify generated exceptions", "[JSON][Stringify][Exceptions]")
@@ -111,8 +111,8 @@ TEST_CASE("Stringify generated exceptions", "[JSON][Stringify][Exceptions]")
     }
     SECTION("Stringify file passed invalid JNode type", "[JSON][Stringify][Exceptions]")
     {
-        REQUIRE_THROWS_AS(json.stringifyToFile(std::unique_ptr<JNode>(nullptr), kGeneratedTorrentFile), std::invalid_argument);
-        REQUIRE_THROWS_WITH(json.stringifyToFile(std::unique_ptr<JNode>(nullptr), kGeneratedTorrentFile), "Nullptr passed as JNode root to be stringified.");
+        REQUIRE_THROWS_AS(json.stringifyToFile(std::unique_ptr<JNode>(nullptr), kGeneratedJSONFile), std::invalid_argument);
+        REQUIRE_THROWS_WITH(json.stringifyToFile(std::unique_ptr<JNode>(nullptr), kGeneratedJSONFile), "Nullptr passed as JNode root to be stringified.");
     }
     SECTION("Stringify file passed empty string for file name", "[JSON][Stringify][Exceptions]")
     {
@@ -135,10 +135,10 @@ TEST_CASE("Creation and use of JSON object for stringification of a list of exam
     }
     SECTION("Stringify to file and check value", "[JSON][Stringify]")
     {
-        std::filesystem::remove(kGeneratedTorrentFile);
+        std::filesystem::remove(kGeneratedJSONFile);
         std::string jsonFileBuffer = readJSONFromFile(testFile);
-        json.stringifyToFile(json.parseBuffer(jsonFileBuffer), kGeneratedTorrentFile);
-        REQUIRE(readJSONFromFile(kGeneratedTorrentFile) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
+        json.stringifyToFile(json.parseBuffer(jsonFileBuffer), kGeneratedJSONFile);
+        REQUIRE(readJSONFromFile(kGeneratedJSONFile) == json.stripWhiteSpaceBuffer(jsonFileBuffer));
     }
 }
 TEST_CASE("Creation and use of JSON object for stringification of strings with escape characters.", "[JSON][Stringify]")

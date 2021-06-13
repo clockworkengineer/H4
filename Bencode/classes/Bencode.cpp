@@ -12,7 +12,7 @@
 // For an indepth desciption of the Bencoding specification refer to its
 // wiki page at https://en.wikipedia.org/wiki/Bencode.
 //
-// Dependencies:   C20++ - Language standard features used.
+// Dependencies:   C17++ - Language standard features used.
 //
 // =================
 // CLASS DEFINITIONS

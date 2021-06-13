@@ -22,7 +22,7 @@
 // ===================
 // Unit test constants
 // ===================
-#define kGeneratedTorrentFile "./testData/generated.json"
+#define kGeneratedJSONFile "./testData/generated.json"
 #define kSIngleJSONFile "./testData/testfile001.json"
 #define kNonExistantJSONFile "./testData/doesntexist.json"
 // ==========================

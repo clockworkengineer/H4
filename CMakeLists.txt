@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17.0)
+cmake_minimum_required(VERSION 3.16.0)
 
 project("H4" VERSION 0.1.0 DESCRIPTION "H4 C++ Static Library")
 
@@ -24,6 +24,15 @@ set (H4_SOURCES
     ./JSON/classes/JSON.cpp
     ./JSON/classes/JSONTranslator.cpp
     ./XML/classes/XML.cpp
+    ./XML/classes/XML_parse.cpp
+    ./XML/classes/XML_validation.cpp
+    ./XML/classes/XML_stringify.cpp
+    ./XML/classes/XML_core.cpp
+    ./XML/classes/DTD.cpp
+    ./XML/classes/DTD_parse.cpp
+    ./XML/classes/DTD_parse_content.cpp
+    ./XML/classes/DTD_parse_external.cpp
+    ./XML/classes/DTD_validate.cpp
 )
 
 set (H4_INCLUDES
@@ -36,6 +45,13 @@ set (H4_INCLUDES
     ./JSON/include/JNode.hpp
     ./JSON/include/JSONTranslator.hpp
     ./XML/include/XML.hpp
+    ./XML/include/ISource.hpp
+    ./XML/inclide/IDestination.hpp
+    ./XML/include/XMLSources.hpp
+    ./XML/include/XMLDestinations.hpp
+    ./XML/include/XMLNode.hpp
+    ./XML/incldue/XML_core.hpp
+    ./XML/include/DTD.cpp
 )
 
 # H4 library

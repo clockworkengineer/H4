@@ -209,7 +209,7 @@ TEST_CASE("Creation and use of JSON object for parse of a list of example JSON f
     JSON json;
     SECTION("Parse from buffer", "[JSON][Parse]")
     {
-        std::string jsonFileBuffer = readXMLFromFile(testFile);
+        std::string jsonFileBuffer = readJSONFromFile(testFile);
         REQUIRE_NOTHROW(json.parseBuffer(jsonFileBuffer));
         std::unique_ptr<JNode> jNode = json.parseBuffer(jsonFileBuffer);
         REQUIRE(jNode->nodeType == JNodeType::object);
