@@ -117,31 +117,31 @@ namespace H4
     /// <returns></returns>
     void DTD::validateAttributeValue(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
     {
-        if (attribute.value.parsed == "#REQUIRED")
+        if ((attribute.type & DTDAttributeType::required) != 0)
         {
             if (!xmlNodeElement->isAttributePresent(attribute.name))
             {
                 throw XML::ValidationError(*this, "Required attribute '" + attribute.name + "' missing for element <" + xmlNodeElement->name + ">.");
             }
         }
-        else if (attribute.value.parsed == "#IMPLIED")
+        else if ((attribute.type & DTDAttributeType::implied) != 0)
         {
             return;
         }
-        else if (attribute.value.parsed.find("#FIXED ") == 0)
+        else if ((attribute.type & DTDAttributeType::fixed) != 0)
         {
             if (xmlNodeElement->isAttributePresent(attribute.name))
             {
                 XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-                if (attribute.value.parsed.substr(7) != elementAttribute.value.parsed)
+                if (attribute.value.parsed != elementAttribute.value.parsed)
                 {
-                    throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' is '" + elementAttribute.value.parsed + "' instead of '" + attribute.value.parsed.substr(7) + "'.");
+                    throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' is '" + elementAttribute.value.parsed + "' instead of '" + attribute.value.parsed + "'.");
                 }
             }
             else
             {
                 XMLValue value;
-                value.parsed = value.unparsed = attribute.value.parsed.substr(7);
+                value.parsed = value.unparsed = attribute.value.parsed;
                 xmlNodeElement->addAttribute(attribute.name, value);
             }
         }
@@ -177,14 +177,14 @@ namespace H4
     void DTD::validateAttributeType(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
     {
         XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-        if (attribute.type == DTDAttributeType::cdata)
+        if ((attribute.type & DTDAttributeType::cdata) != 0)
         {
             if (elementAttribute.value.parsed.empty()) // No character data present.
             {
                 XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' does not contain character data.");
             }
         }
-        else if (attribute.type == DTDAttributeType::id)
+        else if ((attribute.type & DTDAttributeType::id) != 0)
         {
             if (!validateIsIDOK(elementAttribute.value.parsed))
             {
@@ -196,7 +196,7 @@ namespace H4
             }
             m_assignedIDValues.insert(elementAttribute.value.parsed);
         }
-        else if (attribute.type == DTDAttributeType::idref)
+        else if ((attribute.type & DTDAttributeType::idref) != 0)
         {
             if (!validateIsIDOK(elementAttribute.value.parsed))
             {
@@ -204,7 +204,7 @@ namespace H4
             }
             m_assignedIDREFValues.insert(elementAttribute.value.parsed);
         }
-        else if (attribute.type == DTDAttributeType::idrefs)
+        else if ((attribute.type & DTDAttributeType::idrefs) != 0)
         {
             for (auto &id : splitString(elementAttribute.value.parsed, ' '))
             {
@@ -215,14 +215,14 @@ namespace H4
                 m_assignedIDREFValues.insert(id);
             }
         }
-        else if (attribute.type == DTDAttributeType::nmtoken)
+        else if ((attribute.type & DTDAttributeType::nmtoken) != 0)
         {
             if (!validateIsNMTOKENOK(elementAttribute.value.parsed))
             {
                 throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> NMTOKEN attribute '" + attribute.name + "' is invalid.");
             }
         }
-        else if (attribute.type == DTDAttributeType::nmtokens)
+        else if ((attribute.type & DTDAttributeType::nmtokens) != 0)
         {
             for (auto &nmtoken : splitString(elementAttribute.value.parsed, ' '))
             {
@@ -232,14 +232,14 @@ namespace H4
                 }
             }
         }
-        else if (attribute.type == DTDAttributeType::entity)
+        else if ((attribute.type & DTDAttributeType::entity) != 0)
         {
             if (m_entityMapping.count("&" + elementAttribute.value.parsed + ";") == 0)
             {
                 throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ENTITY attribute '" + attribute.name + "' value '" + elementAttribute.value.parsed + "' is not defined.");
             }
         }
-        else if (attribute.type == DTDAttributeType::entities)
+        else if ((attribute.type & DTDAttributeType::entities) != 0)
         {
             for (auto &entity : splitString(elementAttribute.value.parsed, ' '))
             {
@@ -249,7 +249,7 @@ namespace H4
                 }
             }
         }
-        else if (attribute.type == DTDAttributeType::notation)
+        else if ((attribute.type & DTDAttributeType::notation) != 0)
         {
             std::set<std::string> notations;
             for (auto &notation : splitString(attribute.enumeration.substr(1, attribute.enumeration.size() - 2), '|'))
@@ -261,7 +261,7 @@ namespace H4
                 throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> NOTATION attribute '" + attribute.name + "' value '" + elementAttribute.value.parsed + "' is not defined.");
             }
         }
-        else if (attribute.type == DTDAttributeType::enumeration)
+        else if ((attribute.type & DTDAttributeType::enumeration) != 0)
         {
             std::set<std::string> enumeration;
             for (auto &option : splitString(attribute.enumeration.substr(1, attribute.enumeration.size() - 2), '|'))
