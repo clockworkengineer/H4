@@ -58,12 +58,12 @@ namespace H4
     void DTD::parseValidateAttribute(const std::string &elementName, DTDAttribute dtdAttribute)
     {
         // Attribute cannot be ID and fixed
-        if (dtdAttribute.type == DTDAttributeType::id && dtdAttribute.value.parsed.find("#FIXED ") == 0)
+        if (dtdAttribute.type == (DTDAttributeType::id | DTDAttributeType::fixed))
         {
             throw XML::SyntaxError("Attribute '" + dtdAttribute.name + "' may not be of type ID and FIXED.");
         }
         // Only one ID attribute allowed per element
-        else if (dtdAttribute.type == DTDAttributeType::id)
+        else if ((dtdAttribute.type & DTDAttributeType::id)!=0)
         {
             if (m_elements[elementName].idAttributePresent)
             {
@@ -72,7 +72,7 @@ namespace H4
             m_elements[elementName].idAttributePresent = true;
         }
         // Enumeration contains unique values and default is valid value
-        else if (dtdAttribute.type == DTDAttributeType::enumeration)
+        else if (dtdAttribute.type == (DTDAttributeType::enumeration|DTDAttributeType::normal))
         {
             std::set<std::string> options;
             for (auto &option : splitString(dtdAttribute.enumeration.substr(1, dtdAttribute.enumeration.size() - 2), '|'))
@@ -246,25 +246,23 @@ namespace H4
 
         if (dtdSource.match(U"#REQUIRED"))
         {
-            attribute.value.parsed = "#REQUIRED";
-            attribute.value.unparsed = "#REQUIRED";
+            attribute.type |= DTDAttributeType::required;
         }
         else if (dtdSource.match(U"#IMPLIED"))
         {
-            attribute.value.parsed = "#IMPLIED";
-            attribute.value.unparsed = "#IMPLIED";
+            attribute.type |= DTDAttributeType::implied;
         }
         else if (dtdSource.match(U"#FIXED"))
         {
             dtdSource.ignoreWS();
-            XMLValue fixedValue = parseValue(dtdSource, m_entityMapping);
-            attribute.value.parsed = "#FIXED " + fixedValue.parsed;
-            attribute.value.unparsed = "#FIXED " + fixedValue.unparsed;
+            attribute.value = parseValue(dtdSource, m_entityMapping);
+            attribute.type |= DTDAttributeType::fixed;
         }
         else
         {
             dtdSource.ignoreWS();
             attribute.value = parseValue(dtdSource, m_entityMapping);
+            attribute.type |= DTDAttributeType::normal;
         }
     }
     /// <summary>

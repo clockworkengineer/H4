@@ -86,16 +86,12 @@ TEST_CASE("Parse XML DTD with atttributes and check values.", "[XML][DTD][Parse]
     REQUIRE(xml.m_dtd.m_elements["PROGRAMSLOT"].attributes[0].name == "VTR");
     REQUIRE(xml.m_dtd.m_elements["TITLE"].attributes[0].name == "RATING");
     REQUIRE(xml.m_dtd.m_elements["TITLE"].attributes[1].name == "LANGUAGE");
-    REQUIRE(xml.m_dtd.m_elements["TVSCHEDULE"].attributes[0].type == DTD::DTDAttributeType::cdata);
-    REQUIRE(xml.m_dtd.m_elements["CHANNEL"].attributes[0].type == DTD::DTDAttributeType::cdata);
-    REQUIRE(xml.m_dtd.m_elements["PROGRAMSLOT"].attributes[0].type == DTD::DTDAttributeType::cdata);
-    REQUIRE(xml.m_dtd.m_elements["TITLE"].attributes[0].type == DTD::DTDAttributeType::cdata);
-    REQUIRE(xml.m_dtd.m_elements["TITLE"].attributes[1].type == DTD::DTDAttributeType::cdata);
-    REQUIRE(xml.m_dtd.m_elements["TVSCHEDULE"].attributes[0].value.parsed == "#REQUIRED");
-    REQUIRE(xml.m_dtd.m_elements["CHANNEL"].attributes[0].value.parsed == "#REQUIRED");
-    REQUIRE(xml.m_dtd.m_elements["PROGRAMSLOT"].attributes[0].value.parsed == "#IMPLIED");
-    REQUIRE(xml.m_dtd.m_elements["TITLE"].attributes[0].value.parsed == "#IMPLIED");
-    REQUIRE(xml.m_dtd.m_elements["TITLE"].attributes[1].value.parsed == "#IMPLIED");
+    REQUIRE(xml.m_dtd.m_elements["TVSCHEDULE"].attributes[0].type == (DTD::DTDAttributeType::cdata|DTD::DTDAttributeType::required));
+    REQUIRE(xml.m_dtd.m_elements["CHANNEL"].attributes[0].type == (DTD::DTDAttributeType::cdata|DTD::DTDAttributeType::required));
+    REQUIRE(xml.m_dtd.m_elements["PROGRAMSLOT"].attributes[0].type == (DTD::DTDAttributeType::cdata|DTD::DTDAttributeType::implied));
+    REQUIRE(xml.m_dtd.m_elements["TITLE"].attributes[0].type ==  (DTD::DTDAttributeType::cdata|DTD::DTDAttributeType::implied));
+    REQUIRE(xml.m_dtd.m_elements["TITLE"].attributes[1].type ==  (DTD::DTDAttributeType::cdata|DTD::DTDAttributeType::implied));
+
   }
   SECTION("XML with internal DTD with elements with multiple attributes to parse and check values", "[XML][DTD][Parse][Attributes]")
   {
@@ -127,21 +123,19 @@ TEST_CASE("Parse XML DTD with atttributes and check values.", "[XML][DTD][Parse]
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].name == "PRODUCT");
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes.size() == 5);
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[0].name == "NAME");
-    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[0].type == DTD::DTDAttributeType::cdata);
-    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[0].value.parsed == "#IMPLIED");
+    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[0].type == (DTD::DTDAttributeType::cdata|DTD::DTDAttributeType::implied));
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[1].name == "CATEGORY");
-    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[1].type == DTD::DTDAttributeType::enumeration);
+    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[1].type == (DTD::DTDAttributeType::enumeration|DTD::DTDAttributeType::normal));
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[1].enumeration == "(HandTool|Table|Shop-Professional)");
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[1].value.parsed == "HandTool");
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[2].name == "PARTNUM");
-    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[2].type == DTD::DTDAttributeType::cdata);
-    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[2].value.parsed == "#IMPLIED");
+    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[2].type == (DTD::DTDAttributeType::cdata|DTD::DTDAttributeType::implied));
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[3].name == "PLANT");
-    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[3].type == DTD::DTDAttributeType::enumeration);
+    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[3].type == (DTD::DTDAttributeType::enumeration|DTD::DTDAttributeType::normal));
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[3].enumeration == "(Pittsburgh|Milwaukee|Chicago)");
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[3].value.parsed == "Chicago");
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[4].name == "INVENTORY");
-    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[4].type == DTD::DTDAttributeType::enumeration);
+    REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[4].type == (DTD::DTDAttributeType::enumeration|DTD::DTDAttributeType::normal));
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[4].enumeration == "(InStock|Backordered|Discontinued)");
     REQUIRE(xml.m_dtd.m_elements["PRODUCT"].attributes[4].value.parsed == "InStock");
     REQUIRE(xml.m_dtd.m_elements["NOTES"].name == "NOTES");
@@ -173,7 +167,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     REQUIRE(xml.m_dtd.m_elements.find("person") != xml.m_dtd.m_elements.end());
     REQUIRE(xml.m_dtd.m_elements["person"].attributes.size() == 1);
     REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].name == "gender");
-    REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].type == DTD::DTDAttributeType::enumeration);
+    REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].type == (DTD::DTDAttributeType::enumeration|DTD::DTDAttributeType::normal));
     REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].enumeration == "(M|F)");
     REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].value.parsed == "F");
     REQUIRE(xml.m_dtd.m_name == "queue");
@@ -311,12 +305,10 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     REQUIRE(xml.m_dtd.m_elements.find("mountain") != xml.m_dtd.m_elements.end());
     REQUIRE(xml.m_dtd.m_elements["mountain"].attributes.size() == 2);
     REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[0].name == "photo");
-    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[0].type == DTD::DTDAttributeType::entity);
-    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[0].value.parsed == "#IMPLIED");
+    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[0].type == (DTD::DTDAttributeType::entity|DTD::DTDAttributeType::implied));
     REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].name == "photo_type");
-    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].type == DTD::DTDAttributeType::notation);
+    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].type == (DTD::DTDAttributeType::notation|DTD::DTDAttributeType::implied));
     REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].enumeration == "(GIF|JPG|PNG)");
-    REQUIRE(xml.m_dtd.m_elements["mountain"].attributes[1].value.parsed == "#IMPLIED");
   }
   SECTION("Parse XML with DTD that has a missing NOTATION attribute (photo_type GIF) and usage.", "[XML][DTD][Parse][Attribtes][NOTATION]")
   {

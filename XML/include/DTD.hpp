@@ -31,19 +31,24 @@ namespace H4
         //
         // XML DTD attribute types
         //
-        enum DTDAttributeType
+        enum DTDAttributeType : uint16_t
         {
-            none = 0,
-            cdata = 1,
-            enumeration = 2,
-            id = 3,
-            idref = 4,
-            idrefs = 5,
-            nmtoken = 6,
-            nmtokens = 7,
-            entity = 8,
-            entities = 9,
-            notation = 10
+            // Types bits 0 - 9
+            cdata = (0x1 << 0),
+            enumeration = (0x1 << 1),
+            id = (0x1 << 2),
+            idref = (0x1 << 3),
+            idrefs = (0x1 << 4),
+            nmtoken = (0x1 << 5),
+            nmtokens = (0x1 << 6),
+            entity = (0x1 << 7),
+            entities = (0x1 << 8),
+            notation = (0x1 << 9),
+            // Value bits 10 - 13
+            normal = (0x1 << 10),
+            required = (0x1 << 11),
+            implied = (0x1 << 12),
+            fixed = (0x1 << 13)
         };
         //
         // XML DTD attribute definition
@@ -51,7 +56,7 @@ namespace H4
         struct DTDAttribute
         {
             std::string name;
-            DTDAttributeType  type = none;
+            uint16_t type;
             std::string enumeration;
             XMLValue value;
         };
