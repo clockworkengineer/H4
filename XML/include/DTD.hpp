@@ -29,12 +29,30 @@ namespace H4
         // ==========================
         //
         //
+        // XML DTD attribute types
+        //
+        enum DTDAttributeType
+        {
+            none = 0,
+            cdata = 1,
+            enumeration = 2,
+            id = 3,
+            idref = 4,
+            idrefs = 5,
+            nmtoken = 6,
+            nmtokens = 7,
+            entity = 8,
+            entities = 9,
+            notation = 10
+        };
+        //
         // XML DTD attribute definition
         //
         struct DTDAttribute
         {
             std::string name;
-            std::string type;
+            DTDAttributeType  type = none;
+            std::string enumeration;
             XMLValue value;
         };
         //
@@ -117,8 +135,8 @@ namespace H4
         void parseEntity(ISource &dtdSource);
         void parseElement(ISource &dtdSource);
         XMLExternalReference parseExternalReference(ISource &dtdSource);
-        std::string parseAttributeType(ISource &dtdSource);
-        XMLValue parseAttributeValue(ISource &dtdSource);
+        void parseAttributeType(ISource &dtdSource, DTDAttribute &attribute);
+        void parseAttributeValue(ISource &dtdSource, DTDAttribute &attribute);
         void parseComment(ISource &dtdSource);
         void parseParameterEntityReference(ISource &dtdSource);
         void parseExternal(ISource &dtdSource);
@@ -128,7 +146,6 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        static std::vector<XMLString> m_dtdAttrListTypes;
         std::set<std::string> m_assignedIDValues;
         std::set<std::string> m_assignedIDREFValues;
         std::string m_unparsed;

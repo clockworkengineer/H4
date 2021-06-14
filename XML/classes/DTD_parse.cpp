@@ -29,8 +29,6 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
-    // DTD attribute list type tokens
-    std::vector<XMLString> DTD::m_dtdAttrListTypes;
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -60,12 +58,12 @@ namespace H4
     void DTD::parseValidateAttribute(const std::string &elementName, DTDAttribute dtdAttribute)
     {
         // Attribute cannot be ID and fixed
-        if (dtdAttribute.type == "ID" && dtdAttribute.value.parsed.find("#FIXED ") == 0)
+        if (dtdAttribute.type == DTDAttributeType::id && dtdAttribute.value.parsed.find("#FIXED ") == 0)
         {
             throw XML::SyntaxError("Attribute '" + dtdAttribute.name + "' may not be of type ID and FIXED.");
         }
         // Only one ID attribute allowed per element
-        else if (dtdAttribute.type == "ID")
+        else if (dtdAttribute.type == DTDAttributeType::id)
         {
             if (m_elements[elementName].idAttributePresent)
             {
@@ -74,10 +72,10 @@ namespace H4
             m_elements[elementName].idAttributePresent = true;
         }
         // Enumeration contains unique values and default is valid value
-        else if (dtdAttribute.type[0] == '(')
+        else if (dtdAttribute.type == DTDAttributeType::enumeration)
         {
             std::set<std::string> options;
-            for (auto &option : splitString(dtdAttribute.type.substr(1, dtdAttribute.type.size() - 2), '|'))
+            for (auto &option : splitString(dtdAttribute.enumeration.substr(1, dtdAttribute.enumeration.size() - 2), '|'))
             {
                 if (options.find(option) == options.end())
                 {
@@ -165,31 +163,76 @@ namespace H4
     /// Parse DTD attribute type field.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
+    /// <param name="dtdattribute">Attribute description.</param>
     /// <returns>Attribute type as string (UTF-8 encoded).</returns>
-    std::string DTD::parseAttributeType(ISource &dtdSource)
+    void DTD::parseAttributeType(ISource &dtdSource, DTDAttribute &attribute)
     {
-        std::string attributeType;
-        for (auto attrType : m_dtdAttrListTypes)
+
+        if (dtdSource.match(U"CDATA"))
         {
-            if (dtdSource.match(attrType))
-            {
-                dtdSource.ignoreWS();
-                return (dtdSource.to_bytes(attrType));
-            }
+            attribute.type = DTDAttributeType::cdata;
+            dtdSource.ignoreWS();
+            return;
         }
-        if (dtdSource.match(U"NOTATION"))
+        else if (dtdSource.match(U"IDREFS"))
         {
-            attributeType = "NOTATION ";
+            attribute.type = DTDAttributeType::idrefs;
+            dtdSource.ignoreWS();
+            return;
+        }
+        else if (dtdSource.match(U"IDREF"))
+        {
+            attribute.type = DTDAttributeType::idref;
+            dtdSource.ignoreWS();
+            return;
+        }
+        else if (dtdSource.match(U"ID"))
+        {
+            attribute.type = DTDAttributeType::id;
+            dtdSource.ignoreWS();
+            return;
+        }
+        else if (dtdSource.match(U"NMTOKENS"))
+        {
+            attribute.type = DTDAttributeType::nmtokens;
+            dtdSource.ignoreWS();
+            return;
+        }
+        else if (dtdSource.match(U"NMTOKEN"))
+        {
+            attribute.type = DTDAttributeType::nmtoken;
+            dtdSource.ignoreWS();
+            return;
+        }
+        else if (dtdSource.match(U"ENTITY"))
+        {
+            attribute.type = DTDAttributeType::entity;
+            dtdSource.ignoreWS();
+            return;
+        }
+        else if (dtdSource.match(U"ENTITIES"))
+        {
+            attribute.type = DTDAttributeType::entities;
+            dtdSource.ignoreWS();
+            return;
+        }
+        else if (dtdSource.match(U"NOTATION"))
+        {
+            attribute.type = DTDAttributeType::notation;
             dtdSource.ignoreWS();
         }
         if (dtdSource.current() == '(')
         {
-            std::string enumeration = parseAttributeEnumerationType(dtdSource);
-            if (!attributeType.empty())
+            attribute.enumeration = parseAttributeEnumerationType(dtdSource);
+            if (attribute.type == DTDAttributeType::notation)
             {
-                parseValidNotations(enumeration);
+                parseValidNotations(attribute.enumeration);
             }
-            return (attributeType + enumeration);
+            else
+            {
+                attribute.type = DTDAttributeType::enumeration;
+            }
+            return;
         }
         throw XML::SyntaxError(dtdSource, "Invalid attribute type specified.");
     }
@@ -197,34 +240,32 @@ namespace H4
     /// Parse DTD attribute value.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
-    /// <returns>Attribute value as string (UTF-8 encoded).</returns>
-    /// <returns>Attribute value.</returns>
-    XMLValue DTD::parseAttributeValue(ISource &dtdSource)
+    /// <param name="dtdattribute">Attribute description.</param>
+    void DTD::parseAttributeValue(ISource &dtdSource, DTDAttribute &attribute)
     {
-        XMLValue value;
+
         if (dtdSource.match(U"#REQUIRED"))
         {
-            value.parsed = "#REQUIRED";
-            value.unparsed = "#REQUIRED";
+            attribute.value.parsed = "#REQUIRED";
+            attribute.value.unparsed = "#REQUIRED";
         }
         else if (dtdSource.match(U"#IMPLIED"))
         {
-            value.parsed = "#IMPLIED";
-            value.unparsed = "#IMPLIED";
+            attribute.value.parsed = "#IMPLIED";
+            attribute.value.unparsed = "#IMPLIED";
         }
         else if (dtdSource.match(U"#FIXED"))
         {
             dtdSource.ignoreWS();
             XMLValue fixedValue = parseValue(dtdSource, m_entityMapping);
-            value.parsed = "#FIXED " + fixedValue.parsed;
-            value.unparsed = "#FIXED " + fixedValue.unparsed;
+            attribute.value.parsed = "#FIXED " + fixedValue.parsed;
+            attribute.value.unparsed = "#FIXED " + fixedValue.unparsed;
         }
         else
         {
             dtdSource.ignoreWS();
-            value = parseValue(dtdSource, m_entityMapping);
+            attribute.value = parseValue(dtdSource, m_entityMapping);
         }
-        return (value);
     }
     /// <summary>
     /// Parse DTD attribute list.
@@ -238,8 +279,8 @@ namespace H4
         {
             DTDAttribute dtdAttribute;
             dtdAttribute.name = parseName(dtdSource);
-            dtdAttribute.type = parseAttributeType(dtdSource);
-            dtdAttribute.value = parseAttributeValue(dtdSource);
+            parseAttributeType(dtdSource, dtdAttribute);
+            parseAttributeValue(dtdSource, dtdAttribute);
             parseValidateAttribute(elementName, dtdAttribute);
             m_elements[elementName].attributes.emplace_back(dtdAttribute);
             dtdSource.ignoreWS();

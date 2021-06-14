@@ -177,14 +177,14 @@ namespace H4
     void DTD::validateAttributeType(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
     {
         XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
-        if (attribute.type == "CDATA")
+        if (attribute.type == DTDAttributeType::cdata)
         {
             if (elementAttribute.value.parsed.empty()) // No character data present.
             {
                 XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> attribute '" + attribute.name + "' does not contain character data.");
             }
         }
-        else if (attribute.type == "ID")
+        else if (attribute.type == DTDAttributeType::id)
         {
             if (!validateIsIDOK(elementAttribute.value.parsed))
             {
@@ -196,7 +196,7 @@ namespace H4
             }
             m_assignedIDValues.insert(elementAttribute.value.parsed);
         }
-        else if (attribute.type == "IDREF")
+        else if (attribute.type == DTDAttributeType::idref)
         {
             if (!validateIsIDOK(elementAttribute.value.parsed))
             {
@@ -204,7 +204,7 @@ namespace H4
             }
             m_assignedIDREFValues.insert(elementAttribute.value.parsed);
         }
-        else if (attribute.type == "IDREFS")
+        else if (attribute.type == DTDAttributeType::idrefs)
         {
             for (auto &id : splitString(elementAttribute.value.parsed, ' '))
             {
@@ -215,14 +215,14 @@ namespace H4
                 m_assignedIDREFValues.insert(id);
             }
         }
-        else if (attribute.type == "NMTOKEN")
+        else if (attribute.type == DTDAttributeType::nmtoken)
         {
             if (!validateIsNMTOKENOK(elementAttribute.value.parsed))
             {
                 throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> NMTOKEN attribute '" + attribute.name + "' is invalid.");
             }
         }
-        else if (attribute.type == "NMTOKENS")
+        else if (attribute.type == DTDAttributeType::nmtokens)
         {
             for (auto &nmtoken : splitString(elementAttribute.value.parsed, ' '))
             {
@@ -232,14 +232,14 @@ namespace H4
                 }
             }
         }
-        else if (attribute.type == "ENTITY")
+        else if (attribute.type == DTDAttributeType::entity)
         {
             if (m_entityMapping.count("&" + elementAttribute.value.parsed + ";") == 0)
             {
                 throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> ENTITY attribute '" + attribute.name + "' value '" + elementAttribute.value.parsed + "' is not defined.");
             }
         }
-        else if (attribute.type == "ENTITIES")
+        else if (attribute.type == DTDAttributeType::entities)
         {
             for (auto &entity : splitString(elementAttribute.value.parsed, ' '))
             {
@@ -249,10 +249,10 @@ namespace H4
                 }
             }
         }
-        else if (attribute.type.find("NOTATION ") == 0)
+        else if (attribute.type == DTDAttributeType::notation)
         {
             std::set<std::string> notations;
-            for (auto &notation : splitString(attribute.type.substr(10, attribute.type.size() - 11), '|'))
+            for (auto &notation : splitString(attribute.enumeration.substr(1, attribute.enumeration.size() - 2), '|'))
             {
                 notations.insert(notation);
             }
@@ -261,10 +261,10 @@ namespace H4
                 throw XML::ValidationError(*this, "Element <" + xmlNodeElement->name + "> NOTATION attribute '" + attribute.name + "' value '" + elementAttribute.value.parsed + "' is not defined.");
             }
         }
-        else if (attribute.type[0] == '(')
+        else if (attribute.type == DTDAttributeType::enumeration)
         {
             std::set<std::string> enumeration;
-            for (auto &option : splitString(attribute.type.substr(1, attribute.type.size() - 2), '|'))
+            for (auto &option : splitString(attribute.enumeration.substr(1, attribute.enumeration.size() - 2), '|'))
             {
                 enumeration.insert(option);
             }

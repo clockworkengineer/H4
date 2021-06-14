@@ -49,16 +49,6 @@ namespace H4
         m_entityMapping["&apos;"].internal = "&#x27;";
         m_entityMapping["&lt;"].internal = "&#x3C;";
         m_entityMapping["&gt;"].internal = "&#x3E;";
-        // DTD attribute list type tokens
-        // Make sure longer possible matches are first
-        m_dtdAttrListTypes.push_back(U"CDATA");
-        m_dtdAttrListTypes.push_back(U"IDREFS");
-        m_dtdAttrListTypes.push_back(U"IDREF");
-        m_dtdAttrListTypes.push_back(U"ID");
-        m_dtdAttrListTypes.push_back(U"NMTOKENS");
-        m_dtdAttrListTypes.push_back(U"NMTOKEN");
-        m_dtdAttrListTypes.push_back(U"ENTITIES");
-        m_dtdAttrListTypes.push_back(U"ENTITY");
     }
     // ==============
     // PUBLIC METHODS
