@@ -43,7 +43,6 @@ namespace H4
         //
         // XML syntax error.
         //
-        // class ISource;
         struct SyntaxError : public std::exception
         {
         public:
@@ -55,24 +54,6 @@ namespace H4
             {
                 errorMessage = "XML Syntax Error [Line: " + std::to_string(xmlSource.getLineNo()) +
                                " Column: " + std::to_string(xmlSource.getColumnNo()) + "] " + description;
-            }
-            virtual const char *what() const throw()
-            {
-                return (errorMessage.c_str());
-            }
-
-        private:
-            std::string errorMessage;
-        };
-        //
-        // XML validation error
-        //
-        struct ValidationError : public std::exception
-        {
-        public:
-            ValidationError(DTD &dtd, const std::string &description = "")
-            {
-                errorMessage = "XML Validation Error [Line: " + std::to_string(dtd.m_lineNumber) + "] " + description;
             }
             virtual const char *what() const throw()
             {
