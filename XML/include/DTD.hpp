@@ -28,6 +28,23 @@ namespace H4
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
         //
+        // XML validation error
+        //
+        struct ValidationError : public std::exception
+        {
+        public:
+            ValidationError(DTD &dtd, const std::string &description = "")
+            {
+                errorMessage = "XML Validation Error [Line: " + std::to_string(dtd.m_lineNumber) + "] " + description;
+            }
+            virtual const char *what() const throw()
+            {
+                return (errorMessage.c_str());
+            }
+
+        private:
+            std::string errorMessage;
+        };
         //
         // XML DTD attribute types
         //
