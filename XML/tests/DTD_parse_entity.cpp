@@ -149,7 +149,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
                 "<author>&js;</author>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Entity '&js;' contains recursive definition which is not allowed.");
+    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error: Entity '&js;' contains recursive definition which is not allowed.");
   }
   SECTION("XML DTD with entity that contains a character reference that is parsed straight away.", "[XML][DTD][Parse][Entity]")
   {

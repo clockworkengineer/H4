@@ -46,7 +46,7 @@ namespace H4
         {
             if (m_notations.count(notation) == 0)
             {
-                throw XML::SyntaxError("NOTATION " + notation + " is not defined.");
+                throw SyntaxError("NOTATION " + notation + " is not defined.");
             }
         }
     }
@@ -60,14 +60,14 @@ namespace H4
         // Attribute cannot be ID and fixed
         if (dtdAttribute.type == (DTDAttributeType::id | DTDAttributeType::fixed))
         {
-            throw XML::SyntaxError("Attribute '" + dtdAttribute.name + "' may not be of type ID and FIXED.");
+            throw SyntaxError("Attribute '" + dtdAttribute.name + "' may not be of type ID and FIXED.");
         }
         // Only one ID attribute allowed per element
         else if ((dtdAttribute.type & DTDAttributeType::id)!=0)
         {
             if (m_elements[elementName].idAttributePresent)
             {
-                throw XML::SyntaxError("Element <" + elementName + "> has more than one ID attribute.");
+                throw SyntaxError("Element <" + elementName + "> has more than one ID attribute.");
             }
             m_elements[elementName].idAttributePresent = true;
         }
@@ -83,12 +83,12 @@ namespace H4
                 }
                 else
                 {
-                    throw XML::SyntaxError("Enumerator value '" + option + "' for attribute '" + dtdAttribute.name + "' occurs more than once in its definition.");
+                    throw SyntaxError("Enumerator value '" + option + "' for attribute '" + dtdAttribute.name + "' occurs more than once in its definition.");
                 }
             }
             if (options.find(dtdAttribute.value.parsed) == options.end())
             {
-                throw XML::SyntaxError("Default value '" + dtdAttribute.value.parsed + "' for enumeration attribute '" + dtdAttribute.name + "' is invalid.");
+                throw SyntaxError("Default value '" + dtdAttribute.value.parsed + "' for enumeration attribute '" + dtdAttribute.name + "' is invalid.");
             }
         }
     }
@@ -119,7 +119,7 @@ namespace H4
                     mappedEntityName += entitySource.current();
                     if (currentEntities.find(mappedEntityName) != currentEntities.end())
                     {
-                        throw XML::SyntaxError("Entity '" + mappedEntityName + "' contains recursive definition which is not allowed.");
+                        throw SyntaxError("Entity '" + mappedEntityName + "' contains recursive definition which is not allowed.");
                     }
                     if (!m_entityMapping[mappedEntityName].internal.empty())
                     {
@@ -152,7 +152,7 @@ namespace H4
         }
         if (dtdSource.current() != ')')
         {
-            throw XML::SyntaxError(dtdSource, "Missing closing ')' on enumeration attribute type.");
+            throw SyntaxError(dtdSource, "Missing closing ')' on enumeration attribute type.");
         }
         enumerationType += dtdSource.current();
         dtdSource.next();
@@ -234,7 +234,7 @@ namespace H4
             }
             return;
         }
-        throw XML::SyntaxError(dtdSource, "Invalid attribute type specified.");
+        throw SyntaxError(dtdSource, "Invalid attribute type specified.");
     }
     /// <summary>
     /// Parse DTD attribute value.
@@ -416,11 +416,11 @@ namespace H4
             }
             else
             {
-                throw XML::SyntaxError(dtdSource, "Invalid DTD tag.");
+                throw SyntaxError(dtdSource, "Invalid DTD tag.");
             }
             if (dtdSource.current() != '>')
             {
-                throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
+                throw SyntaxError(dtdSource, "Missing '>' terminator.");
             }
             dtdSource.next();
             dtdSource.ignoreWS();
@@ -455,7 +455,7 @@ namespace H4
         // Missing '>' after external DTD reference
         else if (dtdSource.current() != '>')
         {
-            throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
+            throw SyntaxError(dtdSource, "Missing '>' terminator.");
         }
         // Move to the next component in XML prolog
         else

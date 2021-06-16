@@ -216,7 +216,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
                 "</queue>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 7 Column: 39] Missing closing ')' on enumeration attribute type.");
+    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error [Line: 7 Column: 39] Missing closing ')' on enumeration attribute type.");
   }
   SECTION("Parse XML with DTD that contains a enumeration with a default value not in enumeration.", "[XML][DTD][Parse][Error][Attributes]")
   {
@@ -235,7 +235,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
                 "</queue>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Default value 'D' for enumeration attribute 'gender' is invalid.");
+    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error: Default value 'D' for enumeration attribute 'gender' is invalid.");
   }
   SECTION("Parse XML with DTD that contains a enumeration with not all values unique.", "[XML][DTD][Parse][Error][Attributes]")
   {
@@ -254,7 +254,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
                 "</queue>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Enumerator value 'F' for attribute 'gender' occurs more than once in its definition.");
+    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error: Enumerator value 'F' for attribute 'gender' occurs more than once in its definition.");
   }
   SECTION("Parse XML with DTD that specifies the use of an two different ID attributes for an element.", "[XML][DTD][Parse][Error][Attributes]")
   {
@@ -274,7 +274,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
                 "</collection>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Element <item> has more than one ID attribute.");
+    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error: Element <item> has more than one ID attribute.");
   }
   SECTION("Parse XML with DTD that has a valid NOTATION attribute (photo_type) and usage.", "[XML][DTD][Parse][Attribtes][NOTATION]")
   {
@@ -333,6 +333,6 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
                 "</mountains>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: NOTATION GIF is not defined.");
+    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error: NOTATION GIF is not defined.");
   }
 }

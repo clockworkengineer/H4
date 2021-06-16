@@ -386,7 +386,7 @@ TEST_CASE("Creation and use of ISource (Buffer) interface (buffer contains file 
                     "</queue>\n";
         BufferSource xmlSource(xmlString);
         XML xml(xmlSource);
-        REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 7 Column: 2] Missing '>' terminator.");
+        REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error [Line: 7 Column: 2] Missing '>' terminator.");
     }
     SECTION("Check that BufferSource position() and getRange works correctly.", "[XML][Parse][BufferSource]")
     {
