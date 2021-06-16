@@ -120,18 +120,18 @@ TEST_CASE("Parse XML DTD and check values.", "[XML][DTD][Parse]")
     xml.parse();
     REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
-    REQUIRE(xml.m_dtd.m_elements["address"].name == "address");
-    REQUIRE(xml.m_dtd.m_elements["address"].content.unparsed == "(name,company,phone)");
-    REQUIRE(xml.m_dtd.m_elements["name"].name == "name");
-    REQUIRE(xml.m_dtd.m_elements["name"].content.unparsed == "(#PCDATA)");
-    REQUIRE(xml.m_dtd.m_elements["company"].name == "company");
-    REQUIRE(xml.m_dtd.m_elements["company"].content.unparsed == "(#PCDATA)");
-    REQUIRE(xml.m_dtd.m_elements["phone"].name == "phone");
-    REQUIRE(xml.m_dtd.m_elements["phone"].content.unparsed == "(#PCDATA)");
-    REQUIRE(xml.m_dtd.m_elements["br"].name == "br");
-    REQUIRE(xml.m_dtd.m_elements["br"].content.unparsed == "EMPTY");
-    REQUIRE(xml.m_dtd.m_elements["footer"].name == "footer");
-    REQUIRE(xml.m_dtd.m_elements["footer"].content.unparsed == "ANY");
+    REQUIRE(xml.getElement("address").name == "address");
+    REQUIRE(xml.getElement("address").content.unparsed == "(name,company,phone)");
+    REQUIRE(xml.getElement("name").name == "name");
+    REQUIRE(xml.getElement("name").content.unparsed == "(#PCDATA)");
+    REQUIRE(xml.getElement("company").name == "company");
+    REQUIRE(xml.getElement("company").content.unparsed == "(#PCDATA)");
+    REQUIRE(xml.getElement("phone").name == "phone");
+    REQUIRE(xml.getElement("phone").content.unparsed == "(#PCDATA)");
+    REQUIRE(xml.getElement("br").name == "br");
+    REQUIRE(xml.getElement("br").content.unparsed == "EMPTY");
+    REQUIRE(xml.getElement("footer").name == "footer");
+    REQUIRE(xml.getElement("footer").content.unparsed == "ANY");
   }
   SECTION("XML with external file DTD and check values", "[XML][DTD][Parse]")
   {
@@ -148,8 +148,8 @@ TEST_CASE("Parse XML DTD and check values.", "[XML][DTD][Parse]")
     REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_dtd.m_external.type == "SYSTEM");
     REQUIRE(xml.m_dtd.m_external.systemID == "./testData/note001.dtd");
-    REQUIRE(xml.m_dtd.m_elements["note"].name == "note");
-    REQUIRE(xml.m_dtd.m_elements["note"].content.unparsed == "(to,from,heading,body)");
+    REQUIRE(xml.getElement("note").name == "note");
+    REQUIRE(xml.getElement("note").content.unparsed == "(to,from,heading,body)");
   }
   SECTION("XML with external URL DTD to parse and check values", "[XML][DTD][Parse]")
   {

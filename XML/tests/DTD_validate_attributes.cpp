@@ -172,11 +172,11 @@ TEST_CASE("Validate XML with various DTD attribute validation issues.", "[XML][D
     REQUIRE_NOTHROW(xml.validate());
     REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
     REQUIRE(xml.m_dtd.m_elements.find("person") != xml.m_dtd.m_elements.end());
-    REQUIRE(xml.m_dtd.m_elements["person"].attributes.size() == 1);
-    REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].name == "gender");
-    REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].type == (DTD::DTDAttributeType::enumeration|DTD::DTDAttributeType::normal));
-    REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].enumeration == "(M|F)");
-    REQUIRE(xml.m_dtd.m_elements["person"].attributes[0].value.parsed == "F");
+    REQUIRE(xml.getElement("person").attributes.size() == 1);
+    REQUIRE(xml.getElement("person").attributes[0].name == "gender");
+    REQUIRE(xml.getElement("person").attributes[0].type == (DTD::DTDAttributeType::enumeration|DTD::DTDAttributeType::normal));
+    REQUIRE(xml.getElement("person").attributes[0].enumeration == "(M|F)");
+    REQUIRE(xml.getElement("person").attributes[0].value.parsed == "F");
     REQUIRE(xml.m_dtd.m_name == "queue");
     REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_prolog[0][0].name == "person");

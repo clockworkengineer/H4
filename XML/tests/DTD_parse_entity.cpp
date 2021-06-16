@@ -219,8 +219,8 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_dtd.m_name == "REPORT");
     REQUIRE(xml.getEntity("%empty_report;").internal == "<!ELEMENT REPORT EMPTY>");
-    REQUIRE(xml.m_dtd.m_elements["REPORT"].name == "REPORT");
-    REQUIRE(xml.m_dtd.m_elements["REPORT"].content.parsed == "EMPTY");
+    REQUIRE(xml.getElement("REPORT").name == "REPORT");
+    REQUIRE(xml.getElement("REPORT").content.parsed == "EMPTY");
   }
   SECTION("XML with external DTD with parameter entities to parse.", "[XML][DTD][Parse][Entity]")
   {
@@ -244,16 +244,16 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.getEntity("%contact;").internal == "phone");
     REQUIRE(xml.getEntity("%area;").internal == "name, street, pincode, city");
     REQUIRE(xml.m_dtd.m_elements.size() == 5);
-    REQUIRE(xml.m_dtd.m_elements["REPORT"].name == "REPORT");
-    REQUIRE(xml.m_dtd.m_elements["REPORT"].content.unparsed == "(residence|apartment|office|shop)*");
-    REQUIRE(xml.m_dtd.m_elements["residence"].name == "residence");
-    REQUIRE(xml.m_dtd.m_elements["residence"].content.unparsed == "(name, street, pincode, city, phone)");
-    REQUIRE(xml.m_dtd.m_elements["apartment"].name == "apartment");
-    REQUIRE(xml.m_dtd.m_elements["apartment"].content.unparsed == "(name, street, pincode, city, phone)");
-    REQUIRE(xml.m_dtd.m_elements["office"].name == "office");
-    REQUIRE(xml.m_dtd.m_elements["office"].content.unparsed == "(name, street, pincode, city, phone)");
-    REQUIRE(xml.m_dtd.m_elements["shop"].name == "shop");
-    REQUIRE(xml.m_dtd.m_elements["shop"].content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(xml.getElement("REPORT").name == "REPORT");
+    REQUIRE(xml.getElement("REPORT").content.unparsed == "(residence|apartment|office|shop)*");
+    REQUIRE(xml.getElement("residence").name == "residence");
+    REQUIRE(xml.getElement("residence").content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(xml.getElement("apartment").name == "apartment");
+    REQUIRE(xml.getElement("apartment").content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(xml.getElement("office").name == "office");
+    REQUIRE(xml.getElement("office").content.unparsed == "(name, street, pincode, city, phone)");
+    REQUIRE(xml.getElement("shop").name == "shop");
+    REQUIRE(xml.getElement("shop").content.unparsed == "(name, street, pincode, city, phone)");
   }
    SECTION("XML DTD with parameter entity within general entity.", "[XML][DTD][Parse][Entity]")
   {
