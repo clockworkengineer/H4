@@ -12,7 +12,7 @@ namespace H4
     //
     // XML XMLNode structure
     //
-    enum XMLNodeType
+    enum class XMLNodeType
     {
         base = 0,
         prolog = 1,

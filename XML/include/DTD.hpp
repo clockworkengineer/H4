@@ -69,7 +69,10 @@ namespace H4
             std::string errorMessage;
         };
         //
-        // XML DTD attribute types
+        // XML DTD attribute types. Note only one type bit and
+        // value bit should be set for each attribute and that
+        // some combinations like id and fixed are illegal and
+        // are reported as so by the parser.
         //
         enum DTDAttributeType : uint16_t
         {
