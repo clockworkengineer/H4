@@ -97,7 +97,6 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void stringifyElements(XMLNode *xmlNode, IDestination &xmlDestination);
-        bool validAttributeValue(XMLValue &value);
         void validXMLDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
         void parseAddElementContent(XMLNodeElement *xmlNodeElement, const std::string &content);
         void parseEntityMappingContents(XMLNodeElement *xmlNodeElement, XMLValue &entityReference);

@@ -124,6 +124,37 @@ namespace H4
         return (true);
     }
     /// <summary>
+    /// Make sure that XML attribute value does not contain any illegal characters.
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns>true then contains all legal characters..</returns>
+    bool validAttributeValue(XMLValue &value)
+    {
+        BufferSource valueSource(value.parsed);
+        while (valueSource.more())
+        {
+            if (valueSource.match(U"&#"))
+            {
+                parseCharacterReference(valueSource);
+            }
+            else if (valueSource.current() == '&')
+            {
+                parseEntityReference(valueSource);
+            }
+            else if ((valueSource.current() == '<') ||
+                     (valueSource.current() == '"') ||
+                     (valueSource.current() == '\''))
+            {
+                return (false);
+            }
+            else
+            {
+                valueSource.next();
+            }
+        }
+        return (true);
+    }
+    /// <summary>
     /// Parse  and return XML name.
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
@@ -368,7 +399,8 @@ namespace H4
         stringToTrimm.erase(stringToTrimm.begin(), std::find_if(stringToTrimm.begin(), stringToTrimm.end(), [](unsigned char ch)
                                                                 { return !std::iswspace(ch); }));
         stringToTrimm.erase(std::find_if(stringToTrimm.rbegin(), stringToTrimm.rend(), [](unsigned char ch)
-                                         { return !std::iswspace(ch); }).base(),
+                                         { return !std::iswspace(ch); })
+                                .base(),
                             stringToTrimm.end());
     }
 } // namespace H4

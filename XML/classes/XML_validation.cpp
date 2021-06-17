@@ -104,35 +104,4 @@ namespace H4
             xmlNodeProlog->addAttribute(attribute.name, attribute.value);
         }
     }
-    /// <summary>
-    /// Make sure that XML attribute value does not contain any illegal characters.
-    /// </summary>
-    /// <param name=""></param>
-    /// <returns>true then contains all legal characters..</returns>
-    bool XML::validAttributeValue(XMLValue &value)
-    {
-        BufferSource valueSource(value.parsed);
-        while (valueSource.more())
-        {
-            if (valueSource.match(U"&#"))
-            {
-                parseCharacterReference(valueSource);
-            }
-            else if (valueSource.current() == '&')
-            {
-                parseEntityReference(valueSource);
-            }
-            else if ((valueSource.current() == '<') ||
-                     (valueSource.current() == '"') ||
-                     (valueSource.current() == '\''))
-            {
-                return (false);
-            }
-            else
-            {
-                valueSource.next();
-            }
-        }
-        return (true);
-    }
 } // namespace H4

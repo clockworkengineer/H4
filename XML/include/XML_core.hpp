@@ -72,10 +72,11 @@ namespace H4
     bool validNameChar(ISource::Char ch);
     bool validReservedName(const ISource::String &name);
     bool validName(ISource::String name);
+    bool validAttributeValue(XMLValue &value);
     //
     // XML parsing
     //
-    class ISource;
+    // class ISource;
     XMLValue parseEntityReference(ISource &xmlSource);
     std::string parseName(ISource &xmlSource);
     XMLValue parseCharacterReference(ISource &xmlSource);
