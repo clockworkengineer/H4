@@ -117,7 +117,6 @@ namespace H4
         // PRIVATE VARIABLES
         // =================
         static XMLAttribute m_defaultAtributes[3];
-        static std::vector<ISource::String> m_dtdAttrListTypes;
         ISource &m_xmlSource;
     };
 } // namespace H4
