@@ -75,7 +75,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        DTD::DTDElement &getElement(const std::string &elementName);
+        DTDElement &getElement(const std::string &elementName);
         XMLEntityMapping &getEntity(const std::string &entityName);
         void parse();
         void stringify(IDestination &xmlDestination);

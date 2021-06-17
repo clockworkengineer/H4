@@ -41,7 +41,7 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-    DTD::DTDElement &XML::getElement(const std::string &elementName)
+    DTDElement &XML::getElement(const std::string &elementName)
     {
         return(m_dtd.m_elements[elementName]);
     }
