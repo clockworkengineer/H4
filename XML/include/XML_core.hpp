@@ -16,11 +16,6 @@
 namespace H4
 {
     //
-    // 32 bit characters internally
-    //
-    using XMLString = std::u32string;
-    using XMLChar = XMLString::value_type;
-    //
     // XML value
     //
     struct XMLValue
@@ -72,11 +67,11 @@ namespace H4
     //
     // XML validation
     //
-    bool validChar(XMLChar ch);
-    bool validNameStartChar(XMLChar ch);
-    bool validNameChar(XMLChar ch);
-    bool validReservedName(const XMLString &name);
-    bool validName(XMLString name);
+    bool validChar(ISource::Char ch);
+    bool validNameStartChar(ISource::Char ch);
+    bool validNameChar(ISource::Char ch);
+    bool validReservedName(const ISource::String &name);
+    bool validName(ISource::String name);
     //
     // XML parsing
     //

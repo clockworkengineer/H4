@@ -18,7 +18,7 @@ namespace H4
                 m_stringifyBuffer.push_back(b);
             }
         }
-        void add(const XMLChar ch) {
+        void add(const ISource::Char ch) {
             add(m_UTF8.to_bytes(ch));
         }
         std::string getBuffer()
@@ -40,7 +40,7 @@ namespace H4
                 throw std::runtime_error("XML file output stream failed to open or could not be created.");
             }
         }
-        void add(const XMLChar ch) {
+        void add(const ISource::Char ch) {
             add(m_UTF8.to_bytes(ch));
         }
         void add(const std::string &bytes)

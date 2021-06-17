@@ -10,6 +10,11 @@
 #include <set>
 #include <vector>
 //
+// Source/Destination interfaces
+//
+#include "ISource.hpp"
+#include "IDestination.hpp"
+//
 // XML Core
 //
 #include "XML_core.hpp"
@@ -21,11 +26,6 @@
 // XML XNodes
 //
 #include "XMLNode.hpp"
-//
-// Source/Destination interfaces
-//
-#include "ISource.hpp"
-#include "IDestination.hpp"
 // =========
 // NAMESPACE
 // =========
@@ -117,7 +117,7 @@ namespace H4
         // PRIVATE VARIABLES
         // =================
         static XMLAttribute m_defaultAtributes[3];
-        static std::vector<XMLString> m_dtdAttrListTypes;
+        static std::vector<ISource::String> m_dtdAttrListTypes;
         ISource &m_xmlSource;
     };
 } // namespace H4

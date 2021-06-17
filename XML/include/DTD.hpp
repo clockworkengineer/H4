@@ -1,6 +1,11 @@
 #ifndef DTD_DPP
 #define DTD_DPP
 //
+// Source/Destination interfaces
+//
+#include "ISource.hpp"
+#include "IDestination.hpp"
+//
 // DTD Core
 //
 #include "XML_core.hpp"
@@ -12,11 +17,6 @@
 // DTD element/attrribute
 //
 #include "DTDElement.hpp"
-//
-// Source/Destination interfaces
-//
-#include "ISource.hpp"
-#include "IDestination.hpp"
 // =========
 // NAMESPACE
 // =========

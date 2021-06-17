@@ -37,7 +37,7 @@ namespace H4
     /// </summary>
     /// <param name="ch">Character to validate</param>
     /// <returns>true then valid/.</returns>
-    bool validChar(XMLChar ch)
+    bool validChar(ISource::Char ch)
     {
         return ((ch == 0x09) ||
                 (ch == kLineFeed) ||
@@ -51,7 +51,7 @@ namespace H4
     /// </summary>
     /// <param name="ch">Character value to validate.</param>
     /// <returns>true then valid.</returns>
-    bool validNameStartChar(XMLChar ch)
+    bool validNameStartChar(ISource::Char ch)
     {
         return ((ch == ':') ||
                 (ch == '_') ||
@@ -75,7 +75,7 @@ namespace H4
     /// </summary>
     /// <param name="ch">Name to validate.</param>
     /// <returns>true then valid.</returns>
-    bool validNameChar(XMLChar ch)
+    bool validNameChar(ISource::Char ch)
     {
         return (validNameStartChar(ch) ||
                 (ch == '-') ||
@@ -90,7 +90,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>true then valid.</returns>
-    bool validReservedName(const XMLString &name)
+    bool validReservedName(const ISource::String &name)
     {
         return ((name.find(U"xmlns") == 0) || (name.find(U"xml-stylesheet") == 0) || (name == U"xml"));
     }
@@ -99,7 +99,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>true then valid.</returns>
-    bool validName(XMLString name)
+    bool validName(ISource::String name)
     {
         if (name.empty())
         {
@@ -130,7 +130,7 @@ namespace H4
     /// <returns>XML name.</returns>
     std::string parseName(ISource &xmlSource)
     {
-        XMLString name;
+        ISource::String name;
         while (xmlSource.more() && validNameChar(xmlSource.current()))
         {
             name += xmlSource.current();
@@ -287,7 +287,7 @@ namespace H4
         if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
         {
             XMLValue value;
-            XMLChar quote = xmlSource.current();
+            ISource::Char quote = xmlSource.current();
             xmlSource.next();
             while (xmlSource.more() && xmlSource.current() != quote)
             {
