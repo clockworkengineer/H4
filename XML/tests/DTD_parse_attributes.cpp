@@ -164,7 +164,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     XML xml(xmlSource);
     xml.parse();
     REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_elements.find("person") != xml.m_dtd.m_elements.end());
+    REQUIRE(xml.isElementPresent("person") == true);
     REQUIRE(xml.getElement("person").attributes.size() == 1);
     REQUIRE(xml.getElement("person").attributes[0].name == "gender");
     REQUIRE(xml.getElement("person").attributes[0].type == (DTDAttributeType::enumeration|DTDAttributeType::normal));
@@ -302,7 +302,7 @@ TEST_CASE("Parse XML DTD that contains enumeration attributes with various error
     XML xml(xmlSource);
     REQUIRE_NOTHROW(xml.parse());
     REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_elements.find("mountain") != xml.m_dtd.m_elements.end());
+    REQUIRE(xml.isElementPresent("mountain") == true);
     REQUIRE(xml.getElement("mountain").attributes.size() == 2);
     REQUIRE(xml.getElement("mountain").attributes[0].name == "photo");
     REQUIRE(xml.getElement("mountain").attributes[0].type == (DTDAttributeType::entity|DTDAttributeType::implied));

@@ -85,6 +85,10 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
+        bool isElementPresent(const std::string &elementName);
+        DTDElement &getElement(const std::string &elementName);
+        XMLEntityMapping &getEntity(const std::string &entityName);
+        XMLExternalReference &getNotation(const std::string &notationName);
         void parse(ISource &dtdSource);
         void stringify(IDestination &xmlDestination);
         void validate(XMLNodeElement &prolog);
@@ -92,11 +96,8 @@ namespace H4
         // PUBLIC VARIABLES
         // ================
         std::string m_name;
-        XMLEntityMappings m_entityMapping;
         XMLExternalReference m_external;
-        std::unordered_map<std::string, XMLExternalReference> m_notations;
-        std::unordered_map<std::string, DTDElement> m_elements;
-        long m_lineNumber = 1;
+        XMLEntityMappings m_entityMapping;
 
     private:
         // ===========================
@@ -151,9 +152,12 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
+        std::unordered_map<std::string, DTDElement> m_elements;
+        std::unordered_map<std::string, XMLExternalReference> m_notations;
         std::set<std::string> m_assignedIDValues;
         std::set<std::string> m_assignedIDREFValues;
         std::string m_unparsed;
+        long m_lineNumber = 1;
     };
 } // namespace H4
 #endif /* DTD_DPP */

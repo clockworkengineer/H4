@@ -75,6 +75,8 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
+        bool isElementPresent(const std::string &elementName);
+        XMLExternalReference &getNotation(const std::string &notationName);
         DTDElement &getElement(const std::string &elementName);
         XMLEntityMapping &getEntity(const std::string &entityName);
         void parse();

@@ -41,9 +41,29 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
+        /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    bool XML::isElementPresent(const std::string &elementName)
+    {
+        return (m_dtd.isElementPresent(elementName));
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    XMLExternalReference &XML::getNotation(const std::string &notationName)
+    {
+        return (m_dtd.getNotation(notationName));
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
     DTDElement &XML::getElement(const std::string &elementName)
     {
-        return(m_dtd.m_elements[elementName]);
+        return (m_dtd.getElement(elementName));
     }
     /// <summary>
     /// Fetch entity mapping structure.

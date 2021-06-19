@@ -243,7 +243,6 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.m_dtd.m_name == "REPORT");
     REQUIRE(xml.getEntity("%contact;").internal == "phone");
     REQUIRE(xml.getEntity("%area;").internal == "name, street, pincode, city");
-    REQUIRE(xml.m_dtd.m_elements.size() == 5);
     REQUIRE(xml.getElement("REPORT").name == "REPORT");
     REQUIRE(xml.getElement("REPORT").content.unparsed == "(residence|apartment|office|shop)*");
     REQUIRE(xml.getElement("residence").name == "residence");

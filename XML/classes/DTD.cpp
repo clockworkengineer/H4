@@ -53,6 +53,39 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
+        /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    bool DTD::isElementPresent(const std::string &elementName)
+    {
+        return (m_elements.find(elementName)!=m_elements.end());
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    DTDElement &DTD::getElement(const std::string &elementName)
+    {
+        return (m_elements[elementName]);
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    XMLEntityMapping &DTD::getEntity(const std::string &entityName)
+    {
+        return (m_entityMapping[entityName]);
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    XMLExternalReference &DTD::getNotation(const std::string &notationName)
+    {
+        return (m_notations[notationName]);
+    }
     /// <summary>
     /// Parse DTD read from source stream.
     /// </summary>

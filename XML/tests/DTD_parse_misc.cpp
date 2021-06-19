@@ -67,12 +67,12 @@ TEST_CASE("Parse XML with DTD both internal/external", "[XML][DTD][Parse]")
     XML xml(xmlSource);
     xml.parse();
     REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[0]).getNodeType() == XMLNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_notations["GIF"].type == "SYSTEM");
-    REQUIRE(xml.m_dtd.m_notations["GIF"].systemID == "GIF");
-    REQUIRE(xml.m_dtd.m_notations["JPG"].type == "SYSTEM");
-    REQUIRE(xml.m_dtd.m_notations["JPG"].systemID == "JPG");
-    REQUIRE(xml.m_dtd.m_notations["BMP"].type == "SYSTEM");
-    REQUIRE(xml.m_dtd.m_notations["BMP"].systemID == "BMP");
+    REQUIRE(xml.getNotation("GIF").type == "SYSTEM");
+    REQUIRE(xml.getNotation("GIF").systemID == "GIF");
+    REQUIRE(xml.getNotation("JPG").type == "SYSTEM");
+    REQUIRE(xml.getNotation("JPG").systemID == "JPG");
+    REQUIRE(xml.getNotation("BMP").type == "SYSTEM");
+    REQUIRE(xml.getNotation("BMP").systemID == "BMP");
   }
   SECTION("XML with internal DTD containing comments.", "[XML][DTD][Parse]")
   {

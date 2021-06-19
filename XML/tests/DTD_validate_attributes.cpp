@@ -171,7 +171,7 @@ TEST_CASE("Validate XML with various DTD attribute validation issues.", "[XML][D
     xml.parse();
     REQUIRE_NOTHROW(xml.validate());
     REQUIRE(XMLNodeRef<XMLNode>(*xml.m_prolog.children[1]).getNodeType() == XMLNodeType::dtd);
-    REQUIRE(xml.m_dtd.m_elements.find("person") != xml.m_dtd.m_elements.end());
+    REQUIRE(xml.isElementPresent("person") == true);
     REQUIRE(xml.getElement("person").attributes.size() == 1);
     REQUIRE(xml.getElement("person").attributes[0].name == "gender");
     REQUIRE(xml.getElement("person").attributes[0].type == (DTDAttributeType::enumeration|DTDAttributeType::normal));
