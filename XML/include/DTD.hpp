@@ -34,7 +34,7 @@ namespace H4
         //
         // DTD Type
         //
-        enum DTDType : uint8_t
+        enum DTDType : uint16_t
         {
             internal = (0x1 << 0),
             external = (0x1 << 1)
@@ -93,7 +93,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        DTDType &getType();
+        uint16_t getType();
         std::string &getRootName();
         XMLExternalReference &getExternalReference();
         bool isElementPresent(const std::string &elementName);
@@ -106,8 +106,8 @@ namespace H4
         // ================
         // PUBLIC VARIABLES
         // ================
-        std::string m_name;
-        XMLExternalReference m_external;
+        // std::string m_name;
+        // XMLExternalReference m_external;
         XMLEntityMappings m_entityMapping;
 
     private:
@@ -163,9 +163,9 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
-        DTDType m_type;
-        // std::string m_name;
-        // XMLExternalReference m_external;
+        uint16_t m_type = 0;
+        std::string m_name;
+        XMLExternalReference m_external;
         std::unordered_map<std::string, DTDElement> m_elements;
         std::unordered_map<std::string, XMLExternalReference> m_notations;
         std::set<std::string> m_assignedIDValues;

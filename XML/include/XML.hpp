@@ -75,7 +75,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        DTD::DTDType &getDTDType();
+        uint16_t getDTDType();
         std::string &getDTDRootName();
         XMLExternalReference &getDTDExternalReference();
         bool isDTDElementPresent(const std::string &elementName);

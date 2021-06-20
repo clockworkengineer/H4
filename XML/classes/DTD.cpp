@@ -57,7 +57,7 @@ namespace H4
     ///
     /// </summary>
     /// <param name=""></param>
-    DTD::DTDType &DTD::getType()
+    uint16_t DTD::getType()
     {
         return(m_type);
     }

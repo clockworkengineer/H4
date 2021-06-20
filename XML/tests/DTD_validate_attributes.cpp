@@ -177,8 +177,8 @@ TEST_CASE("Validate XML with various DTD attribute validation issues.", "[XML][D
     REQUIRE(xml.getDTDElement("person").attributes[0].type == (DTDAttributeType::enumeration|DTDAttributeType::normal));
     REQUIRE(xml.getDTDElement("person").attributes[0].enumeration == "(M|F)");
     REQUIRE(xml.getDTDElement("person").attributes[0].value.parsed == "F");
-    REQUIRE(xml.m_dtd.m_name == "queue");
-    REQUIRE(xml.m_dtd.m_name == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
+    REQUIRE(xml.getDTDRootName() == "queue");
+    REQUIRE(xml.getDTDRootName() == XMLNodeRef<XMLNodeElement>(xml.m_prolog[0]).name);
     REQUIRE(xml.m_prolog[0][0].name == "person");
     REQUIRE(xml.m_prolog[0][0].getAttributeList().size() == 1);
     REQUIRE(xml.m_prolog[0][0].getAttribute("gender").value.parsed == "M");

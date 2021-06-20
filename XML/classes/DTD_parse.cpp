@@ -63,7 +63,7 @@ namespace H4
             throw SyntaxError("Attribute '" + dtdAttribute.name + "' may not be of type ID and FIXED.");
         }
         // Only one ID attribute allowed per element
-        else if ((dtdAttribute.type & DTDAttributeType::id)!=0)
+        else if ((dtdAttribute.type & DTDAttributeType::id) != 0)
         {
             if (m_elements[elementName].idAttributePresent)
             {
@@ -72,7 +72,7 @@ namespace H4
             m_elements[elementName].idAttributePresent = true;
         }
         // Enumeration contains unique values and default is valid value
-        else if (dtdAttribute.type == (DTDAttributeType::enumeration|DTDAttributeType::normal))
+        else if (dtdAttribute.type == (DTDAttributeType::enumeration | DTDAttributeType::normal))
         {
             std::set<std::string> options;
             for (auto &option : splitString(dtdAttribute.enumeration.substr(1, dtdAttribute.enumeration.size() - 2), '|'))
@@ -451,6 +451,7 @@ namespace H4
             dtdSource.next();
             dtdSource.ignoreWS();
             parseInternal(dtdSource);
+            m_type = DTDType::internal;
         }
         // Missing '>' after external DTD reference
         else if (dtdSource.current() != '>')
@@ -467,6 +468,7 @@ namespace H4
         if (!m_external.type.empty())
         {
             parseExternal(dtdSource);
+            m_type |= DTDType::external;
         }
         // Save away unparsed form of DTD
         m_unparsed = "<!DOCTYPE" + dtdSource.getRange(start, dtdSource.position());
