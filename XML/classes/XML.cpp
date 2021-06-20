@@ -41,11 +41,35 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-        /// <summary>
+    /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
-    bool XML::isElementPresent(const std::string &elementName)
+    DTD::DTDType &XML::getDTDType()
+    {
+        return(m_dtd.getType());
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    std::string &XML::getDTDRootName()
+    {
+        return(m_dtd.getRootName());
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    XMLExternalReference &XML::getDTDExternalReference()
+    {
+        return(m_dtd.getExternalReference());
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    bool XML::isDTDElementPresent(const std::string &elementName)
     {
         return (m_dtd.isElementPresent(elementName));
     }
@@ -53,7 +77,7 @@ namespace H4
     ///
     /// </summary>
     /// <param name=""></param>
-    XMLExternalReference &XML::getNotation(const std::string &notationName)
+    XMLExternalReference &XML::getDTDNotation(const std::string &notationName)
     {
         return (m_dtd.getNotation(notationName));
     }
@@ -61,7 +85,7 @@ namespace H4
     ///
     /// </summary>
     /// <param name=""></param>
-    DTDElement &XML::getElement(const std::string &elementName)
+    DTDElement &XML::getDTDElement(const std::string &elementName)
     {
         return (m_dtd.getElement(elementName));
     }
@@ -70,9 +94,9 @@ namespace H4
     /// </summary>
     /// <param name="entityName">Entity name.</param>
     /// <returns>Entity structure.</returns>
-    XMLEntityMapping &XML::getEntity(const std::string &entityName)
+    XMLEntityMapping &XML::getDTDEntity(const std::string &entityName)
     {
-        return (m_dtd.m_entityMapping[entityName]);
+        return (m_dtd.getEntity(entityName));
     }
     /// <summary>
     /// Parse XML read from source stream into internal object.

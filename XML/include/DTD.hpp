@@ -32,6 +32,14 @@ namespace H4
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
         //
+        // DTD Type
+        //
+        enum DTDType : uint8_t
+        {
+            internal = (0x1 << 0),
+            external = (0x1 << 1)
+        };
+        //
         // XML syntax error.
         //
         struct SyntaxError : public std::exception
@@ -85,6 +93,9 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
+        DTDType &getType();
+        std::string &getRootName();
+        XMLExternalReference &getExternalReference();
         bool isElementPresent(const std::string &elementName);
         DTDElement &getElement(const std::string &elementName);
         XMLEntityMapping &getEntity(const std::string &entityName);
@@ -152,6 +163,9 @@ namespace H4
         // =================
         // PRIVATE VARIABLES
         // =================
+        DTDType m_type;
+        // std::string m_name;
+        // XMLExternalReference m_external;
         std::unordered_map<std::string, DTDElement> m_elements;
         std::unordered_map<std::string, XMLExternalReference> m_notations;
         std::set<std::string> m_assignedIDValues;

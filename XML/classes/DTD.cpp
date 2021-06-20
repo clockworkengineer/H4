@@ -53,15 +53,38 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-        /// <summary>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    DTD::DTDType &DTD::getType()
+    {
+        return(m_type);
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    std::string &DTD::getRootName()
+    {
+        return(m_name);
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    XMLExternalReference &DTD::getExternalReference()
+    {
+        return(m_external);
+    }
+    /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
     bool DTD::isElementPresent(const std::string &elementName)
     {
-        return (m_elements.find(elementName)!=m_elements.end());
+        return (m_elements.find(elementName) != m_elements.end());
     }
-
     /// <summary>
     ///
     /// </summary>

@@ -75,10 +75,13 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        bool isElementPresent(const std::string &elementName);
-        XMLExternalReference &getNotation(const std::string &notationName);
-        DTDElement &getElement(const std::string &elementName);
-        XMLEntityMapping &getEntity(const std::string &entityName);
+        DTD::DTDType &getDTDType();
+        std::string &getDTDRootName();
+        XMLExternalReference &getDTDExternalReference();
+        bool isDTDElementPresent(const std::string &elementName);
+        XMLExternalReference &getDTDNotation(const std::string &notationName);
+        DTDElement &getDTDElement(const std::string &elementName);
+        XMLEntityMapping &getDTDEntity(const std::string &entityName);
         void parse();
         void stringify(IDestination &xmlDestination);
         void validate();
