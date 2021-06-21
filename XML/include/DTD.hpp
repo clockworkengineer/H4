@@ -106,8 +106,6 @@ namespace H4
         // ================
         // PUBLIC VARIABLES
         // ================
-        // std::string m_name;
-        // XMLExternalReference m_external;
         XMLEntityMappings m_entityMapping;
 
     private:

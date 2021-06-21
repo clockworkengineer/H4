@@ -42,63 +42,6 @@ namespace H4
     // PUBLIC METHODS
     // ==============
     /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
-    uint16_t XML::getDTDType()
-    {
-        return(m_dtd.getType());
-    }
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
-    std::string &XML::getDTDRootName()
-    {
-        return(m_dtd.getRootName());
-    }
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
-    XMLExternalReference &XML::getDTDExternalReference()
-    {
-        return(m_dtd.getExternalReference());
-    }
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
-    bool XML::isDTDElementPresent(const std::string &elementName)
-    {
-        return (m_dtd.isElementPresent(elementName));
-    }
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
-    XMLExternalReference &XML::getDTDNotation(const std::string &notationName)
-    {
-        return (m_dtd.getNotation(notationName));
-    }
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name=""></param>
-    DTDElement &XML::getDTDElement(const std::string &elementName)
-    {
-        return (m_dtd.getElement(elementName));
-    }
-    /// <summary>
-    /// Fetch entity mapping structure.
-    /// </summary>
-    /// <param name="entityName">Entity name.</param>
-    /// <returns>Entity structure.</returns>
-    XMLEntityMapping &XML::getDTDEntity(const std::string &entityName)
-    {
-        return (m_dtd.getEntity(entityName));
-    }
-    /// <summary>
     /// Parse XML read from source stream into internal object.
     /// </summary>
     void XML::parse()

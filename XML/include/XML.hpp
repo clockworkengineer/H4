@@ -75,13 +75,6 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        uint16_t getDTDType();
-        std::string &getDTDRootName();
-        XMLExternalReference &getDTDExternalReference();
-        bool isDTDElementPresent(const std::string &elementName);
-        XMLExternalReference &getDTDNotation(const std::string &notationName);
-        DTDElement &getDTDElement(const std::string &elementName);
-        XMLEntityMapping &getDTDEntity(const std::string &entityName);
         void parse();
         void stringify(IDestination &xmlDestination);
         void validate();
