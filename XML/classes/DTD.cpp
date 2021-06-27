@@ -37,11 +37,10 @@ namespace H4
     // ===============
     // PRIVATE METHODS
     // ===============
-    /// <summary>
-    /// Intialise internal tables used by  DTD parser.
-    /// </summary>
-    /// <param name=""></param>
-    void DTD::initialiseTables()
+    // ==============
+    // PUBLIC METHODS
+    // ==============
+    DTD::DTD()
     {
         // Default entity mappings
         m_entityMapping["&amp;"].internal = "&#x26;";
@@ -50,16 +49,13 @@ namespace H4
         m_entityMapping["&lt;"].internal = "&#x3C;";
         m_entityMapping["&gt;"].internal = "&#x3E;";
     }
-    // ==============
-    // PUBLIC METHODS
-    // ==============
     /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
     uint16_t DTD::getType()
     {
-        return(m_type);
+        return (m_type);
     }
     /// <summary>
     ///
@@ -67,7 +63,7 @@ namespace H4
     /// <param name=""></param>
     std::string &DTD::getRootName()
     {
-        return(m_name);
+        return (m_name);
     }
     /// <summary>
     ///
@@ -75,7 +71,7 @@ namespace H4
     /// <param name=""></param>
     XMLExternalReference &DTD::getExternalReference()
     {
-        return(m_external);
+        return (m_external);
     }
     /// <summary>
     ///

@@ -1,6 +1,10 @@
 #ifndef DTD_DPP
 #define DTD_DPP
 //
+// C++ STL
+//
+#include <string>
+//
 // Source/Destination interfaces
 //
 #include "ISource.hpp"
@@ -42,10 +46,7 @@ namespace H4
         // ============
         // CONSTRUCTORS
         // ============
-        DTD()
-        {
-            initialiseTables();
-        }
+        DTD();
         // ==========
         // DESTRUCTOR
         // ==========
@@ -67,7 +68,6 @@ namespace H4
         // ================
         XMLEntityMappings m_entityMapping;
 
-
     private:
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
@@ -79,7 +79,6 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void checkForEntityRecursion(const std::string &entityName, std::set<std::string> names = {});
-        void initialiseTables();
         void validateAttributes(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
         void validateContentSpecification(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
         void validateElement(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
