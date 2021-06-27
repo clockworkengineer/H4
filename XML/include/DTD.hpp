@@ -39,47 +39,6 @@ namespace H4
             internal = (0x1 << 0),
             external = (0x1 << 1)
         };
-        //
-        // XML syntax error.
-        //
-        struct SyntaxError : public std::exception
-        {
-        public:
-            SyntaxError(const std::string &description = "")
-            {
-                errorMessage = "DTD Syntax Error: " + description;
-            }
-            SyntaxError(ISource &xmlSource, const std::string &description = "")
-            {
-                errorMessage = "DTD Syntax Error [Line: " + std::to_string(xmlSource.getLineNo()) +
-                               " Column: " + std::to_string(xmlSource.getColumnNo()) + "] " + description;
-            }
-            virtual const char *what() const throw()
-            {
-                return (errorMessage.c_str());
-            }
-
-        private:
-            std::string errorMessage;
-        };
-        //
-        // XML validation error
-        //
-        struct ValidationError : public std::exception
-        {
-        public:
-            ValidationError(DTD &dtd, const std::string &description = "")
-            {
-                errorMessage = "XML Validation Error [Line: " + std::to_string(dtd.m_lineNumber) + "] " + description;
-            }
-            virtual const char *what() const throw()
-            {
-                return (errorMessage.c_str());
-            }
-
-        private:
-            std::string errorMessage;
-        };
         // ============
         // CONSTRUCTORS
         // ============
@@ -107,6 +66,7 @@ namespace H4
         // PUBLIC VARIABLES
         // ================
         XMLEntityMappings m_entityMapping;
+
 
     private:
         // ===========================

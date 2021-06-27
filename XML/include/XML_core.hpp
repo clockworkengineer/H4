@@ -16,6 +16,47 @@
 namespace H4
 {
     //
+    // XML syntax error.
+    //
+    struct XMLSyntaxError : public std::exception
+    {
+    public:
+        XMLSyntaxError(const std::string &description = "")
+        {
+            errorMessage = "XML Syntax Error: " + description;
+        }
+        XMLSyntaxError(ISource &xmlSource, const std::string &description = "")
+        {
+            errorMessage = "XML Syntax Error [Line: " + std::to_string(xmlSource.getLineNo()) +
+                           " Column: " + std::to_string(xmlSource.getColumnNo()) + "] " + description;
+        }
+        virtual const char *what() const throw()
+        {
+            return (errorMessage.c_str());
+        }
+
+    private:
+        std::string errorMessage;
+    };
+    //
+    // XML validation error
+    //
+    struct XMLValidationError : public std::exception
+    {
+    public:
+        XMLValidationError(long m_lineNumber, const std::string &description = "")
+        {
+            errorMessage = "XML Validation Error [Line: " + std::to_string(m_lineNumber) + "] " + description;
+        }
+        virtual const char *what() const throw()
+        {
+            return (errorMessage.c_str());
+        }
+
+    private:
+        std::string errorMessage;
+    };
+    //
     // XML value
     //
     struct XMLValue

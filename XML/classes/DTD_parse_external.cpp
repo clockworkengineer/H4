@@ -71,7 +71,7 @@ namespace H4
             dtdSource.ignoreWS();
             if (dtdSource.current() != '[')
             {
-                throw XML::SyntaxError(dtdSource, "Missing opening '[' from conditional.");
+                throw XMLSyntaxError(dtdSource, "Missing opening '[' from conditional.");
             }
             dtdSource.next();
             dtdSource.ignoreWS();
@@ -107,11 +107,11 @@ namespace H4
         }
         else
         {
-            throw XML::SyntaxError(dtdSource, "Conditional value not INCLUDE or IGNORE.");
+            throw XMLSyntaxError(dtdSource, "Conditional value not INCLUDE or IGNORE.");
         }
         if (dtdSource.current() != '>')
         {
-            throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
+            throw XMLSyntaxError(dtdSource, "Missing '>' terminator.");
         }
         dtdSource.next();
         dtdSource.ignoreWS();
@@ -160,11 +160,11 @@ namespace H4
             }
             else
             {
-                throw XML::SyntaxError(dtdSource, "Invalid DTD tag.");
+                throw XMLSyntaxError(dtdSource, "Invalid DTD tag.");
             }
             if (dtdSource.current() != '>')
             {
-                throw XML::SyntaxError(dtdSource, "Missing '>' terminator.");
+                throw XMLSyntaxError(dtdSource, "Missing '>' terminator.");
             }
             dtdSource.next();
             dtdSource.ignoreWS();
@@ -208,7 +208,7 @@ namespace H4
         }
         else
         {
-            throw XML::SyntaxError(dtdSource, "Invalid external DTD specifier.");
+            throw XMLSyntaxError(dtdSource, "Invalid external DTD specifier.");
         }
         return (result);
     }

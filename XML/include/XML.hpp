@@ -40,29 +40,6 @@ namespace H4
         // ==========================
         // PUBLIC TYPES AND CONSTANTS
         // ==========================
-        //
-        // XML syntax error.
-        //
-        struct SyntaxError : public std::exception
-        {
-        public:
-            SyntaxError(const std::string &description = "")
-            {
-                errorMessage = "XML Syntax Error: " + description;
-            }
-            SyntaxError(ISource &xmlSource, const std::string &description = "")
-            {
-                errorMessage = "XML Syntax Error [Line: " + std::to_string(xmlSource.getLineNo()) +
-                               " Column: " + std::to_string(xmlSource.getColumnNo()) + "] " + description;
-            }
-            virtual const char *what() const throw()
-            {
-                return (errorMessage.c_str());
-            }
-
-        private:
-            std::string errorMessage;
-        };
         // ============
         // CONSTRUCTORS
         // ============

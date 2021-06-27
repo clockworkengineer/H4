@@ -139,7 +139,7 @@ namespace H4
         }
         if (!xmlSource.match(U">"))
         {
-            throw SyntaxError(xmlSource, "Missing closing '>' for comment line.");
+            throw XMLSyntaxError(xmlSource, "Missing closing '>' for comment line.");
         }
         xmlNodeElement->children.emplace_back(std::make_unique<XMLNodeComment>(std::move(xmlNodeComment)));
     }
@@ -173,7 +173,7 @@ namespace H4
         {
             if (xmlSource.match(U"<![CDATA["))
             {
-                throw SyntaxError(xmlSource, "Nesting of CDATA sections is not allowed.");
+                throw XMLSyntaxError(xmlSource, "Nesting of CDATA sections is not allowed.");
             }
             xmlNodeCDATA.cdata += xmlSource.current_to_bytes();
             xmlSource.next();
@@ -203,13 +203,13 @@ namespace H4
             std::string attributeName = parseName(xmlSource);
             if (!xmlSource.match(U"="))
             {
-                throw SyntaxError(xmlSource, "Missing '=' between attribute name and value.");
+                throw XMLSyntaxError(xmlSource, "Missing '=' between attribute name and value.");
             }
             xmlSource.ignoreWS();
             XMLValue attributeValue = parseValue(xmlSource, m_dtd.m_entityMapping);
             if (!validAttributeValue(attributeValue))
             {
-                throw SyntaxError(xmlSource, "Attribute value contains invalid character '<', '\"', ''' or '&'.");
+                throw XMLSyntaxError(xmlSource, "Attribute value contains invalid character '<', '\"', ''' or '&'.");
             }
             if (!xmlNodeElement->isAttributePresent(attributeName))
             {
@@ -217,7 +217,7 @@ namespace H4
             }
             else
             {
-                throw SyntaxError(xmlSource, "Attribute defined more than once within start tag.");
+                throw XMLSyntaxError(xmlSource, "Attribute defined more than once within start tag.");
             }
         }
         for (auto attribute : xmlNodeElement->getAttributeList())
@@ -246,7 +246,7 @@ namespace H4
         {
             if (!xmlNodeChildElement.isNameSpacePresent(xmlNodeChildElement.name.substr(0, pos)))
             {
-                throw SyntaxError(xmlSource, "Namespace used but not defined.");
+                throw XMLSyntaxError(xmlSource, "Namespace used but not defined.");
             }
         }
         xmlNodeElement->children.push_back(std::make_unique<XMLNodeElement>(std::move(xmlNodeChildElement)));
@@ -290,7 +290,7 @@ namespace H4
         }
         else if (xmlSource.match(U"</"))
         {
-            throw SyntaxError(xmlSource, "Missing closing tag.");
+            throw XMLSyntaxError(xmlSource, "Missing closing tag.");
         }
         else if (xmlSource.match(U"<"))
         {
@@ -298,7 +298,7 @@ namespace H4
         }
         else if (xmlSource.match(U"]]>"))
         {
-            throw SyntaxError(xmlSource, "']]>' invalid in element content area.");
+            throw XMLSyntaxError(xmlSource, "']]>' invalid in element content area.");
         }
         else
         {
@@ -322,7 +322,7 @@ namespace H4
             }
             if (!xmlSource.match(xmlSource.from_bytes(xmlNodeElement->name) + U">"))
             {
-                throw SyntaxError(xmlSource, "Missing closing tag.");
+                throw XMLSyntaxError(xmlSource, "Missing closing tag.");
             }
         }
         else if (xmlSource.match(U"/>"))
@@ -332,7 +332,7 @@ namespace H4
         }
         else
         {
-            throw SyntaxError(xmlSource, "Missing closing tag.");
+            throw XMLSyntaxError(xmlSource, "Missing closing tag.");
         }
     }
     /// <summary>
@@ -353,7 +353,7 @@ namespace H4
             parseAttributes(xmlSource, xmlNodeProlog);
             if (!xmlSource.match(U"?>"))
             {
-                throw SyntaxError(xmlSource, "Declaration end tag not found.");
+                throw XMLSyntaxError(xmlSource, "Declaration end tag not found.");
             }
             validXMLDeclaration(xmlSource, xmlNodeProlog);
         }
@@ -384,7 +384,7 @@ namespace H4
             }
             else
             {
-                throw SyntaxError(xmlSource, "Content detected before root element.");
+                throw XMLSyntaxError(xmlSource, "Content detected before root element.");
             }
         }
     }
@@ -411,13 +411,13 @@ namespace H4
                 }
                 else
                 {
-                    throw SyntaxError(m_xmlSource, "Extra content at the end of document.");
+                    throw XMLSyntaxError(m_xmlSource, "Extra content at the end of document.");
                 }
             }
         }
         else
         {
-            throw SyntaxError(m_xmlSource, "Missing root element.");
+            throw XMLSyntaxError(m_xmlSource, "Missing root element.");
         }
     }
 } // namespace H4

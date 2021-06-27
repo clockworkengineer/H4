@@ -196,7 +196,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
                 "</format>";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error: Invalid content specification for element <format>.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <format>.");
   }
   SECTION("XML with a DTD that contains an illegal mixed content specification (does not end with '*').", "[XML][DTD][Parse][Error]")
   {
@@ -216,7 +216,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
                 "</format>";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error: Invalid content specification for element <format>.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <format>.");
   }
   SECTION("Parse XML with DTD that cotains a content specification in error (missing ',').", "[XML][DTD][Parse][Error]")
   {
@@ -234,7 +234,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
                 "</note>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error: Invalid content specification for element <note>.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <note>.");
   }
   SECTION("Parse XML with DTD that cotains a content specification in error (missing element name).", "[XML][DTD][Parse][Error]")
   {
@@ -252,7 +252,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
                 "</note>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error: Invalid content specification for element <note>.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <note>.");
   }
   SECTION("XML with a DTD that contains an illegal mixed content specification (uses ',').", "[XML][DTD][Parse][Error]")
   {
@@ -272,7 +272,7 @@ TEST_CASE("Parse XML DTD with various element content specification errors.", "[
                 "</format>";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "DTD Syntax Error: Invalid content specification for element <format>.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error: Invalid content specification for element <format>.");
   }
 }
 TEST_CASE("XML with a DTD conditional INCLUDE/IGNORE tags", "[XML][DTD][Parse][Conditional]")

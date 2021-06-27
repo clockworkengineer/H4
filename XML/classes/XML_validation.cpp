@@ -48,7 +48,7 @@ namespace H4
         // Syntax error if no version present
         if (!xmlNodeProlog->isAttributePresent("version"))
         {
-            throw SyntaxError(xmlSource, "Version missing from declaration.");
+            throw XMLSyntaxError(xmlSource, "Version missing from declaration.");
         }
         // Save declaration attributes to be validated and clear tem from prolog element
         std::vector<XMLAttribute> prologAttributes;
@@ -76,7 +76,7 @@ namespace H4
         // Order not version, encoding, standalone == syntax error
         if (currentAttribute != (long)prologAttributes.size())
         {
-            throw SyntaxError(xmlSource, "Incorrect order for version, encoding and standalone attributes.");
+            throw XMLSyntaxError(xmlSource, "Incorrect order for version, encoding and standalone attributes.");
         }
         // Encoding all upper case
         std::transform(validatedAttributes[1].value.parsed.begin(), validatedAttributes[1].value.parsed.end(),
@@ -86,17 +86,17 @@ namespace H4
         std::set<std::string> versions{"1.0", "1.1"};
         if (versions.find(validatedAttributes[0].value.parsed)==versions.end())
         {
-            throw SyntaxError(xmlSource, "Unsupported version number " + validatedAttributes[0].value.parsed + ".");
+            throw XMLSyntaxError(xmlSource, "Unsupported version number " + validatedAttributes[0].value.parsed + ".");
         }
         std::set<std::string> encoding{"UTF-8", "UTF-16"};
         if (encoding.find(validatedAttributes[1].value.parsed)==encoding.end())
         {
-            throw SyntaxError(xmlSource, "Unsupported encoding " + validatedAttributes[1].value.parsed + " specified.");
+            throw XMLSyntaxError(xmlSource, "Unsupported encoding " + validatedAttributes[1].value.parsed + " specified.");
         }
         std::set<std::string> standalone{"yes", "no"};
         if (standalone.find(validatedAttributes[2].value.parsed)==standalone.end())
         {
-            throw SyntaxError(xmlSource, "Invalid standalone value of '" + validatedAttributes[2].value.parsed + "'.");
+            throw XMLSyntaxError(xmlSource, "Invalid standalone value of '" + validatedAttributes[2].value.parsed + "'.");
         }
         // Set validated prolog attributes
         for (auto &attribute : validatedAttributes)

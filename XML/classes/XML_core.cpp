@@ -170,7 +170,7 @@ namespace H4
         xmlSource.ignoreWS();
         if (!validName(name))
         {
-            throw XML::SyntaxError(xmlSource, "Invalid name '" + xmlSource.to_bytes(name) + "' encountered.");
+            throw XMLSyntaxError(xmlSource, "Invalid name '" + xmlSource.to_bytes(name) + "' encountered.");
         }
         return (xmlSource.to_bytes(name));
     }
@@ -187,7 +187,7 @@ namespace H4
         entityReference.unparsed += parseName(xmlSource);
         if (xmlSource.current() != ';')
         {
-            throw XML::SyntaxError(xmlSource, "Invalidly formed entity reference.");
+            throw XMLSyntaxError(xmlSource, "Invalidly formed entity reference.");
         }
         entityReference.unparsed += ';';
         xmlSource.next();
@@ -209,7 +209,7 @@ namespace H4
         }
         if (xmlSource.current() != ';')
         {
-            throw XML::SyntaxError(xmlSource, "Invalidly formed  character reference.");
+            throw XMLSyntaxError(xmlSource, "Invalidly formed  character reference.");
         }
         xmlSource.next();
         characterRefence.unparsed += ';';
@@ -230,12 +230,12 @@ namespace H4
         {
             if (!validChar(result))
             {
-                throw XML::SyntaxError(xmlSource, "Character reference invalid character.");
+                throw XMLSyntaxError(xmlSource, "Character reference invalid character.");
             }
             characterRefence.parsed = xmlSource.to_bytes(result);
             return (characterRefence);
         }
-        throw XML::SyntaxError(xmlSource, "Cannot convert character reference.");
+        throw XMLSyntaxError(xmlSource, "Cannot convert character reference.");
     }
     /// <summary>
     /// Lookup an entity reference to get its parsed value.
@@ -263,7 +263,7 @@ namespace H4
                 }
                 else
                 {
-                    throw XML::SyntaxError("Entity '" + entityReference.unparsed + "' source file '" + entityMapping[entityReference.unparsed].external.systemID + "' does not exist.");
+                    throw XMLSyntaxError("Entity '" + entityReference.unparsed + "' source file '" + entityMapping[entityReference.unparsed].external.systemID + "' does not exist.");
                 }
             }
         }
@@ -304,7 +304,7 @@ namespace H4
         }
         else
         {
-            throw XML::SyntaxError(xmlSource, "Invalid character value encountered.");
+            throw XMLSyntaxError(xmlSource, "Invalid character value encountered.");
         }
         return (character);
     }
@@ -328,7 +328,7 @@ namespace H4
             xmlSource.ignoreWS();
             return (value);
         }
-        throw XML::SyntaxError(xmlSource, "Invalid attribute value.");
+        throw XMLSyntaxError(xmlSource, "Invalid attribute value.");
     }
     /// <summary>
     /// Extract body of tag up until '>'.
