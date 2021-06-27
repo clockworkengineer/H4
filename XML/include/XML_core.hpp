@@ -117,7 +117,6 @@ namespace H4
     //
     // XML parsing
     //
-    // class ISource;
     XMLValue parseEntityReference(ISource &xmlSource);
     std::string parseName(ISource &xmlSource);
     XMLValue parseCharacterReference(ISource &xmlSource);
