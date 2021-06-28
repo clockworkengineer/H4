@@ -255,6 +255,7 @@ namespace H4
                 if (std::filesystem::exists(entityMapping[entityReference.unparsed].external.systemID))
                 {
                     FileSource entitySource(entityMapping[entityReference.unparsed].external.systemID);
+                    entityReference.parsed = "";
                     while (entitySource.more())
                     {
                         entityReference.parsed += entitySource.current_to_bytes();
@@ -277,7 +278,7 @@ namespace H4
     /// <param name="entityMapping">Entity mapping table.</param>
     /// <param name="translateEntity">== true then translate entity reference</param>
     /// <returns>Character value.</returns>
-    XMLValue parseCharacter(ISource &xmlSource, std::unordered_map<std::string, XMLEntityMapping> &entityMapping, bool translateEntity)
+    XMLValue parseCharacter(ISource &xmlSource)
     {
         XMLValue character;
         if (xmlSource.match(U"&#"))
@@ -287,14 +288,7 @@ namespace H4
         else if (xmlSource.current() == '&')
         {
             character = parseEntityReference(xmlSource);
-            if (translateEntity)
-            {
-                mapEntityReference(character, entityMapping);
-            }
-            else
-            {
-                character.parsed = character.unparsed;
-            }
+            character.parsed = character.unparsed;
         }
         else if (validChar(xmlSource.current()))
         {
@@ -322,7 +316,12 @@ namespace H4
             xmlSource.next();
             while (xmlSource.more() && xmlSource.current() != quote)
             {
-                value += parseCharacter(xmlSource, entityMapping, translateEntity);
+                XMLValue character = parseCharacter(xmlSource);
+                if (character.unparsed[0] == '&' && character.unparsed[1] != '#' && character.unparsed.back() == ';' && translateEntity)
+                {
+                    mapEntityReference(character, entityMapping);
+                }
+                value += character;
             }
             xmlSource.next();
             xmlSource.ignoreWS();

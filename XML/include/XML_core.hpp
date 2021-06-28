@@ -120,15 +120,15 @@ namespace H4
     XMLValue parseEntityReference(ISource &xmlSource);
     std::string parseName(ISource &xmlSource);
     XMLValue parseCharacterReference(ISource &xmlSource);
-    XMLValue parseCharacter(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity = true);
+    XMLValue parseCharacter(ISource &xmlSource);
     XMLValue parseValue(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity = true);
     std::string extractTagBody(ISource &xmlSource);
-    std::string translateEntities(const std::string &toTranslate, const XMLEntityMappings &entityMapping, char type = '%');
     std::vector<std::string> splitString(std::string stringToSplit, char delimeter);
     void trimmString(std::string &stringToTrimm);
     //
     // XML entity
     //
+    std::string translateEntities(const std::string &toTranslate, const XMLEntityMappings &entityMapping, char type = '%');
     void mapEntityReference(XMLValue &entityReference, XMLEntityMappings &entityMapping);
 } // namespace H4
 #endif /* XML_CORE_HPP */

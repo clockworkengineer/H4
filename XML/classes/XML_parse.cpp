@@ -258,9 +258,13 @@ namespace H4
     /// <param name="xmlNodeElement">Current element node.</param>
     void XML::parseDefault(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
-        XMLValue entityReference = parseCharacter(xmlSource, m_dtd.m_entityMapping);
+        XMLValue entityReference = parseCharacter(xmlSource);
         if (entityReference.unparsed[0] == '&' && entityReference.unparsed.back() == ';')
         {
+            if (entityReference.unparsed[1] != '#')
+            {
+                mapEntityReference(entityReference, m_dtd.m_entityMapping);
+            }
             parseEntityMappingContents(xmlNodeElement, entityReference);
         }
         else

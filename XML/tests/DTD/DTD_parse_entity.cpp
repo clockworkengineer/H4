@@ -172,7 +172,7 @@ TEST_CASE("Parse XML with internal DTD that contains entity definitions and uses
     REQUIRE(xml.m_dtd.getType() == DTD::DTDType::internal);
     REQUIRE(xml.m_dtd.getEntity("&email;").internal == "josmith@theworldaccordingtojosmith.com");
   }
-  SECTION("XML DTD with entity that is defined externally (file user.txt).", "[XML][DTD][Parse][Entity]")
+  SECTION("XML DTD with entity that is defined externally (file name.txt).", "[XML][DTD][Parse][Entity]")
   {
     xmlString = "<?xml version='1.0'?>\n"
                 "<!DOCTYPE foo [\n"
