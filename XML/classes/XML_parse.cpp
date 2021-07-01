@@ -259,12 +259,13 @@ namespace H4
     void XML::parseDefault(ISource &xmlSource, XMLNodeElement *xmlNodeElement)
     {
         XMLValue entityReference = parseCharacter(xmlSource);
-        if (entityReference.unparsed[0] == '&' && entityReference.unparsed.back() == ';')
+        if (entityReference.isEntityReference())
         {
-            if (entityReference.unparsed[1] != '#')
-            {
-                mapEntityReference(entityReference, m_dtd.m_entityMapping);
-            }
+            mapEntityReference(entityReference, m_dtd.m_entityMapping);
+            parseEntityMappingContents(xmlNodeElement, entityReference);
+        }
+        else if (entityReference.isCharacterReference())
+        {
             parseEntityMappingContents(xmlNodeElement, entityReference);
         }
         else

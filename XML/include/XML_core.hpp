@@ -16,7 +16,7 @@
 namespace H4
 {
     //
-    // XML syntax error.
+    // XML syntax error
     //
     struct XMLSyntaxError : public std::exception
     {
@@ -70,6 +70,14 @@ namespace H4
             unparsed += rhs.unparsed;
             return (*this);
         }
+        bool isEntityReference()
+        {
+            return (unparsed[0] == '&' && unparsed[1] != '#' && unparsed.back() == ';');
+        }
+        bool isCharacterReference()
+        {
+            return (unparsed[0] == '&' && unparsed[1] == '#' && unparsed.back() == ';');
+        }
     };
     //
     // XML Attribute
@@ -122,13 +130,16 @@ namespace H4
     XMLValue parseCharacterReference(ISource &xmlSource);
     XMLValue parseCharacter(ISource &xmlSource);
     XMLValue parseValue(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity = true);
-    std::string extractTagBody(ISource &xmlSource);
-    std::vector<std::string> splitString(std::string stringToSplit, char delimeter);
-    void trimmString(std::string &stringToTrimm);
+    std::string parseTagBody(ISource &xmlSource);
     //
     // XML entity
     //
     std::string translateEntities(const std::string &toTranslate, const XMLEntityMappings &entityMapping, char type = '%');
     void mapEntityReference(XMLValue &entityReference, XMLEntityMappings &entityMapping);
+    //
+    // XML utility
+    //
+    std::vector<std::string> splitString(std::string stringToSplit, char delimeter);
+    void trimmString(std::string &stringToTrimm);
 } // namespace H4
 #endif /* XML_CORE_HPP */

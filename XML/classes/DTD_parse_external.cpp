@@ -126,22 +126,22 @@ namespace H4
         {
             if (dtdSource.match(U"<!ENTITY"))
             {
-                BufferSource dtdTranslatedSource(translateEntities(extractTagBody(dtdSource), m_entityMapping));
+                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapping));
                 parseEntity(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!ELEMENT"))
             {
-                BufferSource dtdTranslatedSource(translateEntities(extractTagBody(dtdSource), m_entityMapping));
+                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapping));
                 parseElement(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!ATTLIST"))
             {
-                BufferSource dtdTranslatedSource(translateEntities(extractTagBody(dtdSource), m_entityMapping));
+                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapping));
                 parseAttributeList(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!NOTATION"))
             {
-                BufferSource dtdTranslatedSource(translateEntities(extractTagBody(dtdSource), m_entityMapping));
+                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapping));
                 parseNotation(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!--"))

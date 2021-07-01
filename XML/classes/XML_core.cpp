@@ -317,7 +317,7 @@ namespace H4
             while (xmlSource.more() && xmlSource.current() != quote)
             {
                 XMLValue character = parseCharacter(xmlSource);
-                if (character.unparsed[0] == '&' && character.unparsed[1] != '#' && character.unparsed.back() == ';' && translateEntity)
+                if (character.isEntityReference() && translateEntity)
                 {
                     mapEntityReference(character, entityMapping);
                 }
@@ -334,7 +334,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Body of tag.</returns>
-    std::string extractTagBody(ISource &xmlSource)
+    std::string parseTagBody(ISource &xmlSource)
     {
         xmlSource.ignoreWS();
         std::string body;
