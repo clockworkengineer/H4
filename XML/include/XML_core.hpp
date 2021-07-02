@@ -112,7 +112,44 @@ namespace H4
         XMLExternalReference external;
         std::string notation;
     };
-    using XMLEntityMappings = std::unordered_map<std::string, XMLEntityMapping>;
+    //
+    // XML Entity mapper
+    //
+    class XMLEntityMapper
+    {
+    public:
+        XMLEntityMapper()
+        {
+            m_enityMappings["&amp;"].internal = "&#x26;";
+            m_enityMappings["&quot;"].internal = "&#x22;";
+            m_enityMappings["&apos;"].internal = "&#x27;";
+            m_enityMappings["&lt;"].internal = "&#x3C;";
+            m_enityMappings["&gt;"].internal = "&#x3E;";
+        }
+        void add(const std::string &entityName, XMLEntityMapping &entityMapping)
+        {
+            m_enityMappings[entityName] = entityMapping;
+        }
+        XMLEntityMapping &get(const std::string &entityName)
+        {
+            return (m_enityMappings[entityName]);
+        }
+        void remove(const std::string &entityName)
+        {
+            m_enityMappings.erase(entityName);
+        }
+        bool isPresent(const std::string &entityName)
+        {
+            return (m_enityMappings.count(entityName) != 0);
+        }
+        std::unordered_map<std::string, XMLEntityMapping> &getList()
+        {
+            return (m_enityMappings);
+        }
+
+    private:
+        std::unordered_map<std::string, XMLEntityMapping> m_enityMappings;
+    };
     //
     // XML validation
     //
@@ -129,13 +166,13 @@ namespace H4
     std::string parseName(ISource &xmlSource);
     XMLValue parseCharacterReference(ISource &xmlSource);
     XMLValue parseCharacter(ISource &xmlSource);
-    XMLValue parseValue(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity = true);
+    XMLValue parseValue(ISource &xmlSource, XMLEntityMapper &entityMapper, bool translateEntity = true);
     std::string parseTagBody(ISource &xmlSource);
     //
     // XML entity
     //
-    std::string translateEntities(const std::string &toTranslate, const XMLEntityMappings &entityMapping, char type = '%');
-    void mapEntityReference(XMLValue &entityReference, XMLEntityMappings &entityMapping);
+    std::string translateEntities(const std::string &toTranslate, XMLEntityMapper &entityMapper, char type = '%');
+    void mapEntityReference(XMLValue &entityReference, XMLEntityMapper &entityMapper);
     //
     // XML utility
     //

@@ -50,7 +50,7 @@ namespace H4
             {
                 XMLValue entityRerence = parseEntityReference(dtdSource);
                 dtdSource.ignoreWS();
-                mapEntityReference(entityRerence, m_entityMapping);
+                mapEntityReference(entityRerence, m_entityMapper);
                 conditionalValue = entityRerence.parsed;
             }
             else if (dtdSource.match(U"INCLUDE"))
@@ -126,22 +126,22 @@ namespace H4
         {
             if (dtdSource.match(U"<!ENTITY"))
             {
-                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapping));
+                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapper));
                 parseEntity(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!ELEMENT"))
             {
-                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapping));
+                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapper));
                 parseElement(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!ATTLIST"))
             {
-                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapping));
+                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapper));
                 parseAttributeList(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!NOTATION"))
             {
-                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapping));
+                BufferSource dtdTranslatedSource(translateEntities(parseTagBody(dtdSource), m_entityMapper));
                 parseNotation(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!--"))
@@ -197,14 +197,14 @@ namespace H4
         {
             dtdSource.ignoreWS();
             result.type = "SYSTEM";
-            result.systemID = parseValue(dtdSource, m_entityMapping).parsed;
+            result.systemID = parseValue(dtdSource, m_entityMapper).parsed;
         }
         else if (dtdSource.match(U"PUBLIC"))
         {
             dtdSource.ignoreWS();
             result.type = "PUBLIC";
-            result.publicID = parseValue(dtdSource, m_entityMapping).parsed;
-            result.systemID = parseValue(dtdSource, m_entityMapping).parsed;
+            result.publicID = parseValue(dtdSource, m_entityMapper).parsed;
+            result.systemID = parseValue(dtdSource, m_entityMapper).parsed;
         }
         else
         {

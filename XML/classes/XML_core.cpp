@@ -242,19 +242,19 @@ namespace H4
     /// </summary>
     /// <param name="entityReference">Entity reference to lookup and return.</param>
     /// <param name="entityMapping">Entity mapping table.</param>
-    void mapEntityReference(XMLValue &entityReference, XMLEntityMappings &entityMapping)
+    void mapEntityReference(XMLValue &entityReference, XMLEntityMapper &entityMapper)
     {
-        if (entityMapping.count(entityReference.unparsed) > 0)
+        if (entityMapper.isPresent(entityReference.unparsed))
         {
-            if (!entityMapping[entityReference.unparsed].internal.empty())
+            if (!entityMapper.get(entityReference.unparsed).internal.empty())
             {
-                entityReference.parsed = entityMapping[entityReference.unparsed].internal;
+                entityReference.parsed = entityMapper.get(entityReference.unparsed).internal;
             }
             else
             {
-                if (std::filesystem::exists(entityMapping[entityReference.unparsed].external.systemID))
+                if (std::filesystem::exists(entityMapper.get(entityReference.unparsed).external.systemID))
                 {
-                    FileSource entitySource(entityMapping[entityReference.unparsed].external.systemID);
+                    FileSource entitySource(entityMapper.get(entityReference.unparsed).external.systemID);
                     entityReference.parsed = "";
                     while (entitySource.more())
                     {
@@ -264,7 +264,7 @@ namespace H4
                 }
                 else
                 {
-                    throw XMLSyntaxError("Entity '" + entityReference.unparsed + "' source file '" + entityMapping[entityReference.unparsed].external.systemID + "' does not exist.");
+                    throw XMLSyntaxError("Entity '" + entityReference.unparsed + "' source file '" + entityMapper.get(entityReference.unparsed).external.systemID + "' does not exist.");
                 }
             }
         }
@@ -307,7 +307,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Literal string value.</returns>
-    XMLValue parseValue(ISource &xmlSource, XMLEntityMappings &entityMapping, bool translateEntity)
+    XMLValue parseValue(ISource &xmlSource, XMLEntityMapper &entityMapper, bool translateEntity)
     {
         if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
         {
@@ -319,7 +319,7 @@ namespace H4
                 XMLValue character = parseCharacter(xmlSource);
                 if (character.isEntityReference() && translateEntity)
                 {
-                    mapEntityReference(character, entityMapping);
+                    mapEntityReference(character, entityMapper);
                 }
                 value += character;
             }
@@ -350,14 +350,14 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns>Translated string.</returns>
-    std::string translateEntities(const std::string &toTranslate, const XMLEntityMappings &entityMapping, char type)
+    std::string translateEntities(const std::string &toTranslate, XMLEntityMapper &entityMapper, char type)
     {
         std::string translated = toTranslate;
         bool matchFound;
         do
         {
             matchFound = false;
-            for (auto entity : entityMapping)
+            for (auto entity : entityMapper.getList())
             {
                 if (entity.first[0] == type)
                 {

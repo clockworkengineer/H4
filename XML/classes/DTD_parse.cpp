@@ -121,10 +121,10 @@ namespace H4
                     {
                         throw XMLSyntaxError("Entity '" + mappedEntityName + "' contains recursive definition which is not allowed.");
                     }
-                    if (!m_entityMapping[mappedEntityName].internal.empty())
+                    if (!m_entityMapper.get(mappedEntityName).internal.empty())
                     {
                         currentEntities.emplace(mappedEntityName);
-                        checkForEntityRecursion(m_entityMapping[mappedEntityName].internal, currentEntities);
+                        checkForEntityRecursion(m_entityMapper.get(mappedEntityName).internal, currentEntities);
                         currentEntities.erase(mappedEntityName);
                     }
                 }
@@ -255,13 +255,13 @@ namespace H4
         else if (dtdSource.match(U"#FIXED"))
         {
             dtdSource.ignoreWS();
-            attribute.value = parseValue(dtdSource, m_entityMapping);
+            attribute.value = parseValue(dtdSource, m_entityMapper);
             attribute.type |= DTDAttributeType::fixed;
         }
         else
         {
             dtdSource.ignoreWS();
-            attribute.value = parseValue(dtdSource, m_entityMapping);
+            attribute.value = parseValue(dtdSource, m_entityMapper);
             attribute.type |= DTDAttributeType::normal;
         }
     }
@@ -313,16 +313,16 @@ namespace H4
         entityName += parseName(dtdSource) + ";";
         if (dtdSource.current() == '\'' || dtdSource.current() == '"')
         {
-            XMLValue entityValue = parseValue(dtdSource, m_entityMapping, false);
-            m_entityMapping[entityName].internal = entityValue.parsed;
+            XMLValue entityValue = parseValue(dtdSource, m_entityMapper, false);
+            m_entityMapper.get(entityName).internal = entityValue.parsed;
         }
         else
         {
-            m_entityMapping[entityName].external = parseExternalReference(dtdSource);
+            m_entityMapper.get(entityName).external = parseExternalReference(dtdSource);
             if (dtdSource.match(U"NDATA"))
             {
                 dtdSource.ignoreWS();
-                m_entityMapping[entityName].notation = parseName(dtdSource);
+                m_entityMapper.get(entityName).notation = parseName(dtdSource);
             }
         }
     }
@@ -377,7 +377,7 @@ namespace H4
     void DTD::parseParameterEntityReference(ISource &dtdSource)
     {
         XMLValue parameterEntity = parseEntityReference(dtdSource);
-        BufferSource entitySource(translateEntities(parameterEntity.unparsed, m_entityMapping));
+        BufferSource entitySource(translateEntities(parameterEntity.unparsed, m_entityMapper));
         parseInternal(entitySource);
         dtdSource.ignoreWS();
     }
@@ -480,7 +480,7 @@ namespace H4
             }
         }
         // Make sure no defined entity contains recursion
-        for (auto &entityName : m_entityMapping)
+        for (auto &entityName : m_entityMapper.getList())
         {
             checkForEntityRecursion(entityName.first);
         }

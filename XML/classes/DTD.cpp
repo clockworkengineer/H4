@@ -40,15 +40,6 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-    DTD::DTD()
-    {
-        // Default entity mappings
-        m_entityMapping["&amp;"].internal = "&#x26;";
-        m_entityMapping["&quot;"].internal = "&#x22;";
-        m_entityMapping["&apos;"].internal = "&#x27;";
-        m_entityMapping["&lt;"].internal = "&#x3C;";
-        m_entityMapping["&gt;"].internal = "&#x3E;";
-    }
     /// <summary>
     ///
     /// </summary>
@@ -95,7 +86,7 @@ namespace H4
     /// <param name=""></param>
     XMLEntityMapping &DTD::getEntity(const std::string &entityName)
     {
-        return (m_entityMapping[entityName]);
+        return (m_entityMapper.get(entityName));
     }
     /// <summary>
     ///

@@ -234,7 +234,7 @@ namespace H4
         }
         else if ((attribute.type & DTDAttributeType::entity) != 0)
         {
-            if (m_entityMapping.count("&" + elementAttribute.value.parsed + ";") == 0)
+            if (!m_entityMapper.isPresent("&" + elementAttribute.value.parsed + ";"))
             {
                 throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> ENTITY attribute '" + attribute.name + "' value '" + elementAttribute.value.parsed + "' is not defined.");
             }
@@ -243,7 +243,7 @@ namespace H4
         {
             for (auto &entity : splitString(elementAttribute.value.parsed, ' '))
             {
-                if (m_entityMapping.count("&" + entity + ";") == 0)
+                if (!m_entityMapper.isPresent("&" + entity + ";"))
                 {
                     throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> ENTITIES attribute '" + attribute.name + "' value '" + entity + "' is not defined.");
                 }

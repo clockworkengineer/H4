@@ -46,7 +46,6 @@ namespace H4
         // ============
         // CONSTRUCTORS
         // ============
-        DTD();
         // ==========
         // DESTRUCTOR
         // ==========
@@ -66,7 +65,7 @@ namespace H4
         // ================
         // PUBLIC VARIABLES
         // ================
-        XMLEntityMappings m_entityMapping;
+        XMLEntityMapper m_entityMapper;
 
     private:
         // ===========================
