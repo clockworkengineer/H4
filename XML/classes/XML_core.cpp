@@ -238,38 +238,6 @@ namespace H4
         throw XMLSyntaxError(xmlSource, "Cannot convert character reference.");
     }
     /// <summary>
-    /// Lookup an entity reference to get its parsed value.
-    /// </summary>
-    /// <param name="entityReference">Entity reference to lookup and return.</param>
-    /// <param name="entityMapping">Entity mapping table.</param>
-    void mapEntityReference(XMLValue &entityReference, XMLEntityMapper &entityMapper)
-    {
-        if (entityMapper.isPresent(entityReference.unparsed))
-        {
-            if (!entityMapper.get(entityReference.unparsed).internal.empty())
-            {
-                entityReference.parsed = entityMapper.get(entityReference.unparsed).internal;
-            }
-            else
-            {
-                if (std::filesystem::exists(entityMapper.get(entityReference.unparsed).external.systemID))
-                {
-                    FileSource entitySource(entityMapper.get(entityReference.unparsed).external.systemID);
-                    entityReference.parsed = "";
-                    while (entitySource.more())
-                    {
-                        entityReference.parsed += entitySource.current_to_bytes();
-                        entitySource.next();
-                    }
-                }
-                else
-                {
-                    throw XMLSyntaxError("Entity '" + entityReference.unparsed + "' source file '" + entityMapper.get(entityReference.unparsed).external.systemID + "' does not exist.");
-                }
-            }
-        }
-    }
-    /// <summary>
     /// Parse character value which can be either be a plain character,
     /// character reference or entity reference that maps to a string of
     /// characters.
@@ -319,7 +287,7 @@ namespace H4
                 XMLValue character = parseCharacter(xmlSource);
                 if (character.isEntityReference() && translateEntity)
                 {
-                    mapEntityReference(character, entityMapper);
+                    entityMapper.mapEntityReference(character);
                 }
                 value += character;
             }
@@ -344,33 +312,6 @@ namespace H4
             xmlSource.next();
         }
         return (body);
-    }
-    /// <summary>
-    /// Translate any entities found in passed in string.
-    /// </summary>
-    /// <param name=""></param>
-    /// <returns>Translated string.</returns>
-    std::string translateEntities(const std::string &toTranslate, XMLEntityMapper &entityMapper, char type)
-    {
-        std::string translated = toTranslate;
-        bool matchFound;
-        do
-        {
-            matchFound = false;
-            for (auto entity : entityMapper.getList())
-            {
-                if (entity.first[0] == type)
-                {
-                    size_t pos = translated.find(entity.first);
-                    if (pos != std::string::npos)
-                    {
-                        translated.replace(pos, entity.first.length(), entity.second.internal);
-                        matchFound = true;
-                    }
-                }
-            }
-        } while (matchFound);
-        return (translated);
     }
     /// <summary>
     /// Split a string into a vector of strings using the passed in delimeter.

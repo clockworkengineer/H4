@@ -377,7 +377,7 @@ namespace H4
     void DTD::parseParameterEntityReference(ISource &dtdSource)
     {
         XMLValue parameterEntity = parseEntityReference(dtdSource);
-        BufferSource entitySource(translateEntities(parameterEntity.unparsed, m_entityMapper));
+        BufferSource entitySource(m_entityMapper.translateEntities(parameterEntity.unparsed));
         parseInternal(entitySource);
         dtdSource.ignoreWS();
     }

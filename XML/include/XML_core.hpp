@@ -10,6 +10,10 @@
 //
 #define kCarriageReturn 0x0D
 #define kLineFeed 0x0A
+//
+// XML Sources
+//
+#include "XMLSources.hpp"
 // =========
 // NAMESPACE
 // =========
@@ -146,6 +150,55 @@ namespace H4
         {
             return (m_enityMappings);
         }
+        void mapEntityReference(XMLValue &entityReference)
+        {
+            if (isPresent(entityReference.unparsed))
+            {
+                if (!get(entityReference.unparsed).internal.empty())
+                {
+                    entityReference.parsed = get(entityReference.unparsed).internal;
+                }
+                else
+                {
+                    if (std::filesystem::exists(get(entityReference.unparsed).external.systemID))
+                    {
+                        FileSource entitySource(get(entityReference.unparsed).external.systemID);
+                        entityReference.parsed = "";
+                        while (entitySource.more())
+                        {
+                            entityReference.parsed += entitySource.current_to_bytes();
+                            entitySource.next();
+                        }
+                    }
+                    else
+                    {
+                        throw XMLSyntaxError("Entity '" + entityReference.unparsed + "' source file '" + get(entityReference.unparsed).external.systemID + "' does not exist.");
+                    }
+                }
+            }
+        }
+        std::string translateEntities(const std::string &toTranslate, char type = '%')
+        {
+            std::string translated = toTranslate;
+            bool matchFound;
+            do
+            {
+                matchFound = false;
+                for (auto entity : getList())
+                {
+                    if (entity.first[0] == type)
+                    {
+                        size_t pos = translated.find(entity.first);
+                        if (pos != std::string::npos)
+                        {
+                            translated.replace(pos, entity.first.length(), entity.second.internal);
+                            matchFound = true;
+                        }
+                    }
+                }
+            } while (matchFound);
+            return (translated);
+        }
 
     private:
         std::unordered_map<std::string, XMLEntityMapping> m_enityMappings;
@@ -168,11 +221,6 @@ namespace H4
     XMLValue parseCharacter(ISource &xmlSource);
     XMLValue parseValue(ISource &xmlSource, XMLEntityMapper &entityMapper, bool translateEntity = true);
     std::string parseTagBody(ISource &xmlSource);
-    //
-    // XML entity
-    //
-    std::string translateEntities(const std::string &toTranslate, XMLEntityMapper &entityMapper, char type = '%');
-    void mapEntityReference(XMLValue &entityReference, XMLEntityMapper &entityMapper);
     //
     // XML utility
     //
