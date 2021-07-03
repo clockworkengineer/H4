@@ -261,7 +261,7 @@ namespace H4
         XMLValue entityReference = parseCharacter(xmlSource);
         if (entityReference.isEntityReference())
         {
-            m_dtd.m_entityMapper.mapEntityReference(entityReference);
+            m_dtd.m_entityMapper.map(entityReference);
             parseEntityMappingContents(xmlNodeElement, entityReference);
         }
         else if (entityReference.isCharacterReference())

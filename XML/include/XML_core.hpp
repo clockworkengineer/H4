@@ -150,7 +150,7 @@ namespace H4
         {
             return (m_enityMappings);
         }
-        void mapEntityReference(XMLValue &entityReference)
+        void map(XMLValue &entityReference)
         {
             if (isPresent(entityReference.unparsed))
             {
@@ -177,7 +177,7 @@ namespace H4
                 }
             }
         }
-        std::string translateEntities(const std::string &toTranslate, char type = '%')
+        std::string translate(const std::string &toTranslate, char type = '%')
         {
             std::string translated = toTranslate;
             bool matchFound;

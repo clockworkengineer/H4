@@ -50,7 +50,7 @@ namespace H4
             {
                 XMLValue entityRerence = parseEntityReference(dtdSource);
                 dtdSource.ignoreWS();
-                m_entityMapper.mapEntityReference(entityRerence);
+                m_entityMapper.map(entityRerence);
                 conditionalValue = entityRerence.parsed;
             }
             else if (dtdSource.match(U"INCLUDE"))
@@ -126,22 +126,22 @@ namespace H4
         {
             if (dtdSource.match(U"<!ENTITY"))
             {
-                BufferSource dtdTranslatedSource(m_entityMapper.translateEntities(parseTagBody(dtdSource)));
+                BufferSource dtdTranslatedSource(m_entityMapper.translate(parseTagBody(dtdSource)));
                 parseEntity(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!ELEMENT"))
             {
-                BufferSource dtdTranslatedSource(m_entityMapper.translateEntities(parseTagBody(dtdSource)));
+                BufferSource dtdTranslatedSource(m_entityMapper.translate(parseTagBody(dtdSource)));
                 parseElement(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!ATTLIST"))
             {
-                BufferSource dtdTranslatedSource(m_entityMapper.translateEntities(parseTagBody(dtdSource)));
+                BufferSource dtdTranslatedSource(m_entityMapper.translate(parseTagBody(dtdSource)));
                 parseAttributeList(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!NOTATION"))
             {
-                    BufferSource dtdTranslatedSource(m_entityMapper.translateEntities(parseTagBody(dtdSource)));
+                    BufferSource dtdTranslatedSource(m_entityMapper.translate(parseTagBody(dtdSource)));
                 parseNotation(dtdTranslatedSource);
             }
             else if (dtdSource.match(U"<!--"))

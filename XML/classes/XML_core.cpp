@@ -287,7 +287,7 @@ namespace H4
                 XMLValue character = parseCharacter(xmlSource);
                 if (character.isEntityReference() && translateEntity)
                 {
-                    entityMapper.mapEntityReference(character);
+                    entityMapper.map(character);
                 }
                 value += character;
             }
