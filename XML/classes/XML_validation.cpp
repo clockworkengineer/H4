@@ -52,19 +52,19 @@ namespace H4
         }
         // Save declaration attributes to be validated
         std::vector<XMLAttribute> prologAttributes{xmlNodeProlog->getAttributeList()};
-        std::vector<XMLAttribute> validatedAttributes;
+        xmlNodeProlog->clearAttributes();
         long currentAttribute = 0;
         for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
         {
             if ((currentAttribute < (int)prologAttributes.size()) &&
                 (prologAttributes[currentAttribute].name == XML::m_defaultAtributes[attrIndex].name))
             {
-                validatedAttributes.push_back(prologAttributes[currentAttribute]);
+                xmlNodeProlog->addAttribute(prologAttributes[currentAttribute].name, prologAttributes[currentAttribute].value);
                 currentAttribute++;
             }
             else
             {
-                validatedAttributes.push_back(XML::m_defaultAtributes[attrIndex]);
+                xmlNodeProlog->addAttribute(XML::m_defaultAtributes[attrIndex].name, XML::m_defaultAtributes[attrIndex].value);
             }
         }
         // Order not version, encoding, standalone == syntax error
@@ -73,30 +73,24 @@ namespace H4
             throw XMLSyntaxError(xmlSource, "Incorrect order for version, encoding and standalone attributes.");
         }
         // Encoding all upper case
-        std::transform(validatedAttributes[1].value.parsed.begin(), validatedAttributes[1].value.parsed.end(),
-                       validatedAttributes[1].value.parsed.begin(), [](unsigned int c)
+        std::transform(xmlNodeProlog->getAttribute("encoding").value.parsed.begin(), xmlNodeProlog->getAttribute("encoding").value.parsed.end(),
+                       xmlNodeProlog->getAttribute("encoding").value.parsed.begin(), [](unsigned int c)
                        { return std::toupper(c); });
         // Check valid declaration values
         std::set<std::string> versions{"1.0", "1.1"};
-        if (versions.find(validatedAttributes[0].value.parsed) == versions.end())
+        if (versions.find(xmlNodeProlog->getAttribute("version").value.parsed) == versions.end())
         {
-            throw XMLSyntaxError(xmlSource, "Unsupported version number " + validatedAttributes[0].value.parsed + ".");
+            throw XMLSyntaxError(xmlSource, "Unsupported version number " + xmlNodeProlog->getAttribute("version").value.parsed + ".");
         }
         std::set<std::string> encoding{"UTF-8", "UTF-16"};
-        if (encoding.find(validatedAttributes[1].value.parsed) == encoding.end())
+        if (encoding.find(xmlNodeProlog->getAttribute("encoding").value.parsed) == encoding.end())
         {
-            throw XMLSyntaxError(xmlSource, "Unsupported encoding " + validatedAttributes[1].value.parsed + " specified.");
+            throw XMLSyntaxError(xmlSource, "Unsupported encoding " + xmlNodeProlog->getAttribute("encoding").value.parsed + " specified.");
         }
         std::set<std::string> standalone{"yes", "no"};
-        if (standalone.find(validatedAttributes[2].value.parsed) == standalone.end())
+        if (standalone.find(xmlNodeProlog->getAttribute("standalone").value.parsed) == standalone.end())
         {
-            throw XMLSyntaxError(xmlSource, "Invalid standalone value of '" + validatedAttributes[2].value.parsed + "'.");
-        }
-        // Set validated prolog attributes
-        xmlNodeProlog->clearAttributes();
-        for (auto &attribute : validatedAttributes)
-        {
-            xmlNodeProlog->addAttribute(attribute.name, attribute.value);
+            throw XMLSyntaxError(xmlSource, "Invalid standalone value of '" + xmlNodeProlog->getAttribute("standalone").value.parsed + "'.");
         }
     }
 } // namespace H4
