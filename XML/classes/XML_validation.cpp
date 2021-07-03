@@ -43,21 +43,15 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>true when declaration valid.</returns>
-    void XML::validXMLDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeProlog)
+    void XML::validDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeProlog)
     {
         // Syntax error if no version present
         if (!xmlNodeProlog->isAttributePresent("version"))
         {
             throw XMLSyntaxError(xmlSource, "Version missing from declaration.");
         }
-        // Save declaration attributes to be validated and clear tem from prolog element
-        std::vector<XMLAttribute> prologAttributes;
-        for (auto attribute : xmlNodeProlog->getAttributeList())
-        {
-            prologAttributes.push_back(attribute);
-        }
-        xmlNodeProlog->clearAttributes();
-        // Fill in gaps with default if missing attributes
+        // Save declaration attributes to be validated
+        std::vector<XMLAttribute> prologAttributes{xmlNodeProlog->getAttributeList()};
         std::vector<XMLAttribute> validatedAttributes;
         long currentAttribute = 0;
         for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
@@ -84,21 +78,22 @@ namespace H4
                        { return std::toupper(c); });
         // Check valid declaration values
         std::set<std::string> versions{"1.0", "1.1"};
-        if (versions.find(validatedAttributes[0].value.parsed)==versions.end())
+        if (versions.find(validatedAttributes[0].value.parsed) == versions.end())
         {
             throw XMLSyntaxError(xmlSource, "Unsupported version number " + validatedAttributes[0].value.parsed + ".");
         }
         std::set<std::string> encoding{"UTF-8", "UTF-16"};
-        if (encoding.find(validatedAttributes[1].value.parsed)==encoding.end())
+        if (encoding.find(validatedAttributes[1].value.parsed) == encoding.end())
         {
             throw XMLSyntaxError(xmlSource, "Unsupported encoding " + validatedAttributes[1].value.parsed + " specified.");
         }
         std::set<std::string> standalone{"yes", "no"};
-        if (standalone.find(validatedAttributes[2].value.parsed)==standalone.end())
+        if (standalone.find(validatedAttributes[2].value.parsed) == standalone.end())
         {
             throw XMLSyntaxError(xmlSource, "Invalid standalone value of '" + validatedAttributes[2].value.parsed + "'.");
         }
         // Set validated prolog attributes
+        xmlNodeProlog->clearAttributes();
         for (auto &attribute : validatedAttributes)
         {
             xmlNodeProlog->addAttribute(attribute.name, attribute.value);

@@ -360,7 +360,7 @@ namespace H4
             {
                 throw XMLSyntaxError(xmlSource, "Declaration end tag not found.");
             }
-            validXMLDeclaration(xmlSource, xmlNodeProlog);
+            validDeclaration(xmlSource, xmlNodeProlog);
         }
         while (xmlSource.more())
         {

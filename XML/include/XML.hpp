@@ -72,7 +72,7 @@ namespace H4
         // PRIVATE METHODS
         // ===============
         void stringifyElements(XMLNode *xmlNode, IDestination &xmlDestination);
-        void validXMLDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
+        void validDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
         void parseAddElementContent(XMLNodeElement *xmlNodeElement, const std::string &content);
         void parseEntityMappingContents(XMLNodeElement *xmlNodeElement, XMLValue &entityReference);
         void parseDefault(ISource &xmlSource, XMLNodeElement *xmlNodeElement);

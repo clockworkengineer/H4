@@ -107,7 +107,7 @@ namespace H4
         {
             attributes.emplace_back(name, value);
         }
-        XMLAttribute getAttribute(const std::string &name)
+        XMLAttribute &getAttribute(const std::string &name)
         {
             return (*std::find_if(attributes.rbegin(), attributes.rend(),
                                   [&name](const XMLAttribute &attr)

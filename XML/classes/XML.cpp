@@ -50,7 +50,7 @@ namespace H4
     }
     /// <summary>
     /// Validate XML against any DTD provided to see whether it is well-formed. If an
-    /// exception is thrown then there is a validation issue and the XML is not wellformed.
+    /// exception is thrown then there is a validation issue and the XML is not well-formed.
     /// </summary>
     void XML::validate()
     {
