@@ -343,4 +343,15 @@ namespace H4
                                 .base(),
                             stringToTrimm.end());
     }
+    /// <summary>
+    /// Trimm whitespace from beginning and end of a string.
+    /// </summary>
+    /// <param name="stringToTrimm">String to trimm.</param>
+    void toUpperString(std::string &stringToUpper)
+    {
+        std::transform(stringToUpper.begin(), stringToUpper.end(),
+                       stringToUpper.begin(), [](unsigned int c)
+                       { return std::toupper(c); });
+    }
+
 } // namespace H4

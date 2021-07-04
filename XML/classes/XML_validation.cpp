@@ -29,8 +29,6 @@ namespace H4
     // ========================
     // PRIVATE STATIC VARIABLES
     // ========================
-    // Defaults for XML declaration
-    XMLAttribute XML::m_defaultAtributes[3] = {{"version", {"1.0", "1.0"}}, {"encoding", {"UTF-8", "UTF-8"}}, {"standalone", {"no", "no"}}};
     // =======================
     // PUBLIC STATIC VARIABLES
     // =======================
@@ -45,50 +43,50 @@ namespace H4
     /// <returns>true when declaration valid.</returns>
     void XML::validDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeProlog)
     {
+        XMLAttribute defaultAttributes[] {{"version", {"1.0", "1.0"}}, {"encoding", {"UTF-8", "UTF-8"}}, {"standalone", {"no", "no"}}};
         // Syntax error if no version present
         if (!xmlNodeProlog->isAttributePresent("version"))
         {
             throw XMLSyntaxError(xmlSource, "Version missing from declaration.");
         }
         // Save declaration attributes to be validated
-        std::vector<XMLAttribute> prologAttributes{xmlNodeProlog->getAttributeList()};
+        std::vector<XMLAttribute> declarationAttributes{xmlNodeProlog->getAttributeList()};
         xmlNodeProlog->clearAttributes();
+        // Check attribute order
         long currentAttribute = 0;
         for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
         {
-            if ((currentAttribute < (int)prologAttributes.size()) &&
-                (prologAttributes[currentAttribute].name == XML::m_defaultAtributes[attrIndex].name))
+            if ((currentAttribute < (int)declarationAttributes.size()) &&
+                (declarationAttributes[currentAttribute].name == defaultAttributes[attrIndex].name))
             {
-                xmlNodeProlog->addAttribute(prologAttributes[currentAttribute].name, prologAttributes[currentAttribute].value);
+                xmlNodeProlog->addAttribute(declarationAttributes[currentAttribute].name, declarationAttributes[currentAttribute].value);
                 currentAttribute++;
             }
             else
             {
-                xmlNodeProlog->addAttribute(XML::m_defaultAtributes[attrIndex].name, XML::m_defaultAtributes[attrIndex].value);
+                xmlNodeProlog->addAttribute(defaultAttributes[attrIndex].name, defaultAttributes[attrIndex].value);
             }
         }
         // Order not version, encoding, standalone == syntax error
-        if (currentAttribute != (long)prologAttributes.size())
+        if (currentAttribute != (long)declarationAttributes.size())
         {
             throw XMLSyntaxError(xmlSource, "Incorrect order for version, encoding and standalone attributes.");
         }
         // Encoding all upper case
-        std::transform(xmlNodeProlog->getAttribute("encoding").value.parsed.begin(), xmlNodeProlog->getAttribute("encoding").value.parsed.end(),
-                       xmlNodeProlog->getAttribute("encoding").value.parsed.begin(), [](unsigned int c)
-                       { return std::toupper(c); });
+        toUpperString(xmlNodeProlog->getAttribute("encoding").value.parsed);
         // Check valid declaration values
-        std::set<std::string> versions{"1.0", "1.1"};
-        if (versions.find(xmlNodeProlog->getAttribute("version").value.parsed) == versions.end())
+        std::set<std::string> validVersions{"1.0", "1.1"};
+        if (validVersions.find(xmlNodeProlog->getAttribute("version").value.parsed) == validVersions.end())
         {
-            throw XMLSyntaxError(xmlSource, "Unsupported version number " + xmlNodeProlog->getAttribute("version").value.parsed + ".");
+            throw XMLSyntaxError(xmlSource, "Unsupported version " + xmlNodeProlog->getAttribute("version").value.parsed + ".");
         }
-        std::set<std::string> encoding{"UTF-8", "UTF-16"};
-        if (encoding.find(xmlNodeProlog->getAttribute("encoding").value.parsed) == encoding.end())
+        std::set<std::string> validEncodings{"UTF-8", "UTF-16"};
+        if (validEncodings.find(xmlNodeProlog->getAttribute("encoding").value.parsed) == validEncodings.end())
         {
             throw XMLSyntaxError(xmlSource, "Unsupported encoding " + xmlNodeProlog->getAttribute("encoding").value.parsed + " specified.");
         }
-        std::set<std::string> standalone{"yes", "no"};
-        if (standalone.find(xmlNodeProlog->getAttribute("standalone").value.parsed) == standalone.end())
+        std::set<std::string> validStandalone{"yes", "no"};
+        if (validStandalone.find(xmlNodeProlog->getAttribute("standalone").value.parsed) == validStandalone.end())
         {
             throw XMLSyntaxError(xmlSource, "Invalid standalone value of '" + xmlNodeProlog->getAttribute("standalone").value.parsed + "'.");
         }

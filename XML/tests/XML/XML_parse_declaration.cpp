@@ -34,7 +34,7 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 2 Column: 1] Unsupported version number 1.2.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 2 Column: 1] Unsupported version 1.2.");
   }
   SECTION("Parse XML declaration with unsupported encoding. ", "[XML][Parse][Declaration]")
   {

@@ -226,5 +226,6 @@ namespace H4
     //
     std::vector<std::string> splitString(std::string stringToSplit, char delimeter);
     void trimmString(std::string &stringToTrimm);
+    void toUpperString(std::string &stringToUpper);
 } // namespace H4
 #endif /* XML_CORE_HPP */
