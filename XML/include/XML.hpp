@@ -71,7 +71,6 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        void stringifyElements(XMLNode *xmlNode, IDestination &xmlDestination);
         void parseAddElementContent(XMLNodeElement *xmlNodeElement, const std::string &content);
         void parseEntityMappingContents(XMLNodeElement *xmlNodeElement, XMLValue &entityReference);
         void parseDefault(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
@@ -86,11 +85,11 @@ namespace H4
         void parseDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeProlog);
         void parseProlog(ISource &xmlSource, XMLNodeElement *xmlNodeProlog);
         void parseXML();
+        void stringifyElements(XMLNode *xmlNode, IDestination &xmlDestination);
         void stringifyXML(IDestination &xmlDestination);
         // =================
         // PRIVATE VARIABLES
         // =================
-        static XMLAttribute m_defaultAtributes[3];
         ISource &m_xmlSource;
     };
 } // namespace H4
