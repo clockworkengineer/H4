@@ -219,7 +219,8 @@ namespace H4
     std::string parseName(ISource &xmlSource);
     XMLValue parseCharacterReference(ISource &xmlSource);
     XMLValue parseCharacter(ISource &xmlSource);
-    XMLValue parseValue(ISource &xmlSource, XMLEntityMapper &entityMapper, bool translateEntity = true);
+    XMLValue parseValue(ISource &xmlSource);
+    XMLValue parseValue(ISource &xmlSource, XMLEntityMapper &entityMapper);
     std::string parseTagBody(ISource &xmlSource);
     //
     // XML utility

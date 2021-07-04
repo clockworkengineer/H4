@@ -275,7 +275,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Literal string value.</returns>
-    XMLValue parseValue(ISource &xmlSource, XMLEntityMapper &entityMapper, bool translateEntity)
+    XMLValue parseValue(ISource &xmlSource, XMLEntityMapper &entityMapper)
     {
         if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
         {
@@ -285,11 +285,33 @@ namespace H4
             while (xmlSource.more() && xmlSource.current() != quote)
             {
                 XMLValue character = parseCharacter(xmlSource);
-                if (character.isEntityReference() && translateEntity)
+                if (character.isEntityReference())
                 {
                     entityMapper.map(character);
                 }
                 value += character;
+            }
+            xmlSource.next();
+            xmlSource.ignoreWS();
+            return (value);
+        }
+        throw XMLSyntaxError(xmlSource, "Invalid attribute value.");
+    }
+    /// <summary>
+    /// Parse literal string value and return it.
+    /// </summary>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <returns>Literal string value.</returns>
+    XMLValue parseValue(ISource &xmlSource)
+    {
+        if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
+        {
+            XMLValue value;
+            ISource::Char quote = xmlSource.current();
+            xmlSource.next();
+            while (xmlSource.more() && xmlSource.current() != quote)
+            {
+                value += parseCharacter(xmlSource);
             }
             xmlSource.next();
             xmlSource.ignoreWS();

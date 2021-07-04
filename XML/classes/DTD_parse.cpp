@@ -313,7 +313,7 @@ namespace H4
         entityName += parseName(dtdSource) + ";";
         if (dtdSource.current() == '\'' || dtdSource.current() == '"')
         {
-            XMLValue entityValue = parseValue(dtdSource, m_entityMapper, false);
+            XMLValue entityValue = parseValue(dtdSource);
             m_entityMapper.get(entityName).internal = entityValue.parsed;
         }
         else

@@ -354,7 +354,7 @@ namespace H4
                 throw XMLSyntaxError(xmlSource, "Missing '=' after version.");
             }
             xmlSource.ignoreWS();
-            xmlNodeProlog->addAttribute("version", parseValue(xmlSource, m_dtd.m_entityMapper, false));
+            xmlNodeProlog->addAttribute("version", parseValue(xmlSource));
             // Check valid declaration values
             std::set<std::string> validVersions{"1.0", "1.1"};
             if (validVersions.find(xmlNodeProlog->getAttribute("version").value.parsed) == validVersions.end())
@@ -374,7 +374,7 @@ namespace H4
                 throw XMLSyntaxError(xmlSource, "Missing '=' after encoding.");
             }
             xmlSource.ignoreWS();
-            xmlNodeProlog->addAttribute("encoding", parseValue(xmlSource, m_dtd.m_entityMapper, false));
+            xmlNodeProlog->addAttribute("encoding", parseValue(xmlSource));
             // Check valid declaration values
             toUpperString(xmlNodeProlog->getAttribute("encoding").value.parsed);
             std::set<std::string> validEncodings{"UTF-8", "UTF-16"};
@@ -395,7 +395,7 @@ namespace H4
                 throw XMLSyntaxError(xmlSource, "Missing '=' after standalone.");
             }
             xmlSource.ignoreWS();
-            xmlNodeProlog->addAttribute("standalone", parseValue(xmlSource, m_dtd.m_entityMapper, false));
+            xmlNodeProlog->addAttribute("standalone", parseValue(xmlSource));
             // Check valid declaration values
             std::set<std::string> validStandalone{"yes", "no"};
             if (validStandalone.find(xmlNodeProlog->getAttribute("standalone").value.parsed) == validStandalone.end())
