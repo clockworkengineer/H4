@@ -355,6 +355,12 @@ namespace H4
             }
             xmlSource.ignoreWS();
             xmlNodeProlog->addAttribute("version", parseValue(xmlSource, m_dtd.m_entityMapper, false));
+            // Check valid declaration values
+            std::set<std::string> validVersions{"1.0", "1.1"};
+            if (validVersions.find(xmlNodeProlog->getAttribute("version").value.parsed) == validVersions.end())
+            {
+                throw XMLSyntaxError(xmlSource, "Unsupported version " + xmlNodeProlog->getAttribute("version").value.parsed + ".");
+            }
         }
         else
         {
@@ -369,6 +375,13 @@ namespace H4
             }
             xmlSource.ignoreWS();
             xmlNodeProlog->addAttribute("encoding", parseValue(xmlSource, m_dtd.m_entityMapper, false));
+            // Check valid declaration values
+            toUpperString(xmlNodeProlog->getAttribute("encoding").value.parsed);
+            std::set<std::string> validEncodings{"UTF-8", "UTF-16"};
+            if (validEncodings.find(xmlNodeProlog->getAttribute("encoding").value.parsed) == validEncodings.end())
+            {
+                throw XMLSyntaxError(xmlSource, "Unsupported encoding " + xmlNodeProlog->getAttribute("encoding").value.parsed + " specified.");
+            }
         }
         else
         {
@@ -383,6 +396,12 @@ namespace H4
             }
             xmlSource.ignoreWS();
             xmlNodeProlog->addAttribute("standalone", parseValue(xmlSource, m_dtd.m_entityMapper, false));
+            // Check valid declaration values
+            std::set<std::string> validStandalone{"yes", "no"};
+            if (validStandalone.find(xmlNodeProlog->getAttribute("standalone").value.parsed) == validStandalone.end())
+            {
+                throw XMLSyntaxError(xmlSource, "Invalid standalone value of '" + xmlNodeProlog->getAttribute("standalone").value.parsed + "'.");
+            }
         }
         else
         {
@@ -409,7 +428,6 @@ namespace H4
         {
             xmlSource.ignoreWS();
             parseDeclaration(xmlSource, xmlNodeProlog);
-            validDeclaration(xmlSource, xmlNodeProlog);
             if (!xmlSource.match(U"?>"))
             {
                 throw XMLSyntaxError(xmlSource, "Declaration end tag not found.");

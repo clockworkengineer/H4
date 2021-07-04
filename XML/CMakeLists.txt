@@ -20,7 +20,6 @@ enable_testing()
 set (XML_SOURCES
     ./classes/XML.cpp
     ./classes/XML_parse.cpp
-    ./classes/XML_validation.cpp
     ./classes/XML_stringify.cpp
     ./classes/XML_core.cpp
     ./classes/DTD.cpp

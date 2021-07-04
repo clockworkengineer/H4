@@ -34,7 +34,7 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 53] Unsupported version 1.2.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 21] Unsupported version 1.2.");
   }
   SECTION("Parse XML declaration with unsupported encoding. ", "[XML][Parse][Declaration]")
   {
@@ -42,7 +42,7 @@ TEST_CASE("Use XML object to parse XML declaration", "[XML][Parse][Declaration]"
                 "<root></root>\n";
     BufferSource xmlSource(xmlString);
     XML xml(xmlSource);
-    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 54] Unsupported encoding UTF-32 specified.");
+    REQUIRE_THROWS_WITH(xml.parse(), "XML Syntax Error [Line: 1 Column: 39] Unsupported encoding UTF-32 specified.");
   }
   SECTION("Parse XML declaration with invalid standalone value. ", "[XML][Parse][Declaration]")
   {
