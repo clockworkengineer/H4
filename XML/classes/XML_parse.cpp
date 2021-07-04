@@ -341,6 +341,59 @@ namespace H4
         }
     }
     /// <summary>
+    /// </summary>
+    /// <param name="xmlSource">XML source stream.</param>
+    /// <param name="xmlNodeProlog">Prolog element node.</param>
+    void XML::parseDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeProlog)
+    {
+        if (xmlSource.match(U"version"))
+        {
+            xmlSource.ignoreWS();
+            if (!xmlSource.match(U"="))
+            {
+                throw XMLSyntaxError(xmlSource, "Missing '=' after version.");
+            }
+            xmlSource.ignoreWS();
+            xmlNodeProlog->addAttribute("version", parseValue(xmlSource, m_dtd.m_entityMapper, false));
+        }
+        else
+        {
+            throw XMLSyntaxError(xmlSource, "Version missing from declaration.");
+        }
+        if (xmlSource.match(U"encoding"))
+        {
+            xmlSource.ignoreWS();
+            if (!xmlSource.match(U"="))
+            {
+                throw XMLSyntaxError(xmlSource, "Missing '=' after encoding.");
+            }
+            xmlSource.ignoreWS();
+            xmlNodeProlog->addAttribute("encoding", parseValue(xmlSource, m_dtd.m_entityMapper, false));
+        }
+        else
+        {
+            xmlNodeProlog->addAttribute("encoding", {"UTF-8", "UTF-8"});
+        }
+        if (xmlSource.match(U"standalone"))
+        {
+            xmlSource.ignoreWS();
+            if (!xmlSource.match(U"="))
+            {
+                throw XMLSyntaxError(xmlSource, "Missing '=' after standalone.");
+            }
+            xmlSource.ignoreWS();
+            xmlNodeProlog->addAttribute("standalone", parseValue(xmlSource, m_dtd.m_entityMapper, false));
+        }
+        else
+        {
+            xmlNodeProlog->addAttribute("standalone", {"no", "no"});
+        }
+        if (xmlSource.match(U"encoding"))
+        {
+            throw XMLSyntaxError(xmlSource, "Incorrect order for version, encoding and standalone attributes.");
+        }
+    }
+    /// <summary>
     /// Parse XML prolog and create the necessary XMLNodeElements for it. Valid
     /// parts of the prolog include delaration (first line if present),
     /// processing instructions, comments, whitespace content and XML
@@ -355,12 +408,12 @@ namespace H4
         if (xmlSource.match(U"<?xml"))
         {
             xmlSource.ignoreWS();
-            parseAttributes(xmlSource, xmlNodeProlog);
+            parseDeclaration(xmlSource, xmlNodeProlog);
+            validDeclaration(xmlSource, xmlNodeProlog);
             if (!xmlSource.match(U"?>"))
             {
                 throw XMLSyntaxError(xmlSource, "Declaration end tag not found.");
             }
-            validDeclaration(xmlSource, xmlNodeProlog);
         }
         while (xmlSource.more())
         {

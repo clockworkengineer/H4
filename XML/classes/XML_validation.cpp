@@ -43,35 +43,6 @@ namespace H4
     /// <returns>true when declaration valid.</returns>
     void XML::validDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeProlog)
     {
-        XMLAttribute defaultAttributes[] {{"version", {"1.0", "1.0"}}, {"encoding", {"UTF-8", "UTF-8"}}, {"standalone", {"no", "no"}}};
-        // Syntax error if no version present
-        if (!xmlNodeProlog->isAttributePresent("version"))
-        {
-            throw XMLSyntaxError(xmlSource, "Version missing from declaration.");
-        }
-        // Save declaration attributes to be validated
-        std::vector<XMLAttribute> declarationAttributes{xmlNodeProlog->getAttributeList()};
-        xmlNodeProlog->clearAttributes();
-        // Check attribute order
-        long currentAttribute = 0;
-        for (auto attrIndex = 0; attrIndex < 3; attrIndex++)
-        {
-            if ((currentAttribute < (int)declarationAttributes.size()) &&
-                (declarationAttributes[currentAttribute].name == defaultAttributes[attrIndex].name))
-            {
-                xmlNodeProlog->addAttribute(declarationAttributes[currentAttribute].name, declarationAttributes[currentAttribute].value);
-                currentAttribute++;
-            }
-            else
-            {
-                xmlNodeProlog->addAttribute(defaultAttributes[attrIndex].name, defaultAttributes[attrIndex].value);
-            }
-        }
-        // Order not version, encoding, standalone == syntax error
-        if (currentAttribute != (long)declarationAttributes.size())
-        {
-            throw XMLSyntaxError(xmlSource, "Incorrect order for version, encoding and standalone attributes.");
-        }
         // Encoding all upper case
         toUpperString(xmlNodeProlog->getAttribute("encoding").value.parsed);
         // Check valid declaration values

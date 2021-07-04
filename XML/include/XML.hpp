@@ -84,6 +84,7 @@ namespace H4
         void parsePI(ISource &xmlSource, XMLNodeElement *xmlNodeElement);
         void parseElementContents(ISource &xmlSource, XMLNodeElement *XNodeElement);
         void parseElement(ISource &xmlSource, XMLNodeElement *XNodeElement);
+        void parseDeclaration(ISource &xmlSource, XMLNodeElement *xmlNodeProlog);
         void parseProlog(ISource &xmlSource, XMLNodeElement *xmlNodeProlog);
         void parseXML();
         void stringifyXML(IDestination &xmlDestination);
