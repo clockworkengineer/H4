@@ -52,6 +52,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
+        DTD &getDTD() { return (m_dtd); }
         void parse();
         void stringify(IDestination &xmlDestination);
         void validate();
@@ -59,7 +60,6 @@ namespace H4
         // PUBLIC VARIABLES
         // ================
         XMLNodeElement m_prolog;
-        DTD m_dtd;
 
     private:
         // ===========================
@@ -91,6 +91,7 @@ namespace H4
         // PRIVATE VARIABLES
         // =================
         ISource &m_xmlSource;
+        DTD m_dtd;
     };
 } // namespace H4
 #endif /* XML_HPP */
