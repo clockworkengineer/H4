@@ -127,7 +127,7 @@ namespace H4
         // XML DTD
         case XMLNodeType::dtd:
         {
-            m_dtd.stringify(xmlDestination);
+            getDTD().stringify(xmlDestination);
             break;
         }
         default:

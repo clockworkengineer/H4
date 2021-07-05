@@ -45,6 +45,7 @@ namespace H4
         // ============
         XML(ISource &xmlSource) : m_xmlSource(xmlSource)
         {
+            m_dtd = std::make_unique<DTD>();
         }
         // ==========
         // DESTRUCTOR
@@ -52,7 +53,7 @@ namespace H4
         // ==============
         // PUBLIC METHODS
         // ==============
-        DTD &getDTD() { return (m_dtd); }
+        DTD &getDTD() { return (*m_dtd); }
         void parse();
         void stringify(IDestination &xmlDestination);
         void validate();
@@ -91,7 +92,7 @@ namespace H4
         // PRIVATE VARIABLES
         // =================
         ISource &m_xmlSource;
-        DTD m_dtd;
+        std::unique_ptr<DTD> m_dtd;
     };
 } // namespace H4
 #endif /* XML_HPP */
