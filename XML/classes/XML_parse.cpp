@@ -206,7 +206,7 @@ namespace H4
                 throw XMLSyntaxError(xmlSource, "Missing '=' between attribute name and value.");
             }
             xmlSource.ignoreWS();
-            XMLValue attributeValue = parseValue(xmlSource, getDTD().m_entityMapper);
+            XMLValue attributeValue = parseValue(xmlSource, m_entityMapper);
             if (!validAttributeValue(attributeValue))
             {
                 throw XMLSyntaxError(xmlSource, "Attribute value contains invalid character '<', '\"', ''' or '&'.");
@@ -261,7 +261,7 @@ namespace H4
         XMLValue entityReference = parseCharacter(xmlSource);
         if (entityReference.isEntityReference())
         {
-            getDTD().m_entityMapper.map(entityReference);
+            m_entityMapper.map(entityReference);
             parseEntityMappingContents(xmlNodeElement, entityReference);
         }
         else if (entityReference.isCharacterReference())

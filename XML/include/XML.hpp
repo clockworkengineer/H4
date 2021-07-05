@@ -45,7 +45,7 @@ namespace H4
         // ============
         XML(ISource &xmlSource) : m_xmlSource(xmlSource)
         {
-            m_dtd = std::make_unique<DTD>();
+            m_dtd = std::make_unique<DTD>(m_entityMapper);
         }
         // ==========
         // DESTRUCTOR
@@ -93,6 +93,7 @@ namespace H4
         // =================
         ISource &m_xmlSource;
         std::unique_ptr<DTD> m_dtd;
+        XMLEntityMapper m_entityMapper;
     };
 } // namespace H4
 #endif /* XML_HPP */
