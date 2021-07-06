@@ -18,6 +18,7 @@
 // XML Core
 //
 #include "XML_core.hpp"
+#include "XMLEntityMapper.hpp"
 //
 // XML DTD
 //

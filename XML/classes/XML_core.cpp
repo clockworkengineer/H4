@@ -275,7 +275,7 @@ namespace H4
     /// </summary>
     /// <param name="xmlSource">XML source stream.</param>
     /// <returns>Literal string value.</returns>
-    XMLValue parseValue(ISource &xmlSource, XMLEntityMapper &entityMapper)
+    XMLValue parseValue(ISource &xmlSource, IXMLEntityMapper &entityMapper)
     {
         if ((xmlSource.current() == '\'') || ((xmlSource.current() == '"')))
         {

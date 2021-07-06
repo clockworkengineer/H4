@@ -46,7 +46,7 @@ namespace H4
         // ============
         // CONSTRUCTORS
         // ============
-        DTD(XMLEntityMapper &entityMapper) : m_entityMapper(entityMapper) {}
+        DTD(IXMLEntityMapper &entityMapper) : m_entityMapper(entityMapper) {}
         // ==========
         // DESTRUCTOR
         // ==========
@@ -128,7 +128,7 @@ namespace H4
         std::set<std::string> m_assignedIDREFValues;
         std::string m_unparsed;
         long m_lineNumber = 1;
-        XMLEntityMapper &m_entityMapper;
+        IXMLEntityMapper &m_entityMapper;
     };
 } // namespace H4
 #endif /* DTD_DPP */

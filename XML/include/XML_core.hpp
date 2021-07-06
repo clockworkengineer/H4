@@ -117,91 +117,18 @@ namespace H4
         std::string notation;
     };
     //
-    // XML Entity mapper
+    // XML Entity mapper interface
     //
-    class XMLEntityMapper
+    class IXMLEntityMapper
     {
     public:
-        XMLEntityMapper()
-        {
-            m_enityMappings["&amp;"].internal = "&#x26;";
-            m_enityMappings["&quot;"].internal = "&#x22;";
-            m_enityMappings["&apos;"].internal = "&#x27;";
-            m_enityMappings["&lt;"].internal = "&#x3C;";
-            m_enityMappings["&gt;"].internal = "&#x3E;";
-        }
-        void add(const std::string &entityName, XMLEntityMapping &entityMapping)
-        {
-            m_enityMappings[entityName] = entityMapping;
-        }
-        XMLEntityMapping &get(const std::string &entityName)
-        {
-            return (m_enityMappings[entityName]);
-        }
-        void remove(const std::string &entityName)
-        {
-            m_enityMappings.erase(entityName);
-        }
-        bool isPresent(const std::string &entityName)
-        {
-            return (m_enityMappings.count(entityName) != 0);
-        }
-        std::unordered_map<std::string, XMLEntityMapping> &getList()
-        {
-            return (m_enityMappings);
-        }
-        void map(XMLValue &entityReference)
-        {
-            if (isPresent(entityReference.unparsed))
-            {
-                if (!get(entityReference.unparsed).internal.empty())
-                {
-                    entityReference.parsed = get(entityReference.unparsed).internal;
-                }
-                else
-                {
-                    if (std::filesystem::exists(get(entityReference.unparsed).external.systemID))
-                    {
-                        FileSource entitySource(get(entityReference.unparsed).external.systemID);
-                        entityReference.parsed = "";
-                        while (entitySource.more())
-                        {
-                            entityReference.parsed += entitySource.current_to_bytes();
-                            entitySource.next();
-                        }
-                    }
-                    else
-                    {
-                        throw XMLSyntaxError("Entity '" + entityReference.unparsed + "' source file '" + get(entityReference.unparsed).external.systemID + "' does not exist.");
-                    }
-                }
-            }
-        }
-        std::string translate(const std::string &toTranslate, char type = '%')
-        {
-            std::string translated = toTranslate;
-            bool matchFound;
-            do
-            {
-                matchFound = false;
-                for (auto entity : getList())
-                {
-                    if (entity.first[0] == type)
-                    {
-                        size_t pos = translated.find(entity.first);
-                        if (pos != std::string::npos)
-                        {
-                            translated.replace(pos, entity.first.length(), entity.second.internal);
-                            matchFound = true;
-                        }
-                    }
-                }
-            } while (matchFound);
-            return (translated);
-        }
-
-    private:
-        std::unordered_map<std::string, XMLEntityMapping> m_enityMappings;
+        virtual void add(const std::string &entityName, XMLEntityMapping &entityMapping) = 0;
+        virtual XMLEntityMapping &get(const std::string &entityName) =0;
+        virtual void remove(const std::string &entityName) =0;
+        virtual bool isPresent(const std::string &entityName) =0;
+        virtual std::unordered_map<std::string, XMLEntityMapping> &getList() =0;
+        virtual void map(XMLValue &entityReference) =0;
+        virtual std::string translate(const std::string &toTranslate, char type = '%') =0;
     };
     //
     // XML validation
@@ -220,7 +147,7 @@ namespace H4
     XMLValue parseCharacterReference(ISource &xmlSource);
     XMLValue parseCharacter(ISource &xmlSource);
     XMLValue parseValue(ISource &xmlSource);
-    XMLValue parseValue(ISource &xmlSource, XMLEntityMapper &entityMapper);
+    XMLValue parseValue(ISource &xmlSource, IXMLEntityMapper &entityMapper);
     std::string parseTagBody(ISource &xmlSource);
     //
     // XML utility
