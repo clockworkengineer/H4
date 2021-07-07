@@ -93,46 +93,6 @@ namespace H4
         }
     }
     /// <summary>
-    /// Take an entity reference string, check whether it contains any infinitely recursive
-    /// definition and throw an exception if so. This is done by recurively parsing any entities
-    /// found in a entiity mapping and adding it to a current stack of used entities; throwing an
-    /// exception if it is already being used (recursive).
-    /// </summary>
-    /// <param name="entityReference">Entity reference to check.</param>
-    /// <param name="currentEntities">Set of currently active entities.</param>
-    void DTD::checkForEntityRecursion(const std::string &entityReference, std::set<std::string> currentEntities)
-    {
-        BufferSource entitySource(entityReference);
-        while (entitySource.more())
-        {
-            if ((entitySource.current() == '&') || (entitySource.current() == '%'))
-            {
-                std::string mappedEntityName = entitySource.current_to_bytes();
-                entitySource.next();
-                while (entitySource.more() && entitySource.current() != ';')
-                {
-                    mappedEntityName += entitySource.current();
-                    entitySource.next();
-                }
-                if (mappedEntityName[1] != '#')
-                {
-                    mappedEntityName += entitySource.current();
-                    if (currentEntities.find(mappedEntityName) != currentEntities.end())
-                    {
-                        throw XMLSyntaxError("Entity '" + mappedEntityName + "' contains recursive definition which is not allowed.");
-                    }
-                    if (!m_entityMapper.get(mappedEntityName).internal.empty())
-                    {
-                        currentEntities.emplace(mappedEntityName);
-                        checkForEntityRecursion(m_entityMapper.get(mappedEntityName).internal, currentEntities);
-                        currentEntities.erase(mappedEntityName);
-                    }
-                }
-            }
-            entitySource.next();
-        }
-    }
-    /// <summary>
     /// Parse attribute of type enumeration.
     /// </summary>
     /// <param name="dtdSource">DTD source stream.</param>
@@ -482,7 +442,7 @@ namespace H4
         // Make sure no defined entity contains recursion
         for (auto &entityName : m_entityMapper.getList())
         {
-            checkForEntityRecursion(entityName.first);
+            m_entityMapper.recursive(entityName.first, entityName.first[0]);
         }
     }
 } // namespace H4

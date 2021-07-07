@@ -92,6 +92,41 @@ namespace H4
             } while (matchFound);
             return (translated);
         }
+        /// <summary>
+        /// Take an entity reference string, check whether it contains any infinitely recursive
+        /// definition and throw an exception if so. This is done by recurively parsing any entities
+        /// found in a entiity mapping and adding it to a current stack of used entities; throwing an
+        /// exception if it is already being used (recursive).
+        /// </summary>
+        void recursive(const std::string &entityReference, ISource::Char type, std::set<std::string> currentEntities)
+        {
+            BufferSource entitySource(entityReference);
+            while (entitySource.more())
+            {
+                if (entitySource.current() == type)
+                {
+                    std::string mappedEntityName = entitySource.current_to_bytes();
+                    entitySource.next();
+                    while (entitySource.more() && entitySource.current() != ';')
+                    {
+                        mappedEntityName += entitySource.current();
+                        entitySource.next();
+                    }
+                    mappedEntityName += entitySource.current();
+                    if (currentEntities.find(mappedEntityName) != currentEntities.end())
+                    {
+                        throw XMLSyntaxError("Entity '" + mappedEntityName + "' contains recursive definition which is not allowed.");
+                    }
+                    if (!get(mappedEntityName).internal.empty())
+                    {
+                        currentEntities.emplace(mappedEntityName);
+                        recursive(get(mappedEntityName).internal, type, currentEntities);
+                        currentEntities.erase(mappedEntityName);
+                    }
+                }
+                entitySource.next();
+            }
+        }
 
     private:
         std::unordered_map<std::string, XMLEntityMapping> m_enityMappings;

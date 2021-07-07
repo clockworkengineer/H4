@@ -129,6 +129,7 @@ namespace H4
         virtual std::unordered_map<std::string, XMLEntityMapping> &getList() =0;
         virtual void map(XMLValue &entityReference) =0;
         virtual std::string translate(const std::string &toTranslate, char type = '%') =0;
+        virtual void recursive(const std::string &entityName, ISource::Char type, std::set<std::string> names = {}) = 0;
     };
     //
     // XML validation

@@ -77,7 +77,6 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        void checkForEntityRecursion(const std::string &entityName, std::set<std::string> names = {});
         void validateAttributes(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
         void validateContentSpecification(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
         void validateElement(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
