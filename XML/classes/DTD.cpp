@@ -84,6 +84,14 @@ namespace H4
     ///
     /// </summary>
     /// <param name=""></param>
+    bool DTD::isEntityPresent(const std::string &entityName)
+    {
+        return (m_entityMapper.isPresent(entityName));
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
     XMLEntityMapping &DTD::getEntity(const std::string &entityName)
     {
         return (m_entityMapper.get(entityName));
@@ -109,10 +117,10 @@ namespace H4
     /// issue and the XML is not well-formed.
     /// </summary>
     /// <param name="prolog">Prolog element containing root of XML to validate.</param>
-    void DTD::validate(XMLNodeElement &prolog)
-    {
-        validateDTD(prolog);
-    }
+    // void DTD::validate(XMLNodeElement &prolog)
+    // {
+    //     validateDTD(prolog);
+    // }
     /// <summary>
     /// Create DTD text from an DTD object.
     /// </summary>

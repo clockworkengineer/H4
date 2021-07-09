@@ -54,7 +54,7 @@ namespace H4
     /// </summary>
     void XML::validate()
     {
-        getDTD().validate(m_prolog);
+        m_validator->validate(m_prolog);
     }
     /// <summary>
     /// Create XML text from an XML object.

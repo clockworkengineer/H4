@@ -1,17 +1,16 @@
 //
-// Class: DTD
+// Class: XMLValidator
 //
-// Description: XML DTD validation code.
+// Description: XML validation code.
 //
 // Dependencies:   C17++ - Language standard features used.
-//
-// TODO: This module is a work in progress (functionality and tests to be added).
 //
 // =================
 // CLASS DEFINITIONS
 // =================
 #include "XMLConfig.hpp"
 #include "XML.hpp"
+#include "XMLValidator.hpp"
 #include "XMLSources.hpp"
 #include "XMLDestinations.hpp"
 // ====================
@@ -45,7 +44,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool DTD::validateIsNMTOKENOK(std::string nmTokenValue)
+    bool XMLValidator::validateIsNMTOKENOK(std::string nmTokenValue)
     {
         trimmString(nmTokenValue);
         BufferSource nmTokenValueSource(nmTokenValue);
@@ -64,7 +63,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool DTD::validateIsIDOK(const std::string &idValue)
+    bool XMLValidator::validateIsIDOK(const std::string &idValue)
     {
         try
         {
@@ -82,7 +81,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool DTD::validateIsPCDATA(XMLNodeElement *xmlNodeElement)
+    bool XMLValidator::validateIsPCDATA(XMLNodeElement *xmlNodeElement)
     {
         for (auto &element : xmlNodeElement->children)
         {
@@ -99,7 +98,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool DTD::validateIsEMPTY(XMLNodeElement *xmlNodeElement)
+    bool XMLValidator::validateIsEMPTY(XMLNodeElement *xmlNodeElement)
     {
         return (xmlNodeElement->children.empty() || xmlNodeElement->getNodeType() == XMLNodeType::self);
     }
@@ -115,7 +114,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateAttributeValue(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
+    void XMLValidator::validateAttributeValue(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
     {
         if ((attribute.type & DTDAttributeType::required) != 0)
         {
@@ -174,7 +173,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateAttributeType(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
+    void XMLValidator::validateAttributeType(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
     {
         XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
         if ((attribute.type & DTDAttributeType::cdata) != 0)
@@ -234,7 +233,7 @@ namespace H4
         }
         else if ((attribute.type & DTDAttributeType::entity) != 0)
         {
-            if (!m_entityMapper.isPresent("&" + elementAttribute.value.parsed + ";"))
+            if (!m_dtd.isEntityPresent("&" + elementAttribute.value.parsed + ";"))
             {
                 throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> ENTITY attribute '" + attribute.name + "' value '" + elementAttribute.value.parsed + "' is not defined.");
             }
@@ -243,7 +242,7 @@ namespace H4
         {
             for (auto &entity : splitString(elementAttribute.value.parsed, ' '))
             {
-                if (!m_entityMapper.isPresent("&" + entity + ";"))
+                if (!m_dtd.isEntityPresent("&" + entity + ";"))
                 {
                     throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> ENTITIES attribute '" + attribute.name + "' value '" + entity + "' is not defined.");
                 }
@@ -279,9 +278,9 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateAttributes(XMLNodeDTD * /*dtd*/, XMLNodeElement *xmlNodeElement)
+    void XMLValidator::validateAttributes(XMLNodeDTD * /*dtd*/, XMLNodeElement *xmlNodeElement)
     {
-        for (auto &attribute : m_elements[xmlNodeElement->name].attributes)
+        for (auto &attribute : m_dtd.getElement(xmlNodeElement->name).attributes)
         {
             if (xmlNodeElement->isAttributePresent(attribute.name))
             {
@@ -295,13 +294,13 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateContentSpecification(XMLNodeDTD *dtd, XMLNodeElement *xmlNodeElement)
+    void XMLValidator::validateContentSpecification(XMLNodeDTD *dtd, XMLNodeElement *xmlNodeElement)
     {
-        if ((dtd == nullptr) || (m_elements.empty()))
+        if ((dtd == nullptr) || (m_dtd.getElementCount() == 0))
         {
             return;
         }
-        if (m_elements[xmlNodeElement->name].content.parsed == "((<#PCDATA>))")
+        if (m_dtd.getElement(xmlNodeElement->name).content.parsed == "((<#PCDATA>))")
         {
             if (!validateIsPCDATA(xmlNodeElement))
             {
@@ -309,7 +308,7 @@ namespace H4
             }
             return;
         }
-        if (m_elements[xmlNodeElement->name].content.parsed == "EMPTY")
+        if (m_dtd.getElement(xmlNodeElement->name).content.parsed == "EMPTY")
         {
             if (!validateIsEMPTY(xmlNodeElement))
             {
@@ -317,11 +316,11 @@ namespace H4
             }
             return;
         }
-        if (m_elements[xmlNodeElement->name].content.parsed == "ANY")
+        if (m_dtd.getElement(xmlNodeElement->name).content.parsed == "ANY")
         {
             return;
         }
-        std::regex match(m_elements[xmlNodeElement->name].content.parsed);
+        std::regex match(m_dtd.getElement(xmlNodeElement->name).content.parsed);
         std::string elements;
         for (auto &element : xmlNodeElement->children)
         {
@@ -341,7 +340,7 @@ namespace H4
         if (!std::regex_match(elements, match))
         {
             throw XMLValidationError(m_lineNumber, "<" + xmlNodeElement->name + "> element does not conform to the content specification " +
-                                                  m_elements[xmlNodeElement->name].content.unparsed + ".");
+                                                       m_dtd.getElement(xmlNodeElement->name).content.unparsed + ".");
         }
     }
     /// <summary>
@@ -349,7 +348,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateElement(XMLNodeDTD *dtd, XMLNodeElement *xmlNodeElement)
+    void XMLValidator::validateElement(XMLNodeDTD *dtd, XMLNodeElement *xmlNodeElement)
     {
         validateContentSpecification(dtd, xmlNodeElement);
         validateAttributes(dtd, xmlNodeElement);
@@ -359,7 +358,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateElements(XMLNodeDTD *dtd, XMLNode *xmlNode)
+    void XMLValidator::validateElements(XMLNodeDTD *dtd, XMLNode *xmlNode)
     {
         switch (xmlNode->getNodeType())
         {
@@ -371,7 +370,7 @@ namespace H4
             break;
         case XMLNodeType::root:
         case XMLNodeType::element:
-            if (xmlNode->getNodeType() == XMLNodeType::root && XMLNodeRef<XMLNodeElement>((*xmlNode)).name != m_name)
+            if (xmlNode->getNodeType() == XMLNodeType::root && XMLNodeRef<XMLNodeElement>((*xmlNode)).name != m_dtd.getRootName())
             {
                 throw XMLValidationError(m_lineNumber, "DOCTYPE name does not match that of root element " + XMLNodeRef<XMLNodeElement>((*xmlNode)).name + " of DTD.");
             }
@@ -408,10 +407,17 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void DTD::validateDTD(XMLNodeElement &prolog)
+    void XMLValidator::validateDTD(XMLNodeElement &prolog)
     {
         if (prolog.getNodeType() == XMLNodeType::prolog)
         {
+            for (auto ch : m_dtd.m_unparsed)
+            {
+                if (ch == kLineFeed)
+                {
+                    m_lineNumber++;
+                }
+            }
             XMLNodeDTD *dtd;
             for (auto &element : prolog.children)
             {
@@ -433,5 +439,14 @@ namespace H4
                 }
             }
         }
+    }
+    /// <summary>
+    /// Validate XML against its DTD. Throwing an exception if there is a
+    /// issue and the XML is not well-formed.
+    /// </summary>
+    /// <param name="prolog">Prolog element containing root of XML to validate.</param>
+    void XMLValidator::validate(XMLNodeElement &prolog)
+    {
+        validateDTD(prolog);
     }
 } // namespace H4

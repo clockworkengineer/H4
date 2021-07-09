@@ -57,7 +57,9 @@ namespace H4
         std::string &getRootName();
         XMLExternalReference &getExternalReference();
         bool isElementPresent(const std::string &elementName);
+        long getElementCount() { return (m_elements.size());}
         DTDElement &getElement(const std::string &elementName);
+        bool isEntityPresent(const std::string &entityName);
         XMLEntityMapping &getEntity(const std::string &entityName);
         XMLExternalReference &getNotation(const std::string &notationName);
         void parse(ISource &dtdSource);
@@ -66,7 +68,7 @@ namespace H4
         // ================
         // PUBLIC VARIABLES
         // ================
-
+        std::string m_unparsed;
     private:
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
@@ -77,16 +79,6 @@ namespace H4
         // ===============
         // PRIVATE METHODS
         // ===============
-        void validateAttributes(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
-        void validateContentSpecification(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
-        void validateElement(XMLNodeDTD *dtd, XMLNodeElement *xNodeElement);
-        void validateElements(XMLNodeDTD *dtd, XMLNode *xNodeRoot);
-        bool validateIsNMTOKENOK(std::string nmTokenValue);
-        bool validateIsIDOK(const std::string &idValue);
-        void validateAttributeValue(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute);
-        void validateAttributeType(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute);
-        bool validateIsPCDATA(XMLNodeElement *xNodeElement);
-        bool validateIsEMPTY(XMLNodeElement *xNodeElement);
         void parseConditional(ISource &dtdSource, bool includeOff = true);
         void parseValidNotations(const std::string &notations);
         void parseValidateAttribute(const std::string &elementName, DTDAttribute xDTDAttribute);
@@ -123,10 +115,6 @@ namespace H4
         XMLExternalReference m_external;
         std::unordered_map<std::string, DTDElement> m_elements;
         std::unordered_map<std::string, XMLExternalReference> m_notations;
-        std::set<std::string> m_assignedIDValues;
-        std::set<std::string> m_assignedIDREFValues;
-        std::string m_unparsed;
-        long m_lineNumber = 1;
         IXMLEntityMapper &m_entityMapper;
     };
 } // namespace H4

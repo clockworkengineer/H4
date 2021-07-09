@@ -432,13 +432,6 @@ namespace H4
         }
         // Save away unparsed form of DTD
         m_unparsed = "<!DOCTYPE" + dtdSource.getRange(start, dtdSource.position());
-        for (auto ch : m_unparsed)
-        {
-            if (ch == kLineFeed)
-            {
-                m_lineNumber++;
-            }
-        }
         // Make sure no defined entity contains recursion
         for (auto &entityName : m_entityMapper.getList())
         {
