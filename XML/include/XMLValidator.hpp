@@ -5,6 +5,7 @@
 //
 #include <string>
 #include <unordered_map>
+#include <set>
 //
 // Source/Destination interfaces
 //
@@ -31,7 +32,7 @@ namespace H4
     // ================
     // CLASS DEFINITION
     // ================
-    class XMLValidator
+    class XMLValidator : public IXMLValidator
     {
     public:
         // ==========================

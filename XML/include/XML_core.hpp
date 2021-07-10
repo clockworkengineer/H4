@@ -132,6 +132,15 @@ namespace H4
         virtual void recursive(const std::string &entityName, ISource::Char type, std::set<std::string> names = {}) = 0;
     };
     //
+    // XML validator interface
+    //
+    class XMLNodeElement;
+    class IXMLValidator
+    {
+    public:
+        virtual void validate(XMLNodeElement &prolog) = 0;
+    };
+    //
     // XML validation
     //
     bool validChar(ISource::Char ch);

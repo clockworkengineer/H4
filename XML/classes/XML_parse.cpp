@@ -12,6 +12,7 @@
 // =================
 #include "XMLConfig.hpp"
 #include "XML.hpp"
+#include "XMLValidator.hpp"
 #include "XMLSources.hpp"
 #include "XMLDestinations.hpp"
 // ====================

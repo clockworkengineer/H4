@@ -20,10 +20,6 @@
 #include "XML_core.hpp"
 #include "XMLEntityMapper.hpp"
 //
-//
-//
-#include "XMLValidator.hpp"
-//
 // XML DTD
 //
 #include "DTD.hpp"
@@ -98,8 +94,8 @@ namespace H4
         // =================
         ISource &m_xmlSource;
         std::unique_ptr<DTD> m_dtd;
-        std::unique_ptr<XMLValidator> m_validator;
-        std::unique_ptr<XMLEntityMapper> m_entityMapper;
+        std::unique_ptr<IXMLValidator> m_validator;
+        std::unique_ptr<IXMLEntityMapper> m_entityMapper;
     };
 } // namespace H4
 #endif /* XML_HPP */
