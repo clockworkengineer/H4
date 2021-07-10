@@ -123,12 +123,12 @@ namespace H4
     {
     public:
         virtual void add(const std::string &entityName, XMLEntityMapping &entityMapping) = 0;
-        virtual XMLEntityMapping &get(const std::string &entityName) =0;
-        virtual void remove(const std::string &entityName) =0;
-        virtual bool isPresent(const std::string &entityName) =0;
-        virtual std::unordered_map<std::string, XMLEntityMapping> &getList() =0;
-        virtual void map(XMLValue &entityReference) =0;
-        virtual std::string translate(const std::string &toTranslate, char type = '%') =0;
+        virtual XMLEntityMapping &get(const std::string &entityName) = 0;
+        virtual void remove(const std::string &entityName) = 0;
+        virtual bool isPresent(const std::string &entityName) = 0;
+        virtual std::unordered_map<std::string, XMLEntityMapping> &getList() = 0;
+        virtual void map(XMLValue &entityReference) = 0;
+        virtual std::string translate(const std::string &toTranslate, char type = '%') = 0;
         virtual void recursive(const std::string &entityName, ISource::Char type, std::set<std::string> names = {}) = 0;
     };
     //

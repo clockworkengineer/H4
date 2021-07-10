@@ -50,8 +50,7 @@ namespace H4
         // ============
         XML(ISource &xmlSource) : m_xmlSource(xmlSource)
         {
-            m_dtd = std::make_unique<DTD>(m_entityMapper);
-            m_validator = std::make_unique<XMLValidator>(*m_dtd);
+            m_entityMapper = std::make_unique<XMLEntityMapper>();
         }
         // ==========
         // DESTRUCTOR
@@ -100,7 +99,7 @@ namespace H4
         ISource &m_xmlSource;
         std::unique_ptr<DTD> m_dtd;
         std::unique_ptr<XMLValidator> m_validator;
-        XMLEntityMapper m_entityMapper;
+        std::unique_ptr<XMLEntityMapper> m_entityMapper;
     };
 } // namespace H4
 #endif /* XML_HPP */

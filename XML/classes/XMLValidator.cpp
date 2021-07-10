@@ -44,7 +44,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool XMLValidator::validateIsNMTOKENOK(std::string nmTokenValue)
+    bool XMLValidator::checkIsNMTOKENOK(std::string nmTokenValue)
     {
         trimmString(nmTokenValue);
         BufferSource nmTokenValueSource(nmTokenValue);
@@ -63,7 +63,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool XMLValidator::validateIsIDOK(const std::string &idValue)
+    bool XMLValidator::checkIsIDOK(const std::string &idValue)
     {
         try
         {
@@ -81,7 +81,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool XMLValidator::validateIsPCDATA(XMLNodeElement *xmlNodeElement)
+    bool XMLValidator::checkIsPCDATA(XMLNodeElement *xmlNodeElement)
     {
         for (auto &element : xmlNodeElement->children)
         {
@@ -98,7 +98,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    bool XMLValidator::validateIsEMPTY(XMLNodeElement *xmlNodeElement)
+    bool XMLValidator::checkIsEMPTY(XMLNodeElement *xmlNodeElement)
     {
         return (xmlNodeElement->children.empty() || xmlNodeElement->getNodeType() == XMLNodeType::self);
     }
@@ -114,7 +114,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XMLValidator::validateAttributeValue(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
+    void XMLValidator::checkAttributeValue(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
     {
         if ((attribute.type & DTDAttributeType::required) != 0)
         {
@@ -173,7 +173,7 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XMLValidator::validateAttributeType(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
+    void XMLValidator::checkAttributeType(XMLNodeElement *xmlNodeElement, DTDAttribute &attribute)
     {
         XMLAttribute elementAttribute = xmlNodeElement->getAttribute(attribute.name);
         if ((attribute.type & DTDAttributeType::cdata) != 0)
@@ -185,7 +185,7 @@ namespace H4
         }
         else if ((attribute.type & DTDAttributeType::id) != 0)
         {
-            if (!validateIsIDOK(elementAttribute.value.parsed))
+            if (!checkIsIDOK(elementAttribute.value.parsed))
             {
                 throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> ID attribute '" + attribute.name + "' is invalid.");
             }
@@ -197,7 +197,7 @@ namespace H4
         }
         else if ((attribute.type & DTDAttributeType::idref) != 0)
         {
-            if (!validateIsIDOK(elementAttribute.value.parsed))
+            if (!checkIsIDOK(elementAttribute.value.parsed))
             {
                 throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> IDREF attribute '" + attribute.name + "' is invalid.");
             }
@@ -207,7 +207,7 @@ namespace H4
         {
             for (auto &id : splitString(elementAttribute.value.parsed, ' '))
             {
-                if (!validateIsIDOK(id))
+                if (!checkIsIDOK(id))
                 {
                     throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> IDREFS attribute '" + attribute.name + "' contains an invalid IDREF.");
                 }
@@ -216,7 +216,7 @@ namespace H4
         }
         else if ((attribute.type & DTDAttributeType::nmtoken) != 0)
         {
-            if (!validateIsNMTOKENOK(elementAttribute.value.parsed))
+            if (!checkIsNMTOKENOK(elementAttribute.value.parsed))
             {
                 throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> NMTOKEN attribute '" + attribute.name + "' is invalid.");
             }
@@ -225,7 +225,7 @@ namespace H4
         {
             for (auto &nmtoken : splitString(elementAttribute.value.parsed, ' '))
             {
-                if (!validateIsNMTOKENOK(nmtoken))
+                if (!checkIsNMTOKENOK(nmtoken))
                 {
                     throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> NMTOKEN attribute '" + attribute.name + "' contains an invald NMTOKEN.");
                 }
@@ -278,15 +278,15 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XMLValidator::validateAttributes(XMLNodeDTD * /*dtd*/, XMLNodeElement *xmlNodeElement)
+    void XMLValidator::checkAttributes(XMLNodeElement *xmlNodeElement)
     {
         for (auto &attribute : m_dtd.getElement(xmlNodeElement->name).attributes)
         {
             if (xmlNodeElement->isAttributePresent(attribute.name))
             {
-                validateAttributeType(xmlNodeElement, attribute);
+                checkAttributeType(xmlNodeElement, attribute);
             }
-            validateAttributeValue(xmlNodeElement, attribute);
+            checkAttributeValue(xmlNodeElement, attribute);
         }
     }
     /// <summary>
@@ -294,15 +294,15 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XMLValidator::validateContentSpecification(XMLNodeDTD *dtd, XMLNodeElement *xmlNodeElement)
+    void XMLValidator::checkContentSpecification(XMLNodeElement *xmlNodeElement)
     {
-        if ((dtd == nullptr) || (m_dtd.getElementCount() == 0))
+        if (m_dtd.getElementCount() == 0)
         {
             return;
         }
         if (m_dtd.getElement(xmlNodeElement->name).content.parsed == "((<#PCDATA>))")
         {
-            if (!validateIsPCDATA(xmlNodeElement))
+            if (!checkIsPCDATA(xmlNodeElement))
             {
                 throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> does not contain just any parsable data.");
             }
@@ -310,7 +310,7 @@ namespace H4
         }
         if (m_dtd.getElement(xmlNodeElement->name).content.parsed == "EMPTY")
         {
-            if (!validateIsEMPTY(xmlNodeElement))
+            if (!checkIsEMPTY(xmlNodeElement))
             {
                 throw XMLValidationError(m_lineNumber, "Element <" + xmlNodeElement->name + "> is not empty.");
             }
@@ -348,24 +348,24 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XMLValidator::validateElement(XMLNodeDTD *dtd, XMLNodeElement *xmlNodeElement)
+    void XMLValidator::checkElement(XMLNodeElement *xmlNodeElement)
     {
-        validateContentSpecification(dtd, xmlNodeElement);
-        validateAttributes(dtd, xmlNodeElement);
+        checkContentSpecification(xmlNodeElement);
+        checkAttributes(xmlNodeElement);
     }
     /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XMLValidator::validateElements(XMLNodeDTD *dtd, XMLNode *xmlNode)
+    void XMLValidator::checkElements(XMLNode *xmlNode)
     {
         switch (xmlNode->getNodeType())
         {
         case XMLNodeType::prolog:
             for (auto &element : XMLNodeRef<XMLNodeElement>((*xmlNode)).children)
             {
-                validateElements(dtd, element.get());
+                checkElements(element.get());
             }
             break;
         case XMLNodeType::root:
@@ -374,14 +374,14 @@ namespace H4
             {
                 throw XMLValidationError(m_lineNumber, "DOCTYPE name does not match that of root element " + XMLNodeRef<XMLNodeElement>((*xmlNode)).name + " of DTD.");
             }
-            validateElement(dtd, static_cast<XMLNodeElement *>(xmlNode));
+            checkElement(static_cast<XMLNodeElement *>(xmlNode));
             for (auto &element : XMLNodeRef<XMLNodeElement>((*xmlNode)).children)
             {
-                validateElements(dtd, element.get());
+                checkElements(element.get());
             }
             break;
         case XMLNodeType::self:
-            validateElement(dtd, static_cast<XMLNodeElement *>(xmlNode));
+            checkElement(static_cast<XMLNodeElement *>(xmlNode));
             break;
         case XMLNodeType::comment:
         case XMLNodeType::entity:
@@ -407,36 +407,15 @@ namespace H4
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    void XMLValidator::validateDTD(XMLNodeElement &prolog)
+    void XMLValidator::checkAgainstDTD(XMLNodeElement &prolog)
     {
-        if (prolog.getNodeType() == XMLNodeType::prolog)
+        m_lineNumber = m_dtd.getLineCount();
+        checkElements(&prolog);
+        for (auto &idref : m_assignedIDREFValues)
         {
-            for (auto ch : m_dtd.m_unparsed)
+            if (m_assignedIDValues.find(idref) == m_assignedIDValues.end())
             {
-                if (ch == kLineFeed)
-                {
-                    m_lineNumber++;
-                }
-            }
-            XMLNodeDTD *dtd;
-            for (auto &element : prolog.children)
-            {
-                if (element->getNodeType() == XMLNodeType::dtd)
-                {
-                    dtd = static_cast<XMLNodeDTD *>(element.get());
-                    break;
-                }
-            }
-            if (dtd != nullptr)
-            {
-                validateElements(dtd, &prolog);
-                for (auto &idref : m_assignedIDREFValues)
-                {
-                    if (m_assignedIDValues.find(idref) == m_assignedIDValues.end())
-                    {
-                        throw XMLValidationError(m_lineNumber, "IDREF attribute '" + idref + "' does not reference any element with the ID.");
-                    }
-                }
+                throw XMLValidationError(m_lineNumber, "IDREF attribute '" + idref + "' does not reference any element with the ID.");
             }
         }
     }
@@ -447,6 +426,6 @@ namespace H4
     /// <param name="prolog">Prolog element containing root of XML to validate.</param>
     void XMLValidator::validate(XMLNodeElement &prolog)
     {
-        validateDTD(prolog);
+        checkAgainstDTD(prolog);
     }
 } // namespace H4

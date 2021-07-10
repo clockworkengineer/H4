@@ -206,7 +206,7 @@ namespace H4
                 throw XMLSyntaxError(xmlSource, "Missing '=' between attribute name and value.");
             }
             xmlSource.ignoreWS();
-            XMLValue attributeValue = parseValue(xmlSource, m_entityMapper);
+            XMLValue attributeValue = parseValue(xmlSource, *m_entityMapper);
             if (!validAttributeValue(attributeValue))
             {
                 throw XMLSyntaxError(xmlSource, "Attribute value contains invalid character '<', '\"', ''' or '&'.");
@@ -261,7 +261,7 @@ namespace H4
         XMLValue entityReference = parseCharacter(xmlSource);
         if (entityReference.isEntityReference())
         {
-            m_entityMapper.map(entityReference);
+            m_entityMapper->map(entityReference);
             parseEntityMappingContents(xmlNodeElement, entityReference);
         }
         else if (entityReference.isCharacterReference())
@@ -445,7 +445,9 @@ namespace H4
             }
             else if (xmlSource.match(U"<!DOCTYPE"))
             {
-                getDTD().parse(xmlSource);
+                m_dtd = std::make_unique<DTD>(*m_entityMapper);
+                m_validator = std::make_unique<XMLValidator>(*m_dtd);
+                m_dtd->parse(xmlSource);
                 xmlNodeProlog->children.emplace_back(std::make_unique<XMLNodeDTD>());
             }
             else if (xmlSource.current() == '<')

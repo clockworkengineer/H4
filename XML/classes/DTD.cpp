@@ -40,6 +40,22 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
+        /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+            long DTD::getLineCount()
+        {
+            long lineNumber=1;
+            for (auto ch : m_unparsed)
+            {
+                if (ch == kLineFeed)
+                {
+                    lineNumber++;
+                }
+            }
+            return(lineNumber);
+        }
     /// <summary>
     ///
     /// </summary>
@@ -112,15 +128,6 @@ namespace H4
     {
         parseDTD(dtdSource);
     }
-    /// <summary>
-    /// Validate XML against its DTD. Throwing an exception if there is a
-    /// issue and the XML is not well-formed.
-    /// </summary>
-    /// <param name="prolog">Prolog element containing root of XML to validate.</param>
-    // void DTD::validate(XMLNodeElement &prolog)
-    // {
-    //     validateDTD(prolog);
-    // }
     /// <summary>
     /// Create DTD text from an DTD object.
     /// </summary>

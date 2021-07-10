@@ -3,6 +3,8 @@
 //
 // C++ STL
 //
+#include <string>
+#include <vector>
 // =========
 // NAMESPACE
 // =========

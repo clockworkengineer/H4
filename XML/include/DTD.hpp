@@ -1,5 +1,5 @@
-#ifndef DTD_DPP
-#define DTD_DPP
+#ifndef DTD_HPP
+#define DTD_HPP
 //
 // C++ STL
 //
@@ -57,18 +57,18 @@ namespace H4
         std::string &getRootName();
         XMLExternalReference &getExternalReference();
         bool isElementPresent(const std::string &elementName);
-        long getElementCount() { return (m_elements.size());}
+        long getElementCount() { return (m_elements.size()); }
         DTDElement &getElement(const std::string &elementName);
         bool isEntityPresent(const std::string &entityName);
         XMLEntityMapping &getEntity(const std::string &entityName);
         XMLExternalReference &getNotation(const std::string &notationName);
+        long getLineCount();
         void parse(ISource &dtdSource);
         void stringify(IDestination &xmlDestination);
         void validate(XMLNodeElement &prolog);
         // ================
         // PUBLIC VARIABLES
         // ================
-        std::string m_unparsed;
     private:
         // ===========================
         // PRIVATE TYPES AND CONSTANTS
@@ -106,7 +106,6 @@ namespace H4
         void parseExternal(ISource &dtdSource);
         void parseInternal(ISource &dtdSource);
         void parseDTD(ISource &dtdSource);
-        void validateDTD(XMLNodeElement &prolog);
         // =================
         // PRIVATE VARIABLES
         // =================
@@ -116,6 +115,7 @@ namespace H4
         std::unordered_map<std::string, DTDElement> m_elements;
         std::unordered_map<std::string, XMLExternalReference> m_notations;
         IXMLEntityMapper &m_entityMapper;
+        std::string m_unparsed;
     };
 } // namespace H4
-#endif /* DTD_DPP */
+#endif /* DTD_HPP */
