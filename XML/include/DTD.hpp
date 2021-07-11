@@ -5,12 +5,7 @@
 //
 #include <string>
 //
-// Source/Destination interfaces
-//
-#include "ISource.hpp"
-#include "IDestination.hpp"
-//
-// DTD Core
+// XML Core
 //
 #include "XML_core.hpp"
 //
@@ -38,7 +33,7 @@ namespace H4
         //
         // DTD Type
         //
-        enum DTDType : uint16_t
+        enum DTDType : uint8_t
         {
             internal = (0x1 << 0),
             external = (0x1 << 1)

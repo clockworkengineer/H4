@@ -10,11 +10,6 @@
 #include <set>
 #include <vector>
 //
-// Source/Destination interfaces
-//
-#include "ISource.hpp"
-#include "IDestination.hpp"
-//
 // XML Core
 //
 #include "XML_core.hpp"

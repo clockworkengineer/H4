@@ -40,22 +40,22 @@ namespace H4
     // ==============
     // PUBLIC METHODS
     // ==============
-        /// <summary>
+    /// <summary>
     ///
     /// </summary>
     /// <param name=""></param>
-            long DTD::getLineCount()
+    long DTD::getLineCount()
+    {
+        long lineNumber = 1;
+        for (auto ch : m_unparsed)
         {
-            long lineNumber=1;
-            for (auto ch : m_unparsed)
+            if (ch == kLineFeed)
             {
-                if (ch == kLineFeed)
-                {
-                    lineNumber++;
-                }
+                lineNumber++;
             }
-            return(lineNumber);
         }
+        return (lineNumber);
+    }
     /// <summary>
     ///
     /// </summary>
