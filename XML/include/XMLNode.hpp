@@ -4,6 +4,9 @@
 // C++ STL
 //
 #include <vector>
+#include <string>
+#include <memory>
+#include <algorithm>
 // =========
 // NAMESPACE
 // =========

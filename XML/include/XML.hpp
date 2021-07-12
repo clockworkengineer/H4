@@ -15,13 +15,13 @@
 #include "XML_core.hpp"
 #include "XMLEntityMapper.hpp"
 //
-// XML DTD
-//
-#include "DTD.hpp"
-//
 // XML XNodes
 //
 #include "XMLNode.hpp"
+//
+// XML DTD
+//
+#include "DTD.hpp"
 // =========
 // NAMESPACE
 // =========

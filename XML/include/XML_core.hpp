@@ -3,6 +3,7 @@
 //
 // C++ STL
 //
+#include <stdexcept>
 #include <filesystem>
 #include <algorithm>
 //
@@ -171,4 +172,8 @@ namespace H4
     void trimmString(std::string &stringToTrimm);
     void toUpperString(std::string &stringToUpper);
 } // namespace H4
+//
+// XML XNodes
+//
+#include "XMLNode.hpp"
 #endif /* XML_CORE_HPP */

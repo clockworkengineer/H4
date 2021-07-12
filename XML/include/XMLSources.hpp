@@ -4,6 +4,8 @@
 // C++ STL
 //
 #include <fstream>
+#include <string>
+#include <stdexcept>
 namespace H4
 {
     //

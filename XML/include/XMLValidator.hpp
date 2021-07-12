@@ -4,7 +4,6 @@
 // C++ STL
 //
 #include <string>
-#include <unordered_map>
 #include <set>
 //
 // XML Core
@@ -18,7 +17,6 @@
 // XML DTD
 //
 #include "DTD.hpp"
-#include "DTDElement.hpp"
 // =========
 // NAMESPACE
 // =========

@@ -1,6 +1,13 @@
 #ifndef XMLENTITYMAPPER_HPP
 #define XMLENTITYMAPPER_HPP
 //
+// C++ STL
+//
+#include <string>
+#include <unordered_map>
+#include <filesystem>
+#include <set>
+//
 // XML Sources
 //
 #include "XMLSources.hpp"

@@ -1,5 +1,11 @@
 #ifndef XMLDESTINATIONS_HPP
 #define XMLDESTINATIONS_HPP
+//
+// C++ STL
+//
+#include <string>
+#include <stdexcept>
+#include <fstream>
 namespace H4
 {
     //
